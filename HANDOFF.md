@@ -7,6 +7,8 @@
 
 **Versão atual:** `0.4.0` · **Última atualização:** 2026-09-21
 **Stack:** HTML + CSS + JavaScript puro (ES Modules). Sem backend, sem build, sem dependências.
+**Repositório:** https://github.com/FellipePeres/pokemon-bullet-heaven (público)
+**Jogo no ar:** https://fellipeperes.github.io/pokemon-bullet-heaven/
 
 ---
 
@@ -44,6 +46,31 @@ descansado, escolhe melhorias e prefere TMs.
 
 ⚠️ **Nunca foi validado em navegador por mim.** A lógica e a montagem das telas
 estão cobertas por teste; aparência, layout e feel são validados pelo Fellipe.
+
+---
+
+## 2b. Publicação (GitHub Pages)
+
+O jogo está no ar em **https://fellipeperes.github.io/pokemon-bullet-heaven/**,
+servido pelo GitHub Pages direto da branch `main`, pasta raiz (`build_type: legacy`).
+
+**Para publicar uma atualização, basta `git push` na `main`** — o workflow
+*pages build and deployment* roda sozinho e leva ~1-2 minutos. Acompanhe com:
+
+```bash
+gh run list --limit 3                  # status do deploy
+gh api repos/FellipePeres/pokemon-bullet-heaven/pages --jq .status
+curl -sI https://fellipeperes.github.io/pokemon-bullet-heaven/ | head -1
+```
+
+⚠️ **O site é servido em um subcaminho** (`/pokemon-bullet-heaven/`), então
+**todos os caminhos do projeto precisam continuar relativos** (`css/style.css`,
+`src/main.js`, `assets/...`). Nada de barra inicial — isso quebraria o deploy
+sem quebrar o ambiente local.
+
+A identidade de commit configurada no repositório local é
+`Fellipe Peres <130771865+FellipePeres@users.noreply.github.com>` (e-mail noreply
+do GitHub, para não expor o e-mail pessoal no histórico público).
 
 ---
 
