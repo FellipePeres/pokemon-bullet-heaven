@@ -1,0 +1,14 @@
+{
+  "name": "pokemon-bullet-heaven",
+  "version": "0.1.0",
+  "description": "Bullet Heaven com jornada Pokemon - HTML/CSS/JS puro, sem backend.",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "npx --yes serve . -l 5173",
+    "smoke": "node tools/smoke-test.js",
+    "smoke:ui": "node tools/ui-smoke.js",
+    "test": "node tools/check-data.mjs && node tools/smoke-test.js && node tools/ui-smoke.js",
+    "check": "node tools/check-data.mjs"
+  }
+}

@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Pokémon Bullet Heaven</title>
+<link rel="preconnect" href="https://raw.githubusercontent.com" />
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<div id="app">
+
+  <!-- ============================================================
+       BARRA LATERAL — atalhos que abrem janelas sobre o menu
+       ============================================================ -->
+  <aside id="side-rail">
+    <button class="rail-btn" data-modal="modal-pokedex" title="Pokédex">
+      <span class="ui-icon rail-icon"><img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/town-map.png" alt="" /></span><span class="rail-label">Pokédex</span>
+    </button>
+    <button class="rail-btn" data-modal="modal-achievements" title="Conquistas">
+      <span class="ui-icon rail-icon"><img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/star-piece.png" alt="" /></span><span class="rail-label">Conquistas</span>
+    </button>
+    <button class="rail-btn" data-modal="modal-team" title="Equipe">
+      <span class="ui-icon rail-icon"><img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png" alt="" /></span><span class="rail-label">Equipe</span>
+    </button>
+    <button class="rail-btn" data-modal="modal-trainer" title="Treinador">
+      <span class="ui-icon rail-icon"><img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/coin-case.png" alt="" /></span><span class="rail-label">Treinador</span>
+    </button>
+    <button class="rail-btn" data-modal="modal-options" title="Opções">
+      <span class="ui-icon rail-icon"><img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/escape-rope.png" alt="" /></span><span class="rail-label">Opções</span>
+    </button>
+    <button class="rail-btn" data-modal="modal-help" title="Como jogar">
+      <span class="ui-icon rail-icon"><img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/oaks-parcel.png" alt="" /></span><span class="rail-label">Como jogar</span>
+    </button>
+  </aside>
+
+  <!-- ============================================================
+       MENU PRINCIPAL
+       ============================================================ -->
+  <section id="screen-title" class="screen title-screen">
+    <div class="poke-bg" aria-hidden="true">
+      <div class="poke-orb"></div>
+      <div class="poke-stripe"></div>
+    </div>
+
+    <div class="title-content">
+      <div class="logo-block">
+        <h1 class="logo-main">POKÉMON</h1>
+        <div class="logo-sub"><span>BULLET HEAVEN</span></div>
+        <p class="tagline">Monte sua equipe. Enfrente a horda. Conquiste Kanto.</p>
+      </div>
+
+      <div class="menu-column">
+        <button id="btn-continue" class="menu-btn primary" disabled>
+          <span class="btn-ball"></span><span class="btn-text">Continuar</span>
+        </button>
+        <button id="btn-new-game" class="menu-btn">
+          <span class="btn-ball"></span><span class="btn-text">Nova Jornada</span>
+        </button>
+        <button id="btn-load-game" class="menu-btn">
+          <span class="btn-ball"></span><span class="btn-text">Carregar Jogo (.json)</span>
+        </button>
+      </div>
+
+      <div id="title-progress" class="progress-strip"></div>
+    </div>
+
+    <p class="version-tag" id="version-tag"></p>
+  </section>
+
+  <!-- ============================================================
+       ESCOLHA DO INICIAL
+       ============================================================ -->
+  <section id="screen-starter" class="screen hidden">
+    <header class="screen-head">
+      <h2 class="screen-title">ESCOLHA SEU POKÉMON INICIAL</h2>
+      <p class="subtitle">Ele será o primeiro membro da sua equipe. Cada um joga de um jeito diferente.</p>
+    </header>
+    <div id="starter-choices" class="starter-grid"></div>
+    <button class="menu-btn ghost back" data-back="screen-title">Voltar</button>
+  </section>
+
+  <!-- ============================================================
+       MAPA DA JORNADA
+       ============================================================ -->
+  <section id="screen-campaign" class="screen hidden">
+    <header class="screen-head">
+      <h2 class="screen-title">JORNADA — KANTO</h2>
+      <p class="subtitle" id="campaign-subtitle"></p>
+    </header>
+
+    <div id="campaign-team" class="journey-team"></div>
+    <div id="campaign-list" class="stage-list"></div>
+
+    <div class="row-buttons">
+      <button id="btn-save-campaign" class="menu-btn ghost">Salvar Jogo (.json)</button>
+      <button class="menu-btn ghost back" data-back="screen-title">Menu Principal</button>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       JOGO
+       ============================================================ -->
+  <div id="stage-wrapper" class="hidden">
+    <canvas id="game-canvas" width="1280" height="720"></canvas>
+
+    <div id="hud">
+      <div class="hud-top">
+        <div class="hud-chip stage-chip">
+          <span id="stage-name">Fase 1</span>
+          <span id="segment-name">Rota 1</span>
+          <span id="objective">SOBREVIVA</span>
+        </div>
+
+        <div class="hud-chip timer-chip">
+          <span id="timer">03:00</span>
+        </div>
+
+        <div class="hud-chip stats-chip">
+          <span id="kill-count">0</span>
+          <span id="ball-count">0</span>
+          <button id="btn-pause" class="icon-btn" title="Pausar (ESC)">❚❚</button>
+        </div>
+      </div>
+
+      <!-- equipe: 3 ativos com vida/XP próprios + reserva -->
+      <div id="team-hud">
+        <div id="active-slots" class="active-row"></div>
+        <div class="bench-block">
+          <div id="reserve-slots" class="bench-row"></div>
+          <div class="swap-chip">
+            <span class="swap-label">TROCA</span>
+            <div class="bar swap"><i id="swap-fill"></i></div>
+            <span id="swap-text">Pronta</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== MELHORIA DE NÍVEL ===== -->
+    <div id="levelup-overlay" class="overlay hidden">
+      <div class="overlay-card">
+        <div class="overlay-head levelup-head">
+          <img id="levelup-sprite" class="overlay-sprite" alt="" />
+          <div>
+            <h2 class="glow">SUBIU DE NÍVEL!</h2>
+            <p class="subtitle" id="levelup-subtitle"></p>
+          </div>
+        </div>
+        <div id="upgrade-choices" class="card-row"></div>
+      </div>
+    </div>
+
+    <!-- ===== CAPTURA ===== -->
+    <div id="capture-overlay" class="overlay hidden">
+      <div class="overlay-card">
+        <div class="overlay-head">
+          <span class="ui-icon big"><img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png" alt="" /></span>
+          <div>
+            <h2 class="glow">POKÉ BALL ENCONTRADA!</h2>
+            <p class="subtitle" id="capture-subtitle">Escolha um Pokémon para a sua equipe</p>
+          </div>
+        </div>
+        <div id="capture-choices" class="card-row"></div>
+        <button id="capture-skip" class="menu-btn ghost slim">Ignorar</button>
+      </div>
+    </div>
+
+    <!-- ===== EVOLUÇÃO ===== -->
+    <div id="evolution-overlay" class="overlay hidden">
+      <div class="overlay-card narrow evolution-card">
+        <h2 class="glow">EVOLUÇÃO!</h2>
+        <div class="evo-stage">
+          <img id="evo-from" class="evo-sprite" alt="" />
+          <span class="evo-arrow">➜</span>
+          <img id="evo-to" class="evo-sprite evo-new" alt="" />
+        </div>
+        <p class="subtitle" id="evolution-text"></p>
+        <button id="evolution-continue" class="menu-btn primary"><span class="btn-text">Continuar</span></button>
+      </div>
+    </div>
+
+    <!-- ===== PAUSA ===== -->
+    <div id="pause-overlay" class="overlay hidden">
+      <div class="overlay-card narrow">
+        <h2>PAUSADO</h2>
+        <div id="pause-team-summary" class="team-summary"></div>
+        <div class="menu-column">
+          <button id="btn-resume" class="menu-btn primary"><span class="btn-text">Continuar</span></button>
+          <button id="btn-save-run" class="menu-btn"><span class="btn-text">Salvar Jogo (.json)</span></button>
+          <button id="btn-quit" class="menu-btn danger"><span class="btn-text">Abandonar Fase</span></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== RESULTADO ===== -->
+    <div id="result-overlay" class="overlay hidden">
+      <div class="overlay-card narrow">
+        <h2 id="result-title">VITÓRIA!</h2>
+        <p class="subtitle" id="result-subtitle"></p>
+        <div id="result-team" class="team-summary"></div>
+        <div id="result-stats" class="stat-list"></div>
+        <div class="menu-column">
+          <button id="btn-result-save" class="menu-btn"><span class="btn-text">Salvar Jogo (.json)</span></button>
+          <button id="btn-result-menu" class="menu-btn primary"><span class="btn-text">Continuar Jornada</span></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       JANELAS (abrem por cima de qualquer tela)
+       ============================================================ -->
+  <div id="modal-pokedex" class="modal hidden">
+    <div class="modal-card wide">
+      <header class="modal-head">
+        <h3>📕 POKÉDEX DE KANTO</h3>
+        <span id="pokedex-progress" class="modal-sub"></span>
+        <button class="icon-btn close" data-close>✕</button>
+      </header>
+      <div class="modal-body">
+        <div id="pokedex-grid" class="dex-grid"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="modal-achievements" class="modal hidden">
+    <div class="modal-card">
+      <header class="modal-head">
+        <h3>🏆 CONQUISTAS</h3>
+        <span class="modal-sub" id="achievements-sub"></span>
+        <button class="icon-btn close" data-close>✕</button>
+      </header>
+      <div class="modal-body">
+        <div id="achievements-list" class="node-list"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="modal-team" class="modal hidden">
+    <div class="modal-card">
+      <header class="modal-head">
+        <h3>🎒 EQUIPE DA JORNADA</h3>
+        <span class="modal-sub">Equipe e build levadas para a próxima fase.</span>
+        <button class="icon-btn close" data-close>✕</button>
+      </header>
+      <div class="modal-body">
+        <div id="team-detail" class="node-list"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="modal-trainer" class="modal hidden">
+    <div class="modal-card">
+      <header class="modal-head">
+        <h3>🪙 MELHORIAS DO TREINADOR</h3>
+        <span class="modal-sub" id="trainer-coins">0 Shards</span>
+        <button class="icon-btn close" data-close>✕</button>
+      </header>
+      <div class="modal-body">
+        <p class="subtitle small" style="margin-bottom:14px">
+          Shards vêm de concluir fases e de coletar conquistas. Estas melhorias são
+          permanentes e valem em todas as partidas — dentro da fase, o level up
+          melhora só o Pokémon.
+        </p>
+        <div id="trainer-list" class="node-list"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="modal-options" class="modal hidden">
+    <div class="modal-card">
+      <header class="modal-head">
+        <h3>⚙️ OPÇÕES</h3>
+        <span class="modal-sub">Valores provisórios, fáceis de ajustar.</span>
+        <button class="icon-btn close" data-close>✕</button>
+      </header>
+      <div class="modal-body">
+        <div id="options-list" class="node-list"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="modal-help" class="modal hidden">
+    <div class="modal-card">
+      <header class="modal-head">
+        <h3>❔ COMO JOGAR</h3>
+        <button class="icon-btn close" data-close>✕</button>
+      </header>
+      <div class="modal-body">
+        <div class="help-grid">
+          <div class="help-item"><b>WASD / Setas</b><span>Mover o treinador</span></div>
+          <div class="help-item"><b>1 – 6</b><span>Trocar o Pokémon em campo</span></div>
+          <div class="help-item"><b>Tab</b><span>Escolher qual slot ativo recebe a troca</span></div>
+          <div class="help-item"><b>ESC</b><span>Pausar</span></div>
+          <div class="help-item"><b>▲ no card</b><span>Gastar os níveis acumulados de um Pokémon</span></div>
+        </div>
+        <p class="subtitle small">
+          Os Pokémon atacam sozinhos. Você controla a posição, a composição da equipe e a build.
+          O treinador não tem vida: quem toma dano são os Pokémon. Se os 6 desmaiarem, a fase é perdida.
+        </p>
+        <p class="subtitle small">
+          O XP de cada inimigo é dividido pela equipe: 25% para cada Pokémon em campo e
+          8,33% para cada um da reserva.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <input type="file" id="save-file-input" accept="application/json,.json" hidden />
+  <div id="toast-container"></div>
+</div>
+
+<script type="module" src="src/main.js"></script>
+</body>
+</html>
