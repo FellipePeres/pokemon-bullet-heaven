@@ -223,6 +223,17 @@ if (benched) {
   check('gastando o último nível, a partida volta', game.run.state === 'running' && benched.pendingLevels === 0);
 }
 
+// ---- apresentação do líder ----
+game.run.pendingIntro = game.run.stage.leader;
+game.run._checkState();
+game._handleRunState();
+check('o líder chega com a apresentação (retrato e fala)',
+      game.run.state === 'intro' && !registry.get('leader-overlay').classes.has('hidden') &&
+      registry.get('leader-quote').textContent === game.run.stage.leader.quote);
+game.closeLeaderIntro();
+check('"Lutar!" fecha a apresentação e a partida volta',
+      game.run.state === 'running' && registry.get('leader-overlay').classes.has('hidden'));
+
 // ---- fim de partida ----
 for (const member of game.run.team.members) member.fainted = true;
 game.run.state = 'defeat';
@@ -274,6 +285,22 @@ game.quitToMenu();
 game.menus.buildCampaign();
 check('Fase 2 desbloqueia após a Fase 1',
       registry.get('campaign-list').children.length >= 3);
+
+// ---- Campeão e Hall da Fama ----
+game.region.campaign.slice(0, -1).forEach((e) => {
+  if (!game.campaign.clearedStages.includes(e.stage)) game.campaign.clearedStages.push(e.stage);
+});
+game.startStage('champion');
+game.run.state = 'victory';
+game._handleRunState();
+check('vencer o Campeão abre o Hall da Fama com a equipe',
+      !registry.get('hall-overlay').classes.has('hidden') && game.profile.hallOfFame.length === 1 &&
+      registry.get('hall-team').children.length === game.profile.hallOfFame[0].team.length,
+      `${registry.get('hall-team').children.length} Pokémon`);
+registry.get('hall-close').click();
+check('fechar o Hall da Fama volta para a jornada',
+      registry.get('hall-overlay').classes.has('hidden') && !registry.get('screen-campaign').classes.has('hidden'));
+check('o mapa mostra o botão do Hall da Fama', !registry.get('btn-hall').classes.has('hidden'));
 
 const save = game.buildSaveData();
 check('save é montado a partir do estado atual',

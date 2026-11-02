@@ -83,7 +83,9 @@ export class ProgressionSystem {
     const data = getPokemon(member.pokemonId);
     const evo = data?.evolution;
     if (!evo || member.level < evo.level) return null;
-    const next = getPokemon(evo.to);
+    // Eevee: sem pedras como item, a evolução é sorteada entre as opções
+    const options = [evo.to, ...(evo.alternatives ?? [])];
+    const next = getPokemon(options[Math.floor(Math.random() * options.length)]);
     if (!next) return null;
 
     const beforeMax = maxHpFor(member, this.run.playerStats.pokemonHpBonus);
@@ -91,6 +93,17 @@ export class ProgressionSystem {
 
     const from = data;
     member.pokemonId = next.id;
+
+    // golpe que não existe na linha da espécie nova (Eevee → Vaporeon) vira o
+    // da mesma posição nela, com as melhorias transferidas
+    const current = member.abilities[0];
+    if (next.moveLine?.length && !next.moveLine.includes(current)) {
+      const tier = Math.max(0, from.moveLine?.indexOf(current) ?? 0);
+      const replacement = next.moveLine[Math.min(tier, next.moveLine.length - 1)];
+      member.upgrades = transferUpgrades(member.upgrades, current, replacement);
+      member.abilities[0] = replacement;
+      this.run.rebuildCompanionAbilities();
+    }
     // mantém a proporção de vida: evoluir não cura, mas também não penaliza
     member.hp = Math.round(maxHpFor(member, this.run.playerStats.pokemonHpBonus) * ratio);
 

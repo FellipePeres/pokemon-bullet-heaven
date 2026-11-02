@@ -20,8 +20,9 @@ export function levelDamageMultiplier(level) {
 
 /** XP necessário para o Pokémon sair do nível informado. */
 export function xpToNextLevel(level) {
-  const { baseXp, xpGrowth } = CONFIG.progression;
-  return Math.floor(baseXp * Math.pow(xpGrowth, level - 1));
+  const { baseXp, xpGrowth, xpKnee, xpLateExponent } = CONFIG.progression;
+  if (level <= xpKnee) return Math.floor(baseXp * Math.pow(xpGrowth, level - 1));
+  return Math.floor(baseXp * Math.pow(xpGrowth, xpKnee - 1) * Math.pow(level / xpKnee, xpLateExponent));
 }
 
 /** Fração 0..1 da barra de vida. */

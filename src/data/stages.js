@@ -132,25 +132,643 @@ export const STAGES = {
     maxBalls: 5,
     scriptedBalls: [30, 120, 220],
     reward: { shards: 200 }
+  },
+
+  /* ============================================================
+     FASE 3 — RUMO A VERMILION
+     ============================================================ */
+  gym_3_vermilion: {
+    id: 'gym_3_vermilion',
+    name: 'Fase 3 — Rumo a Vermilion',
+    region: 'Kanto',
+    type: 'gym',
+    icon: 'tm-electric',
+    description: 'Rotas 5 e 6, a Caverna do Diglett e a Rota 11 — até o Ginásio do Lt. Surge.',
+    duration: 345,
+    world: { width: 3000, height: 2000, theme: 'grass' },
+    scaling: { hp: 3.0, speed: 0.3, damage: 0.75 },
+    unlockedBy: 'gym_2_cerulean',
+
+    segments: [
+      { from: 0, name: 'Rota 5', theme: 'grass' },
+      { from: 85, name: 'Rota 6', theme: 'grass' },
+      { from: 165, name: 'Caverna do Diglett', theme: 'cave' },
+      { from: 265, name: 'Ginásio de Vermilion', theme: 'gym' }
+    ],
+
+    // nível dos selvagens: acompanha a equipe, chegando perto do ace do líder
+    // (os líderes têm os níveis do FireRed; ver CONFIG.enemies)
+    waves: [
+      { from: 0, to: 95, interval: 1.08, batch: 3, maxAlive: 50, level: [17, 20], enemies: [{ id: 'meowth', weight: 5 }, { id: 'pidgey', weight: 4 }, { id: 'oddish', weight: 4 }, { id: 'mankey', weight: 2 }] },
+      { from: 80, to: 175, interval: 0.9, batch: 4, maxAlive: 80, level: [19, 22], enemies: [{ id: 'meowth', weight: 3 }, { id: 'psyduck', weight: 4 }, { id: 'oddish', weight: 3 }, { id: 'pidgey', weight: 3 }, { id: 'mankey', weight: 3 }] },
+      { from: 160, to: 270, interval: 0.81, batch: 5, maxAlive: 115, level: [21, 24], enemies: [{ id: 'diglett', weight: 6 }, { id: 'ekans', weight: 3 }, { id: 'spearow', weight: 3 }, { id: 'drowzee', weight: 3 }] },
+      { from: 255, to: 338, interval: 0.72, batch: 6, maxAlive: 130, level: [23, 26], enemies: [{ id: 'voltorb', weight: 5 }, { id: 'magnemite', weight: 5 }, { id: 'pikachu', weight: 3 }, { id: 'diglett', weight: 2 }] }
+    ],
+
+    elites: [
+      { at: 100, id: 'primeape', count: 1, level: 25 },
+      { at: 180, id: 'dugtrio_elite', count: 2, level: 25 },
+      { at: 240, id: 'raticate', count: 2, level: 25 },
+      { at: 300, id: 'electrode_elite', count: 2, level: 25 }
+    ],
+
+    leader: {
+      name: 'LT. SURGE',
+      title: 'Líder do Ginásio de Vermilion',
+      badge: 'Insígnia Trovão',
+      badgeIndex: 3,
+      type: 'electric',
+      dex: 26,
+      portrait: 'portrait/lt_surge',
+      quote: 'Ei, garoto! Eletricidade de verdade não perdoa amador!'
+    },
+    bossTeam: ['lt_surge_voltorb', 'lt_surge_pikachu', 'lt_surge_raichu'],
+    // presentes (como as trocas e o Dojo do FireRed): oferecidos uma vez, na hora marcada
+    gifts: [
+      { at: 150, choices: ['farfetchd'], title: 'A troca de Vermilion: um Farfetch\'d quer entrar para a sua equipe!' }
+    ],
+
+    capturePool: 'phase3',
+    ballChance: 1,
+    maxBalls: 6,
+    scriptedBalls: [30, 125, 230],
+    reward: { shards: 260 }
+  },
+
+  /* ============================================================
+     FASE 4 — RUMO A CELADON
+     ============================================================ */
+  gym_4_celadon: {
+    id: 'gym_4_celadon',
+    name: 'Fase 4 — Rumo a Celadon',
+    region: 'Kanto',
+    type: 'gym',
+    icon: 'tm-grass',
+    description: 'Rota 9, o Túnel de Pedra e a Rota 8 — até o Ginásio da Erika.',
+    duration: 360,
+    world: { width: 3000, height: 2000, theme: 'grass' },
+    scaling: { hp: 3.5, speed: 0.3, damage: 0.9 },
+    unlockedBy: 'gym_3_vermilion',
+
+    segments: [
+      { from: 0, name: 'Rota 9', theme: 'grass' },
+      { from: 90, name: 'Túnel de Pedra', theme: 'cave' },
+      { from: 190, name: 'Rota 8', theme: 'grass' },
+      { from: 280, name: 'Ginásio de Celadon', theme: 'gym' }
+    ],
+
+    // nível dos selvagens: acompanha a equipe, chegando perto do ace do líder
+    // (os líderes têm os níveis do FireRed; ver CONFIG.enemies)
+    waves: [
+      { from: 0, to: 100, interval: 0.99, batch: 4, maxAlive: 70, level: [23, 26], enemies: [{ id: 'spearow', weight: 3 }, { id: 'rattata', weight: 3 }, { id: 'ekans', weight: 3 }, { id: 'voltorb', weight: 2 }, { id: 'sandshrew', weight: 2 }] },
+      { from: 85, to: 200, interval: 0.9, batch: 4, maxAlive: 95, level: [25, 28], enemies: [{ id: 'zubat', weight: 4 }, { id: 'geodude_wild', weight: 4 }, { id: 'machop', weight: 3 }, { id: 'mankey', weight: 2 }] },
+      { from: 185, to: 290, interval: 0.77, batch: 5, maxAlive: 125, level: [27, 30], enemies: [{ id: 'growlithe', weight: 3 }, { id: 'meowth', weight: 3 }, { id: 'oddish', weight: 3 }, { id: 'pidgey', weight: 2 }, { id: 'drowzee', weight: 2 }] },
+      { from: 275, to: 352, interval: 0.72, batch: 6, maxAlive: 145, level: [29, 32], enemies: [{ id: 'gloom', weight: 3 }, { id: 'weepinbell', weight: 3 }, { id: 'tangela', weight: 2 }, { id: 'exeggcute', weight: 2 }, { id: 'paras', weight: 2 }, { id: 'bellsprout', weight: 2 }] }
+    ],
+
+    elites: [
+      { at: 110, id: 'graveler', count: 1, level: 31 },
+      { at: 175, id: 'onix_elite', count: 1, level: 31 },
+      { at: 240, id: 'persian_elite', count: 2, level: 31 },
+      { at: 315, id: 'ninetales_elite', count: 2, level: 31 }
+    ],
+
+    leader: {
+      name: 'ERIKA',
+      title: 'Líder do Ginásio de Celadon',
+      badge: 'Insígnia Arco-Íris',
+      badgeIndex: 4,
+      type: 'grass',
+      dex: 45,
+      portrait: 'portrait/erika',
+      quote: 'Ah... que dia lindo. Minhas flores não vão pegar leve, viu?'
+    },
+    bossTeam: ['erika_victreebel', 'erika_tangela', 'erika_vileplume'],
+
+    capturePool: 'phase4',
+    ballChance: 1,
+    maxBalls: 6,
+    scriptedBalls: [30, 130, 240],
+    reward: { shards: 320 }
+  },
+
+  /* ============================================================
+     FASE 5 — RUMO A FUCHSIA
+     ============================================================ */
+  gym_5_fuchsia: {
+    id: 'gym_5_fuchsia',
+    name: 'Fase 5 — Rumo a Fuchsia',
+    region: 'Kanto',
+    type: 'gym',
+    icon: 'tm-poison',
+    description: 'A Torre Pokémon, as Rotas 12 a 15 e a Zona Safári — até o Ginásio do Koga.',
+    duration: 375,
+    world: { width: 3200, height: 2100, theme: 'cave' },
+    scaling: { hp: 4.0, speed: 0.3, damage: 0.9 },
+    unlockedBy: 'gym_4_celadon',
+
+    segments: [
+      { from: 0, name: 'Torre Pokémon', theme: 'cave' },
+      { from: 95, name: 'Rotas 12–15', theme: 'grass' },
+      { from: 195, name: 'Zona Safári', theme: 'forest' },
+      { from: 295, name: 'Ginásio de Fuchsia', theme: 'gym' }
+    ],
+
+    // nível dos selvagens: acompanha a equipe, chegando perto do ace do líder
+    // (os líderes têm os níveis do FireRed; ver CONFIG.enemies)
+    waves: [
+      { from: 0, to: 105, interval: 0.9, batch: 4, maxAlive: 85, level: [28, 31], enemies: [{ id: 'gastly', weight: 6 }, { id: 'haunter', weight: 2 }, { id: 'cubone', weight: 3 }, { id: 'zubat', weight: 2 }] },
+      { from: 90, to: 205, interval: 0.81, batch: 5, maxAlive: 115, level: [30, 33], enemies: [{ id: 'venonat', weight: 4 }, { id: 'gloom', weight: 3 }, { id: 'pidgeotto', weight: 3 }, { id: 'bellsprout', weight: 2 }, { id: 'ditto', weight: 1 }] },
+      { from: 190, to: 300, interval: 0.77, batch: 5, maxAlive: 140, level: [32, 35], enemies: [{ id: 'rhyhorn', weight: 3 }, { id: 'exeggcute', weight: 3 }, { id: 'nidorino', weight: 2 }, { id: 'nidorina', weight: 2 }, { id: 'venonat', weight: 2 }, { id: 'doduo', weight: 2 }, { id: 'paras', weight: 2 }] },
+      { from: 285, to: 367, interval: 0.68, batch: 6, maxAlive: 160, level: [34, 37], enemies: [{ id: 'koffing', weight: 5 }, { id: 'grimer', weight: 4 }, { id: 'venonat', weight: 3 }, { id: 'arbok', weight: 3 }] }
+    ],
+
+    elites: [
+      { at: 120, id: 'marowak_elite', count: 1, level: 36 },
+      { at: 210, id: 'kangaskhan_elite', count: 1, level: 36 },
+      { at: 250, id: 'tauros_elite', count: 2, level: 36 },
+      { at: 300, id: 'scyther_elite', count: 2, level: 36 },
+      { at: 340, id: 'weezing_elite', count: 2, level: 36 }
+    ],
+
+    leader: {
+      name: 'KOGA',
+      title: 'Líder do Ginásio de Fuchsia',
+      badge: 'Insígnia Alma',
+      badgeIndex: 5,
+      type: 'poison',
+      dex: 110,
+      portrait: 'portrait/koga',
+      quote: 'Fwahahaha! Veneno e sombras: a arte ninja!'
+    },
+    bossTeam: ['koga_koffing', 'koga_muk', 'koga_koffing', 'koga_weezing'],
+
+    capturePool: 'phase5',
+    ballChance: 1,
+    maxBalls: 6,
+    scriptedBalls: [30, 135, 245],
+    reward: { shards: 380 }
+  },
+
+  /* ============================================================
+     FASE 6 — RUMO A SAFFRON
+     ============================================================ */
+  gym_6_saffron: {
+    id: 'gym_6_saffron',
+    name: 'Fase 6 — Rumo a Saffron',
+    region: 'Kanto',
+    type: 'gym',
+    icon: 'tm-psychic',
+    description: 'A Usina, a Ciclovia e a Silph Co. — até o Ginásio da Sabrina.',
+    duration: 390,
+    world: { width: 3200, height: 2100, theme: 'cave' },
+    scaling: { hp: 7.0, speed: 0.3, damage: 1.4 },
+    unlockedBy: 'gym_5_fuchsia',
+
+    segments: [
+      { from: 0, name: 'Usina', theme: 'cave' },
+      { from: 100, name: 'Rotas 16–18', theme: 'grass' },
+      { from: 200, name: 'Silph Co.', theme: 'gym' },
+      { from: 300, name: 'Ginásio de Saffron', theme: 'gym' }
+    ],
+
+    // nível dos selvagens: acompanha a equipe, chegando perto do ace do líder
+    // (os líderes têm os níveis do FireRed; ver CONFIG.enemies)
+    waves: [
+      { from: 0, to: 110, interval: 0.9, batch: 4, maxAlive: 95, level: [33, 36], enemies: [{ id: 'voltorb', weight: 4 }, { id: 'magnemite', weight: 4 }, { id: 'pikachu', weight: 2 }, { id: 'magneton', weight: 1 }] },
+      { from: 95, to: 210, interval: 0.81, batch: 5, maxAlive: 125, level: [35, 38], enemies: [{ id: 'doduo', weight: 4 }, { id: 'fearow', weight: 3 }, { id: 'rattata', weight: 3 }, { id: 'grimer', weight: 2 }] },
+      { from: 195, to: 310, interval: 0.72, batch: 5, maxAlive: 150, level: [37, 40], enemies: [{ id: 'koffing', weight: 3 }, { id: 'arbok', weight: 3 }, { id: 'grimer', weight: 2 }, { id: 'drowzee', weight: 3 }, { id: 'machop', weight: 2 }, { id: 'machoke', weight: 1 }, { id: 'zubat', weight: 2 }] },
+      { from: 295, to: 382, interval: 0.68, batch: 6, maxAlive: 170, level: [39, 42], enemies: [{ id: 'drowzee', weight: 3 }, { id: 'kadabra', weight: 2 }, { id: 'slowpoke', weight: 3 }, { id: 'jynx', weight: 1 }] }
+    ],
+
+    elites: [
+      { at: 120, id: 'electabuzz_elite', count: 1, level: 41 },
+      { at: 190, id: 'dodrio_elite', count: 2, level: 41 },
+      { at: 260, id: 'muk_elite', count: 2, level: 41 },
+      { at: 330, id: 'hypno_elite', count: 2, level: 41 }
+    ],
+
+    leader: {
+      name: 'SABRINA',
+      title: 'Líder do Ginásio de Saffron',
+      badge: 'Insígnia Pântano',
+      badgeIndex: 6,
+      type: 'psychic',
+      dex: 65,
+      portrait: 'portrait/sabrina',
+      quote: 'Eu já sabia que você viria. E também sei como isso termina.'
+    },
+    bossTeam: ['sabrina_kadabra', 'sabrina_mr_mime', 'sabrina_venomoth', 'sabrina_alakazam'],
+    // presentes (como as trocas e o Dojo do FireRed): oferecidos uma vez, na hora marcada
+    gifts: [
+      { at: 150, choices: ['lickitung'], title: 'Uma troca na Rota 18: Lickitung quer entrar para a sua equipe!' },
+      { at: 240, choices: ['hitmonlee', 'hitmonchan'], title: 'O Dojo de Saffron: escolha o seu prêmio!' }
+    ],
+
+    capturePool: 'phase6',
+    ballChance: 1,
+    maxBalls: 6,
+    scriptedBalls: [30, 140, 250],
+    reward: { shards: 440 }
+  },
+
+  /* ============================================================
+     FASE 7 — RUMO A CINNABAR
+     ============================================================ */
+  gym_7_cinnabar: {
+    id: 'gym_7_cinnabar',
+    name: 'Fase 7 — Rumo a Cinnabar',
+    region: 'Kanto',
+    type: 'gym',
+    icon: 'tm-fire',
+    description: 'As Rotas 19 e 20, as Ilhas Seafoam e a Mansão Pokémon — até o Ginásio do Blaine.',
+    duration: 405,
+    world: { width: 3300, height: 2200, theme: 'grass' },
+    scaling: { hp: 4.5, speed: 0.3, damage: 1.1 },
+    unlockedBy: 'gym_6_saffron',
+
+    segments: [
+      { from: 0, name: 'Rotas 19 e 20', theme: 'grass' },
+      { from: 105, name: 'Ilhas Seafoam', theme: 'cave' },
+      { from: 205, name: 'Mansão Pokémon', theme: 'gym' },
+      { from: 305, name: 'Ginásio de Cinnabar', theme: 'gym' }
+    ],
+
+    // nível dos selvagens: acompanha a equipe, chegando perto do ace do líder
+    // (os líderes têm os níveis do FireRed; ver CONFIG.enemies)
+    waves: [
+      { from: 0, to: 115, interval: 0.85, batch: 5, maxAlive: 110, level: [38, 41], enemies: [{ id: 'tentacool', weight: 6 }, { id: 'horsea', weight: 3 }, { id: 'shellder', weight: 3 }, { id: 'staryu', weight: 2 }, { id: 'krabby', weight: 2 }] },
+      { from: 100, to: 215, interval: 0.77, batch: 5, maxAlive: 140, level: [40, 43], enemies: [{ id: 'seel', weight: 4 }, { id: 'golduck', weight: 2 }, { id: 'psyduck', weight: 2 }, { id: 'zubat', weight: 3 }, { id: 'slowpoke', weight: 3 }, { id: 'krabby', weight: 2 }] },
+      { from: 200, to: 315, interval: 0.72, batch: 6, maxAlive: 165, level: [42, 45], enemies: [{ id: 'growlithe', weight: 3 }, { id: 'ponyta', weight: 3 }, { id: 'grimer', weight: 3 }, { id: 'koffing', weight: 3 }, { id: 'rattata', weight: 2 }, { id: 'vulpix', weight: 2 }, { id: 'ditto', weight: 1 }] },
+      { from: 300, to: 397, interval: 0.68, batch: 6, maxAlive: 185, level: [44, 47], enemies: [{ id: 'ponyta', weight: 3 }, { id: 'growlithe', weight: 3 }, { id: 'vulpix', weight: 3 }] }
+    ],
+
+    elites: [
+      { at: 110, id: 'tentacruel_elite', count: 1, level: 46 },
+      { at: 180, id: 'dewgong_elite', count: 2, level: 46 },
+      { at: 230, id: 'cloyster_elite', count: 1, level: 46 },
+      { at: 280, id: 'weezing_elite', count: 2, level: 46 },
+      { at: 330, id: 'magmar_elite', count: 2, level: 46 },
+      { at: 370, id: 'rapidash_elite', count: 2, level: 46 }
+    ],
+
+    leader: {
+      name: 'BLAINE',
+      title: 'Líder do Ginásio de Cinnabar',
+      badge: 'Insígnia Vulcão',
+      badgeIndex: 7,
+      type: 'fire',
+      dex: 59,
+      portrait: 'portrait/blaine',
+      quote: 'Hah! Espero que você tenha trazido Anti-Queimadura!'
+    },
+    bossTeam: ['blaine_growlithe', 'blaine_ponyta', 'blaine_rapidash', 'blaine_arcanine'],
+
+    capturePool: 'phase7',
+    ballChance: 1,
+    maxBalls: 6,
+    scriptedBalls: [30, 145, 260],
+    reward: { shards: 500 }
+  },
+
+  /* ============================================================
+     FASE 8 — RUMO A VIRIDIAN
+     ============================================================ */
+  gym_8_viridian: {
+    id: 'gym_8_viridian',
+    name: 'Fase 8 — Rumo a Viridian',
+    region: 'Kanto',
+    type: 'gym',
+    icon: 'tm-ground',
+    description: 'A Rota 21, o Esconderijo Rocket e a Rota 22 — até o Ginásio do Giovanni.',
+    duration: 420,
+    world: { width: 3400, height: 2200, theme: 'grass' },
+    scaling: { hp: 3.2, speed: 0.3, damage: 0.85 },
+    unlockedBy: 'gym_7_cinnabar',
+
+    segments: [
+      { from: 0, name: 'Rota 21', theme: 'grass' },
+      { from: 110, name: 'Esconderijo Rocket', theme: 'gym' },
+      { from: 215, name: 'Rota 22', theme: 'grass' },
+      { from: 315, name: 'Ginásio de Viridian', theme: 'gym' }
+    ],
+
+    // nível dos selvagens: acompanha a equipe, chegando perto do ace do líder
+    // (os líderes têm os níveis do FireRed; ver CONFIG.enemies)
+    waves: [
+      { from: 0, to: 120, interval: 0.85, batch: 5, maxAlive: 120, level: [43, 46], enemies: [{ id: 'tangela', weight: 3 }, { id: 'tentacool', weight: 3 }, { id: 'pidgeotto', weight: 3 }, { id: 'rattata', weight: 2 }] },
+      { from: 105, to: 225, interval: 0.77, batch: 5, maxAlive: 150, level: [45, 48], enemies: [{ id: 'arbok', weight: 3 }, { id: 'koffing', weight: 2 }, { id: 'grimer', weight: 2 }, { id: 'zubat', weight: 2 }, { id: 'machoke', weight: 2 }, { id: 'drowzee', weight: 2 }, { id: 'rattata', weight: 2 }] },
+      { from: 210, to: 325, interval: 0.72, batch: 6, maxAlive: 175, level: [47, 50], enemies: [{ id: 'mankey', weight: 3 }, { id: 'nidorino', weight: 3 }, { id: 'nidorina', weight: 3 }, { id: 'fearow', weight: 2 }, { id: 'ponyta', weight: 2 }] },
+      { from: 310, to: 412, interval: 0.63, batch: 6, maxAlive: 200, level: [49, 52], enemies: [{ id: 'rhyhorn', weight: 3 }, { id: 'diglett', weight: 3 }, { id: 'sandslash', weight: 2 }, { id: 'cubone', weight: 2 }, { id: 'nidorino', weight: 2 }] }
+    ],
+
+    elites: [
+      { at: 130, id: 'rhydon_elite', count: 1, level: 51 },
+      { at: 200, id: 'nidoking_elite', count: 1, level: 51 },
+      { at: 260, id: 'nidoqueen_elite', count: 1, level: 51 },
+      { at: 330, id: 'dugtrio_elite', count: 2, level: 51 },
+      { at: 380, id: 'marowak_elite', count: 2, level: 51 }
+    ],
+
+    leader: {
+      name: 'GIOVANNI',
+      title: 'Líder do Ginásio de Viridian',
+      badge: 'Insígnia Terra',
+      badgeIndex: 8,
+      type: 'ground',
+      dex: 111,
+      portrait: 'portrait/giovanni',
+      quote: 'Fwahaha! Faz tempo que ninguém me desafia de verdade.'
+    },
+    bossTeam: ['giovanni_rhyhorn', 'giovanni_dugtrio', 'giovanni_nidoqueen', 'giovanni_nidoking', 'giovanni_rhyhorn_ace'],
+
+    capturePool: 'phase8',
+    ballChance: 1,
+    maxBalls: 6,
+    scriptedBalls: [30, 150, 270],
+    reward: { shards: 560 }
+  },
+
+  /* ============================================================
+     ELITE FOUR — LORELEI
+     ============================================================ */
+  e4_lorelei: {
+    id: 'e4_lorelei',
+    name: 'Elite Four — Lorelei',
+    region: 'Kanto',
+    type: 'gym',
+    icon: 'tm-ice',
+    description: 'A Rota 23 e a Victory Road — até a sala da Lorelei.',
+    duration: 300,
+    world: { width: 3000, height: 2000, theme: 'cave' },
+    scaling: { hp: 4.0, speed: 0.3, damage: 0.9 },
+    unlockedBy: 'gym_8_viridian',
+
+    segments: [
+      { from: 0, name: 'Rota 23', theme: 'grass' },
+      { from: 100, name: 'Victory Road', theme: 'cave' },
+      { from: 200, name: 'Sala da Lorelei', theme: 'gym' }
+    ],
+
+    // nível dos selvagens: acompanha a equipe, chegando perto do ace do líder
+    // (os líderes têm os níveis do FireRed; ver CONFIG.enemies)
+    waves: [
+      { from: 0, to: 110, interval: 0.81, batch: 5, maxAlive: 130, level: [48, 51], enemies: [{ id: 'arbok', weight: 3 }, { id: 'fearow', weight: 3 }, { id: 'mankey', weight: 3 }, { id: 'machoke', weight: 2 }, { id: 'cubone', weight: 2 }] },
+      { from: 95, to: 210, interval: 0.72, batch: 6, maxAlive: 170, level: [50, 53], enemies: [{ id: 'geodude_wild', weight: 3 }, { id: 'machoke', weight: 3 }, { id: 'zubat', weight: 2 }, { id: 'kadabra', weight: 1 }, { id: 'sandslash', weight: 2 }] },
+      { from: 195, to: 292, interval: 0.68, batch: 6, maxAlive: 200, level: [52, 55], enemies: [{ id: 'seel', weight: 3 }, { id: 'shellder', weight: 3 }, { id: 'jynx', weight: 2 }, { id: 'slowpoke', weight: 3 }] }
+    ],
+
+    elites: [
+      { at: 120, id: 'primeape', count: 2, level: 54 },
+      { at: 200, id: 'golbat', count: 2, level: 54 },
+      { at: 250, id: 'dewgong_elite', count: 2, level: 54 },
+      { at: 280, id: 'cloyster_elite', count: 1, level: 54 }
+    ],
+
+    leader: {
+      name: 'LORELEI',
+      title: 'Elite Four',
+      type: 'ice',
+      dex: 131,
+      portrait: 'portrait/lorelei',
+      quote: 'Ninguém entende de gelo como eu. Prepare-se para congelar!'
+    },
+    bossTeam: ['lorelei_dewgong', 'lorelei_cloyster', 'lorelei_slowbro', 'lorelei_jynx', 'lorelei_lapras'],
+
+    capturePool: 'phase9',
+    ballChance: 1,
+    maxBalls: 4,
+    scriptedBalls: [40, 160],
+    reward: { shards: 300 }
+  },
+
+  /* ============================================================
+     ELITE FOUR — BRUNO
+     ============================================================ */
+  e4_bruno: {
+    id: 'e4_bruno',
+    name: 'Elite Four — Bruno',
+    region: 'Kanto',
+    type: 'gym',
+    icon: 'tm-fighting',
+    description: 'O corredor da Liga — até a sala do Bruno.',
+    duration: 280,
+    world: { width: 3000, height: 2000, theme: 'gym' },
+    scaling: { hp: 2.4, speed: 0.3, damage: 0.65 },
+    unlockedBy: 'e4_lorelei',
+
+    segments: [
+      { from: 0, name: 'Corredor da Liga', theme: 'gym' },
+      { from: 180, name: 'Sala do Bruno', theme: 'gym' }
+    ],
+
+    // nível dos selvagens: acompanha a equipe, chegando perto do ace do líder
+    // (os líderes têm os níveis do FireRed; ver CONFIG.enemies)
+    waves: [
+      { from: 0, to: 140, interval: 0.77, batch: 6, maxAlive: 160, level: [53, 56], enemies: [{ id: 'machop', weight: 3 }, { id: 'machoke', weight: 4 }, { id: 'mankey', weight: 3 }, { id: 'geodude_wild', weight: 2 }] },
+      { from: 125, to: 272, interval: 0.68, batch: 6, maxAlive: 200, level: [55, 58], enemies: [{ id: 'machoke', weight: 4 }, { id: 'rhyhorn', weight: 2 }, { id: 'sandslash', weight: 2 }, { id: 'mankey', weight: 2 }] }
+    ],
+
+    elites: [
+      { at: 100, id: 'onix_elite', count: 2, level: 57 },
+      { at: 170, id: 'hitmonlee_elite', count: 1, level: 57 },
+      { at: 200, id: 'hitmonchan_elite', count: 1, level: 57 },
+      { at: 250, id: 'machamp_elite', count: 2, level: 57 }
+    ],
+
+    leader: {
+      name: 'BRUNO',
+      title: 'Elite Four',
+      type: 'fighting',
+      dex: 68,
+      portrait: 'portrait/bruno',
+      quote: 'Treinamos os músculos até o limite. Hoo hah!'
+    },
+    bossTeam: ['bruno_onix', 'bruno_hitmonchan', 'bruno_hitmonlee', 'bruno_onix', 'bruno_machamp'],
+
+    capturePool: 'phase9',
+    ballChance: 1,
+    maxBalls: 4,
+    scriptedBalls: [40, 150],
+    reward: { shards: 320 }
+  },
+
+  /* ============================================================
+     ELITE FOUR — AGATHA
+     ============================================================ */
+  e4_agatha: {
+    id: 'e4_agatha',
+    name: 'Elite Four — Agatha',
+    region: 'Kanto',
+    type: 'gym',
+    icon: 'tm-ghost',
+    description: 'O corredor da Liga — até a sala da Agatha.',
+    duration: 280,
+    world: { width: 3000, height: 2000, theme: 'cave' },
+    scaling: { hp: 2.9, speed: 0.3, damage: 0.75 },
+    unlockedBy: 'e4_bruno',
+
+    segments: [
+      { from: 0, name: 'Corredor da Liga', theme: 'gym' },
+      { from: 180, name: 'Sala da Agatha', theme: 'cave' }
+    ],
+
+    // nível dos selvagens: acompanha a equipe, chegando perto do ace do líder
+    // (os líderes têm os níveis do FireRed; ver CONFIG.enemies)
+    waves: [
+      { from: 0, to: 140, interval: 0.77, batch: 6, maxAlive: 160, level: [55, 58], enemies: [{ id: 'gastly', weight: 5 }, { id: 'haunter', weight: 3 }, { id: 'zubat', weight: 2 }, { id: 'arbok', weight: 2 }] },
+      { from: 125, to: 272, interval: 0.68, batch: 6, maxAlive: 200, level: [57, 60], enemies: [{ id: 'haunter', weight: 4 }, { id: 'gastly', weight: 3 }, { id: 'arbok', weight: 2 }, { id: 'kadabra', weight: 1 }] }
+    ],
+
+    elites: [
+      { at: 100, id: 'golbat', count: 2, level: 59 },
+      { at: 170, id: 'arbok_elite', count: 2, level: 59 },
+      { at: 230, id: 'gengar_elite', count: 2, level: 59 }
+    ],
+
+    leader: {
+      name: 'AGATHA',
+      title: 'Elite Four',
+      type: 'ghost',
+      dex: 94,
+      portrait: 'portrait/agatha',
+      quote: 'Pokémon são para lutar! Vou te mostrar como se faz.'
+    },
+    bossTeam: ['agatha_gengar', 'agatha_golbat', 'agatha_haunter', 'agatha_arbok', 'agatha_gengar_ace'],
+
+    capturePool: 'phase9',
+    ballChance: 1,
+    maxBalls: 4,
+    scriptedBalls: [40, 150],
+    reward: { shards: 340 }
+  },
+
+  /* ============================================================
+     ELITE FOUR — LANCE
+     ============================================================ */
+  e4_lance: {
+    id: 'e4_lance',
+    name: 'Elite Four — Lance',
+    region: 'Kanto',
+    type: 'gym',
+    icon: 'tm-dragon',
+    description: 'O corredor da Liga — até a sala do Lance.',
+    duration: 280,
+    world: { width: 3000, height: 2000, theme: 'cave' },
+    scaling: { hp: 2.7, speed: 0.3, damage: 0.7 },
+    unlockedBy: 'e4_agatha',
+
+    segments: [
+      { from: 0, name: 'Corredor da Liga', theme: 'gym' },
+      { from: 180, name: 'Sala do Lance', theme: 'cave' }
+    ],
+
+    // nível dos selvagens: acompanha a equipe, chegando perto do ace do líder
+    // (os líderes têm os níveis do FireRed; ver CONFIG.enemies)
+    waves: [
+      { from: 0, to: 140, interval: 0.77, batch: 6, maxAlive: 160, level: [57, 60], enemies: [{ id: 'dratini', weight: 4 }, { id: 'dragonair', weight: 2 }, { id: 'seadra', weight: 3 }, { id: 'horsea', weight: 3 }] },
+      { from: 125, to: 272, interval: 0.68, batch: 6, maxAlive: 200, level: [59, 62], enemies: [{ id: 'dragonair', weight: 4 }, { id: 'seadra', weight: 3 }, { id: 'kingler', weight: 2 }] }
+    ],
+
+    elites: [
+      { at: 100, id: 'gyarados_elite', count: 2, level: 61 },
+      { at: 170, id: 'aerodactyl_elite', count: 2, level: 61 },
+      { at: 230, id: 'gyarados_elite', count: 2, level: 61 }
+    ],
+
+    leader: {
+      name: 'LANCE',
+      title: 'Elite Four',
+      type: 'dragon',
+      dex: 149,
+      portrait: 'portrait/lance',
+      quote: 'Dragões são criaturas místicas... e quase invencíveis.'
+    },
+    bossTeam: ['lance_gyarados', 'lance_dragonair', 'lance_dragonair', 'lance_aerodactyl', 'lance_dragonite'],
+
+    capturePool: 'phase9',
+    ballChance: 1,
+    maxBalls: 4,
+    scriptedBalls: [40, 150],
+    reward: { shards: 360 }
+  },
+
+  /* ============================================================
+     CAMPEÃO — O SEU RIVAL
+     ============================================================ */
+  champion: {
+    id: 'champion',
+    name: 'Campeão — o seu rival',
+    region: 'Kanto',
+    type: 'gym',
+    icon: 'badge',
+    description: 'O Platô Indigo — o desafio final da jornada.',
+    duration: 240,
+    world: { width: 3000, height: 2000, theme: 'gym' },
+    scaling: { hp: 2.4, speed: 0.3, damage: 0.65 },
+    unlockedBy: 'e4_lance',
+
+    segments: [
+      { from: 0, name: 'Platô Indigo', theme: 'gym' },
+      { from: 150, name: 'Sala do Campeão', theme: 'gym' }
+    ],
+
+    // nível dos selvagens: acompanha a equipe, chegando perto do ace do líder
+    // (os líderes têm os níveis do FireRed; ver CONFIG.enemies)
+    waves: [
+      { from: 0, to: 120, interval: 0.77, batch: 6, maxAlive: 170, level: [59, 62], enemies: [{ id: 'golduck', weight: 3 }, { id: 'kadabra', weight: 3 }, { id: 'magneton', weight: 3 }, { id: 'kingler', weight: 2 }, { id: 'ditto', weight: 1 }] },
+      { from: 105, to: 232, interval: 0.68, batch: 6, maxAlive: 210, level: [61, 64], enemies: [{ id: 'rhyhorn', weight: 2 }, { id: 'sandslash', weight: 2 }, { id: 'golduck', weight: 2 }, { id: 'seadra', weight: 2 }, { id: 'machoke', weight: 2 }] }
+    ],
+
+    elites: [
+      { at: 90, id: 'kadabra_elite', count: 2, level: 63 },
+      { at: 150, id: 'magneton_elite', count: 2, level: 63 },
+      { at: 200, id: 'golduck_elite', count: 2, level: 63 }
+    ],
+
+    leader: {
+      name: 'RIVAL',
+      title: 'Campeão da Liga Pokémon',
+      type: 'normal',
+      dex: 18,
+      portrait: 'portrait/rival',
+      quote: 'Até que enfim! Eu sou o melhor treinador do mundo!'
+    },
+    // como no FireRed, o rival escolheu o inicial com vantagem sobre o seu
+    bossTeam: ['rival_pidgeot', 'rival_alakazam', 'rival_rhydon', 'rival_arcanine', 'rival_exeggutor', 'rival_blastoise'],
+    bossTeamByStarter: {
+      charmander: ['rival_pidgeot', 'rival_alakazam', 'rival_rhydon', 'rival_arcanine', 'rival_exeggutor', 'rival_blastoise'],
+      bulbasaur: ['rival_pidgeot', 'rival_alakazam', 'rival_rhydon', 'rival_exeggutor', 'rival_gyarados', 'rival_charizard'],
+      squirtle: ['rival_pidgeot', 'rival_alakazam', 'rival_rhydon', 'rival_gyarados', 'rival_arcanine', 'rival_venusaur']
+    },
+
+    capturePool: 'phase9',
+    ballChance: 1,
+    maxBalls: 2,
+    scriptedBalls: [60],
+    reward: { shards: 800 }
   }
 };
 
 /**
- * CAMPANHA — a jornada por Kanto, ginásio a ginásio.
- * Entradas com `comingSoon` são o esqueleto do resto da região: cada uma vira
- * uma fase completa copiando um bloco de STAGES e ajustando rotas e líder.
+ * CAMPANHA — a jornada por Kanto, ginásio a ginásio, até o Campeão.
+ * Uma entrada `{ comingSoon: true, name, icon, portrait, description }` aparece no
+ * mapa como "em breve": é como uma região nova começa antes de ter as fases.
  */
 export const KANTO_CAMPAIGN = [
   { stage: 'gym_1_pewter' },
   { stage: 'gym_2_cerulean' },
-  { comingSoon: true, name: 'Fase 3 — Rumo a Vermilion (LT. SURGE)', icon: 'tm-electric', portrait: 'portrait/lt_surge', description: 'Rotas 5 e 6 até o Ginásio Elétrico.' },
-  { comingSoon: true, name: 'Fase 4 — Rumo a Celadon (ERIKA)', icon: 'tm-grass', portrait: 'portrait/erika', description: 'Rota 7 e Celadon até o Ginásio de Planta.' },
-  { comingSoon: true, name: 'Fase 5 — Rumo a Fuchsia (KOGA)', icon: 'tm-poison', portrait: 'portrait/koga', description: 'Ciclovia e Rotas 16-19 até o Ginásio Venenoso.' },
-  { comingSoon: true, name: 'Fase 6 — Rumo a Saffron (SABRINA)', icon: 'tm-psychic', portrait: 'portrait/sabrina', description: 'Saffron e o Ginásio Psíquico.' },
-  { comingSoon: true, name: 'Fase 7 — Rumo a Cinnabar (BLAINE)', icon: 'tm-fire', portrait: 'portrait/blaine', description: 'Mansão de Cinnabar e o Ginásio de Fogo.' },
-  { comingSoon: true, name: 'Fase 8 — Rumo a Viridian (GIOVANNI)', icon: 'tm-ground', portrait: 'portrait/giovanni', description: 'O último ginásio de Kanto.' },
-  { comingSoon: true, name: 'ELITE FOUR', icon: 'master-ball', portrait: 'portrait/lorelei', description: 'Lorelei, Bruno, Agatha e Lance, em sequência.' },
-  { comingSoon: true, name: 'CAMPEÃO', icon: 'badge', portrait: 'portrait/rival', description: 'O desafio final da jornada.' }
+  { stage: 'gym_3_vermilion' },
+  { stage: 'gym_4_celadon' },
+  { stage: 'gym_5_fuchsia' },
+  { stage: 'gym_6_saffron' },
+  { stage: 'gym_7_cinnabar' },
+  { stage: 'gym_8_viridian' },
+  { stage: 'e4_lorelei' },
+  { stage: 'e4_bruno' },
+  { stage: 'e4_agatha' },
+  { stage: 'e4_lance' },
+  { stage: 'champion' }
 ];
 
 export const getStage = (id) => STAGES[id];

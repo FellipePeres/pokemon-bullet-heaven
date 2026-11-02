@@ -70,6 +70,7 @@ export function simulate(stageId, starter, { maxSeconds = 600, journey = null } 
       if (p.kind === 'ball' && !seenBalls.has(p)) { seenBalls.add(p); ballsDropped++; }
     }
 
+    if (run.state === 'intro') { run.pendingIntro = null; run.state = 'running'; continue; }
     if (run.state === 'evolution') { run.evolutionQueue.shift(); if (!run.evolutionQueue.length) run.state = 'running'; continue; }
     if (run.state === 'levelup') { resolveLevelUp(run); levelUps++; continue; }
 
@@ -81,6 +82,7 @@ export function simulate(stageId, starter, { maxSeconds = 600, journey = null } 
         captures++;
       }
       run.pendingBall = false;
+      run.pendingGift = null;
       run.state = 'running';
       continue;
     }

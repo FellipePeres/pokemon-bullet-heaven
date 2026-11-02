@@ -50,27 +50,34 @@ for (const starter of ['charmander', 'bulbasaur', 'squirtle']) {
 // ------------------------------------------- 2. jornada encadeada (campanha)
 console.log('\n[jornada — equipe e build passam de fase em fase]');
 {
+  // A fase é desafiadora de propósito: o bot vence ~60% das tentativas
+  // (tools/balance.mjs) e perder devolve ao início com a mesma equipe, então o
+  // teste também repete. Mas uma equipe ruim montada na Fase 1 perde a Fase 2
+  // todas as vezes (~1 jornada em 15): aí começa uma jornada nova, até 3.
   let journey = null;
-  for (const stageId of ['gym_1_pewter', 'gym_2_cerulean']) {
-    const stage = STAGES[stageId];
-
-    // A fase é desafiadora de propósito (o jogador virtual ganha ~60% das vezes)
-    // e perder devolve ao início com a equipe intacta — então o teste também
-    // repete, como um jogador faria. O bot vence ~60% das tentativas
-    // (tools/balance.mjs), então 6 seguidas perdidas já indicam problema.
-    let result = null;
-    let attempts = 0;
-    do {
-      attempts++;
-      result = simulate(stageId, 'charmander', { maxSeconds: stage.duration + 240, journey });
-    } while (result.run.state !== 'victory' && attempts < 6);
-
+  let results = [];
+  for (let journeyTry = 0; journeyTry < 3; journeyTry++) {
+    journey = null;
+    results = [];
+    for (const stageId of ['gym_1_pewter', 'gym_2_cerulean']) {
+      const stage = STAGES[stageId];
+      let result = null;
+      let attempts = 0;
+      do {
+        attempts++;
+        result = simulate(stageId, 'charmander', { maxSeconds: stage.duration + 240, journey });
+      } while (result.run.state !== 'victory' && attempts < 6);
+      results.push({ stage, result, attempts });
+      if (result.run.state !== 'victory') break;
+      journey = { team: result.run.team.serialize() };
+    }
+    if (results.length === 2 && results[1].result.run.state === 'victory') break;
+  }
+  for (const { stage, result, attempts } of results) {
     const { run, captures, ballsDropped } = result;
     check(`${stage.name}: líder derrotado`, run.state === 'victory',
           `estado=${run.state} em ${attempts} tentativa(s), equipe ${run.team.members.length}, níveis ${teamLevels(run)}`);
     console.log(`         ${captures} capturas · ${ballsDropped} Poké Balls · ${run.stats.faints} desmaios · ${run.stats.kills} abates`);
-    if (run.state !== 'victory') break;
-    journey = { team: run.team.serialize() };
   }
   check('jornada chega ao fim com equipe formada', (journey?.team.members.length ?? 0) >= 4,
         `${journey?.team.members.length ?? 0} Pokémon`);
@@ -283,6 +290,40 @@ console.log('\n[dados]');
   run.progression.applyUpgrade('ember_damage', charmander);
   check('upgrade de habilidade fica só com o Pokémon que escolheu',
         (charmander.upgrades.ember_damage ?? 0) === 1 && !pikachu.upgrades.ember_damage);
+}
+
+// ----------------------------------------------------------- 6c. conteúdo novo
+console.log('\n[conteúdo]');
+{
+  // presentes da Fase 6, um de cada vez: a troca do Lickitung e o Dojo de Saffron
+  const dojo = new Run('gym_6_saffron', { starter: 'charmander' });
+  dojo.time = 241;
+  dojo.update(DT, { x: 0, y: 0 });
+  const first = dojo.captureSystem.rollChoices().map((p) => p.id).join(',');
+  dojo.pendingGift = null;
+  dojo.state = 'running';
+  dojo.update(DT, { x: 0, y: 0 });
+  const offered = dojo.captureSystem.rollChoices().map((p) => p.id).sort().join(',');
+  check('presentes chegam um de cada vez: primeiro a troca do Lickitung', first === 'lickitung', first);
+  check('o Dojo de Saffron oferece Hitmonlee ou Hitmonchan', dojo.state === 'capture' && offered === 'hitmonchan,hitmonlee', offered);
+
+  // o rival monta o time pelo inicial do jogador, como no FireRed
+  const aceOf = (starter) => new Run('champion', { starter, campaignStarter: starter }).spawner.bossQueue.at(-1);
+  check('o ace do rival depende do seu inicial',
+        aceOf('charmander') === 'rival_blastoise' && aceOf('bulbasaur') === 'rival_charizard' && aceOf('squirtle') === 'rival_venusaur',
+        `${aceOf('charmander')} / ${aceOf('bulbasaur')} / ${aceOf('squirtle')}`);
+
+  // selvagem com nível: mais vida e mais XP que o mesmo selvagem sem nível
+  const lvRun = new Run('gym_5_fuchsia', { starter: 'charmander' });
+  const plain = lvRun.spawner.spawnAt('gastly', 10, 10);
+  const leveled = lvRun.spawner.spawnAt('gastly', 10, 10, 30);
+  check('selvagem de nível alto tem mais vida e dá mais XP',
+        leveled.maxHp > plain.maxHp * 3 && leveled.xp > plain.xp && leveled.level === 30,
+        `${Math.round(plain.maxHp)} → ${Math.round(leveled.maxHp)} de vida`);
+
+  // Kanto inteira: 151 espécies e as 13 etapas jogáveis
+  check('os 151 de Kanto são jogáveis', Object.keys(POKEMON).length === 151, `${Object.keys(POKEMON).length}`);
+  check('as 13 etapas de Kanto existem', Object.keys(STAGES).length === 13, `${Object.keys(STAGES).length}`);
 }
 
 // ----------------------------------------------------------- 6b. treinador

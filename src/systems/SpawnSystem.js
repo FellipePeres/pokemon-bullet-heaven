@@ -6,6 +6,24 @@ import { weightedPick, rand, clamp } from '../core/utils.js';
 import { bus, EVENTS } from '../core/events.js';
 import { getAbility } from '../data/abilities.js';
 
+/** Nível sorteado dentro da faixa da onda ([mínimo, máximo]), ou null. */
+const pickLevel = (range) => (range ? range[0] + Math.floor(Math.random() * (range[1] - range[0] + 1)) : null);
+
+/**
+ * Força do selvagem pelo nível dele (ver CONFIG.enemies). Sem nível, nada muda:
+ * é como as fases 1 e 2 foram calibradas.
+ */
+export function levelScaling(level) {
+  if (!level) return { hp: 1, damage: 1, xp: 1 };
+  const { referenceLevel, hpGrowth, damageGrowth, xpPerLevel } = CONFIG.enemies;
+  const d = level - referenceLevel;
+  return {
+    hp: Math.pow(hpGrowth, d),
+    damage: Math.pow(damageGrowth, d),
+    xp: Math.max(0.5, 1 + xpPerLevel * d)
+  };
+}
+
 /**
  * Cria inimigos seguindo as ondas descritas nos dados da fase.
  * Nenhuma regra de fase específica mora aqui — tudo vem de stages.js.
@@ -17,9 +35,13 @@ export class SpawnSystem {
     this.waveTimers = this.stage.waves.map((w) => w.interval * Math.random());
     this.elitesSpawned = new Set();
     this.scriptedBalls = new Set();
+    this.giftsGiven = new Set();
 
     // Time do líder: enfrentado em sequência, um Pokémon por vez.
-    this.bossQueue = [...(this.stage.bossTeam ?? [])];
+    // o rival do Campeão monta o time pelo inicial que você escolheu
+    this.bossQueue = [...(this.stage.bossTeamByStarter?.[run.campaignStarter] ?? this.stage.bossTeam ?? [])];
+    // as invocações dos líderes vêm no nível mais alto das ondas da fase
+    this.summonLevel = Math.max(0, ...this.stage.waves.map((w) => w.level?.[1] ?? 0)) || null;
     this.bossSpawned = false;
     this.bossesDefeated = 0;
     this.nextBossDelay = 0;
@@ -50,7 +72,7 @@ export class SpawnSystem {
       if (run.enemies.length >= wave.maxAlive) return;
 
       for (let n = 0; n < wave.batch; n++) {
-        this.spawn(weightedPick(wave.enemies).id);
+        this.spawn(weightedPick(wave.enemies).id, null, pickLevel(wave.level));
       }
     });
 
@@ -58,7 +80,7 @@ export class SpawnSystem {
     (this.stage.elites ?? []).forEach((elite, i) => {
       if (this.elitesSpawned.has(i) || t < elite.at) return;
       this.elitesSpawned.add(i);
-      for (let n = 0; n < (elite.count ?? 1); n++) this.spawn(elite.id);
+      for (let n = 0; n < (elite.count ?? 1); n++) this.spawn(elite.id, null, elite.level ?? null);
       bus.emit(EVENTS.TOAST, { text: 'Um Pokémon poderoso apareceu!', icon: 'boss' });
     });
 
@@ -69,13 +91,18 @@ export class SpawnSystem {
       this.dropBall();
     });
 
+    // ---- presentes da fase (as trocas e o Dojo do FireRed) ----
+    (this.stage.gifts ?? []).forEach((gift, i) => {
+      if (this.giftsGiven.has(i) || t < gift.at || run.pendingGift) return;
+      this.giftsGiven.add(i);
+      run.pendingGift = gift;
+    });
+
     // ---- líder do ginásio ----
     if (!this.bossSpawned && t >= this.stage.duration) {
       this.bossSpawned = true;
-      const leader = this.stage.leader;
-      if (leader) {
-        bus.emit(EVENTS.TOAST, { text: `${leader.name}: "${leader.quote}"`, icon: 'badge' });
-      }
+      // o líder se apresenta antes (a partida pausa na tela dele)
+      if (this.stage.leader) run.pendingIntro = this.stage.leader;
       this.sendNextBoss();
       return;
     }
@@ -143,29 +170,34 @@ export class SpawnSystem {
         for (let i = 0; i < summons.count; i++) {
           const a = Math.random() * Math.PI * 2;
           const d = enemy.radius + rand(30, 90);
-          this.spawnAt(summons.enemy, enemy.x + Math.cos(a) * d, enemy.y + Math.sin(a) * d);
+          this.spawnAt(summons.enemy, enemy.x + Math.cos(a) * d, enemy.y + Math.sin(a) * d, this.summonLevel);
         }
       }
     }
   }
 
   /** Spawna fora da tela, ao redor do jogador. */
-  spawn(enemyId, distance = null) {
+  spawn(enemyId, distance = null, level = null) {
     const { player, world } = this.run;
     const viewRadius = Math.hypot(CONFIG.canvas.width, CONFIG.canvas.height) / 2;
     const d = distance ?? viewRadius + rand(40, 160);
     const a = Math.random() * Math.PI * 2;
     const x = clamp(player.x + Math.cos(a) * d, 30, world.width - 30);
     const y = clamp(player.y + Math.sin(a) * d, 30, world.height - 30);
-    return this.spawnAt(enemyId, x, y);
+    return this.spawnAt(enemyId, x, y, level);
   }
 
-  spawnAt(enemyId, x, y) {
+  spawnAt(enemyId, x, y, level = null) {
     // Chefes têm vida definida direto nos dados: aplicar também a escala da fase
     // dobraria a dificuldade e tornaria o balanceamento impossível de prever.
     const isBoss = !!getEnemy(enemyId)?.boss;
-    const scaling = isBoss ? { hp: 1, speed: 1, damage: 1 } : this.scaling;
-    const enemy = new Enemy(enemyId, x, y, scaling);
+    let scaling = { hp: 1, speed: 1, damage: 1 };
+    if (!isBoss) {
+      const ramp = this.scaling;
+      const byLevel = levelScaling(level);
+      scaling = { hp: ramp.hp * byLevel.hp, speed: ramp.speed, damage: ramp.damage * byLevel.damage, xp: byLevel.xp };
+    }
+    const enemy = new Enemy(enemyId, x, y, scaling, level);
     this.run.enemies.push(enemy);
     return enemy;
   }

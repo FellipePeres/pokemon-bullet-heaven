@@ -34,6 +34,7 @@ export class Menus {
     el('btn-continue').onclick = () => this.game.continueGame();
     el('btn-load-game').onclick = () => el('save-file-input').click();
     el('btn-save-campaign').onclick = () => this.game.saveToFile();
+    el('btn-hall').onclick = () => this.game.showHallOfFame(this.game.profile.hallOfFame.at(-1));
     el('version-tag').textContent = `v${CONFIG.version}`;
 
     // atalhos da barra lateral
@@ -196,6 +197,8 @@ export class Menus {
     el('campaign-trainer').src = assetUrl(trainer.portrait);
     el('campaign-trainer').alt = trainer.name;
     el('campaign-title').textContent = `JORNADA — ${this.game.region.name.toUpperCase()}`;
+    const hall = this.game.profile.hallOfFame.filter((h) => h.region === this.game.profile.region);
+    if (hall.length) show(el('btn-hall')); else hide(el('btn-hall'));
 
     el('campaign-subtitle').textContent = journey
       ? 'Sua equipe e sua build continuam de uma fase para a outra. Uma derrota devolve você ao início da fase.'
@@ -255,7 +258,7 @@ export class Menus {
         <p>${stage.description}</p>
         <div class="stage-meta">
           ⏱ ${formatTime(stage.duration)} de travessia · ${trail}
-          ${leader ? ` · 🥇 ${leader.badge}` : ''}
+          ${leader?.badge ? ` · 🥇 ${leader.badge}` : ''}
         </div>
       `;
       node.appendChild(body);

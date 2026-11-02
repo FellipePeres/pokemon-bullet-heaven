@@ -40,6 +40,7 @@ uma equipe de seis, evoluída, com golpes melhorados e sinergias que você escol
 | Escolher qual slot ativo recebe a troca | `Tab` ou clique no card |
 | Gastar os níveis acumulados de um Pokémon | botão `▲` no card |
 | Pausar / fechar janela | `ESC` |
+| Controle (gamepad) | analógico ou direcional anda · LB/RB escolhem o slot · X/Y/B põem a reserva em campo · Start pausa · nas telas, direcional e A |
 
 Os ataques são automáticos. O que você controla é **onde estar**, **quem está em
 campo** e **quais melhorias escolher**.
@@ -91,17 +92,22 @@ Perder devolve você ao início da fase com a equipe como estava ao entrar nela.
 
 ## Conteúdo atual
 
-- **2 fases completas** — Fase 1: Rumo a Pewter (**BROCK**, Geodude + Onix) ·
-  Fase 2: Rumo a Cerulean (**MISTY**, Staryu + Starmie).
+- **Kanto inteira, 13 etapas** — os 8 ginásios (Brock, Misty, Lt. Surge, Erika,
+  Koga, Sabrina, Blaine e Giovanni), a Elite Four (Lorelei, Bruno, Agatha e Lance)
+  e o Campeão, cada líder com o time do FireRed. O time do rival muda conforme o
+  seu inicial, como no jogo.
 - **Treinador à sua escolha**: Red ou Leaf, com os sprites de andar e correr do FireRed
   e o Prof. Carvalho fazendo a pergunta.
-- **68 Pokémon jogáveis**, cada um com linha de 3 golpes e linha evolutiva.
-- **57 habilidades** sobre 7 comportamentos genéricos (projétil, arco, órbita,
-  aura, zona de chão, onda de choque e raio em corrente).
+- **Os 151 Pokémon de Kanto jogáveis**, cada um com linha de 3 golpes e linha
+  evolutiva. Alguns chegam como presente, como no FireRed (Farfetch'd, Lickitung e
+  o prêmio do Dojo de Saffron: Hitmonlee ou Hitmonchan).
+- **52 golpes** com o sprite da animação do FireRed, no máximo 4 por tipo, sobre 7
+  comportamentos genéricos (projétil, arco, órbita, aura, zona de chão, onda de
+  choque e raio em corrente).
 - **Pokédex de Kanto** (151) que se preenche conforme você captura e evolui.
 - **12 conquistas** com recompensa em Shards.
-- Fases 3 a 9 (Lt. Surge → Elite Four e Campeão) já estão no mapa como próximos
-  passos, com as tabelas de captura definidas.
+- A dificuldade e a quantidade de inimigos sobem fase a fase: os selvagens ganham
+  nível junto com a sua equipe, e as hordas passam de 80 para mais de 150 na tela.
 
 ## Rodando localmente
 

@@ -42,6 +42,8 @@ export function createProfile() {
       dexCaught: 0,
       playTime: 0
     },
+    // equipes campeãs (Hall da Fama): { date, trainer, region, team: [{ pokemonId, level }] }
+    hallOfFame: [],
     // a campanha é guardada por região (data/regions.js); `region` é a da jornada atual
     region: DEFAULT_REGION,
     regions: { [DEFAULT_REGION]: createRegionProgress() }

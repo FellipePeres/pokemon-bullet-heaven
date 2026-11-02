@@ -7,8 +7,12 @@ import { preload } from '../render/sprites.js';
 import { HUD } from '../ui/HUD.js';
 import { Menus } from '../ui/Menus.js';
 import { toast } from '../ui/dom.js';
-import { preloadAssets } from '../render/assets.js';
+import { preloadAssets, assetUrl } from '../render/assets.js';
 import { loadOptions } from '../save/options.js';
+import { PadNavigator } from '../ui/pad.js';
+
+/** X, Y e B põem em campo os da reserva (posições 4, 5 e 6 da equipe). */
+const RESERVE_BUTTONS = { x: 3, y: 4, b: 5 };
 import { SaveManager } from '../save/SaveManager.js';
 import {
   createProfile, normalizeProfile, ProfileTracker,
@@ -42,6 +46,7 @@ export class Game {
     this.input.onAction = (action) => this.handleAction(action);
     this.hud = new HUD(this);
     this.menus = new Menus(this);
+    this.padNav = new PadNavigator();
 
     this.run = null;
     this.runEnded = false;
@@ -49,6 +54,7 @@ export class Game {
     this.levelUpOpen = false;
     this.captureOpen = false;
     this.evolutionOpen = false;
+    this.introOpen = false;
     this.lastTime = 0;
     this.autosaveTimer = 0;
 
@@ -70,6 +76,7 @@ export class Game {
   loop(ts) {
     const dt = this.lastTime ? Math.min(0.05, (ts - this.lastTime) / 1000) : 0;
     this.lastTime = ts;
+    this.input.poll();   // controle (os botões chegam em handleAction)
 
     if (this.run) {
       this.run.update(dt, this.input.getMoveVector());
@@ -98,6 +105,9 @@ export class Game {
         break;
       case 'evolution':
         if (!this.evolutionOpen) this.openEvolution();
+        break;
+      case 'intro':
+        if (!this.introOpen) this.openLeaderIntro();
         break;
       case 'victory':
         this.endRun(true);
@@ -212,6 +222,7 @@ export class Game {
     // melhorias compradas com moedas valem em todas as fases
     options.trainerUpgrades = { ...this.profile.trainerUpgrades };
     options.trainer = this.profile.trainer;
+    options.campaignStarter = this.campaign.starter;
 
     this.run = new Run(stageId, options);
     this.runEnded = false;
@@ -242,6 +253,7 @@ export class Game {
   /* ============================== partida ============================== */
 
   handleAction(action) {
+    if (action.startsWith('pad:')) { this.handlePad(action.slice(4)); return; }
     if (action === 'pause') {
       // fora da partida, ESC fecha a janela aberta
       if (this.menus.openModal) { this.menus.closeModal(); return; }
@@ -261,6 +273,22 @@ export class Game {
       this.run.team.swapByIndex(Number(action.split(':')[1]));
       this.hud.signature = '';
     }
+  }
+
+  /**
+   * Controle. Na partida: Start pausa, LB/RB escolhem o slot, X/Y/B põem em campo
+   * o 1º, 2º e 3º da reserva (como as teclas 4, 5 e 6). Fora dela: o direcional
+   * move o foco e o A confirma, em qualquer tela ou janela (ui/pad.js).
+   */
+  handlePad(button) {
+    if (this.run?.state === 'running') {
+      if (button === 'start') this.handleAction('pause');
+      else if (button === 'lb' || button === 'rb') this.handleAction('cycleSlot');
+      else if (button in RESERVE_BUTTONS) this.handleAction(`team:${RESERVE_BUTTONS[button]}`);
+      return;
+    }
+    if (button === 'start' && this.run?.state === 'paused') { this.togglePause(); return; }
+    this.padNav.handle(button);
   }
 
   togglePause() {
@@ -322,6 +350,34 @@ export class Game {
     if (this.run.state === 'levelup') this.run.state = 'running';
   }
 
+  /** Abre o Hall da Fama de uma equipe campeã; `then` roda ao fechar. */
+  showHallOfFame(entry, then = null) {
+    const look = getTrainerLook(entry.trainer);
+    this.hud.showHallOfFame(entry, {
+      trainerName: look.name,
+      portrait: assetUrl(look.portrait),
+      regionName: getRegion(entry.region).name
+    }, () => {
+      this.hud.hideHallOfFame();
+      then?.();
+    });
+  }
+
+  /** O líder chega: a partida pausa na apresentação dele até o jogador lutar. */
+  openLeaderIntro() {
+    this.introOpen = true;
+    this.hud.showLeaderIntro(this.run.pendingIntro, () => this.closeLeaderIntro());
+  }
+
+  closeLeaderIntro() {
+    this.introOpen = false;
+    this.hud.hideLeaderIntro();
+    if (!this.run) return;
+    this.run.pendingIntro = null;
+    if (this.run.state === 'intro') this.run.state = 'running';
+    this.input.clear();
+  }
+
   /** Mostra a evolução (a partida fica pausada até o jogador confirmar). */
   openEvolution() {
     const evolution = this.run.evolutionQueue[0];
@@ -349,7 +405,7 @@ export class Game {
       this.resolveCapture();
       return;
     }
-    this.hud.showCapture(choices, (pokemonId) => this.pickCapture(pokemonId));
+    this.hud.showCapture(choices, (pokemonId) => this.pickCapture(pokemonId), this.run.pendingGift?.title);
   }
 
   pickCapture(pokemonId) {
@@ -375,6 +431,7 @@ export class Game {
     this.hud.signature = '';
     if (!this.run) return;
     this.run.pendingBall = false;
+    this.run.pendingGift = null;
     if (this.run.state === 'capture') this.run.state = 'running';
   }
 
@@ -396,9 +453,22 @@ export class Game {
     });
 
     this.pendingRun = null;
+    const champion = victory && run.stage.id === this.region.campaign.filter((e) => e.stage).at(-1)?.stage;
+    if (champion) {
+      this.profile.hallOfFame.push({
+        date: new Date().toISOString(),
+        trainer: this.profile.trainer,
+        region: this.profile.region,
+        team: run.team.members.map((m) => ({ pokemonId: m.pokemonId, level: m.level }))
+      });
+    }
     this.autosave();
     this.hud.hideLevelUp();
     this.hud.hideCapture();
+    if (champion) {
+      this.showHallOfFame(this.profile.hallOfFame.at(-1), () => this.quitToMenu());
+      return;
+    }
     this.hud.showResult({ victory, run });
 
     if (victory) {

@@ -8,7 +8,7 @@ import { rand } from '../core/utils.js';
  * novo normalmente não exige código novo.
  */
 export class Enemy {
-  constructor(enemyId, x, y, scaling = { hp: 1, speed: 1, damage: 1 }) {
+  constructor(enemyId, x, y, scaling = { hp: 1, speed: 1, damage: 1 }, level = null) {
     const data = getEnemy(enemyId);
     this.data = data;
     this.id = enemyId;
@@ -20,7 +20,8 @@ export class Enemy {
     this.hp = this.maxHp;
     this.speed = data.speed * scaling.speed;
     this.damage = data.damage * scaling.damage;
-    this.xp = data.xp;
+    this.xp = data.xp * (scaling.xp ?? 1);
+    this.level = level ?? data.level ?? null;
     this.elite = !!data.elite;
     this.boss = !!data.boss;
     this.kind = 'enemy';

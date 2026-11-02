@@ -6,6 +6,7 @@ import { typeColor, typeName } from '../data/types.js';
 import { maxHpFor, xpRatio } from '../systems/stats.js';
 import { CONFIG } from '../core/config.js';
 import { iconHTML } from '../render/icons.js';
+import { assetUrl } from '../render/assets.js';
 
 /**
  * HUD da partida: cards dos Pokémon ativos (vida, XP e nível de cada um),
@@ -245,11 +246,49 @@ export class HUD {
 
   hideEvolution() { hide(el('evolution-overlay')); }
 
+  /* ======================== APRESENTAÇÃO DO LÍDER ======================== */
+
+  /** O líder chega: retrato, nome e a fala dele antes do time entrar em campo. */
+  showLeaderIntro(leader, onFight) {
+    const portrait = el('leader-portrait');
+    portrait.src = assetUrl(leader.portrait) ?? spriteUrl(leader.dex);
+    portrait.alt = leader.name;
+    el('leader-name').textContent = leader.name;
+    el('leader-title').textContent = leader.title ?? '';
+    el('leader-quote').textContent = leader.quote ?? '';
+    el('leader-fight').onclick = onFight;
+    show(el('leader-overlay'));
+  }
+
+  hideLeaderIntro() { hide(el('leader-overlay')); }
+
+  /* ============================ HALL DA FAMA ============================ */
+
+  /** A equipe campeã, um Pokémon por vez (o atraso de cada card é a entrada). */
+  showHallOfFame(entry, { trainerName, portrait, regionName }, onClose) {
+    el('hall-trainer').src = portrait;
+    el('hall-text').textContent =
+      `Parabéns, ${trainerName}! Sua equipe entrou para o Hall da Fama de ${regionName}.`;
+    const row = clear(el('hall-team'));
+    entry.team.forEach((mon, i) => {
+      const data = getPokemon(mon.pokemonId);
+      const card = create('div', 'hall-mon');
+      card.style.animationDelay = `${0.35 + i * 0.45}s`;
+      card.appendChild(pokemonImg(data.dex, { alt: data.name }));
+      card.append(create('b', '', data.name), create('span', '', `Nv. ${mon.level}`));
+      row.appendChild(card);
+    });
+    el('hall-close').onclick = onClose;
+    show(el('hall-overlay'));
+  }
+
+  hideHallOfFame() { hide(el('hall-overlay')); }
+
   /* ============================== CAPTURA ============================== */
 
-  showCapture(choices, onPick) {
+  showCapture(choices, onPick, subtitle = 'Escolha um Pokémon para a sua equipe') {
     const row = clear(el('capture-choices'));
-    el('capture-subtitle').textContent = 'Escolha um Pokémon para a sua equipe';
+    el('capture-subtitle').textContent = subtitle;
     el('capture-skip').textContent = 'Ignorar';
 
     choices.forEach((pokemon) => {
@@ -348,6 +387,7 @@ export class HUD {
   }
 
   hideAllOverlays() {
+    this.hideLeaderIntro();
     this.hideEvolution();
     this.hideLevelUp();
     this.hideCapture();

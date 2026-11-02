@@ -438,6 +438,537 @@ export const POKEMON = {
     abilities: ['fire_blast'], moveLine: ['ember', 'flamethrower', 'fire_blast'], role: 'Dano direto', rarity: 'evolved',
     power: 1.9, hp: 200,
     description: 'Forma final: o Pokémon lendário das chamas.'
+  },
+
+  /* ============ KANTO COMPLETA (0.7): as 83 que faltavam ============
+     Tipos e status de hoje (PokeAPI), evolução do FireRed, linha de golpes
+     por família. Vida e potência seguem a mesma conta das espécies acima. */
+  vulpix: {
+    id: 'vulpix', dex: 37, name: 'Vulpix', types: ['fire'],
+    abilities: ['ember'], moveLine: ['ember', 'fire_spin', 'fire_blast'], role: 'Defesa giratória', rarity: 'common',
+    power: 1.0, hp: 120,
+    description: 'Brasas que queimam aos poucos; evolui com a Pedra do Fogo.',
+    evolution: { to: 'ninetales', level: 32, method: 'stone', item: 'Pedra do Fogo' }
+  },
+  ninetales: {
+    id: 'ninetales', dex: 38, name: 'Ninetales', types: ['fire'],
+    abilities: ['fire_blast'], moveLine: ['ember', 'fire_spin', 'fire_blast'], role: 'Defesa giratória', rarity: 'evolved',
+    power: 1.84, hp: 215,
+    description: 'Forma final: nove caudas de chamas que não se apagam.'
+  },
+  venonat: {
+    id: 'venonat', dex: 48, name: 'Venonat', types: ['bug', 'poison'],
+    abilities: ['leech_life'], moveLine: ['leech_life', 'psybeam', 'psychic_wave'], role: 'Dano à distância', rarity: 'common',
+    power: 1.0, hp: 150,
+    description: 'Ondas psíquicas que atravessam a horda e a deixam lenta.',
+    evolution: { to: 'venomoth', level: 31 }
+  },
+  venomoth: {
+    id: 'venomoth', dex: 49, name: 'Venomoth', types: ['bug', 'poison'],
+    abilities: ['psybeam'], moveLine: ['leech_life', 'psybeam', 'psychic_wave'], role: 'Dano à distância', rarity: 'evolved',
+    power: 1.64, hp: 185,
+    description: 'Forma final: pó psíquico que persegue os inimigos.'
+  },
+  diglett: {
+    id: 'diglett', dex: 50, name: 'Diglett', types: ['ground'],
+    abilities: ['mud_slap'], moveLine: ['mud_slap', 'rock_slide', 'earthquake'], role: 'Dano à distância', rarity: 'common',
+    power: 1.0, hp: 60,
+    description: 'Lama que atrasa a horda; tremores quando cresce.',
+    evolution: { to: 'dugtrio', level: 26 }
+  },
+  dugtrio: {
+    id: 'dugtrio', dex: 51, name: 'Dugtrio', types: ['ground'],
+    abilities: ['rock_slide'], moveLine: ['mud_slap', 'rock_slide', 'earthquake'], role: 'Dano à distância', rarity: 'evolved',
+    power: 1.55, hp: 130,
+    description: 'Forma final: três cabeças, terremotos sem descanso.'
+  },
+  meowth: {
+    id: 'meowth', dex: 52, name: 'Meowth', types: ['normal'],
+    abilities: ['quick_attack'], moveLine: ['quick_attack', 'hyper_fang', 'hyper_beam'], role: 'Corpo a corpo', rarity: 'common',
+    power: 1.0, hp: 105,
+    description: 'Arranhões rápidos de quem vive atrás de moedinhas.',
+    evolution: { to: 'persian', level: 28 }
+  },
+  persian: {
+    id: 'persian', dex: 53, name: 'Persian', types: ['normal'],
+    abilities: ['hyper_fang'], moveLine: ['quick_attack', 'hyper_fang', 'hyper_beam'], role: 'Corpo a corpo', rarity: 'evolved',
+    power: 1.6, hp: 170,
+    description: 'Forma final: elegante e mortal no corpo a corpo.'
+  },
+  psyduck: {
+    id: 'psyduck', dex: 54, name: 'Psyduck', types: ['water'],
+    abilities: ['water_gun'], moveLine: ['water_gun', 'confusion', 'hydro_pump'], role: 'Dano à distância', rarity: 'common',
+    power: 1.0, hp: 135,
+    description: 'Jatos d\'água e, quando a dor de cabeça aperta, Confusion.',
+    evolution: { to: 'golduck', level: 33 }
+  },
+  golduck: {
+    id: 'golduck', dex: 55, name: 'Golduck', types: ['water'],
+    abilities: ['confusion'], moveLine: ['water_gun', 'confusion', 'hydro_pump'], role: 'Dano à distância', rarity: 'evolved',
+    power: 1.82, hp: 215,
+    description: 'Forma final: nadador veloz com poder psíquico.'
+  },
+  mankey: {
+    id: 'mankey', dex: 56, name: 'Mankey', types: ['fighting'],
+    abilities: ['karate_chop'], moveLine: ['karate_chop', 'seismic_toss', 'cross_chop'], role: 'Corpo a corpo', rarity: 'common',
+    power: 1.0, hp: 110,
+    description: 'Golpes de caratê de quem vive irritado.',
+    evolution: { to: 'primeape', level: 28 }
+  },
+  primeape: {
+    id: 'primeape', dex: 57, name: 'Primeape', types: ['fighting'],
+    abilities: ['seismic_toss'], moveLine: ['karate_chop', 'seismic_toss', 'cross_chop'], role: 'Corpo a corpo', rarity: 'evolved',
+    power: 1.65, hp: 175,
+    description: 'Forma final: fúria pura em golpes de luta.'
+  },
+  tentacool: {
+    id: 'tentacool', dex: 72, name: 'Tentacool', types: ['water', 'poison'],
+    abilities: ['poison_sting'], moveLine: ['poison_sting', 'bubble_beam', 'hydro_pump'], role: 'Dano à distância', rarity: 'uncommon',
+    power: 1.0, hp: 145,
+    description: 'Ferrões venenosos e jatos que atravessam inimigos.',
+    evolution: { to: 'tentacruel', level: 30 }
+  },
+  tentacruel: {
+    id: 'tentacruel', dex: 73, name: 'Tentacruel', types: ['water', 'poison'],
+    abilities: ['bubble_beam'], moveLine: ['poison_sting', 'bubble_beam', 'hydro_pump'], role: 'Dano à distância', rarity: 'evolved',
+    power: 1.87, hp: 235,
+    description: 'Forma final: oitenta tentáculos e Hydro Pump.'
+  },
+  slowpoke: {
+    id: 'slowpoke', dex: 79, name: 'Slowpoke', types: ['water', 'psychic'],
+    abilities: ['water_gun'], moveLine: ['water_gun', 'confusion', 'psychic_wave'], role: 'Dano à distância', rarity: 'common',
+    power: 1.0, hp: 190,
+    description: 'Lento para reagir, mas o poder psíquico chega longe.',
+    evolution: { to: 'slowbro', level: 37 }
+  },
+  slowbro: {
+    id: 'slowbro', dex: 80, name: 'Slowbro', types: ['water', 'psychic'],
+    abilities: ['confusion'], moveLine: ['water_gun', 'confusion', 'psychic_wave'], role: 'Dano à distância', rarity: 'evolved',
+    power: 1.78, hp: 255,
+    description: 'Forma final: um Shellder na cauda e ondas psíquicas.'
+  },
+  magnemite: {
+    id: 'magnemite', dex: 81, name: 'Magnemite', types: ['electric', 'steel'],
+    abilities: ['thunder_shock'], moveLine: ['thunder_shock', 'thunderbolt', 'thunder'], role: 'Raio em cadeia', rarity: 'common',
+    power: 1.0, hp: 120,
+    description: 'Raios que saltam de inimigo em inimigo.',
+    evolution: { to: 'magneton', level: 30 }
+  },
+  magneton: {
+    id: 'magneton', dex: 82, name: 'Magneton', types: ['electric', 'steel'],
+    abilities: ['thunderbolt'], moveLine: ['thunder_shock', 'thunderbolt', 'thunder'], role: 'Raio em cadeia', rarity: 'evolved',
+    power: 1.69, hp: 180,
+    description: 'Forma final: três ímãs, o triplo de eletricidade.'
+  },
+  farfetchd: {
+    id: 'farfetchd', dex: 83, name: 'Farfetchd', types: ['normal', 'flying'],
+    abilities: ['peck'], moveLine: ['peck', 'wing_attack', 'hurricane'], role: 'Corpo a corpo', rarity: 'uncommon',
+    power: 1.37, hp: 150,
+    description: 'Bicadas e cortes com o alho-poró que nunca larga.'
+  },
+  doduo: {
+    id: 'doduo', dex: 84, name: 'Doduo', types: ['normal', 'flying'],
+    abilities: ['peck'], moveLine: ['peck', 'hyper_voice', 'hurricane'], role: 'Afastamento', rarity: 'common',
+    power: 1.0, hp: 100,
+    description: 'Duas cabeças bicando ao mesmo tempo.',
+    evolution: { to: 'dodrio', level: 31 }
+  },
+  dodrio: {
+    id: 'dodrio', dex: 85, name: 'Dodrio', types: ['normal', 'flying'],
+    abilities: ['hyper_voice'], moveLine: ['peck', 'hyper_voice', 'hurricane'], role: 'Afastamento', rarity: 'evolved',
+    power: 1.71, hp: 170,
+    description: 'Forma final: três cabeças e gritos ensurdecedores.'
+  },
+  seel: {
+    id: 'seel', dex: 86, name: 'Seel', types: ['water'],
+    abilities: ['water_gun'], moveLine: ['water_gun', 'ice_beam', 'blizzard'], role: 'Dano à distância', rarity: 'common',
+    power: 1.0, hp: 170,
+    description: 'Jatos gelados que deixam a horda quase parada.',
+    evolution: { to: 'dewgong', level: 34 }
+  },
+  dewgong: {
+    id: 'dewgong', dex: 87, name: 'Dewgong', types: ['water', 'ice'],
+    abilities: ['ice_beam'], moveLine: ['water_gun', 'ice_beam', 'blizzard'], role: 'Dano à distância', rarity: 'evolved',
+    power: 1.73, hp: 240,
+    description: 'Forma final: nevascas que congelam a arena.'
+  },
+  grimer: {
+    id: 'grimer', dex: 88, name: 'Grimer', types: ['poison'],
+    abilities: ['poison_fang'], moveLine: ['poison_fang', 'toxic', 'sludge_bomb'], role: 'Controle de área', rarity: 'common',
+    power: 1.0, hp: 175,
+    description: 'Lama tóxica que envenena tudo por onde passa.',
+    evolution: { to: 'muk', level: 38 }
+  },
+  muk: {
+    id: 'muk', dex: 89, name: 'Muk', types: ['poison'],
+    abilities: ['toxic'], moveLine: ['poison_fang', 'toxic', 'sludge_bomb'], role: 'Controle de área', rarity: 'evolved',
+    power: 1.82, hp: 260,
+    description: 'Forma final: uma poça de veneno que não acaba.'
+  },
+  shellder: {
+    id: 'shellder', dex: 90, name: 'Shellder', types: ['water'],
+    abilities: ['water_gun'], moveLine: ['water_gun', 'ice_beam', 'blizzard'], role: 'Dano à distância', rarity: 'common',
+    power: 1.0, hp: 125,
+    description: 'Concha dura e jatos que viram gelo; evolui com a Pedra da Água.',
+    evolution: { to: 'cloyster', level: 32, method: 'stone', item: 'Pedra da Água' }
+  },
+  cloyster: {
+    id: 'cloyster', dex: 91, name: 'Cloyster', types: ['water', 'ice'],
+    abilities: ['blizzard'], moveLine: ['water_gun', 'ice_beam', 'blizzard'], role: 'Dano à distância', rarity: 'evolved',
+    power: 1.91, hp: 220,
+    description: 'Forma final: concha impenetrável e nevascas.'
+  },
+  gastly: {
+    id: 'gastly', dex: 92, name: 'Gastly', types: ['ghost', 'poison'],
+    abilities: ['lick'], moveLine: ['lick', 'night_shade', 'shadow_ball'], role: 'Raio em cadeia', rarity: 'common',
+    power: 1.0, hp: 85,
+    description: 'Lambidas fantasmagóricas que paralisam.',
+    evolution: { to: 'haunter', level: 25 }
+  },
+  haunter: {
+    id: 'haunter', dex: 93, name: 'Haunter', types: ['ghost', 'poison'],
+    abilities: ['night_shade'], moveLine: ['lick', 'night_shade', 'shadow_ball'], role: 'Raio em cadeia', rarity: 'evolved',
+    power: 1.47, hp: 130,
+    description: 'Sombras que saltam entre os inimigos; evolui por troca.',
+    evolution: { to: 'gengar', level: 38, method: 'trade' }
+  },
+  gengar: {
+    id: 'gengar', dex: 94, name: 'Gengar', types: ['ghost', 'poison'],
+    abilities: ['shadow_ball'], moveLine: ['lick', 'night_shade', 'shadow_ball'], role: 'Raio em cadeia', rarity: 'evolved',
+    power: 1.82, hp: 170,
+    description: 'Forma final: esferas de sombra que perseguem e explodem.'
+  },
+  onix: {
+    id: 'onix', dex: 95, name: 'Onix', types: ['rock', 'ground'],
+    abilities: ['rock_throw'], moveLine: ['rock_throw', 'rock_slide', 'earthquake'], role: 'Dano à distância', rarity: 'uncommon',
+    power: 1.4, hp: 185,
+    description: 'Uma serpente de pedra que faz o chão tremer.'
+  },
+  drowzee: {
+    id: 'drowzee', dex: 96, name: 'Drowzee', types: ['psychic'],
+    abilities: ['confusion'], moveLine: ['confusion', 'psybeam', 'psychic_wave'], role: 'Dano à distância', rarity: 'common',
+    power: 1.0, hp: 170,
+    description: 'Hipnose e ondas psíquicas que atravessam a horda.',
+    evolution: { to: 'hypno', level: 26 }
+  },
+  hypno: {
+    id: 'hypno', dex: 97, name: 'Hypno', types: ['psychic'],
+    abilities: ['psybeam'], moveLine: ['confusion', 'psybeam', 'psychic_wave'], role: 'Dano à distância', rarity: 'evolved',
+    power: 1.76, hp: 240,
+    description: 'Forma final: o pêndulo que adormece e destrói.'
+  },
+  krabby: {
+    id: 'krabby', dex: 98, name: 'Krabby', types: ['water'],
+    abilities: ['water_gun'], moveLine: ['water_gun', 'bubble_beam', 'hydro_pump'], role: 'Dano à distância', rarity: 'common',
+    power: 1.0, hp: 120,
+    description: 'Jatos d\'água de quem tem uma pinça poderosa.',
+    evolution: { to: 'kingler', level: 28 }
+  },
+  kingler: {
+    id: 'kingler', dex: 99, name: 'Kingler', types: ['water'],
+    abilities: ['bubble_beam'], moveLine: ['water_gun', 'bubble_beam', 'hydro_pump'], role: 'Dano à distância', rarity: 'evolved',
+    power: 1.73, hp: 185,
+    description: 'Forma final: a pinça gigante esmaga a horda.'
+  },
+  voltorb: {
+    id: 'voltorb', dex: 100, name: 'Voltorb', types: ['electric'],
+    abilities: ['thunder_shock'], moveLine: ['thunder_shock', 'thunderbolt', 'thunder'], role: 'Raio em cadeia', rarity: 'uncommon',
+    power: 1.0, hp: 125,
+    description: 'Raios em cadeia de uma Poké Ball que não é Poké Ball.',
+    evolution: { to: 'electrode', level: 30 }
+  },
+  electrode: {
+    id: 'electrode', dex: 101, name: 'Electrode', types: ['electric'],
+    abilities: ['thunderbolt'], moveLine: ['thunder_shock', 'thunderbolt', 'thunder'], role: 'Raio em cadeia', rarity: 'evolved',
+    power: 1.78, hp: 180,
+    description: 'Forma final: o Pokémon mais rápido de Kanto.'
+  },
+  exeggcute: {
+    id: 'exeggcute', dex: 102, name: 'Exeggcute', types: ['grass', 'psychic'],
+    abilities: ['confusion'], moveLine: ['confusion', 'razor_leaf', 'solar_beam'], role: 'Dano à distância', rarity: 'common',
+    power: 1.0, hp: 165,
+    description: 'Ovos psíquicos que viram folhas cortantes; evolui com a Pedra das Folhas.',
+    evolution: { to: 'exeggutor', level: 32, method: 'stone', item: 'Pedra das Folhas' }
+  },
+  exeggutor: {
+    id: 'exeggutor', dex: 103, name: 'Exeggutor', types: ['grass', 'psychic'],
+    abilities: ['solar_beam'], moveLine: ['confusion', 'razor_leaf', 'solar_beam'], role: 'Dano à distância', rarity: 'evolved',
+    power: 1.93, hp: 235,
+    description: 'Forma final: três cabeças e Solar Beam.'
+  },
+  cubone: {
+    id: 'cubone', dex: 104, name: 'Cubone', types: ['ground'],
+    abilities: ['mud_slap'], moveLine: ['mud_slap', 'bone_club', 'earthquake'], role: 'Dano à distância', rarity: 'common',
+    power: 1.0, hp: 165,
+    description: 'Arremessa o osso que nunca larga.',
+    evolution: { to: 'marowak', level: 28 }
+  },
+  marowak: {
+    id: 'marowak', dex: 105, name: 'Marowak', types: ['ground'],
+    abilities: ['bone_club'], moveLine: ['mud_slap', 'bone_club', 'earthquake'], role: 'Dano à distância', rarity: 'evolved',
+    power: 1.55, hp: 210,
+    description: 'Forma final: o osso vira um bumerangue implacável.'
+  },
+  hitmonlee: {
+    id: 'hitmonlee', dex: 106, name: 'Hitmonlee', types: ['fighting'],
+    abilities: ['seismic_toss'], moveLine: ['karate_chop', 'seismic_toss', 'cross_chop'], role: 'Corpo a corpo', rarity: 'rare',
+    power: 1.65, hp: 180,
+    description: 'Chutes que alcançam longe; o prêmio do Dojo de Saffron.'
+  },
+  hitmonchan: {
+    id: 'hitmonchan', dex: 107, name: 'Hitmonchan', types: ['fighting'],
+    abilities: ['seismic_toss'], moveLine: ['karate_chop', 'seismic_toss', 'cross_chop'], role: 'Corpo a corpo', rarity: 'rare',
+    power: 1.65, hp: 195,
+    description: 'Socos rapidíssimos; o prêmio do Dojo de Saffron.'
+  },
+  lickitung: {
+    id: 'lickitung', dex: 108, name: 'Lickitung', types: ['normal'],
+    abilities: ['lick'], moveLine: ['lick', 'hyper_fang', 'hyper_beam'], role: 'Corpo a corpo', rarity: 'uncommon',
+    power: 1.4, hp: 225,
+    description: 'Uma língua enorme que paralisa quem chega perto.'
+  },
+  koffing: {
+    id: 'koffing', dex: 109, name: 'Koffing', types: ['poison'],
+    abilities: ['toxic'], moveLine: ['toxic', 'sludge_bomb', 'fire_blast'], role: 'Dano à distância', rarity: 'uncommon',
+    power: 1.0, hp: 150,
+    description: 'Gás tóxico que cobre o chão.',
+    evolution: { to: 'weezing', level: 35 }
+  },
+  weezing: {
+    id: 'weezing', dex: 110, name: 'Weezing', types: ['poison'],
+    abilities: ['sludge_bomb'], moveLine: ['toxic', 'sludge_bomb', 'fire_blast'], role: 'Dano à distância', rarity: 'evolved',
+    power: 1.78, hp: 215,
+    description: 'Forma final: duas cabeças de gás e explosões de fogo.'
+  },
+  rhyhorn: {
+    id: 'rhyhorn', dex: 111, name: 'Rhyhorn', types: ['ground', 'rock'],
+    abilities: ['rock_throw'], moveLine: ['rock_throw', 'rock_slide', 'earthquake'], role: 'Dano à distância', rarity: 'uncommon',
+    power: 1.25, hp: 190,
+    description: 'Pedras e investidas de um tanque com chifre.',
+    evolution: { to: 'rhydon', level: 42 }
+  },
+  rhydon: {
+    id: 'rhydon', dex: 112, name: 'Rhydon', types: ['ground', 'rock'],
+    abilities: ['rock_slide'], moveLine: ['rock_throw', 'rock_slide', 'earthquake'], role: 'Dano à distância', rarity: 'evolved',
+    power: 1.76, hp: 255,
+    description: 'Forma final: perfura rochas e faz a terra tremer.'
+  },
+  chansey: {
+    id: 'chansey', dex: 113, name: 'Chansey', types: ['normal'],
+    abilities: ['disarming_voice'], moveLine: ['quick_attack', 'disarming_voice', 'hyper_voice'], role: 'Afastamento', rarity: 'rare',
+    power: 0.9, hp: 410,
+    description: 'Muita vida e vozes que empurram a horda.'
+  },
+  tangela: {
+    id: 'tangela', dex: 114, name: 'Tangela', types: ['grass'],
+    abilities: ['vine_whip'], moveLine: ['vine_whip', 'mega_drain', 'solar_beam'], role: 'Controle de área', rarity: 'uncommon',
+    power: 1.58, hp: 190,
+    description: 'Vinhas que chicoteiam e drenam a vida.'
+  },
+  kangaskhan: {
+    id: 'kangaskhan', dex: 115, name: 'Kangaskhan', types: ['normal'],
+    abilities: ['hyper_fang'], moveLine: ['quick_attack', 'hyper_fang', 'hyper_beam'], role: 'Corpo a corpo', rarity: 'rare',
+    power: 1.78, hp: 250,
+    description: 'Mãe protetora: golpes fortes por ela e pelo filhote.'
+  },
+  horsea: {
+    id: 'horsea', dex: 116, name: 'Horsea', types: ['water'],
+    abilities: ['twister'], moveLine: ['twister', 'bubble_beam', 'hydro_pump'], role: 'Dano à distância', rarity: 'common',
+    power: 1.0, hp: 105,
+    description: 'Redemoinhos de dragão e jatos d\'água.',
+    evolution: { to: 'seadra', level: 32 }
+  },
+  seadra: {
+    id: 'seadra', dex: 117, name: 'Seadra', types: ['water'],
+    abilities: ['bubble_beam'], moveLine: ['twister', 'bubble_beam', 'hydro_pump'], role: 'Dano à distância', rarity: 'evolved',
+    power: 1.6, hp: 170,
+    description: 'Forma final: espinhos venenosos e Hydro Pump.'
+  },
+  goldeen: {
+    id: 'goldeen', dex: 118, name: 'Goldeen', types: ['water'],
+    abilities: ['peck'], moveLine: ['peck', 'water_pulse', 'hydro_pump'], role: 'Afastamento', rarity: 'common',
+    power: 1.0, hp: 135,
+    description: 'O chifre que bica e as ondas que empurram.',
+    evolution: { to: 'seaking', level: 33 }
+  },
+  seaking: {
+    id: 'seaking', dex: 119, name: 'Seaking', types: ['water'],
+    abilities: ['water_pulse'], moveLine: ['peck', 'water_pulse', 'hydro_pump'], role: 'Afastamento', rarity: 'evolved',
+    power: 1.64, hp: 205,
+    description: 'Forma final: o rei das cachoeiras.'
+  },
+  mr_mime: {
+    id: 'mr_mime', dex: 122, name: 'Mr. Mime', types: ['psychic', 'fairy'],
+    abilities: ['psybeam'], moveLine: ['confusion', 'psybeam', 'psychic_wave'], role: 'Dano à distância', rarity: 'rare',
+    power: 1.67, hp: 180,
+    description: 'Paredes invisíveis e ondas psíquicas.'
+  },
+  scyther: {
+    id: 'scyther', dex: 123, name: 'Scyther', types: ['bug', 'flying'],
+    abilities: ['wing_attack'], moveLine: ['quick_attack', 'wing_attack', 'hurricane'], role: 'Corpo a corpo', rarity: 'rare',
+    power: 1.82, hp: 200,
+    description: 'Lâminas tão rápidas que parecem asas.'
+  },
+  jynx: {
+    id: 'jynx', dex: 124, name: 'Jynx', types: ['ice', 'psychic'],
+    abilities: ['ice_beam'], moveLine: ['powder_snow', 'ice_beam', 'blizzard'], role: 'Dano à distância', rarity: 'rare',
+    power: 1.65, hp: 175,
+    description: 'Neve e beijos que congelam a horda.'
+  },
+  electabuzz: {
+    id: 'electabuzz', dex: 125, name: 'Electabuzz', types: ['electric'],
+    abilities: ['thunderbolt'], moveLine: ['thunder_shock', 'thunderbolt', 'thunder'], role: 'Raio em cadeia', rarity: 'rare',
+    power: 1.78, hp: 185,
+    description: 'Raios poderosos de quem vive em usinas.'
+  },
+  magmar: {
+    id: 'magmar', dex: 126, name: 'Magmar', types: ['fire'],
+    abilities: ['flamethrower'], moveLine: ['ember', 'flamethrower', 'fire_blast'], role: 'Dano à distância', rarity: 'rare',
+    power: 1.8, hp: 185,
+    description: 'Chamas de um vulcão que anda.'
+  },
+  pinsir: {
+    id: 'pinsir', dex: 127, name: 'Pinsir', types: ['bug'],
+    abilities: ['seismic_toss'], moveLine: ['bug_bite', 'seismic_toss', 'cross_chop'], role: 'Corpo a corpo', rarity: 'rare',
+    power: 1.82, hp: 200,
+    description: 'Pinças que agarram e arremessam.'
+  },
+  tauros: {
+    id: 'tauros', dex: 128, name: 'Tauros', types: ['normal'],
+    abilities: ['hyper_fang'], moveLine: ['quick_attack', 'hyper_fang', 'hyper_beam'], role: 'Corpo a corpo', rarity: 'rare',
+    power: 1.78, hp: 215,
+    description: 'Investidas de uma manada inteira em um só.'
+  },
+  lapras: {
+    id: 'lapras', dex: 131, name: 'Lapras', types: ['water', 'ice'],
+    abilities: ['ice_beam'], moveLine: ['water_gun', 'ice_beam', 'blizzard'], role: 'Dano à distância', rarity: 'rare',
+    power: 1.95, hp: 295,
+    description: 'Gentil, atravessa o mar e congela a horda.'
+  },
+  ditto: {
+    id: 'ditto', dex: 132, name: 'Ditto', types: ['normal'],
+    abilities: ['quick_attack'], moveLine: ['quick_attack', 'hyper_voice', 'hyper_beam'], role: 'Afastamento', rarity: 'common',
+    power: 0.9, hp: 130,
+    description: 'Imita o que vê; quase nunca é o suficiente.'
+  },
+  eevee: {
+    id: 'eevee', dex: 133, name: 'Eevee', types: ['normal'],
+    abilities: ['quick_attack'], moveLine: ['quick_attack', 'hyper_fang', 'hyper_beam'], role: 'Corpo a corpo', rarity: 'common',
+    power: 1.0, hp: 150,
+    description: 'Instável: evolui para Vaporeon, Jolteon ou Flareon.',
+    evolution: { to: 'vaporeon', level: 30, method: 'stone', item: 'Pedra da Água/Trovão/Fogo', alternatives: ['jolteon', 'flareon'] }
+  },
+  vaporeon: {
+    id: 'vaporeon', dex: 134, name: 'Vaporeon', types: ['water'],
+    abilities: ['water_pulse'], moveLine: ['water_gun', 'water_pulse', 'hydro_pump'], role: 'Afastamento', rarity: 'evolved',
+    power: 1.91, hp: 280,
+    description: 'Forma de água: ondas e jatos poderosos.'
+  },
+  jolteon: {
+    id: 'jolteon', dex: 135, name: 'Jolteon', types: ['electric'],
+    abilities: ['thunderbolt'], moveLine: ['thunder_shock', 'thunderbolt', 'thunder'], role: 'Raio em cadeia', rarity: 'evolved',
+    power: 1.91, hp: 190,
+    description: 'Forma elétrica: raios em cadeia velocíssimos.'
+  },
+  flareon: {
+    id: 'flareon', dex: 136, name: 'Flareon', types: ['fire'],
+    abilities: ['fire_spin'], moveLine: ['ember', 'fire_spin', 'fire_blast'], role: 'Defesa giratória', rarity: 'evolved',
+    power: 1.91, hp: 200,
+    description: 'Forma de fogo: chamas que giram e explodem.'
+  },
+  porygon: {
+    id: 'porygon', dex: 137, name: 'Porygon', types: ['normal'],
+    abilities: ['thunder_shock'], moveLine: ['thunder_shock', 'psybeam', 'hyper_beam'], role: 'Dano à distância', rarity: 'uncommon',
+    power: 1.44, hp: 185,
+    description: 'Um Pokémon feito de código: ataques de três elementos.'
+  },
+  omanyte: {
+    id: 'omanyte', dex: 138, name: 'Omanyte', types: ['rock', 'water'],
+    abilities: ['water_gun'], moveLine: ['water_gun', 'rock_slide', 'hydro_pump'], role: 'Dano à distância', rarity: 'uncommon',
+    power: 1.29, hp: 150,
+    description: 'Um fóssil revivido: jatos e pedras antigas.',
+    evolution: { to: 'omastar', level: 40 }
+  },
+  omastar: {
+    id: 'omastar', dex: 139, name: 'Omastar', types: ['rock', 'water'],
+    abilities: ['rock_slide'], moveLine: ['water_gun', 'rock_slide', 'hydro_pump'], role: 'Dano à distância', rarity: 'evolved',
+    power: 1.8, hp: 225,
+    description: 'Forma final: a concha pesada e Hydro Pump.'
+  },
+  kabuto: {
+    id: 'kabuto', dex: 140, name: 'Kabuto', types: ['rock', 'water'],
+    abilities: ['rock_throw'], moveLine: ['rock_throw', 'water_pulse', 'rock_slide'], role: 'Afastamento', rarity: 'uncommon',
+    power: 1.29, hp: 130,
+    description: 'Um fóssil revivido: pedras e ondas.',
+    evolution: { to: 'kabutops', level: 40 }
+  },
+  kabutops: {
+    id: 'kabutops', dex: 141, name: 'Kabutops', types: ['rock', 'water'],
+    abilities: ['water_pulse'], moveLine: ['rock_throw', 'water_pulse', 'rock_slide'], role: 'Afastamento', rarity: 'evolved',
+    power: 1.8, hp: 200,
+    description: 'Forma final: foices afiadas do mar antigo.'
+  },
+  aerodactyl: {
+    id: 'aerodactyl', dex: 142, name: 'Aerodactyl', types: ['rock', 'flying'],
+    abilities: ['rock_slide'], moveLine: ['wing_attack', 'rock_slide', 'hyper_beam'], role: 'Dano à distância', rarity: 'rare',
+    power: 1.87, hp: 200,
+    description: 'Fera pré-histórica dos céus: asas e pedras.'
+  },
+  snorlax: {
+    id: 'snorlax', dex: 143, name: 'Snorlax', types: ['normal'],
+    abilities: ['hyper_voice'], moveLine: ['quick_attack', 'hyper_voice', 'hyper_beam'], role: 'Afastamento', rarity: 'rare',
+    power: 1.96, hp: 335,
+    description: 'Dorme quase o tempo todo; acordado, é uma muralha.'
+  },
+  articuno: {
+    id: 'articuno', dex: 144, name: 'Articuno', types: ['ice', 'flying'],
+    abilities: ['ice_beam'], moveLine: ['powder_snow', 'ice_beam', 'blizzard'], role: 'Dano à distância', rarity: 'legendary',
+    power: 2.11, hp: 275,
+    description: 'Lendário: nevascas que congelam a horda.'
+  },
+  zapdos: {
+    id: 'zapdos', dex: 145, name: 'Zapdos', types: ['electric', 'flying'],
+    abilities: ['thunderbolt'], moveLine: ['thunder_shock', 'thunderbolt', 'thunder'], role: 'Raio em cadeia', rarity: 'legendary',
+    power: 2.11, hp: 240,
+    description: 'Lendário: tempestades de raios.'
+  },
+  moltres: {
+    id: 'moltres', dex: 146, name: 'Moltres', types: ['fire', 'flying'],
+    abilities: ['flamethrower'], moveLine: ['ember', 'flamethrower', 'fire_blast'], role: 'Dano à distância', rarity: 'legendary',
+    power: 2.11, hp: 240,
+    description: 'Lendário: chamas que iluminam o céu.'
+  },
+  dratini: {
+    id: 'dratini', dex: 147, name: 'Dratini', types: ['dragon'],
+    abilities: ['twister'], moveLine: ['twister', 'dragon_breath', 'outrage'], role: 'Dano à distância', rarity: 'common',
+    power: 1.0, hp: 120,
+    description: 'Raro e tímido: redemoinhos de dragão.',
+    evolution: { to: 'dragonair', level: 30 }
+  },
+  dragonair: {
+    id: 'dragonair', dex: 148, name: 'Dragonair', types: ['dragon'],
+    abilities: ['dragon_breath'], moveLine: ['twister', 'dragon_breath', 'outrage'], role: 'Dano à distância', rarity: 'evolved',
+    power: 1.53, hp: 175,
+    description: 'Aura de dragão que acalma o clima.',
+    evolution: { to: 'dragonite', level: 55 }
+  },
+  dragonite: {
+    id: 'dragonite', dex: 149, name: 'Dragonite', types: ['dragon', 'flying'],
+    abilities: ['outrage'], moveLine: ['twister', 'dragon_breath', 'outrage'], role: 'Dano à distância', rarity: 'evolved',
+    power: 2.18, hp: 255,
+    description: 'Forma final: o dragão que dá a volta ao mundo.'
+  },
+  mewtwo: {
+    id: 'mewtwo', dex: 150, name: 'Mewtwo', types: ['psychic'],
+    abilities: ['psybeam'], moveLine: ['confusion', 'psybeam', 'psychic_wave'], role: 'Dano à distância', rarity: 'legendary',
+    power: 2.47, hp: 265,
+    description: 'Lendário: o Pokémon mais poderoso já criado.'
+  },
+  mew: {
+    id: 'mew', dex: 151, name: 'Mew', types: ['psychic'],
+    abilities: ['psybeam'], moveLine: ['confusion', 'psybeam', 'psychic_wave'], role: 'Dano à distância', rarity: 'legendary',
+    power: 2.18, hp: 270,
+    description: 'Lendário: dizem que guarda o código de todos.'
   }
 };
 

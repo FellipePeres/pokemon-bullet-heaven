@@ -44,6 +44,8 @@ export const CAPTURE_POOLS = {
     id: 'phase3',
     name: 'Rotas 5 e 6',
     species: {
+      // pesca nas Rotas 5 e 6 no FireRed — padrão até o Fellipe decidir (PLANEJAMENTO, D7)
+      goldeen: 3,
       rattata: 7, pidgey: 6, zubat: 6, magikarp: 6, geodude: 6, poliwag: 5,
       oddish: 5, bellsprout: 5, pikachu: 5, meowth: 4, psyduck: 4, mankey: 4,
       diglett: 4, sandshrew: 3, ekans: 3, growlithe: 3, vulpix: 3, ponyta: 2,
@@ -57,6 +59,8 @@ export const CAPTURE_POOLS = {
     id: 'phase4',
     name: 'Rota 7 e Celadon',
     species: {
+      // Túnel de Pedra no FireRed — padrão até o Fellipe decidir (PLANEJAMENTO, D7)
+      onix: 3,
       zubat: 5, geodude: 5, psyduck: 5, poliwag: 5, oddish: 5, bellsprout: 5,
       meowth: 4, growlithe: 4, vulpix: 4, ponyta: 4, gastly: 4, drowzee: 4, machop: 4,
       diglett: 3, magnemite: 3, voltorb: 3, krabby: 3, horsea: 3, tentacool: 3,
@@ -71,6 +75,8 @@ export const CAPTURE_POOLS = {
     id: 'phase5',
     name: 'Ciclovia e Rotas 16-19',
     species: {
+      // Rotas 12–15 e Zona Safári no FireRed — padrão até o Fellipe decidir (PLANEJAMENTO, D7)
+      venonat: 3,
       zubat: 4, golbat: 3, geodude: 3, graveler: 3, psyduck: 3, golduck: 2,
       poliwag: 3, poliwhirl: 2, tentacool: 4, tentacruel: 2, krabby: 3, kingler: 1,
       horsea: 3, seadra: 1, shellder: 3, cloyster: 1, gastly: 3, haunter: 2,
@@ -87,6 +93,8 @@ export const CAPTURE_POOLS = {
     id: 'phase6',
     name: 'Saffron',
     species: {
+      // Rotas 16–18 no FireRed — padrão até o Fellipe decidir (PLANEJAMENTO, D7)
+      doduo: 3,
       golbat: 3, kadabra: 3, haunter: 3, machoke: 3, graveler: 3,
       gloom: 2, weepinbell: 2, ivysaur: 2, charmeleon: 2, wartortle: 2,
       raichu: 2, arcanine: 2, ninetales: 2, rapidash: 2, magneton: 2, dugtrio: 2,
@@ -103,6 +111,8 @@ export const CAPTURE_POOLS = {
     id: 'phase7',
     name: 'Cinnabar',
     species: {
+      // Ilhas Seafoam no FireRed — padrão até o Fellipe decidir (PLANEJAMENTO, D7)
+      seel: 3,
       golbat: 2.5, graveler: 2.5, kadabra: 2.5, haunter: 2.5, machoke: 2.5,
       ivysaur: 2, charmeleon: 2, wartortle: 2, arcanine: 2, ninetales: 2,
       rapidash: 2, magneton: 2, weezing: 2, muk: 2, rhydon: 2,

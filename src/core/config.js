@@ -3,7 +3,7 @@
  * Nada de número mágico espalhado pelo gameplay: se precisar ajustar, ajuste aqui.
  */
 export const CONFIG = {
-  version: '0.6.0',
+  version: '0.7.0',
 
   canvas: { width: 1280, height: 720 },
 
@@ -83,7 +83,28 @@ export const CONFIG = {
      * 25% para cada ativo (75% no total) e 8,33% para cada um da reserva.
      * Com menos Pokémon, a mesma proporção 3:1 é redistribuída.
      */
-    xpWeight: { active: 3, benched: 1 }
+    xpWeight: { active: 3, benched: 1 },
+    /**
+     * Até o nível `xpKnee` a curva é exponencial (o começo, calibrado nas fases
+     * 1 e 2); depois cresce como potência do nível. Só exponencial, chegar ao
+     * nível 60 da Elite Four exigiria ~305 mil XP por Pokémon.
+     */
+    xpKnee: 20,
+    xpLateExponent: 2.2
+  },
+
+  /**
+   * Nível dos selvagens (definido nas ondas de cada fase, acompanhando a
+   * equipe). Os números de enemies.js valem para `referenceLevel`; cada nível
+   * acima multiplica vida e dano (crescimento composto: o poder do jogador
+   * cresce mais rápido que linear, com evolução, golpe final e melhorias) e
+   * soma XP. Fase sem nível nas ondas (1 e 2) fica como sempre foi.
+   */
+  enemies: {
+    referenceLevel: 5,
+    hpGrowth: 1.075,
+    damageGrowth: 1.035,
+    xpPerLevel: 0.08
   },
 
   capture: {

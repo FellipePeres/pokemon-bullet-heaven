@@ -111,6 +111,7 @@
     <div id="campaign-list" class="stage-list"></div>
 
     <div class="row-buttons">
+      <button id="btn-hall" class="menu-btn ghost hidden">Hall da Fama</button>
       <button id="btn-save-campaign" class="menu-btn ghost">Salvar Jogo (.json)</button>
       <button class="menu-btn ghost back" data-back="screen-title">Menu Principal</button>
     </div>
@@ -195,6 +196,19 @@
         </div>
         <p class="subtitle" id="evolution-text"></p>
         <button id="evolution-continue" class="menu-btn primary"><span class="btn-text">Continuar</span></button>
+      </div>
+    </div>
+
+    <!-- ===== APRESENTAÇÃO DO LÍDER (retrato e fala, como no FireRed) ===== -->
+    <div id="leader-overlay" class="overlay hidden">
+      <div class="leader-intro">
+        <img id="leader-portrait" class="leader-intro-portrait" alt="" />
+        <div class="leader-intro-text">
+          <h2 id="leader-name" class="glow"></h2>
+          <p id="leader-title" class="subtitle small"></p>
+          <div class="fr-window"><p id="leader-quote"></p></div>
+          <button id="leader-fight" class="menu-btn primary"><span class="btn-text">Lutar!</span></button>
+        </div>
       </div>
     </div>
 
@@ -322,6 +336,23 @@
           8,33% para cada um da reserva.
         </p>
       </div>
+    </div>
+  </div>
+
+  <!-- ===== HALL DA FAMA (depois do Campeão, como no FireRed) ===== -->
+  <div id="hall-overlay" class="overlay hidden">
+    <div class="overlay-card hall-card">
+      <h2 class="glow">HALL DA FAMA</h2>
+      <p class="subtitle" id="hall-text"></p>
+      <div class="hall-row">
+        <img id="hall-trainer" class="hall-trainer" alt="" />
+        <div id="hall-team" class="hall-team"></div>
+      </div>
+      <p class="hall-credits">
+        Pokémon © Nintendo, Game Freak e Creatures. Sprites da PokeAPI e do FireRed
+        (pret/pokefirered). Um projeto de fã, sem fins lucrativos.
+      </p>
+      <button id="hall-close" class="menu-btn primary"><span class="btn-text">Voltar à jornada</span></button>
     </div>
   </div>
 

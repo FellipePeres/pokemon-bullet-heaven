@@ -19,6 +19,10 @@ export class CaptureSystem {
    * (ver data/capturePools.js). Quem já está na equipe fica de fora.
    */
   rollChoices(count = CONFIG.capture.choices) {
+    // presente da fase: as opções são fixas (uma troca, o prêmio do Dojo)
+    const gift = this.run.pendingGift;
+    if (gift) return gift.choices.map(getPokemon).filter((p) => p && !this.run.team.has(p.id));
+
     const pool = poolEntries(this.run.stage.capturePool)
       .filter((entry) => !entry.pokemon.starter && !this.run.team.has(entry.pokemon.id));
 

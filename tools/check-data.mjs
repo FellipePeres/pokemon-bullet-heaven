@@ -69,7 +69,11 @@ for (const stage of Object.values(STAGES)) {
     ...(stage.bossTeam ?? [])
   ].filter((id) => !ENEMIES[id]);
 
+  const rivalTeams = Object.values(stage.bossTeamByStarter ?? {}).flat();
+  missingEnemies.push(...rivalTeams.filter((id) => !ENEMIES[id]));
   if (missingEnemies.length) fail(`${stage.id}: inimigos inexistentes — ${[...new Set(missingEnemies)].join(', ')}`);
+  const badGifts = (stage.gifts ?? []).flatMap((g) => g.choices).filter((id) => !POKEMON[id]);
+  if (badGifts.length) fail(`${stage.id}: presentes com espécie inexistente — ${badGifts.join(', ')}`);
   if (!CAPTURE_POOLS[stage.capturePool]) fail(`${stage.id}: pool de captura "${stage.capturePool}" não existe`);
 }
 ok(`${Object.keys(STAGES).length} fases com inimigos e pools válidos`);

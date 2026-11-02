@@ -37,6 +37,7 @@ export class Run {
     // ---- entidades ----
     this.player = new Player(this.world.width / 2, this.world.height / 2);
     this.trainerLook = options.trainer ?? null;   // modelo do sprite (data/trainers.js)
+    this.campaignStarter = options.campaignStarter ?? options.starter ?? null;   // o rival monta o time por ele
     this.companions = [];
     this.enemies = [];
     this.projectiles = [];
@@ -72,6 +73,8 @@ export class Run {
     this.refreshStats();
 
     this.pendingBall = false;
+    this.pendingGift = null;     // presente da fase esperando a escolha (ver stage.gifts)
+    this.pendingIntro = null;    // líder que acabou de chegar e se apresenta
     this.levelUpMember = null;   // Pokémon que está com a tela de melhoria aberta
 
     // ---- efeitos ----
@@ -488,8 +491,9 @@ export class Run {
       bus.emit(EVENTS.STAGE_CLEARED, { stage: this.stage });
       return;
     }
+    if (this.pendingIntro) { this.state = 'intro'; return; }
     if (this.evolutionQueue.length) { this.state = 'evolution'; return; }
-    if (this.pendingBall) { this.state = 'capture'; return; }
+    if (this.pendingBall || this.pendingGift) { this.state = 'capture'; return; }
 
     // Pokémon ativo que subiu de nível pausa o jogo na hora.
     // Os da reserva acumulam e sobem quando o jogador quiser (botão ↑).

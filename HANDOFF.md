@@ -5,7 +5,7 @@
 > decisão foi tomada e o que falta fazer. O `README.md` é o manual de uso;
 > este aqui é o contexto de desenvolvimento.
 
-**Versão atual:** `0.6.0` · **Última atualização:** 2026-11-02
+**Versão atual:** `0.7.0` · **Última atualização:** 2026-11-02
 **Stack:** HTML + CSS + JavaScript puro (ES Modules). Sem backend, sem build, sem dependências.
 **Repositório:** https://github.com/FellipePeres/pokemon-bullet-heaven (público)
 **Jogo no ar:** https://fellipeperes.github.io/pokemon-bullet-heaven/
@@ -102,7 +102,7 @@ src/
   core/
     config.js         ⭐ TODO o balanceamento e as opções
     events.js         EventBus + nomes de eventos
-    input.js          teclado
+    input.js          teclado e controle (Gamepad API)
     utils.js          matemática, sorteios, sistema de modificadores
   data/               ⭐ CONTEÚDO (só dados, sem lógica)
     pokemon.js        68 espécies: tipos, hp, power, evolução, moveLine
@@ -142,6 +142,7 @@ src/
     HUD.js            HUD da partida e overlays (nível, captura, evolução, pausa)
     Menus.js          menu, mapa, modais (Pokédex, conquistas, equipe, loja, opções)
     dom.js            helpers de DOM e toasts
+    pad.js            o controle nas telas: foco nos alvos clicáveis da camada de cima
   save/
     SaveManager.js    arquivo .json + autosave em localStorage
     profile.js        progresso permanente + ProfileTracker (eventos → perfil)
@@ -239,8 +240,19 @@ Nunca voltar bônus globais para o pool de level up — foi pedido explícito.
 - O chefe final é o **time do líder, enfrentado em sequência** (`bossTeam`),
   terminando no ace. Vencer dá insígnia + Shards.
 - A **jornada carrega equipe, níveis e build** de uma fase para a próxima
-  (`profile.campaign.journey`). Derrota devolve ao início da fase com a equipe
+  (`regions.kanto.journey`). Derrota devolve ao início da fase com a equipe
   como estava no começo dela.
+- **Kanto tem 13 etapas** (0.7): os 8 ginásios, a Elite Four em 4 salas (uma por
+  membro, cada uma com o time de 5 do FireRed) e o Campeão. Os times são os do
+  FireRed, com os níveis dele; o do rival muda pelo seu inicial
+  (`bossTeamByStarter`), como no jogo.
+- **Selvagens com nível** (0.7, só da Fase 3 em diante): cada onda tem `level:
+  [mín, máx]`, que **acompanha a equipe** (alguns níveis abaixo dela no começo,
+  perto do ace do líder no fim). Vida e dano crescem de forma composta por nível
+  (`CONFIG.enemies`). As Fases 1 e 2 não têm nível e ficaram como eram.
+- **Presentes** (`stage.gifts`): na hora marcada, a tela de captura abre com
+  opções fixas, como as trocas e o Dojo do FireRed (Farfetch'd na Fase 3;
+  Lickitung e Hitmonlee ou Hitmonchan na Fase 6). Um de cada vez.
 
 ### Shards (moeda)
 - Vêm de concluir fases (automático: 120 + 180 na primeira vez) e de
@@ -258,28 +270,55 @@ Valores em `src/core/config.js` (o que não estiver lá está em `/data`):
 |---|---|
 | Pokémon ativos / equipe | 3 / 6 |
 | Cooldown de troca | 6s |
-| Curva de XP por Pokémon | 12 × 1,15^nível |
+| Curva de XP por Pokémon | 12 × 1,15^nível até o nível 20; depois cresce como (nível/20)^2,2 |
 | Melhoria a cada | 3 níveis |
 | Chance de TM no level up | 12% |
 | Vida por nível / dano por nível | +6 HP / +7% |
 | Invencibilidade após golpe | 0,5s |
 | Regeneração: campo / reserva | 0,6 / 2,5 HP/s |
 | Chance de poção (selvagem comum) | 4% |
-| Poké Balls por fase | 5 (3 garantidas) |
+| Poké Balls por fase | 5 a 6 (3 garantidas); 4 na Elite Four, 2 no Campeão |
 | Shards por fase | 120 (+180 na 1ª vez) |
-| Duração das fases | 300s / 330s |
+| Duração das fases | 300s a 420s (Fases 1 a 8); 280s a 300s (Elite Four); 240s (Campeão) |
+| Selvagens por nível (Fase 3+) | vida ×1,075 e dano ×1,035 por nível acima do 5; XP +8% por nível |
 
-**Dificuldade medida** (24 partidas simuladas na Fase 1, jogador virtual):
-**63% de vitória**, nível máximo ~17-18, ~20 telas de melhoria, 2-4 desmaios por
-partida, derrotas concentradas entre 260s e 293s (na reta final / no líder).
-O Fellipe joga melhor que o bot, então na prática fica em torno de 75-85%.
+**Dificuldade medida** (0.7, `npm run balance -- --runs 12 --until champion`: 12
+jornadas do zero, levando a equipe de fase em fase, jogador virtual):
+
+| Etapa | Vitórias do bot | Nível no líder (ace) | Luta | Desmaios | Pico de inimigos |
+|---|---|---|---|---|---|
+| Fase 1 (Brock) | 71% | 16 (14) | 24s | 2,4 | 65 |
+| Fase 2 (Misty) | 80% | 22 (21) | 18s | 2,0 | 79 |
+| Fase 3 (Lt. Surge) | 63% | 31 (24) | 21s | 3,1 | 92 |
+| Fase 4 (Erika) | 79% | 35 (29) | 21s | 1,7 | 90 |
+| Fase 5 (Koga) | 71% | 39 (43) | 33s | 1,9 | 103 |
+| Fase 6 (Sabrina) | 44% | 45 (43) | 28s | 4,3 | 116 |
+| Fase 7 (Blaine) | 80% | 49 (47) | 28s | 2,0 | 111 |
+| Fase 8 (Giovanni) | 70% | 48 (50) | 35s | 2,1 | 115 |
+| Lorelei | 88% | 49 (54) | 40s | 1,8 | 142 |
+| Bruno | 78% | 51 (56) | 43s | 1,6 | 103 |
+| Agatha | 50% | 53 (58) | 52s | 3,5 | 91 |
+| Lance | 63% | 54 (60) | 43s | 2,9 | 135 |
+| Campeão | 83% | 60 (63) | 48s | 1,8 | 121 |
+
+5 das 12 jornadas foram do zero até o Campeão. Entre uma medição e outra os
+números variam uns ±15 pontos (o sorteio de capturas pesa muito), então olhe a
+tendência de várias rodadas antes de mexer. O Fellipe joga melhor que o bot: se a
+sensação for de jogo fácil, a primeira alavanca é o `scaling.damage` da fase.
 
 **Como ajustar dificuldade** (na ordem de impacto):
 1. `scaling.damage` da fase — é o que mais mata.
 2. Densidade das ondas (`batch`, `interval`, `maxAlive`) e quantidade de elites.
 3. `scaling.hp` da fase — alonga a partida sem matar.
-4. Vida dos Pokémon do líder em `enemies.js`.
-5. `damagePerLevel` / upgrade de dano — mexem no poder do jogador.
+4. Faixa de `level` das ondas (Fase 3+): cada nível a mais é +7,5% de vida.
+5. Vida dos Pokémon do líder em `enemies.js`.
+6. `CONFIG.enemies` / `damagePerLevel` / upgrade de dano — mexem em todas as
+   fases de uma vez: evite.
+
+**Como medir uma fase do fim** sem rejogar tudo: `npm run balance -- --until
+gym_5_fuchsia --save equipes.json` guarda as equipes que venceram, e `--load
+equipes.json --from gym_6_saffron` recomeça delas. Cada fase recebe equipes vindas
+da anterior, então calibre **em ordem**, uma fase por vez.
 
 ⚠️ Aprendizado: mexer em várias alavancas ao mesmo tempo já levou de 90% para 13%
 de vitória. **Mexa em uma, meça, repita.**
@@ -407,28 +446,30 @@ região atual é `game.campaign` (`regionProgress(profile)`).
 
 ## 9. Estado do conteúdo
 
-**Pronto e jogável:**
-- Fase 1 — Rumo a Pewter (BROCK): 4 trechos, elites, Geodude + Onix em sequência.
-- Fase 2 — Rumo a Cerulean (MISTY): 4 trechos, elites, Staryu + Starmie.
-- 68 espécies jogáveis com linha de golpes e evolução.
-- Pools de captura: **fases 1 e 2 a 100%** das tabelas.
+**Pronto e jogável (0.7): Kanto inteira.**
+- **13 etapas**: Fase 1 (Brock) → Fase 2 (Misty) → Fase 3 (Lt. Surge) → Fase 4
+  (Erika) → Fase 5 (Koga) → Fase 6 (Sabrina) → Fase 7 (Blaine) → Fase 8
+  (Giovanni) → Elite Four (Lorelei, Bruno, Agatha, Lance) → Campeão (o rival).
+  Cada uma com trechos dos lugares do FireRed, selvagens das rotas, elites e o
+  time do líder com os níveis do jogo.
+- **151 espécies jogáveis**, todas com linha de 3 golpes e evolução (pedra e troca
+  por nível equivalente; Eevee sorteia a evolução).
+- **Tabelas de captura**: as 9 do Fellipe, 100% das espécies disponíveis; mais
+  Goldeen, Onix, Venonat, Doduo e Seel com peso 3 (padrão até o Fellipe decidir).
+- **52 golpes**, no máximo 4 por tipo, todos com sprite do FireRed.
 
-**Esqueleto (aparece como "em breve" no mapa):**
-Fases 3 a 9 — Lt. Surge, Erika, Koga, Sabrina, Blaine, Giovanni, Elite Four + Campeão.
-As tabelas de captura delas **já estão escritas** em `capturePools.js`; falta
-implementar as espécies e os blocos de fase. Cobertura hoje:
+Quando o líder chega, a partida pausa na **apresentação** dele (retrato, nome e a
+fala na caixa de texto do FireRed) até o jogador apertar "Lutar!".
 
-| Pool | Espécies prontas |
-|---|---|
-| phase3 | 17/27 (64%) |
-| phase4 | 14/31 (43%) |
-| phase5 | 8/44 (22%) |
-| phase6 | 19/43 (35%) |
-| phase7 | 16/41 (31%) |
-| phase8 | 18/55 (26%) |
-| phase9 | 18/60 (21%) |
+Vencer o Campeão abre o **Hall da Fama** (a equipe campeã, um Pokémon por vez, com
+os créditos); as equipes ficam em `profile.hallOfFame`, e o mapa da jornada tem o
+botão para revê-las.
 
-`npm run check` sempre mostra esse quadro atualizado.
+**Ainda não existe** (ver `PLANEJAMENTO.md`): os lendários como encontros
+especiais, o pós-jogo, os Pokémon animados e o cenário de tiles (Etapa 3), o som
+(Etapa 5) e o celular (Etapa 6). O controle (gamepad) funciona desde a 0.7.
+
+`npm run check` mostra o quadro das tabelas de captura sempre atualizado.
 
 ---
 
@@ -481,6 +522,13 @@ tipo, som e o polimento de troca e captura.
   chaves iguais de propósito (`ember`, `gust`, `bubble`...). Ao remover um golpe,
   mexa só no `ABILITY_FX`: na 0.6 um script apagou o efeito `bubble` no lugar do
   golpe, e o `check-data` pegou.
+- **Pular o relógio nos testes** (`game.run.time = ...`) dispara de uma vez todos
+  os eventos que ficaram para trás: elites, Poké Balls garantidas, presentes e
+  avisos. É efeito do atalho, não do jogo.
+- **Estados que pausam a partida** (`levelup`, `capture`, `evolution`, `intro`):
+  `Run.update` não roda fora de `running`. Todo estado novo precisa ser resolvido
+  pelo `Game`, pelo bot (`tools/bot.mjs`) e pelo `SETTLE` do `screenshot.mjs`,
+  senão a simulação congela.
 - **Desempenho:** gradiente criado por projétil a cada quadro era o desenho mais
   caro; agora é sprite. Efeitos, acertos e partículas têm teto (`CONFIG.fx`).
   Medido na `vitrine.html?estresse` (Chrome sem janela): 60 FPS e ~2 ms por
@@ -500,7 +548,7 @@ tipo, som e o polimento de troca e captura.
 | 3d | ícones de item em vez de emoji | `icons.js` + sprites de item/insígnia |
 | 4 | jogo muito fácil; TM tem que ser a linha do próprio Pokémon; UI do treinador feia; Shards coletáveis | `moveLine` de 3 golpes por espécie, dificuldade recalibrada (63%), treinador redesenhado, conquistas com botão de coletar |
 | 5 | fases que faltam com dificuldade crescente; sprites de golpe; escolher menino ou menina; tudo ambientado com sprites (movimento continua livre, só o cenário espelha o FireRed); outras regiões em breve | `PLANEJAMENTO.md`; etapas 0 e 1 (0.5): extrator do Pokemon All, vitrine e screenshots, progresso por região, tela do treinador com o Oak, Red/Leaf em jogo, retratos dos líderes; conserto da insígnia |
-| 6 | jogo leve no navegador: no máximo 4 golpes por tipo, reaproveitando; otimizar; todo o conteúdo (fases e Pokémon novos) | etapa 2 (0.6): 52 golpes em 16 tipos (Terra, Fantasma, Dragão e Gelo novos), sprites do FireRed em todos, aviso no chão antes do golpe do líder, tremor de tela, opções salvas, vitrine de golpes e de estresse; migração dos saves |
+| 6 | jogo leve no navegador: no máximo 4 golpes por tipo, reaproveitando; otimizar; todo o conteúdo (fases e Pokémon novos) | etapa 2 (0.6): 52 golpes em 16 tipos (Terra, Fantasma, Dragão e Gelo novos), sprites do FireRed em todos, aviso no chão antes do golpe do líder, tremor de tela, opções salvas, vitrine de golpes e de estresse; migração dos saves. Etapa 4 (0.7): as 151 espécies, as 13 etapas até o Campeão, selvagens com nível, presentes, rival pelo inicial, apresentação do líder, calibragem fase a fase com `tools/balance.mjs` |
 
 ---
 

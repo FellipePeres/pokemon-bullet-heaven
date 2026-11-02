@@ -3,6 +3,11 @@
  *
  * Uso:
  *   node tools/balance.mjs [--runs 8] [--starter charmander] [--until gym_2_cerulean]
+ *   node tools/balance.mjs --until gym_5_fuchsia --save equipes.json
+ *   node tools/balance.mjs --load equipes.json --from gym_6_saffron --until gym_8_viridian
+ *
+ * --save guarda as equipes que venceram a última fase; --load + --from
+ * recomeça delas, sem rejogar as fases anteriores (calibrar as finais rápido).
  *
  * Cada jornada joga as fases em ordem, levando a equipe de uma para a outra
  * como no jogo; uma derrota repete a fase com a equipe do começo dela (até 3
@@ -17,6 +22,7 @@
  * Fellipe joga melhor que ele, e chega ao líder perto do nível do ace dele.
  * Regra do projeto: mexa em uma alavanca por vez, meça, repita.
  */
+import { readFileSync, writeFileSync } from 'node:fs';
 import { simulate } from './bot.mjs';
 import { STAGES } from '../src/data/stages.js';
 import { getRegion } from '../src/data/regions.js';
@@ -32,21 +38,30 @@ const STARTER = arg('starter', null);
 const UNTIL = arg('until', null);
 const STARTERS = ['charmander', 'bulbasaur', 'squirtle'];
 const MAX_ATTEMPTS = 3;
+const SAVE = arg('save', null);
+const LOAD = arg('load', null);
+const FROM = arg('from', null);
+const loaded = LOAD ? JSON.parse(readFileSync(LOAD, 'utf8')) : [];
+const saved = [];
 
 const stages = [];
+let started = !FROM;
 for (const entry of getRegion('kanto').campaign) {
   if (entry.comingSoon) break;
-  stages.push(STAGES[entry.stage]);
+  if (entry.stage === FROM) started = true;
+  if (started) stages.push(STAGES[entry.stage]);
   if (entry.stage === UNTIL) break;
 }
 
 const stats = new Map(stages.map((s) => [s.id, { tries: 0, wins: 0, levels: [], fights: [], faints: [], peaks: [], blocked: 0 }]));
 const avg = (list) => (list.length ? list.reduce((a, b) => a + b, 0) / list.length : NaN);
-const started = Date.now();
+const startedAt = Date.now();
 
 for (let r = 0; r < RUNS; r++) {
-  const starter = STARTER ?? STARTERS[r % STARTERS.length];
-  let journey = null;
+  const from = loaded.length ? loaded[r % loaded.length] : null;
+  const starter = from?.starter ?? STARTER ?? STARTERS[r % STARTERS.length];
+  let journey = from ? { team: from.team } : null;
+  let finished = true;
   for (const stage of stages) {
     const s = stats.get(stage.id);
     let won = false;
@@ -64,12 +79,13 @@ for (let r = 0; r < RUNS; r++) {
         journey = { team: run.team.serialize() };
       }
     }
-    if (!won) { s.blocked++; break; }   // a jornada para aqui
+    if (!won) { s.blocked++; finished = false; break; }   // a jornada para aqui
   }
+  if (finished && journey) saved.push({ starter, team: journey.team });
   process.stdout.write('.');
 }
 
-console.log(`\n\nBALANCEAMENTO — ${RUNS} jornada(s), ${((Date.now() - started) / 1000).toFixed(0)}s\n`);
+console.log(`\n\nBALANCEAMENTO — ${RUNS} jornada(s), ${((Date.now() - startedAt) / 1000).toFixed(0)}s\n`);
 console.log('fase                 vitórias        no líder (ace)   luta    desmaios  pico');
 for (const stage of stages) {
   const s = stats.get(stage.id);
@@ -81,4 +97,9 @@ for (const stage of stages) {
     `${avg(s.fights).toFixed(0).padStart(4)}s  ${avg(s.faints).toFixed(1).padStart(6)}  ${Math.round(avg(s.peaks)).toString().padStart(5)}` +
     (s.blocked ? `   ${s.blocked} jornada(s) parada(s) aqui` : '')
   );
+}
+
+if (SAVE) {
+  writeFileSync(SAVE, JSON.stringify(saved));
+  console.log(`\n${saved.length} equipe(s) vencedora(s) guardada(s) em ${SAVE}`);
 }

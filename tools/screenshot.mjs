@@ -52,6 +52,48 @@ const ROTEIROS = {
     { hold: ['KeyS'] }, { wait: 600 }, { shot: 'partida-baixo' },
     { hold: [] }, { wait: 400 }, { shot: 'partida-parado' }
   ],
+  // a apresentação do líder (o Lt. Surge, na Fase 3)
+  lider: [
+    { open: 'index.html' }, { wait: 500 },
+    { run: "game.newGame(); game.chooseTrainer('red'); game.chooseStarter('pikachu' in {} ? 'pikachu' : 'charmander');" +
+           "['gym_1_pewter','gym_2_cerulean'].forEach((s) => game.campaign.clearedStages.push(s)); game.startStage('gym_3_vermilion')" },
+    { wait: 300 }, { run: 'game.run.time = game.run.stage.duration + 0.2' }, { wait: 6500 }, { shot: 'lider', raw: true }
+  ],
+  // o controle nas telas: o 1º direcional mostra o foco, o 2º vai para a Menina; A confirma
+  controle: [
+    { open: 'index.html' }, { wait: 500 },
+    { run: "game.newGame(); ['right', 'right', 'a'].forEach((b) => game.handleAction('pad:' + b))" }, { wait: 300 },
+    { log: 'game.profile.trainer' },
+    { run: "['a', 'a'].forEach((b) => game.handleAction('pad:' + b))" }, { wait: 400 },
+    { log: 'game.campaign.starter' }, { shot: 'controle' }
+  ],
+  // vencer o Campeão: o Hall da Fama com a equipe campeã
+  hall: [
+    { open: 'index.html' }, { wait: 500 },
+    { run: "game.newGame(); game.chooseTrainer('leaf'); game.chooseStarter('bulbasaur');" +
+           "game.region.campaign.slice(0, -1).forEach((e) => game.campaign.clearedStages.push(e.stage));" +
+           "game.startStage('champion'); game.run.team.members[0].pokemonId = 'venusaur'; game.run.team.members[0].level = 61;" +
+           "[['pikachu', 58], ['lapras', 57], ['gengar', 59], ['dragonite', 60], ['snorlax', 58]].forEach(([id, lv]) => game.run.team.add(id, lv));" +
+           "game.run.state = 'victory'" },
+    { wait: 4500 }, { shot: 'hall', raw: true }
+  ],
+  // a jornada inteira liberada (página alta: use --size 1366x2600)
+  campanha: [
+    { open: 'index.html' }, { wait: 500 },
+    { run: "game.newGame(); game.chooseTrainer('leaf'); game.chooseStarter('squirtle');" +
+           "game.region.campaign.slice(0, -1).forEach((e) => game.campaign.clearedStages.push(e.stage)); game.openCampaign()" },
+    { wait: 1500 }, { shot: 'campanha' }
+  ],
+  // uma fase nova (Torre Pokémon) com uma equipe forte, para ver a horda e os golpes
+  fase5: [
+    { open: 'index.html' }, { wait: 500 },
+    { run: "game.newGame(); game.chooseTrainer('red'); game.chooseStarter('charmander');" +
+           "['gym_1_pewter','gym_2_cerulean','gym_3_vermilion','gym_4_celadon'].forEach((s) => game.campaign.clearedStages.push(s));" +
+           "game.startStage('gym_5_fuchsia');" +
+           "game.run.team.members[0].level = 36; ['gengar', 'blastoise', 'jolteon'].forEach((id) => game.run.team.add(id, 36));" +
+           "game.run.team.members.forEach((m) => { m.hp = 9999; }); game.run.refreshStats()" },
+    { wait: 6000 }, { shot: 'fase5' }
+  ],
   // os 52 golpes, 6 por foto, numa partida de verdade (vitrine.html?golpes=N)
   golpes: Array.from({ length: 9 }, (_, i) => [
     { open: `vitrine.html?golpes=${i}` }, { wait: 1600 }, { shot: `golpes-${i}` }
@@ -77,6 +119,7 @@ const SETTLE = `typeof game !== 'undefined' && game.run && (() => {
   if (game.levelUpOpen) game.pickUpgrade(game.run.progression.rollChoices(game.run.levelUpMember)[0].id);
   if (game.captureOpen) game.resolveCapture();
   if (game.evolutionOpen) game.closeEvolution();
+  if (game.introOpen) game.closeLeaderIntro();
 })()`;
 
 const BROWSERS = [
@@ -262,7 +305,7 @@ async function main() {
       } else if (step.hold) {
         await evaluate(`game.input.keys.clear(); ${JSON.stringify(step.hold)}.forEach((k) => game.input.keys.add(k))`);
       } else if (step.shot) {
-        await evaluate(SETTLE);
+        if (!step.raw) await evaluate(SETTLE);   // raw: fotografa a tela como está
         const { data } = await page('Page.captureScreenshot', { format: 'png' });
         const file = join(args.out, `${step.shot}.png`);
         writeFileSync(file, Buffer.from(data, 'base64'));

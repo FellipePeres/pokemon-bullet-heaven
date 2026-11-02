@@ -92,10 +92,10 @@ quando o Fellipe mandar**, porque o push publica o jogo.
 | 1 | Treinador: Menino ou Menina | 0.5 | 🟡 feita; falta a partida do Fellipe |
 | 2 | Golpes com sprite (e no máximo 4 por tipo) | 0.6 | ✅ feita (2026-11-02) |
 | 3 | Pokémon animados e cenário de tiles | 0.7 | ⏳ |
-| 4 | Fases 3 a 8, Elite Four e Campeão | 0.8 → 1.0 | ⏳ |
+| 4 | Fases 3 a 8, Elite Four e Campeão | 0.7 | ✅ feita (2026-11-02); falta só os lendários como encontros especiais |
 | 5 | Som | 1.0 | ⏳ |
-| 6 | Acabamento: opções salvas, controle, celular, desempenho, assets locais | 0.6 → 1.0 | ⏳ |
-| 7 | Final da jornada: Hall da Fama e créditos | 1.0 | ⏳ |
+| 6 | Acabamento: opções salvas, controle, celular, desempenho, assets locais | 0.6 → 1.0 | 🔶 opções, desempenho e controle feitos; faltam celular e assets locais |
+| 7 | Final da jornada: Hall da Fama e créditos | 0.7 | ✅ feita (2026-11-02); o pós-jogo (D9) fica para depois |
 | 8 | Outras regiões | 1.x | ⏳ |
 
 Kanto completo (a 1.0) é o fim das etapas 2 a 7. Os itens pequenos da Etapa 6
@@ -213,6 +213,39 @@ O plano original, para referência:
   do traço preto.
 
 ### Etapa 4 — Fases 3 a 8, Elite Four e Campeão
+
+**Feita na 0.7**, junto com o pedido de "todo o conteúdo":
+
+- **151 espécies jogáveis.** As 83 novas foram geradas com tipos e status de hoje
+  (PokeAPI), evolução do FireRed e a mesma conta de vida e potência das antigas;
+  a linha de golpes de cada família usa a lista enxuta da Etapa 2.
+- **13 etapas**: Fases 3 a 8, a Elite Four em 4 salas (uma por membro, cada uma
+  com o time de 5 do FireRed) e o Campeão, cujo time depende do seu inicial.
+- **Selvagens com nível** (D3). Diferente do plano: o nível **acompanha a equipe**
+  (de uns níveis abaixo dela no começo da fase até perto do ace do líder), e não o
+  das rotas do FireRed. Aqui a equipe sobe mais rápido que no jogo, e com os
+  níveis das rotas as fases 4 em diante ficavam triviais. Os líderes mantêm os
+  níveis do FireRed. Vida e dano crescem de forma composta por nível
+  (`CONFIG.enemies`), porque o poder do jogador cresce mais rápido que linear.
+- **Curva de XP com joelho** no nível 20 (exponencial antes, potência depois).
+  A equipe do bot chega ao Campeão por volta do nível 55.
+- **Presentes** (`stage.gifts`, D7): Farfetch'd na Fase 3, Lickitung e o prêmio do
+  Dojo (Hitmonlee ou Hitmonchan) na Fase 6. Goldeen, Onix, Venonat, Doduo e Seel
+  entraram nas tabelas de captura com peso 3, nos lugares do FireRed, como padrão
+  até o Fellipe decidir as porcentagens.
+- **Eevee** sorteia entre Vaporeon, Jolteon e Flareon (sem pedras como item), e
+  quem evolui para uma linha de golpes diferente leva o golpe para a posição
+  equivalente, com as melhorias.
+- **Calibrado** com `tools/balance.mjs`, uma fase por vez (ver HANDOFF §5).
+
+- **Apresentação do líder**: quando o líder chega, a partida pausa no retrato dele,
+  com a fala na caixa de texto do FireRed e o botão "Lutar!".
+
+Ainda falta desta etapa: os **lendários como encontros especiais** (hoje estão na
+tabela da fase 9 com chance baixa, como o Fellipe definiu).
+
+O plano original, para referência:
+
 
 Uma fase por vez, e cada uma é jogada e medida antes da próxima. Toda fase tem:
 
@@ -342,8 +375,9 @@ Levantamento de 2026-11-02:
 
 - ✅ **Opções salvas** (0.6): ficam no navegador (`save/options.js`), com o
   tremor de tela como opção nova.
-- **Controle (gamepad).** Hoje é só teclado. A Gamepad API do navegador é
-  barata: analógico para andar, botões para trocar e pausar.
+- ✅ **Controle (gamepad)** (0.7): na partida, analógico ou direcional anda,
+  LB/RB escolhem o slot, X/Y/B põem a reserva em campo e Start pausa; nas telas e
+  janelas, o direcional move o foco e o A confirma (`ui/pad.js`, genérico).
 - **Celular (D8).** Joystick virtual na tela e uma interface que caiba na tela
   pequena. O site é público, e hoje no celular o jogo não é jogável.
 - ✅ **Desempenho medido** (0.6): `vitrine.html?estresse` deu 60 FPS e ~2 ms por
@@ -355,6 +389,11 @@ Levantamento de 2026-11-02:
   merge na `main` + push, quando o Fellipe mandar.
 
 ### Etapa 7 — Final da jornada
+
+**Feita na 0.7**: vencer o Campeão abre o Hall da Fama com a equipe campeã (um
+Pokémon por vez, com o retrato do treinador) e os créditos; o perfil guarda as
+equipes (`profile.hallOfFame`) e o mapa da jornada ganha o botão para revê-las.
+O plano original, para referência:
 
 - Hoje, depois do Campeão, não acontece nada.
 - **Hall da Fama como no FireRed**: a equipe que venceu, um Pokémon por vez,
@@ -391,12 +430,12 @@ região, da Etapa 0, serve para as duas respostas.
 |---|---|---|---|
 | D1 | Pokémon em campo: GIF animado da Gen 5, sprite do FireRed (parado, mas no estilo do cenário) ou ícone da caixa (2 quadros, estilo "mini")? | GIF animado, porque é o que dá movimento. A vitrine mostra os três lado a lado para escolher olhando. | Etapa 3 |
 | D2 | Árvores e pedras do cenário: só decoração ou obstáculo de verdade? | Decoração no começo. Obstáculo muda o jogo: os inimigos precisariam desviar. | Etapa 3 |
-| D3 | Selvagens com nível e curva de XP cúbica? | Sim (ver Etapa 4). | Etapa 4, antes da Fase 5 |
+| D3 | Selvagens com nível e curva de XP cúbica? | ✅ Feito na 0.7, com ajustes: nível acompanha a equipe; curva exponencial até o 20 e potência depois. | Etapa 4 |
 | D4 | Quem já tem save escolhe o treinador ao abrir o jogo, ou fica Menino até trocar em Opções? | ✅ Decidido: escolhe ao continuar (a tela aparece uma vez) e pode trocar em Opções. | Etapa 1 |
 | D5 | Próxima região? | Hoenn | Etapa 8 |
 | D6 | Músicas novas do FireRed: renderizar (numa cópia temporária do Pokemon All, ou com o Braga) ou ficar com as 3 prontas por enquanto? | Renderizar as das rotas e a da batalha contra selvagem. | Etapa 5 |
-| D7 | Onde entram as 9 espécies que não estão em tabela nenhuma? | Os lugares do FireRed e os presentes (ver Etapa 4). As porcentagens nas tabelas são suas. | Etapa 4 |
-| D8 | Celular e controle importam? | Controle já (é barato); celular depois de Kanto fechado. | Etapa 6 |
+| D7 | Onde entram as 9 espécies que não estão em tabela nenhuma? | Aplicado como padrão na 0.7 (lugares do FireRed com peso 3, e os presentes). As porcentagens são suas: é só mudar em `capturePools.js`. | Etapa 4 |
+| D8 | Celular e controle importam? | Controle feito na 0.7 (padrão); celular depois de Kanto fechado. | Etapa 6 |
 | D9 | Final e pós-jogo | Hall da Fama e créditos na 1.0; revanche dos líderes e lendários depois. | Etapa 7 |
 
 Enquanto uma decisão não vem, a recomendação vale como padrão. O que foi feito
