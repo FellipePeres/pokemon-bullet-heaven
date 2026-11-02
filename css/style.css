@@ -116,7 +116,17 @@ html, body {
   padding: 28px 28px 28px 110px;
   overflow: hidden;
 }
-.screen.scrollable, #screen-campaign, #screen-starter { overflow-y: auto; }
+.screen.scrollable, #screen-campaign, #screen-starter, #screen-trainer { overflow-y: auto; }
+/*
+ * Telas que rolam centralizam com margem automática, e não com
+ * justify-content: no centro do flex, o que passa da altura da janela some
+ * para cima e não dá para rolar até lá.
+ */
+.screen.scrollable, #screen-campaign, #screen-starter, #screen-trainer { justify-content: flex-start; }
+.screen.scrollable > :first-child, #screen-campaign > :first-child,
+#screen-starter > :first-child, #screen-trainer > :first-child { margin-top: auto; }
+.screen.scrollable > :last-child, #screen-campaign > :last-child,
+#screen-starter > :last-child, #screen-trainer > :last-child { margin-bottom: auto; }
 
 .screen-head { text-align: center; display: flex; flex-direction: column; gap: 6px; }
 .screen-title {
@@ -320,6 +330,85 @@ html, body {
 .starter-card .move-box b { font-size: 13px; color: var(--text); }
 .starter-card .move-box span { display: block; font-size: 11.5px; color: var(--muted); margin-top: 3px; line-height: 1.4; }
 
+/* ======================= ESCOLHA DO TREINADOR ======================= */
+/* Pixel art do FireRed: sempre em escala inteira e sem suavizar. */
+.oak-intro { display: flex; align-items: center; gap: 18px; max-width: 780px; }
+.oak-portrait { width: 128px; height: 128px; flex-shrink: 0; image-rendering: pixelated; }
+
+/* A caixa de texto do FireRed: moldura `type2` (fatias de 8 px) em 3x. */
+.fr-window {
+  border: 24px solid transparent;
+  border-image: url(../assets/ui/text_window.png) 8 fill / 24px stretch;
+  image-rendering: pixelated;
+  padding: 0 8px;
+  color: #404048;
+  font-size: 21px;
+  line-height: 1.5;
+  text-shadow: 2px 2px 0 #d0d0c8;
+}
+/* no FireRed o menino é azul e a menina é vermelha */
+.fr-window .boy { color: #3068d8; }
+.fr-window .girl { color: #e03838; }
+
+.trainer-grid { display: flex; gap: 22px; flex-wrap: wrap; justify-content: center; }
+.trainer-card {
+  width: 236px;
+  padding: 16px 18px 18px;
+  background: linear-gradient(180deg, var(--bg-2), var(--bg-1));
+  border: 2px solid var(--line);
+  border-radius: 18px;
+  color: var(--text);
+  font-family: inherit;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  transition: transform .14s, border-color .18s, box-shadow .18s;
+}
+.trainer-card:hover, .trainer-card:focus-visible {
+  transform: translateY(-6px);
+  border-color: var(--yellow);
+  box-shadow: var(--shadow), 0 0 0 3px rgba(255, 203, 5, .12);
+  outline: none;
+}
+.trainer-card.selected { border-color: var(--yellow); }
+.trainer-portrait { width: 192px; height: 192px; image-rendering: pixelated; }
+.trainer-card h3 { font-size: 20px; letter-spacing: 2px; }
+.trainer-name { font-size: 12px; color: var(--muted); letter-spacing: 1px; }
+
+/*
+ * O sprite de andar, quadro a quadro como no jogo: folha de 18 quadros de
+ * 16x32 em 3x (48x96 cada). O boneco ocupa só a parte de baixo do quadro,
+ * por isso a margem negativa.
+ */
+.trainer-walker {
+  width: 48px;
+  height: 96px;
+  margin-top: -30px;
+  background-size: 864px 96px;
+  background-repeat: no-repeat;
+  image-rendering: pixelated;
+  animation: trainer-walk .53s step-end infinite;
+}
+.trainer-card:hover .trainer-walker,
+.trainer-card:focus-visible .trainer-walker { animation: trainer-run .27s step-end infinite; }
+
+/* sAnim_GoSouth: um pé, parado, o outro pé, parado */
+@keyframes trainer-walk {
+  0%   { background-position: -144px 0; }
+  25%  { background-position: 0 0; }
+  50%  { background-position: -192px 0; }
+  75%  { background-position: 0 0; }
+}
+/* sAnim_RunSouth: a passada por 5/8 do passo, o pé da vez no resto */
+@keyframes trainer-run {
+  0%     { background-position: -432px 0; }
+  31.25% { background-position: -480px 0; }
+  50%    { background-position: -432px 0; }
+  81.25% { background-position: -528px 0; }
+}
+
 /* tipos */
 .type-row { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; }
 .type-tag {
@@ -385,6 +474,21 @@ html, body {
 .stage-card .stage-meta { font-size: 11.5px; color: #6b7cab; margin-top: 5px; }
 .stage-card .stage-boss { display: flex; flex-direction: column; align-items: center; gap: 2px; min-width: 76px; }
 .stage-card .stage-boss img { width: 56px; height: 56px; object-fit: contain; image-rendering: pixelated; }
+.stage-card .stage-boss img.leader-portrait { width: 64px; height: 64px; }
+.silhouette { filter: brightness(0) invert(.2); }
+
+/* retrato do treinador escolhido no cabeçalho da jornada */
+.campaign-head { flex-direction: row; align-items: center; gap: 16px; }
+.campaign-trainer { width: 128px; height: 128px; flex-shrink: 0; image-rendering: pixelated; }
+/* o treinador parado, de frente, em 2x (o quadro 0 da folha, sem o espaço vazio de cima) */
+.option-trainer {
+  display: block;
+  width: 32px;
+  height: 42px;
+  background-size: 576px 64px;
+  background-position: 0 -22px;
+  image-rendering: pixelated;
+}
 .stage-card .stage-boss span { font-size: 10px; color: var(--muted); letter-spacing: 1px; }
 .stage-card .stage-state { font-size: 12px; color: var(--muted); text-align: right; min-width: 92px; }
 .stage-card .stage-state.done { color: var(--ok); font-weight: 700; }

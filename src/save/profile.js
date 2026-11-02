@@ -1,6 +1,8 @@
 import { CONFIG } from '../core/config.js';
 import { ACHIEVEMENTS } from '../data/achievements.js';
 import { KANTO_TOTAL } from '../data/kanto.js';
+import { REGIONS, DEFAULT_REGION } from '../data/regions.js';
+import { STAGES } from '../data/stages.js';
 import { bus, EVENTS } from '../core/events.js';
 
 /**
@@ -14,6 +16,8 @@ export function createProfile() {
   return {
     createdAt: new Date().toISOString(),
     trainerName: 'Treinador',
+    // modelo de treinador escolhido no começo (data/trainers.js); null = ainda não escolheu
+    trainer: null,
     // Pokédex: só registra o que foi CAPTURADO. O que não foi aparece como silhueta.
     pokedex: {
       caught: []
@@ -38,33 +42,73 @@ export function createProfile() {
       dexCaught: 0,
       playTime: 0
     },
-    campaign: {
-      region: 'Kanto',
-      starter: null,
-      clearedStages: [],
-      badges: [],
-      lastStage: null,
-      // "jornada": equipe, build e nível levados de uma fase para a seguinte.
-      // É atualizada a cada fase concluída e serve de checkpoint em caso de derrota.
-      journey: null
-    }
+    // a campanha é guardada por região (data/regions.js); `region` é a da jornada atual
+    region: DEFAULT_REGION,
+    regions: { [DEFAULT_REGION]: createRegionProgress() }
   };
+}
+
+/** Progresso de campanha de uma região. */
+export function createRegionProgress() {
+  return {
+    starter: null,
+    clearedStages: [],
+    badges: [],
+    lastStage: null,
+    // "jornada": equipe, build e nível levados de uma fase para a seguinte.
+    // É atualizada a cada fase concluída e serve de checkpoint em caso de derrota.
+    journey: null
+  };
+}
+
+/** Progresso da região informada (por padrão, a da jornada atual). */
+export function regionProgress(profile, regionId = profile.region) {
+  profile.regions[regionId] ??= createRegionProgress();
+  return profile.regions[regionId];
+}
+
+/** Insígnias somadas de todas as regiões. */
+export function countBadges(profile) {
+  return Object.values(profile.regions).reduce((total, region) => total + region.badges.length, 0);
 }
 
 /** Garante que um perfil carregado tenha todos os campos atuais. */
 export function normalizeProfile(loaded) {
   const base = createProfile();
   if (!loaded || typeof loaded !== 'object') return base;
+
+  const regions = { ...base.regions };
+  for (const [id, progress] of Object.entries(loaded.regions ?? {})) {
+    regions[id] = { ...createRegionProgress(), ...progress };
+  }
+  // saves de antes das regiões guardavam a campanha de Kanto em `campaign`
+  const { campaign: legacy, ...rest } = loaded;
+  if (!loaded.regions && legacy) {
+    const { region, ...progress } = legacy;   // `region: 'Kanto'` era só um rótulo
+    regions.kanto = { ...createRegionProgress(), ...progress };
+  }
+  // Até a 0.4 a insígnia não era registrada (procurava `stage.badge`, que não
+  // existe). Quem já venceu um ginásio recebe a dele ao carregar o save.
+  for (const progress of Object.values(regions)) {
+    for (const stageId of progress.clearedStages) {
+      const badge = STAGES[stageId]?.leader?.badge;
+      if (badge && !progress.badges.includes(badge)) progress.badges.push(badge);
+    }
+  }
+  const stats = { ...base.stats, ...(loaded.stats ?? {}) };
+  stats.badges = countBadges({ regions });
+
   return {
     ...base,
-    ...loaded,
+    ...rest,
     pokedex: { ...base.pokedex, ...(loaded.pokedex ?? {}) },
     achievements: { ...base.achievements, ...(loaded.achievements ?? {}) },
     trainerUpgrades: { ...base.trainerUpgrades, ...(loaded.trainerUpgrades ?? {}) },
     // saves antigos guardavam "coins"; vira shards sem perder nada
     shards: loaded.shards ?? loaded.coins ?? base.shards,
-    stats: { ...base.stats, ...(loaded.stats ?? {}) },
-    campaign: { ...base.campaign, ...(loaded.campaign ?? {}) }
+    stats,
+    region: REGIONS[loaded.region] ? loaded.region : base.region,
+    regions
   };
 }
 
@@ -157,6 +201,7 @@ export class ProfileTracker {
   /** Aplica o resultado de uma partida ao perfil. */
   applyRunResult({ stage, victory, level, teamSize, stats, time, journey = null }) {
     const p = this.profile;
+    const campaign = regionProgress(p);
     p.stats.runsPlayed++;
     p.stats.playTime += Math.round(time ?? 0);
     p.stats.maxRunLevel = Math.max(p.stats.maxRunLevel, level ?? 0);
@@ -166,19 +211,20 @@ export class ProfileTracker {
       p.stats.stagesCleared++;
       p.stats.bossesDefeated++;
       // Shards da fase (com bônus na primeira vez)
-      const firstTime = !p.campaign.clearedStages.includes(stage.id);
+      const firstTime = !campaign.clearedStages.includes(stage.id);
       const reward = (stage.reward?.shards ?? CONFIG.shards.perStageClear)
                      + (firstTime ? CONFIG.shards.firstClearBonus : 0);
       this.addShards(reward);
       // a equipe e a build seguem para a próxima fase da jornada
-      if (journey) p.campaign.journey = journey;
-      if (!p.campaign.clearedStages.includes(stage.id)) p.campaign.clearedStages.push(stage.id);
-      if (stage.badge && !p.campaign.badges.includes(stage.badge)) {
-        p.campaign.badges.push(stage.badge);
-        p.stats.badges = p.campaign.badges.length;
+      if (journey) campaign.journey = journey;
+      if (!campaign.clearedStages.includes(stage.id)) campaign.clearedStages.push(stage.id);
+      const badge = stage.leader?.badge;
+      if (badge && !campaign.badges.includes(badge)) {
+        campaign.badges.push(badge);
+        p.stats.badges = countBadges(p);
       }
     }
-    p.campaign.lastStage = stage.id;
+    campaign.lastStage = stage.id;
     this.refreshDexCount();
     return this.checkAchievements();
   }

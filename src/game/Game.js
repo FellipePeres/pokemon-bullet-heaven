@@ -7,9 +7,15 @@ import { preload } from '../render/sprites.js';
 import { HUD } from '../ui/HUD.js';
 import { Menus } from '../ui/Menus.js';
 import { toast } from '../ui/dom.js';
+import { preloadAssets } from '../render/assets.js';
 import { SaveManager } from '../save/SaveManager.js';
-import { createProfile, normalizeProfile, ProfileTracker } from '../save/profile.js';
-import { STAGES, isStageUnlocked, KANTO_CAMPAIGN } from '../data/stages.js';
+import {
+  createProfile, normalizeProfile, ProfileTracker,
+  regionProgress, createRegionProgress, countBadges
+} from '../save/profile.js';
+import { STAGES, isStageUnlocked } from '../data/stages.js';
+import { getRegion } from '../data/regions.js';
+import { TRAINER_LOOKS, getTrainerLook } from '../data/trainers.js';
 import { POKEMON, getPokemon } from '../data/pokemon.js';
 import { ENEMIES } from '../data/enemies.js';
 import { TRAINER_UPGRADES, getTrainerUpgrade, nextCost } from '../data/trainerUpgrades.js';
@@ -36,6 +42,7 @@ export class Game {
 
     this.run = null;
     this.runEnded = false;
+    this.afterTrainer = null;   // o que vem depois da escolha de treinador
     this.levelUpOpen = false;
     this.captureOpen = false;
     this.evolutionOpen = false;
@@ -49,6 +56,7 @@ export class Game {
       ...Object.values(POKEMON).map((p) => p.dex),
       ...Object.values(ENEMIES).map((e) => e.dex)
     ]);
+    preloadAssets(Object.values(TRAINER_LOOKS).map((look) => look.sheet));
 
     this.menus.show('screen-title');
     requestAnimationFrame((ts) => this.loop(ts));
@@ -99,22 +107,46 @@ export class Game {
 
   /* ============================== fluxo de menus ============================== */
 
+  /** Campanha da região atual: fases concluídas, insígnias e a jornada. */
+  get campaign() {
+    return regionProgress(this.profile);
+  }
+
+  get region() {
+    return getRegion(this.profile.region);
+  }
+
   newGame() {
     // Pokédex e conquistas são progresso permanente e permanecem;
-    // apenas a campanha e a partida em andamento recomeçam.
-    this.profile.campaign.starter = null;
-    this.profile.campaign.clearedStages = [];
-    this.profile.campaign.badges = [];
-    this.profile.campaign.journey = null;
-    this.profile.stats.badges = 0;
+    // apenas a campanha da região e a partida em andamento recomeçam.
+    this.profile.regions[this.profile.region] = createRegionProgress();
+    this.profile.stats.badges = countBadges(this.profile);
     this.pendingRun = null;
-    this.menus.buildStarters();
-    this.menus.show('screen-starter');
+    // como no FireRed, a jornada começa dizendo quem é você
+    this.askTrainer(() => {
+      this.menus.buildStarters();
+      this.menus.show('screen-starter');
+    });
+  }
+
+  /** Abre a escolha de treinador; `then` segue o fluxo depois da escolha. */
+  askTrainer(then) {
+    this.afterTrainer = then;
+    this.menus.buildTrainerChoice();
+    this.menus.show('screen-trainer');
+  }
+
+  chooseTrainer(lookId) {
+    this.profile.trainer = getTrainerLook(lookId).id;
+    this.autosave();
+    const next = this.afterTrainer;
+    this.afterTrainer = null;
+    next?.();
   }
 
   chooseStarter(pokemonId) {
-    this.profile.campaign.starter = pokemonId;
-    this.profile.campaign.journey = null;
+    this.campaign.starter = pokemonId;
+    this.campaign.journey = null;
     this.tracker.registerCaught(getPokemon(pokemonId).dex);
     this.tracker.checkAchievements();
     this.autosave();
@@ -128,7 +160,7 @@ export class Game {
   }
 
   canContinue() {
-    return !!this.pendingRun || !!this.profile.campaign.starter;
+    return !!this.pendingRun || !!this.campaign.starter;
   }
 
   continueLabel() {
@@ -141,20 +173,22 @@ export class Game {
   }
 
   continueGame() {
+    // saves de antes da escolha de treinador perguntam uma vez
+    if (!this.profile.trainer) { this.askTrainer(() => this.continueGame()); return; }
     if (this.pendingRun) {
       const snapshot = this.pendingRun;
       toast('Retomando a fase com sua equipe e build salvas.', '💾');
       this.startStage(snapshot.stageId, snapshot);
       return;
     }
-    if (this.profile.campaign.starter) this.openCampaign();
+    if (this.campaign.starter) this.openCampaign();
   }
 
   /** Inicia uma fase. `snapshot` restaura equipe/upgrades de um save. */
   startStage(stageId, snapshot = null) {
     const stage = STAGES[stageId];
     if (!stage) return;
-    if (!isStageUnlocked(stageId, this.profile.campaign.clearedStages)) {
+    if (!isStageUnlocked(stageId, this.campaign.clearedStages)) {
       toast('Essa fase ainda está bloqueada.', '🔒');
       return;
     }
@@ -163,17 +197,18 @@ export class Game {
     // 1) snapshot de um save (continuar exatamente de onde parou)
     // 2) jornada acumulada (equipe e build das fases já vencidas)
     // 3) começo do zero, apenas com o inicial
-    const journey = this.profile.campaign.journey;
+    const journey = this.campaign.journey;
     let options;
     if (snapshot) {
       options = { team: snapshot.team };
     } else if (journey) {
       options = { team: journey.team };
     } else {
-      options = { starter: this.profile.campaign.starter };
+      options = { starter: this.campaign.starter };
     }
     // melhorias compradas com moedas valem em todas as fases
     options.trainerUpgrades = { ...this.profile.trainerUpgrades };
+    options.trainer = this.profile.trainer;
 
     this.run = new Run(stageId, options);
     this.runEnded = false;
@@ -197,7 +232,7 @@ export class Game {
     this.run = null;
     this.runEnded = false;
     this.hud.hideAllOverlays();
-    if (this.profile.campaign.starter) this.openCampaign();
+    if (this.campaign.starter) this.openCampaign();
     else this.menus.show('screen-title');
   }
 
@@ -370,13 +405,11 @@ export class Game {
   }
 
   _nextStage() {
-    for (const entry of KANTO_CAMPAIGN) {
+    const cleared = this.campaign.clearedStages;
+    for (const entry of this.region.campaign) {
       if (entry.comingSoon) continue;
       const stage = STAGES[entry.stage];
-      if (!this.profile.campaign.clearedStages.includes(stage.id) &&
-          isStageUnlocked(stage.id, this.profile.campaign.clearedStages)) {
-        return stage;
-      }
+      if (!cleared.includes(stage.id) && isStageUnlocked(stage.id, cleared)) return stage;
     }
     return null;
   }
@@ -455,8 +488,13 @@ export class Game {
 
       toast(`Save carregado (${data.savedAt ? new Date(data.savedAt).toLocaleString('pt-BR') : 'sem data'}).`, '📂');
 
-      if (this.profile.campaign.starter) this.openCampaign();
-      else { this.menus.buildStarters(); this.menus.show('screen-starter'); }
+      const resume = () => {
+        if (this.campaign.starter) this.openCampaign();
+        else { this.menus.buildStarters(); this.menus.show('screen-starter'); }
+      };
+      // saves de antes da escolha de treinador perguntam uma vez
+      if (this.profile.trainer) resume();
+      else this.askTrainer(resume);
     } catch (err) {
       toast(err.message ?? 'Não foi possível carregar o save.', '⚠️');
     }

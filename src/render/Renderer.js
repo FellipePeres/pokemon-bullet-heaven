@@ -4,6 +4,12 @@ import { drawPokemon, drawPokeball } from './sprites.js';
 import { typeColor } from '../data/types.js';
 import { FloatingText, Beam, SlashArc } from '../entities/effects.js';
 import { maxHpFor } from '../systems/stats.js';
+import { getSheet, drawFrame } from './assets.js';
+import { trainerFrame } from './trainer.js';
+import { getTrainerLook } from '../data/trainers.js';
+
+/** Onde ficam os pés do treinador em relação ao centro dele (o raio de colisão). */
+const TRAINER_FEET = 14;
 
 /** Cores de fundo por tema de fase. */
 const THEMES = {
@@ -64,8 +70,9 @@ export class Renderer {
   updateCamera(run) {
     const halfW = this.width / 2;
     const halfH = this.height / 2;
-    this.camera.x = clamp(run.player.x - halfW, 0, Math.max(0, run.world.width - this.width));
-    this.camera.y = clamp(run.player.y - halfH, 0, Math.max(0, run.world.height - this.height));
+    // câmera em pixel inteiro: com ela quebrada, a pixel art "treme" ao andar
+    this.camera.x = Math.round(clamp(run.player.x - halfW, 0, Math.max(0, run.world.width - this.width)));
+    this.camera.y = Math.round(clamp(run.player.y - halfH, 0, Math.max(0, run.world.height - this.height)));
   }
 
   render(run) {
@@ -239,40 +246,55 @@ export class Renderer {
     ctx.fillRect(enemy.x - w / 2, y, w * ratio, 4);
   }
 
-  /** Treinador desenhado proceduralmente (sem depender de arte externa). */
   /**
-   * Treinador desenhado à mão no canvas (os repositórios de sprites não têm
-   * treinadores). Ele não luta, então o desenho prioriza legibilidade:
-   * silhueta escura por baixo, boné vermelho virado para onde você anda e o
-   * anel do raio de coleta, que mostra até onde os orbes de XP são puxados.
+   * Treinador: o sprite do FireRed do modelo escolhido (Red ou Leaf) e o anel
+   * do raio de coleta, que mostra até onde os orbes de XP são puxados.
+   * Enquanto o sprite não carrega (ou offline), vale o desenho à mão.
    */
   _drawTrainer(ctx, player, run) {
     const { x, y } = player;
-    const moving = Math.abs(player.vx) + Math.abs(player.vy) > 1;
-    const step = Math.sin(player.walkTime * 11);
-    const bounce = moving ? Math.abs(step) * 1.6 : Math.sin(player.walkTime * 2) * 0.6;
-    const f = player.facing;
-    const top = y - bounce;
-
-    ctx.save();
 
     // anel do raio de coleta
     const pickup = run?.playerStats?.pickupRadius ?? 0;
     if (pickup > 0) {
+      ctx.save();
       ctx.strokeStyle = 'rgba(99, 179, 255, .16)';
       ctx.lineWidth = 2;
       ctx.setLineDash([6, 8]);
       ctx.beginPath();
       ctx.arc(x, y, pickup, 0, Math.PI * 2);
       ctx.stroke();
-      ctx.setLineDash([]);
+      ctx.restore();
     }
 
-    // sombra
+    // sombra nos pés
     ctx.fillStyle = 'rgba(0,0,0,.34)';
     ctx.beginPath();
-    ctx.ellipse(x, y + 15, 10, 4, 0, 0, Math.PI * 2);
+    ctx.ellipse(x, y + TRAINER_FEET - 1, 11, 4, 0, 0, Math.PI * 2);
     ctx.fill();
+
+    const look = getTrainerLook(run?.trainerLook);
+    const sheet = getSheet(look.sheet);
+    if (!sheet) { this._drawTrainerFallback(ctx, player); return; }
+
+    const { frame, flip } = trainerFrame(player, look);
+    drawFrame(ctx, sheet, frame, x, y + TRAINER_FEET, { scale: CONFIG.render.pixelScale, flipX: flip });
+  }
+
+  /**
+   * O treinador desenhado à mão, de antes dos sprites do FireRed. Fica para
+   * quando a folha ainda não carregou: silhueta escura por baixo e boné
+   * virado para onde você anda.
+   */
+  _drawTrainerFallback(ctx, player) {
+    const { x, y } = player;
+    const step = Math.sin(player.walkTime * 11);
+    const bounce = player.moving ? Math.abs(step) * 1.6 : Math.sin(player.walkTime * 2) * 0.6;
+    const f = player.facing;
+    const top = y - bounce;
+    const moving = player.moving;
+
+    ctx.save();
 
     // contorno escuro (destaca o treinador em qualquer cenário)
     ctx.fillStyle = 'rgba(8, 12, 26, .85)';

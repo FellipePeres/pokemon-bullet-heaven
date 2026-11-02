@@ -5,7 +5,7 @@
 > decisão foi tomada e o que falta fazer. O `README.md` é o manual de uso;
 > este aqui é o contexto de desenvolvimento.
 
-**Versão atual:** `0.4.0` · **Última atualização:** 2026-09-21
+**Versão atual:** `0.5.0` · **Última atualização:** 2026-11-02
 **Stack:** HTML + CSS + JavaScript puro (ES Modules). Sem backend, sem build, sem dependências.
 **Repositório:** https://github.com/FellipePeres/pokemon-bullet-heaven (público)
 **Jogo no ar:** https://fellipeperes.github.io/pokemon-bullet-heaven/
@@ -34,9 +34,12 @@ npm run dev                  # http://localhost:5173
 # ou Live Server no VS Code, ou: python -m http.server 5173
 
 npm test                     # roda os três testes abaixo
-npm run check                # dados: evoluções, linhas de golpe, inimigos, pools
+npm run check                # dados: evoluções, linhas de golpe, inimigos, pools, assets
 npm run smoke                # lógica: fases inteiras simuladas, sem navegador
 npm run smoke:ui             # interface: DOM simulado a partir do index.html real
+
+npm run screens -- <roteiro> --out <pasta>   # screenshots no Chrome sem janela
+npm run assets               # regera os sprites a partir do Pokemon All (Python + Pillow)
 ```
 
 Os testes são a rede de segurança do projeto — **rode sempre que mexer em
@@ -44,8 +47,13 @@ balanceamento, dados ou interface**. `smoke` usa um "jogador virtual" que foge d
 horda em círculos, desvia para pegar Poké Balls, troca Pokémon machucado por
 descansado, escolhe melhorias e prefere TMs.
 
-⚠️ **Nunca foi validado em navegador por mim.** A lógica e a montagem das telas
-estão cobertas por teste; aparência, layout e feel são validados pelo Fellipe.
+**Conferência visual (desde a 0.5).** `tools/screenshot.mjs` abre o jogo no Chrome
+(ou Edge) sem janela, executa um roteiro (`vitrine`, `treinador`, `jornada`,
+`partida`), salva PNGs e lista os erros de JavaScript da página. Sai com código 1
+se a página tiver erro. A `vitrine.html` desenha os assets com o mesmo código da
+partida: poses, andar e correr, as 8 direções, a proporção com os Pokémon e os
+retratos. **Olhe os screenshots antes de entregar mudança visual.** O feel
+(velocidade, animação em movimento) continua sendo validado pelo Fellipe.
 
 ---
 
@@ -78,9 +86,12 @@ do GitHub, para não expor o e-mail pessoal no histórico público).
 
 ```
 index.html            página única (telas, HUD, overlays, modais)
+vitrine.html          conferência visual dos assets (ver seção 2)
 css/style.css         toda a interface
+assets/               sprites do FireRed gerados pelo extrator + PROVENIENCIA.md
 src/
   main.js             ponto de entrada
+  vitrine.js          a cena da vitrine.html
   core/
     config.js         ⭐ TODO o balanceamento e as opções
     events.js         EventBus + nomes de eventos
@@ -95,6 +106,9 @@ src/
     capturePools.js   chances de captura por fase (as 9 tabelas do design)
     enemies.js        30 inimigos: selvagens, elites e Pokémon dos líderes
     stages.js         2 fases completas + esqueleto da campanha de Kanto
+    regions.js        regiões: Pokédex, iniciais, campanha e treinadores de cada uma
+    trainers.js       modelos de treinador (Red, Leaf) e o mapa de quadros da folha
+    assetManifest.js  GERADO pelo extrator: tamanho e quadros de cada folha
     types.js          tipos, cores e tabela de efetividade
     kanto.js          nomes da Pokédex 1-151
     achievements.js   12 conquistas e suas recompensas em Shards
@@ -113,6 +127,8 @@ src/
     Game.js           orquestra tudo: perfil, telas, loop principal, save, loja
   render/
     Renderer.js       canvas: chão, atores, efeitos, barra do chefe, treinador
+    assets.js         carrega as folhas do catálogo e desenha quadros em escala inteira
+    trainer.js        qual quadro do treinador mostrar (passo pela distância andada)
     sprites.js        sprites de Pokémon (estático/animado/artwork) e insígnias
     icons.js          ícones de item por chave semântica
   ui/
@@ -126,6 +142,8 @@ tools/
   check-data.mjs      conferência dos dados
   smoke-test.js       teste da lógica
   ui-smoke.js         teste da interface
+  screenshot.mjs      screenshots no Chrome sem janela (DevTools Protocol, sem dependências)
+  assets/extract.py   gera assets/ a partir do decomp do FireRed no Pokemon All
 ```
 
 **Regra do projeto: `/data` é conteúdo, `/systems` é comportamento.**
@@ -143,6 +161,13 @@ Estas decisões vieram do Fellipe ao longo de várias rodadas — **não mudar s
 confirmar com ele**.
 
 ### Treinador e equipe
+- O jogador **escolhe menino (Red) ou menina (Leaf)** no começo da jornada, numa
+  tela com o Prof. Carvalho, como no FireRed. Dá para trocar em Opções. Save
+  antigo, sem treinador, pergunta uma vez ao continuar.
+- **O movimento é livre**, em qualquer ângulo, como sempre foi. **Nada de andar
+  por quadrados** como no FireRed: o FireRed entra só no visual. O sprite tem 4
+  poses; na diagonal, a pose atual continua se fizer parte do movimento, senão
+  fica de lado (`facingDir` em `Player.js`).
 - O treinador **não tem vida nem nível**. Só guia a equipe.
 - Cada Pokémon tem **vida e nível próprios**. Inimigo que encosta em um Pokémon
   bate nele; se alcança o treinador, o Pokémon ativo mais próximo o defende.
@@ -279,7 +304,28 @@ Os upgrades genéricos (dano, recarga, quantidade, área, perfuração...) são
 
 ## 7. Assets
 
-Tudo vem do repositório público **PokeAPI/sprites** (verificado, tudo 200):
+Duas fontes:
+
+**1. Sprites do FireRed, locais (desde a 0.5).** Gerados por
+`tools/assets/extract.py` a partir do decomp **pret/pokefirered** que fica no
+**Pokemon All** (`D:\fellipe\Dev\Pokemon All`, o outro projeto do Fellipe, feito
+com o Braga). **O Pokemon All é só leitura**: o extrator lê de lá e grava aqui.
+Procedência e como regerar: `assets/PROVENIENCIA.md`.
+
+| Uso | Arquivo |
+|---|---|
+| Treinador andando e correndo | `assets/trainers/{red,leaf}.png`, 18 quadros de 16x32 |
+| Retratos (escolha, mapa, Opções) | `assets/trainers/portraits/<id>.png`: Red, Leaf, Oak, os 8 líderes, a Elite Four e o rival |
+| Caixa de texto do FireRed | `assets/ui/text_window.png`, usada como `border-image` (`.fr-window`) |
+
+- Tudo é pixel art em **escala inteira, sem suavização** (`CONFIG.render.pixelScale`,
+  hoje 2). `render/assets.js` carrega sob demanda e, enquanto a folha não carrega,
+  devolve null: quem desenha cai no desenho procedural de antes. É assim que os
+  testes sem navegador continuam rodando.
+- O Pokemon All ainda tem o que as próximas etapas usam: sprites de golpe, tilesets
+  de Kanto, GIFs da Gen 5, gritos, efeitos sonoros e músicas (ver `PLANEJAMENTO.md` §3).
+
+**2. PokeAPI/sprites, pela internet** (verificado, tudo 200):
 
 | Uso | Caminho |
 |---|---|
@@ -289,9 +335,8 @@ Tudo vem do repositório público **PokeAPI/sprites** (verificado, tudo 200):
 | Ícones de interface | `sprites/items/<nome>.png` |
 | Insígnias de ginásio | `sprites/badges/<n>.png` (1 = Pedra, 2 = Cascata...) |
 
-- **Não existem sprites de treinador** nesses repositórios — o treinador é
-  desenhado à mão no `Renderer._drawTrainer` (boné virando com o movimento,
-  pernas/braços animados, mochila, anel do raio de coleta).
+- O treinador desenhado à mão (`Renderer._drawTrainerFallback`) ficou como reserva
+  para quando o sprite ainda não carregou.
 - `render/icons.js` mapeia **chaves semânticas** (`damage`, `shards`, `pokedex`...)
   para itens. Os dados guardam só a chave; cada ícone tem emoji de reserva se
   estiver offline. **Preferência do Fellipe: ícones de item, não emojis.**
@@ -306,16 +351,20 @@ botão Continuar). Estrutura:
 
 ```jsonc
 {
-  "signature": "pokemon-bullet-heaven", "schemaVersion": 1, "gameVersion": "0.4.0",
+  "signature": "pokemon-bullet-heaven", "schemaVersion": 1, "gameVersion": "0.5.0",
   "profile": {
+    "trainer": "leaf",                               // null = ainda não escolheu
     "shards": 620,
     "trainerUpgrades": { "meta_speed": 2 },
     "pokedex": { "caught": [4, 5, 25] },            // só capturados/evoluídos
     "achievements": { "unlocked": [], "claimed": [], "progress": {} },
-    "stats": { "totalKills": 0, "...": 0 },
-    "campaign": {
-      "starter": "charmander", "clearedStages": ["gym_1_pewter"], "badges": [],
-      "journey": { "team": { "members": [], "active": [] }, "level": 18 }
+    "stats": { "totalKills": 0, "badges": 1, "...": 0 },
+    "region": "kanto",                               // região da jornada atual
+    "regions": {
+      "kanto": {
+        "starter": "charmander", "clearedStages": ["gym_1_pewter"], "badges": ["Insígnia Pedra"],
+        "journey": { "team": { "members": [], "active": [] }, "level": 18 }
+      }
     }
   },
   "run": { "stageId": "...", "time": 95, "team": {}, "trainerUpgrades": {}, "stats": {} }
@@ -324,6 +373,11 @@ botão Continuar). Estrutura:
 
 `normalizeProfile` faz merge com os padrões, então **campo novo não quebra save
 antigo**. Ao carregar uma partida salva, a fase recomeça com a equipe curada.
+
+**Migrações que ele faz:** `coins` vira `shards`; a campanha antiga em `campaign`
+vira `regions.kanto`; e as insígnias que a 0.4 deixou de registrar (ver seção 11)
+são repostas a partir das fases de ginásio concluídas. No código, a campanha da
+região atual é `game.campaign` (`regionProgress(profile)`).
 
 ---
 
@@ -354,18 +408,14 @@ implementar as espécies e os blocos de fase. Cobertura hoje:
 
 ---
 
-## 10. Próximos passos (ordem sugerida)
+## 10. Próximos passos
 
-1. **Fase 3 (Lt. Surge)** — copiar o bloco da Fase 2 em `stages.js`, criar as
-   espécies que faltam do `phase3` (Meowth, Psyduck, Diglett, Vulpix, Magnemite,
-   Voltorb, Slowpoke...) com `moveLine` e evolução, e montar o time do líder
-   em `enemies.js` (Voltorb, Pikachu, Raichu) com uma habilidade especial.
-2. **Item Revive** — trazer um Pokémon desmaiado de volta no meio da fase.
-   O sistema de desmaio já está isolado em `TeamSystem.handleFaint`.
-3. **Pedras evolutivas como item** — `method: 'stone'` já marca quem depende delas.
-4. Sinergias de tipo entre membros da equipe (ainda não existe nada).
-5. Som e música.
-6. Polimento: animação de troca, efeito de captura.
+O roteiro está em **[PLANEJAMENTO.md](PLANEJAMENTO.md)**, combinado em 2026-11-02:
+fundação de assets a partir do Pokemon All, escolha de treinador (Menino ou
+Menina), golpes com sprite, Pokémon animados e cenário de tiles, fases 3 a 8 +
+Elite Four + Campeão com a curva de dificuldade, som e outras regiões.
+Os itens que estavam aqui foram para lá: Revive, pedras evolutivas, sinergias de
+tipo, som e o polimento de troca e captura.
 
 ---
 
@@ -390,6 +440,18 @@ implementar as espécies e os blocos de fase. Cobertura hoje:
   for muito maior que o alcance em que os inimigos se acumulam, os orbes passam
   por fora e não acertam ninguém. Petal Dance tinha `area: 118` e causava zero
   dano; ficou em 92 com `size: 22`. Referência: 70-100 de raio funciona bem.
+- **Insígnia nunca registrada (até a 0.4):** `applyRunResult` procurava
+  `stage.badge`, mas a insígnia fica em `stage.leader.badge`. O contador ficava
+  em 0 e a conquista "Primeira Insígnia" era impossível. Corrigido na 0.5, com
+  reposição nos saves antigos.
+- **Topo da tela cortado:** tela com `justify-content: center` que passa da
+  altura da janela some para cima, e não dá para rolar até lá. As telas que rolam
+  centralizam com `margin: auto` no primeiro e no último filho.
+- **Pixel art tremendo:** a câmera precisa ficar em pixel inteiro, e `drawFrame`
+  arredonda a posição. Coordenada quebrada com `imageSmoothingEnabled = false`
+  desenha pixels de larguras diferentes.
+- **Paleta do decomp:** o PNG traz uma paleta provisória; a cor certa está no
+  `.pal`. Recorte a transparência pelo índice 0, nunca pela cor.
 
 ---
 
@@ -404,6 +466,7 @@ implementar as espécies e os blocos de fase. Cobertura hoje:
 | 3c | tabelas de captura por fase | `capturePools.js` com as 9 tabelas |
 | 3d | ícones de item em vez de emoji | `icons.js` + sprites de item/insígnia |
 | 4 | jogo muito fácil; TM tem que ser a linha do próprio Pokémon; UI do treinador feia; Shards coletáveis | `moveLine` de 3 golpes por espécie, dificuldade recalibrada (63%), treinador redesenhado, conquistas com botão de coletar |
+| 5 | fases que faltam com dificuldade crescente; sprites de golpe; escolher menino ou menina; tudo ambientado com sprites (movimento continua livre, só o cenário espelha o FireRed); outras regiões em breve | `PLANEJAMENTO.md`; etapas 0 e 1 (0.5): extrator do Pokemon All, vitrine e screenshots, progresso por região, tela do treinador com o Oak, Red/Leaf em jogo, retratos dos líderes; conserto da insígnia |
 
 ---
 

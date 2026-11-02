@@ -11,7 +11,8 @@ import { UPGRADES } from '../src/data/upgrades.js';
 import { ABILITIES } from '../src/data/abilities.js';
 import { POKEMON } from '../src/data/pokemon.js';
 import { SaveManager } from '../src/save/SaveManager.js';
-import { createProfile } from '../src/save/profile.js';
+import { createProfile, normalizeProfile, regionProgress } from '../src/save/profile.js';
+import { Player, facingDir } from '../src/entities/Player.js';
 import { CONFIG } from '../src/core/config.js';
 import { maxHpFor } from '../src/systems/stats.js';
 import { hpRatio } from '../src/systems/stats.js';
@@ -361,19 +362,64 @@ console.log('\n[dados]');
         (charmander.upgrades.ember_damage ?? 0) === 1 && !pikachu.upgrades.ember_damage);
 }
 
+// ----------------------------------------------------------- 6b. treinador
+console.log('\n[treinador]');
+{
+  // O movimento é livre; o sprite do FireRed só tem 4 poses (ver facingDir).
+  const world = { width: 2000, height: 2000 };
+  const stats = { speed: CONFIG.trainer.speed };
+  const player = new Player(1000, 1000);
+  const walk = (x, y, frames = 20) => { for (let i = 0; i < frames; i++) player.update(DT, { x, y }, stats, world); };
+  const d = Math.SQRT1_2;
+
+  walk(0, -1);
+  walk(d, -d);
+  check('na diagonal, segue com a pose que já fazia parte do movimento', player.dir === 'up');
+  walk(-1, 0);
+  walk(d, -d);
+  check('numa diagonal nova, o treinador fica de lado', player.dir === 'right');
+  check('analógico quase reto usa o eixo mais forte', facingDir({ x: 0.2, y: 0.98 }, 'left') === 'down');
+
+  const x0 = player.x;
+  const y0 = player.y;
+  walk(d, d, 60);
+  check('o movimento na diagonal continua livre e com a mesma velocidade',
+        Math.abs((player.x - x0) - (player.y - y0)) < 1e-6 &&
+        Math.abs(Math.hypot(player.x - x0, player.y - y0) - CONFIG.trainer.speed) < 1,
+        `${Math.hypot(player.x - x0, player.y - y0).toFixed(1)} px em 1s`);
+
+  const stride = player.stride;
+  walk(0, 0);
+  check('parado, o passo não avança', !player.moving && player.stride === stride);
+}
+
 // ----------------------------------------------------------- 7. save/load
 console.log('\n[save]');
 {
   const { run } = simulate('gym_1_pewter', 'squirtle', { maxSeconds: 60 });
   const profile = createProfile();
-  profile.campaign.starter = 'squirtle';
+  regionProgress(profile).starter = 'squirtle';
+  profile.trainer = 'leaf';
   profile.pokedex.caught.push(7, 60);
 
   const data = SaveManager.build({ profile, run: run.serialize() });
   const json = SaveManager.toJSON(data);
   const parsed = SaveManager.parse(JSON.parse(json));
 
-  check('save vira JSON válido', json.length > 100 && parsed.profile.campaign.starter === 'squirtle');
+  check('save vira JSON válido', json.length > 100 && parsed.profile.regions.kanto.starter === 'squirtle');
+  check('save guarda o treinador escolhido', parsed.profile.trainer === 'leaf');
+
+  // save de antes das regiões: a campanha ficava em `campaign`, sem insígnias registradas
+  const legacy = normalizeProfile({
+    shards: 50,
+    campaign: { region: 'Kanto', starter: 'charmander', clearedStages: ['gym_1_pewter'], badges: [], journey: null }
+  });
+  check('save antigo migra a campanha para a região Kanto',
+        legacy.regions.kanto.starter === 'charmander' && legacy.campaign === undefined &&
+        legacy.region === 'kanto' && legacy.regions.kanto.region === undefined);
+  check('save antigo recebe a insígnia das fases de ginásio já vencidas',
+        legacy.regions.kanto.badges.includes('Insígnia Pedra') && legacy.stats.badges === 1);
+  check('save antigo pede a escolha de treinador', legacy.trainer === null);
   check('Pokédex do save guarda só os capturados',
         Array.isArray(parsed.profile.pokedex.caught) && parsed.profile.pokedex.seen === undefined);
   check('snapshot preserva equipe, níveis e upgrades por Pokémon',

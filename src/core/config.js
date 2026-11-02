@@ -3,16 +3,30 @@
  * Nada de número mágico espalhado pelo gameplay: se precisar ajustar, ajuste aqui.
  */
 export const CONFIG = {
-  version: '0.4.0',
+  version: '0.5.0',
 
   canvas: { width: 1280, height: 720 },
+
+  /**
+   * Escala da pixel art do FireRed no mundo do jogo: um pixel do GBA vira
+   * `pixelScale` pixels do canvas (o tile de 16 px fica com 32). Sempre inteira,
+   * sem suavização, para a arte continuar nítida.
+   */
+  render: { pixelScale: 2 },
 
   /** O treinador não luta e não tem vida: ele só guia a equipe pelo mapa. */
   trainer: {
     speed: 195,
     radius: 13,
     pickupRadius: 78,
-    magnetSpeed: 620
+    magnetSpeed: 620,
+    /**
+     * O movimento é livre; o sprite só acompanha. O passo segue a distância
+     * andada, como no FireRed: um "quadrado" (`stride`, em px) por passo.
+     * Acima de `runAt` px/s ele usa os quadros de correr. No FireRed, em 2x,
+     * andar é 120 px/s e correr 240: a velocidade do jogo (195) já é de corrida.
+     */
+    animation: { stride: 32, runAt: 180 }
   },
 
   team: {

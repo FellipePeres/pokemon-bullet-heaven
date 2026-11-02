@@ -67,6 +67,7 @@ export const STAGES = {
       badgeIndex: 1,
       type: 'rock',
       dex: 95,
+      portrait: 'portrait/brock',
       quote: 'Minha defesa de rocha é intransponível!'
     },
     bossTeam: ['brock_geodude', 'brock_onix'],
@@ -121,6 +122,7 @@ export const STAGES = {
       badgeIndex: 2,
       type: 'water',
       dex: 121,
+      portrait: 'portrait/misty',
       quote: 'Você vai afundar na minha onda!'
     },
     bossTeam: ['misty_staryu', 'misty_starmie'],
@@ -141,14 +143,14 @@ export const STAGES = {
 export const KANTO_CAMPAIGN = [
   { stage: 'gym_1_pewter' },
   { stage: 'gym_2_cerulean' },
-  { comingSoon: true, name: 'Fase 3 — Rumo a Vermilion (LT. SURGE)', icon: 'tm-electric', description: 'Rotas 5 e 6 até o Ginásio Elétrico.' },
-  { comingSoon: true, name: 'Fase 4 — Rumo a Celadon (ERIKA)', icon: 'tm-grass', description: 'Rota 7 e Celadon até o Ginásio de Planta.' },
-  { comingSoon: true, name: 'Fase 5 — Rumo a Fuchsia (KOGA)', icon: 'tm-poison', description: 'Ciclovia e Rotas 16-19 até o Ginásio Venenoso.' },
-  { comingSoon: true, name: 'Fase 6 — Rumo a Saffron (SABRINA)', icon: 'tm-psychic', description: 'Saffron e o Ginásio Psíquico.' },
-  { comingSoon: true, name: 'Fase 7 — Rumo a Cinnabar (BLAINE)', icon: 'tm-fire', description: 'Mansão de Cinnabar e o Ginásio de Fogo.' },
-  { comingSoon: true, name: 'Fase 8 — Rumo a Viridian (GIOVANNI)', icon: 'tm-ground', description: 'O último ginásio de Kanto.' },
-  { comingSoon: true, name: 'ELITE FOUR', icon: 'master-ball', description: 'Lorelei, Bruno, Agatha e Lance, em sequência.' },
-  { comingSoon: true, name: 'CAMPEÃO', icon: 'badge', description: 'O desafio final da jornada.' }
+  { comingSoon: true, name: 'Fase 3 — Rumo a Vermilion (LT. SURGE)', icon: 'tm-electric', portrait: 'portrait/lt_surge', description: 'Rotas 5 e 6 até o Ginásio Elétrico.' },
+  { comingSoon: true, name: 'Fase 4 — Rumo a Celadon (ERIKA)', icon: 'tm-grass', portrait: 'portrait/erika', description: 'Rota 7 e Celadon até o Ginásio de Planta.' },
+  { comingSoon: true, name: 'Fase 5 — Rumo a Fuchsia (KOGA)', icon: 'tm-poison', portrait: 'portrait/koga', description: 'Ciclovia e Rotas 16-19 até o Ginásio Venenoso.' },
+  { comingSoon: true, name: 'Fase 6 — Rumo a Saffron (SABRINA)', icon: 'tm-psychic', portrait: 'portrait/sabrina', description: 'Saffron e o Ginásio Psíquico.' },
+  { comingSoon: true, name: 'Fase 7 — Rumo a Cinnabar (BLAINE)', icon: 'tm-fire', portrait: 'portrait/blaine', description: 'Mansão de Cinnabar e o Ginásio de Fogo.' },
+  { comingSoon: true, name: 'Fase 8 — Rumo a Viridian (GIOVANNI)', icon: 'tm-ground', portrait: 'portrait/giovanni', description: 'O último ginásio de Kanto.' },
+  { comingSoon: true, name: 'ELITE FOUR', icon: 'master-ball', portrait: 'portrait/lorelei', description: 'Lorelei, Bruno, Agatha e Lance, em sequência.' },
+  { comingSoon: true, name: 'CAMPEÃO', icon: 'badge', portrait: 'portrait/rival', description: 'O desafio final da jornada.' }
 ];
 
 export const getStage = (id) => STAGES[id];

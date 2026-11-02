@@ -141,6 +141,12 @@ check('conquistas listadas sem quebrar', registry.get('achievements-list').child
 
 // ---- nova jornada ----
 game.newGame();
+check('nova jornada começa pela escolha de treinador', !registry.get('screen-trainer').classes.has('hidden'));
+check('tela de treinador oferece menino e menina', registry.get('trainer-choices').children.length === 2,
+      `${registry.get('trainer-choices').children.length} modelos`);
+game.chooseTrainer('leaf');
+check('escolher o treinador grava no perfil e segue para o inicial',
+      game.profile.trainer === 'leaf' && !registry.get('screen-starter').classes.has('hidden'));
 check('tela de iniciais montada com 3 opções', registry.get('starter-choices').children.length === 3);
 
 game.chooseStarter('charmander');
@@ -153,6 +159,7 @@ check('Pokédex registra o inicial escolhido', game.profile.pokedex.caught.inclu
 // ---- partida ----
 game.startStage('gym_1_pewter');
 check('a fase começa', !!game.run && !registry.get('stage-wrapper').classes.has('hidden'));
+check('a partida usa o treinador escolhido', game.run.trainerLook === 'leaf');
 check('barra lateral some durante a partida', registry.get('side-rail').classes.has('hidden'));
 
 const DT = 1 / 60;
@@ -221,7 +228,7 @@ for (const member of game.run.team.members) member.fainted = true;
 game.run.state = 'defeat';
 game._handleRunState();
 check('derrota mostra o resultado', !registry.get('result-overlay').classes.has('hidden'));
-check('derrota não avança a jornada', game.profile.campaign.clearedStages.length === 0);
+check('derrota não avança a jornada', game.campaign.clearedStages.length === 0);
 
 game.quitToMenu();
 check('voltar ao mapa funciona', !registry.get('screen-campaign').classes.has('hidden'));
@@ -230,7 +237,9 @@ check('voltar ao mapa funciona', !registry.get('screen-campaign').classes.has('h
 game.startStage('gym_1_pewter');
 game.run.state = 'victory';
 game._handleRunState();
-check('vitória conclui a fase', game.profile.campaign.clearedStages.includes('gym_1_pewter'));
+check('vitória conclui a fase', game.campaign.clearedStages.includes('gym_1_pewter'));
+check('vitória registra a insígnia do líder',
+      game.campaign.badges.includes('Insígnia Pedra') && game.profile.stats.badges === 1);
 check('vitória rende Shards', game.profile.shards > 0, `${game.profile.shards} Shards`);
 
 // conquistas: concluídas ficam para coletar, não entram sozinhas
@@ -259,7 +268,7 @@ if (affordable) {
         game.profile.trainerUpgrades[affordable.upgrade.id] === 1);
 }
 game.menus.closeModal();
-check('vitória guarda a equipe da jornada', !!game.profile.campaign.journey?.team?.members?.length);
+check('vitória guarda a equipe da jornada', !!game.campaign.journey?.team?.members?.length);
 
 game.quitToMenu();
 game.menus.buildCampaign();
@@ -268,7 +277,16 @@ check('Fase 2 desbloqueia após a Fase 1',
 
 const save = game.buildSaveData();
 check('save é montado a partir do estado atual',
-      save.signature === 'pokemon-bullet-heaven' && !!save.profile.campaign.journey);
+      save.signature === 'pokemon-bullet-heaven' && !!save.profile.regions.kanto.journey);
+
+// save de antes da escolha de treinador: o Continuar pergunta uma vez
+game.profile.trainer = null;
+game.pendingRun = null;
+game.continueGame();
+check('save sem treinador pede a escolha ao continuar', !registry.get('screen-trainer').classes.has('hidden'));
+game.chooseTrainer('red');
+check('depois da escolha, o Continuar segue para a jornada',
+      game.profile.trainer === 'red' && !registry.get('screen-campaign').classes.has('hidden'));
 
 console.log(`\n=== ${failures === 0 ? 'TUDO OK' : failures + ' FALHA(S)'} ===\n`);
 process.exit(failures ? 1 : 0);

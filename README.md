@@ -17,7 +17,8 @@
 
 ## O jogo
 
-Você é um treinador atravessando Kanto. **O treinador não luta** — ele só anda.
+Você é um treinador atravessando Kanto: **menino ou menina**, você escolhe no começo,
+como no FireRed. **O treinador não luta** — ele só anda.
 Quem combate são os **Pokémon da sua equipe**, que atacam sozinhos enquanto você
 se preocupa com posicionamento, composição e build.
 
@@ -92,6 +93,8 @@ Perder devolve você ao início da fase com a equipe como estava ao entrar nela.
 
 - **2 fases completas** — Fase 1: Rumo a Pewter (**BROCK**, Geodude + Onix) ·
   Fase 2: Rumo a Cerulean (**MISTY**, Staryu + Starmie).
+- **Treinador à sua escolha**: Red ou Leaf, com os sprites de andar e correr do FireRed
+  e o Prof. Carvalho fazendo a pergunta.
 - **68 Pokémon jogáveis**, cada um com linha de 3 golpes e linha evolutiva.
 - **57 habilidades** sobre 7 comportamentos genéricos (projétil, arco, órbita,
   aura, zona de chão, onda de choque e raio em corrente).
@@ -159,6 +162,10 @@ Sprites, ícones de item e insígnias vêm do repositório público
 [PokeAPI/sprites](https://github.com/PokeAPI/sprites) — estáticos no canvas,
 animados (Gen V) na interface e arte oficial nas telas grandes. Sem internet, o
 jogo desenha versões procedurais e a interface cai para ícones simples.
+
+Os treinadores (andar, correr e retratos) e a caixa de texto vêm do FireRed, pelo
+decomp [pret/pokefirered](https://github.com/pret/pokefirered), e ficam em `assets/`.
+A procedência de cada arquivo está em [assets/PROVENIENCIA.md](assets/PROVENIENCIA.md).
 
 > **Projeto de fã, sem fins lucrativos.** Pokémon e todos os nomes relacionados são
 > marcas registradas da Nintendo, Game Freak e The Pokémon Company. Este projeto não

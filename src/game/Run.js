@@ -35,6 +35,7 @@ export class Run {
 
     // ---- entidades ----
     this.player = new Player(this.world.width / 2, this.world.height / 2);
+    this.trainerLook = options.trainer ?? null;   // modelo do sprite (data/trainers.js)
     this.companions = [];
     this.enemies = [];
     this.projectiles = [];

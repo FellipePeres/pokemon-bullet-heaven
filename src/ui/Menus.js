@@ -1,18 +1,19 @@
 import { el, create, clear, show, hide } from './dom.js';
-import { getStarters, getPokemon } from '../data/pokemon.js';
+import { getPokemon } from '../data/pokemon.js';
 import { getAbility } from '../data/abilities.js';
-import { STAGES, KANTO_CAMPAIGN, isStageUnlocked } from '../data/stages.js';
-import { KANTO_DEX } from '../data/kanto.js';
+import { STAGES, isStageUnlocked } from '../data/stages.js';
 import { ACHIEVEMENTS } from '../data/achievements.js';
 import { moveLineOf } from '../data/tms.js';
+import { getTrainerLook } from '../data/trainers.js';
 import { spriteUrl, artworkUrl, pokemonImg, badgeUrl } from '../render/sprites.js';
+import { assetUrl } from '../render/assets.js';
 import { typeColor, typeName } from '../data/types.js';
 import { CONFIG } from '../core/config.js';
 import { iconHTML } from '../render/icons.js';
 import { formatTime } from '../core/utils.js';
 import { maxHpFor } from '../systems/stats.js';
 
-const SCREENS = ['screen-title', 'screen-starter', 'screen-campaign'];
+const SCREENS = ['screen-title', 'screen-trainer', 'screen-starter', 'screen-campaign'];
 const MODALS = ['modal-pokedex', 'modal-achievements', 'modal-team', 'modal-trainer', 'modal-options', 'modal-help'];
 
 /**
@@ -106,9 +107,9 @@ export class Menus {
     const strip = clear(el('title-progress'));
     const pills = [
       ['shards', 'Shards', String(profile.shards ?? 0)],
-      ['pokedex', 'Pokédex', `${profile.pokedex.caught.length}/${KANTO_DEX.length}`],
-      ['badge', 'Insígnias', String(profile.campaign.badges.length)],
-      ['stages', 'Fases', String(profile.campaign.clearedStages.length)],
+      ['pokedex', 'Pokédex', `${profile.pokedex.caught.length}/${this.game.region.dex.length}`],
+      ['badge', 'Insígnias', String(profile.stats.badges)],
+      ['stages', 'Fases', String(this.game.campaign.clearedStages.length)],
       ['achievements', 'Conquistas', `${profile.achievements.unlocked.length}/${ACHIEVEMENTS.length}`]
     ];
     for (const [icon, label, value] of pills) {
@@ -116,11 +117,40 @@ export class Menus {
     }
   }
 
+  /* ====================== escolha do treinador ====================== */
+
+  /**
+   * Menino ou menina, como no começo do FireRed. Cada card mostra o retrato
+   * e o sprite andando (a animação é CSS: ver .trainer-walker).
+   */
+  buildTrainerChoice() {
+    const row = clear(el('trainer-choices'));
+    const current = this.game.profile.trainer;
+    el('trainer-oak').src = assetUrl('portrait/oak');
+
+    for (const id of this.game.region.trainers) {
+      const look = getTrainerLook(id);
+      const card = create('button', `trainer-card${id === current ? ' selected' : ''}`);
+      card.type = 'button';
+
+      const portrait = create('img', 'trainer-portrait');
+      portrait.src = assetUrl(look.portrait);
+      portrait.alt = look.name;
+
+      const walker = create('div', 'trainer-walker');
+      walker.style.backgroundImage = `url(${assetUrl(look.sheet)})`;
+
+      card.append(portrait, walker, create('h3', '', look.label), create('span', 'trainer-name', look.name));
+      card.onclick = () => this.game.chooseTrainer(id);
+      row.appendChild(card);
+    }
+  }
+
   /* ======================= escolha do inicial ======================= */
 
   buildStarters() {
     const row = clear(el('starter-choices'));
-    for (const pokemon of getStarters()) {
+    for (const pokemon of this.game.region.starters.map(getPokemon)) {
       const ability = getAbility(pokemon.abilities[0]);
       const types = pokemon.types
         .map((t) => `<span class="type-tag" style="background:${typeColor(t)}">${typeName(t)}</span>`)
@@ -157,9 +187,14 @@ export class Menus {
   /* ============================ mapa da jornada ============================ */
 
   buildCampaign() {
-    const profile = this.game.profile;
-    const cleared = profile.campaign.clearedStages;
-    const journey = profile.campaign.journey;
+    const campaign = this.game.campaign;
+    const cleared = campaign.clearedStages;
+    const journey = campaign.journey;
+
+    const trainer = getTrainerLook(this.game.profile.trainer);
+    el('campaign-trainer').src = assetUrl(trainer.portrait);
+    el('campaign-trainer').alt = trainer.name;
+    el('campaign-title').textContent = `JORNADA — ${this.game.region.name.toUpperCase()}`;
 
     el('campaign-subtitle').textContent = journey
       ? 'Sua equipe e sua build continuam de uma fase para a outra. Uma derrota devolve você ao início da fase.'
@@ -178,19 +213,24 @@ export class Menus {
       }
     } else {
       teamStrip.appendChild(create('span', 'empty',
-        profile.campaign.starter
-          ? `Equipe: ${getPokemon(profile.campaign.starter).name} — capture mais Pokémon durante a fase!`
+        campaign.starter
+          ? `Equipe: ${getPokemon(campaign.starter).name} — capture mais Pokémon durante a fase!`
           : 'Nenhuma equipe ainda.'));
     }
 
     // fases
     const list = clear(el('campaign-list'));
-    for (const entry of KANTO_CAMPAIGN) {
+    for (const entry of this.game.region.campaign) {
       if (entry.comingSoon) {
         const node = create('div', 'stage-card locked');
+        // o líder que vem pela frente aparece só como silhueta
+        const portrait = entry.portrait
+          ? `<div class="stage-boss"><img class="leader-portrait silhouette" src="${assetUrl(entry.portrait)}" alt="" /><span>???</span></div>`
+          : '';
         node.innerHTML = `
           <div class="stage-icon">${iconHTML(entry.icon, 34)}</div>
           <div class="stage-body"><h4>${entry.name}</h4><p>${entry.description}</p></div>
+          ${portrait}
           <div class="stage-state">Em breve</div>
         `;
         list.appendChild(node);
@@ -229,10 +269,12 @@ export class Menus {
           if (!done) badge.style.filter = 'grayscale(1) brightness(.5)';
           box.appendChild(badge);
         }
-        const img = create('img');
-        img.src = spriteUrl(leader.dex);
+        // retrato do líder no FireRed; sem retrato, o sprite do ace dele
+        const portrait = assetUrl(leader.portrait);
+        const img = create('img', portrait ? 'leader-portrait' : '');
+        img.src = portrait ?? spriteUrl(leader.dex);
         img.alt = leader.name;
-        if (!unlocked) img.style.filter = 'brightness(0) invert(.2)';
+        if (!unlocked) img.classList.add('silhouette');
         box.appendChild(img);
         box.appendChild(create('span', '', unlocked ? leader.name : '???'));
         const team = (stage.bossTeam ?? []).length;
@@ -254,10 +296,11 @@ export class Menus {
     const grid = clear(el('pokedex-grid'));
     const caught = this.game.profile.pokedex.caught;
 
+    const dexNames = this.game.region.dex;
     el('pokedex-progress').textContent =
-      `${caught.length} de ${KANTO_DEX.length} registrados — capture para revelar`;
+      `${caught.length} de ${dexNames.length} registrados — capture para revelar`;
 
-    KANTO_DEX.forEach((name, i) => {
+    dexNames.forEach((name, i) => {
       const dex = i + 1;
       const isCaught = caught.includes(dex);
       const cell = create('div', `dex-cell ${isCaught ? 'caught' : 'unknown'}`);
@@ -323,7 +366,7 @@ export class Menus {
 
   buildTeamDetail() {
     const list = clear(el('team-detail'));
-    const journey = this.game.profile.campaign.journey;
+    const journey = this.game.campaign.journey;
     const members = journey?.team?.members ?? [];
 
     if (!members.length) {
@@ -425,6 +468,16 @@ export class Menus {
       node.appendChild(btn);
       list.appendChild(node);
     };
+
+    const looks = this.game.region.trainers;
+    const trainer = getTrainerLook(this.game.profile.trainer);
+    option(`<span class="option-trainer" style="background-image:url(${assetUrl(trainer.sheet)})"></span>`, 'Treinador',
+      'Quem guia a sua equipe pelo mapa. Vale a partir da próxima partida.',
+      trainer.label,
+      () => {
+        this.game.profile.trainer = looks[(looks.indexOf(trainer.id) + 1) % looks.length];
+        this.game.autosave();
+      });
 
     option('👥', 'Pokémon ativos ao mesmo tempo',
       'Vale para a próxima partida. A divisão de XP se ajusta sozinha.',

@@ -11,6 +11,12 @@ import { ENEMIES } from '../src/data/enemies.js';
 import { STAGES } from '../src/data/stages.js';
 import { nextMoveFor } from '../src/data/tms.js';
 import { CAPTURE_POOLS, poolEntries } from '../src/data/capturePools.js';
+import { ASSET_MANIFEST } from '../src/data/assetManifest.js';
+import { TRAINER_LOOKS } from '../src/data/trainers.js';
+import { REGIONS } from '../src/data/regions.js';
+import { existsSync } from 'node:fs';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 let problems = 0;
 const fail = (msg) => { problems++; console.log(` FALHA | ${msg}`); };
@@ -66,6 +72,38 @@ for (const stage of Object.values(STAGES)) {
   if (!CAPTURE_POOLS[stage.capturePool]) fail(`${stage.id}: pool de captura "${stage.capturePool}" não existe`);
 }
 ok(`${Object.keys(STAGES).length} fases com inimigos e pools válidos`);
+
+// ---- assets gerados (tools/assets/extract.py) ----
+const root = join(dirname(fileURLToPath(import.meta.url)), '..');
+const missingFiles = Object.entries(ASSET_MANIFEST).filter(([, a]) => !existsSync(join(root, a.src)));
+missingFiles.length
+  ? fail(`assets do catálogo sem arquivo: ${missingFiles.map(([key]) => key).join(', ')} — rode tools/assets/extract.py`)
+  : ok(`${Object.keys(ASSET_MANIFEST).length} assets do catálogo presentes no disco`);
+
+const brokenLooks = Object.values(TRAINER_LOOKS).filter((look) => {
+  const sheet = ASSET_MANIFEST[look.sheet];
+  const used = Object.values(look.frames).flatMap((pose) => Object.values(pose).flat());
+  return !sheet || !ASSET_MANIFEST[look.portrait] || used.some((frame) => frame >= sheet.frames);
+});
+brokenLooks.length
+  ? fail(`modelo de treinador com folha, retrato ou quadro inexistente: ${brokenLooks.map((l) => l.id).join(', ')}`)
+  : ok(`${Object.keys(TRAINER_LOOKS).length} modelos de treinador com folha e retrato`);
+
+for (const region of Object.values(REGIONS)) {
+  const problemsBefore = problems;
+  const badTrainers = region.trainers.filter((id) => !TRAINER_LOOKS[id]);
+  if (badTrainers.length) fail(`${region.id}: modelos de treinador inexistentes — ${badTrainers.join(', ')}`);
+  const badStarters = region.starters.filter((id) => !POKEMON[id]);
+  if (badStarters.length) fail(`${region.id}: iniciais inexistentes — ${badStarters.join(', ')}`);
+  for (const entry of region.campaign) {
+    if (!entry.comingSoon && !STAGES[entry.stage]) fail(`${region.id}: fase inexistente na campanha — ${entry.stage}`);
+    const portrait = entry.comingSoon ? entry.portrait : STAGES[entry.stage]?.leader?.portrait;
+    if (portrait && !ASSET_MANIFEST[portrait]) fail(`${region.id}: retrato inexistente — ${portrait}`);
+  }
+  if (problems === problemsBefore) {
+    ok(`região ${region.name}: ${region.campaign.length} etapas, iniciais, treinadores e retratos válidos`);
+  }
+}
 
 // pools de captura: mostra quanto de cada fase já está implementado
 console.log('\nPools de captura (espécies já implementadas / total da tabela):');

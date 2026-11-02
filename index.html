@@ -70,6 +70,20 @@
   </section>
 
   <!-- ============================================================
+       ESCOLHA DO TREINADOR — menino ou menina, como no FireRed
+       ============================================================ -->
+  <section id="screen-trainer" class="screen hidden">
+    <div class="oak-intro">
+      <img id="trainer-oak" class="oak-portrait" alt="Prof. Carvalho" />
+      <div class="fr-window">
+        <p>Agora me diga: você é <b class="boy">menino</b> ou <b class="girl">menina</b>?</p>
+      </div>
+    </div>
+    <div id="trainer-choices" class="trainer-grid"></div>
+    <button class="menu-btn ghost back" data-back="screen-title">Voltar</button>
+  </section>
+
+  <!-- ============================================================
        ESCOLHA DO INICIAL
        ============================================================ -->
   <section id="screen-starter" class="screen hidden">
@@ -85,9 +99,12 @@
        MAPA DA JORNADA
        ============================================================ -->
   <section id="screen-campaign" class="screen hidden">
-    <header class="screen-head">
-      <h2 class="screen-title">JORNADA — KANTO</h2>
-      <p class="subtitle" id="campaign-subtitle"></p>
+    <header class="screen-head campaign-head">
+      <img id="campaign-trainer" class="campaign-trainer" alt="" />
+      <div class="screen-head">
+        <h2 class="screen-title" id="campaign-title">JORNADA — KANTO</h2>
+        <p class="subtitle" id="campaign-subtitle"></p>
+      </div>
     </header>
 
     <div id="campaign-team" class="journey-team"></div>
