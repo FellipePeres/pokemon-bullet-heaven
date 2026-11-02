@@ -18,8 +18,9 @@
  *   desmaios     média por tentativa
  *   pico         maior número de inimigos vivos ao mesmo tempo
  *
- * Alvo (PLANEJAMENTO, Etapa 4): o bot vence ~60% das tentativas, porque o
- * Fellipe joga melhor que ele, e chega ao líder perto do nível do ace dele.
+ * Alvo (PLANEJAMENTO, Etapa 4): o bot vence ~45–55% das tentativas e desmaia 3
+ * ou 4 vezes em cada uma (desde a 0.8; era ~60%, e o Fellipe achou fácil: ele
+ * joga melhor que o bot), chegando ao líder perto do nível do ace dele.
  * Regra do projeto: mexa em uma alavanca por vez, meça, repita.
  */
 import { readFileSync, writeFileSync } from 'node:fs';

@@ -9,6 +9,8 @@ import { trainerFrame } from './trainer.js';
 import { getTrainerLook } from '../data/trainers.js';
 
 import { drawFx } from './fx.js';
+import { SceneryCache } from './scenery.js';
+import { stageScenes } from '../data/scenery.js';
 import { abilityFx, zoneFx, STATUS_FX } from '../data/fx.js';
 import { getAbility } from '../data/abilities.js';
 
@@ -25,7 +27,10 @@ function sizeScale(abilityId, size) {
 /** Onde ficam os pés do treinador em relação ao centro dele (o raio de colisão). */
 const TRAINER_FEET = 14;
 
-/** Cores de fundo por tema de fase. */
+/** Quanto dura a troca de cenário entre trechos da fase (segundos). */
+const SCENE_FADE = 0.8;
+
+/** Cores do chão provisório, enquanto as metatiles do cenário carregam. */
 const THEMES = {
   grass:  { base: '#2f6d3a', alt: '#357a41', detail: '#4c9350' },
   forest: { base: '#1f4f31', alt: '#245a37', detail: '#37734a' },
@@ -42,6 +47,8 @@ export class Renderer {
     this.height = CONFIG.canvas.height;
     this.camera = { x: 0, y: 0 };
     this.patterns = new Map();
+    this.scenery = new SceneryCache();
+    this.ground = { run: null, scene: null, scenes: [], canvas: null, fadeFrom: null, fadeStart: 0 };
   }
 
   /** Textura de chão gerada uma vez por tema. */
@@ -106,13 +113,7 @@ export class Renderer {
       const power = run.shakePower * (run.shakeTime / run.shakeDuration);
       ctx.translate(Math.round((Math.random() - 0.5) * 2 * power), Math.round((Math.random() - 0.5) * 2 * power));
     }
-    ctx.fillStyle = this._pattern(run.world.theme);
-    ctx.fillRect(0, 0, run.world.width, run.world.height);
-
-    // limite da arena
-    ctx.strokeStyle = 'rgba(0,0,0,.45)';
-    ctx.lineWidth = 10;
-    ctx.strokeRect(0, 0, run.world.width, run.world.height);
+    this._drawGround(ctx, run);
 
     this._drawZones(ctx, run);
     this._drawPickups(ctx, run);
@@ -127,6 +128,57 @@ export class Renderer {
   }
 
   /* ----------------------------- camadas ----------------------------- */
+
+  /**
+   * Chão da fase: o cenário de metatiles do FireRed (render/scenery.js). Ao
+   * mudar de trecho, o cenário anterior some aos poucos por cima do novo.
+   * Enquanto a tira não carrega, fica o chão provisório do tema.
+   */
+  _drawGround(ctx, run) {
+    const ground = this.ground;
+    if (ground.run !== run) {
+      Object.assign(ground, { run, scene: null, canvas: null, fadeFrom: null });
+      ground.scenes = stageScenes(run.stage);
+    }
+    const canvas = this.scenery.get(run, run.world.scene);
+    if (run.world.scene !== ground.scene && canvas) {
+      ground.fadeFrom = ground.canvas;
+      ground.fadeStart = performance.now();
+      ground.scene = run.world.scene;
+      ground.canvas = canvas;
+    }
+    this.scenery.warm(run, ground.scenes);
+
+    if (!ground.canvas) {
+      ctx.fillStyle = this._pattern(run.world.theme);
+      ctx.fillRect(0, 0, run.world.width, run.world.height);
+      ctx.strokeStyle = 'rgba(0,0,0,.45)';
+      ctx.lineWidth = 10;
+      ctx.strokeRect(0, 0, run.world.width, run.world.height);
+      return;
+    }
+    this._blitGround(ctx, ground.canvas, 1);
+    if (ground.fadeFrom) {
+      const t = (performance.now() - ground.fadeStart) / 1000 / SCENE_FADE;
+      if (t >= 1) ground.fadeFrom = null;
+      else this._blitGround(ctx, ground.fadeFrom, 1 - t);
+    }
+  }
+
+  /** Copia do canvas do cenário só a parte que a câmera vê (com folga para o tremor). */
+  _blitGround(ctx, canvas, alpha) {
+    const scale = CONFIG.render.pixelScale;
+    const margin = 48;
+    const sx = Math.max(0, Math.floor((this.camera.x - margin) / scale));
+    const sy = Math.max(0, Math.floor((this.camera.y - margin) / scale));
+    const sw = Math.min(canvas.width - sx, Math.ceil((this.width + margin * 2) / scale) + 1);
+    const sh = Math.min(canvas.height - sy, Math.ceil((this.height + margin * 2) / scale) + 1);
+    if (sw <= 0 || sh <= 0) return;
+    ctx.imageSmoothingEnabled = false;
+    ctx.globalAlpha = alpha;
+    ctx.drawImage(canvas, sx, sy, sw, sh, sx * scale, sy * scale, sw * scale, sh * scale);
+    ctx.globalAlpha = 1;
+  }
 
   /**
    * Áreas: aura (acompanha o Pokémon), zona no chão e onda (nova).
@@ -230,20 +282,49 @@ export class Renderer {
     for (const p of run.pickups) {
       if (p.dead) continue;
       const bob = Math.sin(p.bob) * 2;
-      if (p.kind === 'ball') {
-        drawPokeball(ctx, p.x, p.y + bob, 22, Math.sin(p.age * 2) * 0.25);
-        ctx.globalAlpha = 0.35 + Math.sin(p.age * 6) * 0.15;
-        ctx.strokeStyle = '#ffcb05';
-        ctx.lineWidth = 2;
+      if (p.kind === 'ball' || p.kind === 'magnet') {
+        // brilho pulsando em volta: dourado na Poké Ball, azul no Ímã
+        const ball = p.kind === 'ball';
+        ctx.globalAlpha = 0.18 + Math.sin(p.age * 6) * 0.08;
+        ctx.fillStyle = ball ? '#ffcb05' : '#63b3ff';
         ctx.beginPath();
-        ctx.arc(p.x, p.y + bob, 18, 0, Math.PI * 2);
+        ctx.arc(p.x, p.y + bob, 24, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.globalAlpha = 0.5 + Math.sin(p.age * 6) * 0.2;
+        ctx.strokeStyle = ball ? '#ffcb05' : '#63b3ff';
+        ctx.lineWidth = 2;
         ctx.stroke();
         ctx.globalAlpha = 1;
+        const sheet = getSheet(ball ? 'item/poke-ball' : 'item/magnet');
+        if (sheet) {
+          // na escala do cenário (o ícone do item é pixel art em 1x)
+          drawFrame(ctx, sheet, 0, p.x, p.y + bob, {
+            scale: CONFIG.render.pixelScale, anchorY: 0.5, rotation: ball ? Math.sin(p.age * 2) * 0.3 : 0
+          });
+        } else if (ball) {
+          drawPokeball(ctx, p.x, p.y + bob, 22, Math.sin(p.age * 2) * 0.25);
+        }
       } else if (p.kind === 'heal') {
         ctx.fillStyle = '#57d18a';
         ctx.fillRect(p.x - 6, p.y + bob - 2, 12, 4);
         ctx.fillRect(p.x - 2, p.y + bob - 6, 4, 12);
       } else {
+        if (p.magnetized) {
+          // rastro do XP voando até o treinador
+          const dx = run.player.x - p.x;
+          const dy = run.player.y - p.y;
+          const d = Math.hypot(dx, dy) || 1;
+          const tail = Math.min(26, 6 + p.pull * 0.012);
+          ctx.globalAlpha = 0.45;
+          ctx.strokeStyle = '#9fd4ff';
+          ctx.lineWidth = 4;
+          ctx.lineCap = 'round';
+          ctx.beginPath();
+          ctx.moveTo(p.x, p.y);
+          ctx.lineTo(p.x - (dx / d) * tail, p.y - (dy / d) * tail);
+          ctx.stroke();
+          ctx.globalAlpha = 1;
+        }
         ctx.fillStyle = '#63b3ff';
         ctx.beginPath();
         ctx.arc(p.x, p.y + bob, 5, 0, Math.PI * 2);

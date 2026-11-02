@@ -172,6 +172,9 @@ const frame = (move = { x: 1, y: 0 }) => {
 
 for (let i = 0; i < 60 * 30 && game.run; i++) {
   frame();
+  // o teste é da interface, não de sobrevivência: desde a 0.8 o inicial sozinho
+  // e parado na borda pode cair antes dos 30s
+  for (const member of game.run?.team.members ?? []) if (!member.fainted) member.hp = Math.max(member.hp, 40);
   if (game.run?.state === 'levelup' && game.levelUpOpen) {
     // escolhe a primeira opção oferecida, como o jogador faria
     const choices = game.run.progression.rollChoices(game.run.levelUpMember);

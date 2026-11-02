@@ -8,6 +8,8 @@ import { HUD } from '../ui/HUD.js';
 import { Menus } from '../ui/Menus.js';
 import { toast } from '../ui/dom.js';
 import { preloadAssets, assetUrl } from '../render/assets.js';
+import { SceneryCache } from '../render/scenery.js';
+import { stageScenes } from '../data/scenery.js';
 import { loadOptions } from '../save/options.js';
 import { PadNavigator } from '../ui/pad.js';
 
@@ -243,7 +245,7 @@ export class Game {
     this.menus.showGame();
   }
 
-  /** Começa a carregar os Pokémon animados que a fase vai mostrar (equipe, selvagens, líder). */
+  /** Começa a carregar o que a fase vai mostrar: Pokémon animados (equipe, selvagens, líder) e cenários. */
   preloadStage(stage) {
     const enemyIds = [
       ...stage.waves.flatMap((wave) => wave.enemies.map((e) => e.id)),
@@ -254,6 +256,7 @@ export class Game {
     const dexes = new Set(enemyIds.map((id) => ENEMIES[id]?.dex).filter(Boolean));
     for (const member of this.run.team.members) dexes.add(getPokemon(member.pokemonId).dex);
     preloadAssets([...dexes].map((dex) => `pokemon/${dex}`));
+    SceneryCache.preload(stageScenes(stage));
   }
 
   quitToMenu() {

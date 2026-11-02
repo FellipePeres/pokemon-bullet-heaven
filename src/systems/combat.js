@@ -109,6 +109,12 @@ export function killEnemy(run, enemy, opts = {}) {
     }
   }
 
+  // Ímã: raro, um por vez no chão; ao ser pego, puxa todo o XP do mapa
+  const magnetChance = enemy.elite || enemy.boss ? CONFIG.capture.magnetChanceElite : CONFIG.capture.magnetChance;
+  if (!run.pickups.some((p) => p.kind === 'magnet' && !p.dead) && chance(magnetChance)) {
+    run.pickups.push(new Pickup('magnet', enemy.x - 4, enemy.y + 8));
+  }
+
   // Curas no chão: como subir de nível não cura mais, a sustentação vem daqui.
   if (enemy.elite || enemy.boss) {
     run.pickups.push(new Pickup('heal', enemy.x - 8, enemy.y, enemy.boss ? 70 : 28));

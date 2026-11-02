@@ -104,6 +104,14 @@ export class ProgressionSystem {
       member.abilities[0] = replacement;
       this.run.rebuildCompanionAbilities();
     }
+    // Evoluir melhora o golpe (0.8): o Pokémon passa para o golpe do estágio novo,
+    // o que a espécie já traz, se ainda estiver atrás dele na linha. Quem já
+    // pegou esse golpe por TM segue com o que tem.
+    const line = next.moveLine ?? [];
+    const stageMove = next.abilities?.[0];
+    if (stageMove && line.indexOf(stageMove) > line.indexOf(member.abilities[0])) {
+      this.learnTM(member, stageMove);
+    }
     // mantém a proporção de vida: evoluir não cura, mas também não penaliza
     member.hp = Math.round(maxHpFor(member, this.run.playerStats.pokemonHpBonus) * ratio);
 

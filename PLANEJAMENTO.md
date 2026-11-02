@@ -91,7 +91,7 @@ quando o Fellipe mandar**, porque o push publica o jogo.
 | 0 | Fundação: extrator, carregador, vitrine e estrutura por região | 0.5 | ✅ feita (2026-11-02) |
 | 1 | Treinador: Menino ou Menina | 0.5 | 🟡 feita; falta a partida do Fellipe |
 | 2 | Golpes com sprite (e no máximo 4 por tipo) | 0.6 | ✅ feita (2026-11-02) |
-| 3 | Pokémon animados e cenário de tiles | 0.7 | ⏳ |
+| 3 | Pokémon animados e cenário de tiles | 0.7 → 0.8 | ✅ feita (2026-11-02): Pokémon animados na 0.7, cenário de tiles na 0.8 |
 | 4 | Fases 3 a 8, Elite Four e Campeão | 0.7 | ✅ feita (2026-11-02); falta só os lendários como encontros especiais |
 | 5 | Som | 1.0 | ⏳ |
 | 6 | Acabamento: opções salvas, controle, celular, desempenho, assets locais | 0.6 → 1.0 | 🔶 opções, desempenho e controle feitos; faltam celular e assets locais |
@@ -211,6 +211,34 @@ O plano original, para referência:
   trecho vira uma transição suave.
 - A borda da arena vira uma fileira de árvores, como as bordas das rotas, no lugar
   do traço preto.
+
+**Como ficou (0.8)**
+
+- O extrator tira, de cada mapa usado, só as metatiles que ele tem (uma tira de
+  16x16 por mapa, ~70 KB ao todo) e, nos salões, o próprio mapa. 17 cenários:
+  `route` (Rota 1), `forest` (Floresta de Viridian), `cave` (Monte Lua), os 8
+  ginásios, as salas da Lorelei, do Bruno, da Agatha, do Lance e do Campeão, e o
+  corredor da Liga. Receitas em `src/data/scenery.js`; gerador em `render/scenery.js`.
+- **Rota, floresta e caverna são geradas** com as regras do FireRed: as árvores
+  juntam as metades conforme o vizinho (como na Rota 1), a mata fecha a borda com
+  duas árvores de espessura, os caminhos de areia são retas que não se cruzam (o
+  tileset não tem os cantos de dentro para curvas), e a caverna tem paredões,
+  crateras e as paredes do Monte Lua em volta.
+- **Os salões são recortados do mapa de verdade**: a parede do alto com a porta no
+  meio, as laterais, o piso repetido, o enfeite principal no centro (a pedra do
+  Brock, a piscina da Misty, o campo de batalha da Liga, o emblema do Campeão) e
+  outros enfeites espalhados numa grade.
+- Silph Co., Mansão Pokémon e Esconderijo Rocket usam o ginásio da mesma cidade (o
+  tileset deles não está completo no decomp do Pokemon All).
+- A semente é a fase: o mesmo desenho toda vez. O canvas é pintado uma vez por
+  trecho (em 1x) e o Renderer só recorta o que a câmera vê; a troca de trecho some
+  aos poucos em 0,8 s.
+- **D2 aplicado como padrão**: árvores e paredes são só desenho, ninguém esbarra.
+  O treinador para 96 px antes da borda (`CONFIG.arena.inset`), onde fica a mata.
+- Ficou para depois: flores e água animadas (hoje paradas) e cenários próprios para
+  a Caverna do Diglett, o Túnel de Pedra, a Torre Pokémon, a Usina, Seafoam e
+  Victory Road (hoje todos usam o Monte Lua) e para Cerulean e a Zona Safári (hoje
+  usam a Floresta). É só tirar a tira do mapa no extrator e escrever a receita.
 
 ### Etapa 4 — Fases 3 a 8, Elite Four e Campeão
 
@@ -350,7 +378,9 @@ essa conta, e evoluções como Dragonite (nível 55) nunca aconteceriam.
   na jornada real (hoje ele já faz isso com as fases 1 e 2). Para cada fase, mostra
   as vitórias do bot, o nível médio ao chegar no líder comparado ao do ace, o pico
   de inimigos vivos e os desmaios.
-- O alvo do bot é ~60% de vitória por fase, porque o Fellipe joga melhor que ele.
+- O alvo do bot era ~60% de vitória por fase, porque o Fellipe joga melhor que ele.
+  Depois da primeira partida (0.8) o alvo passou a ~45–55%, com 3 a 4 desmaios por
+  tentativa: ver "Retorno da primeira partida" abaixo.
 - Vale a regra do HANDOFF: **uma alavanca por vez, medir, repetir.**
 
 ### Etapa 5 — Som
@@ -424,12 +454,25 @@ região, da Etapa 0, serve para as duas respostas.
 
 ---
 
+### Retorno da primeira partida (0.8)
+
+O Fellipe jogou a 0.7 em 2026-11-02 e pediu:
+
+| Pedido | O que mudou |
+|---|---|
+| "Quase não tomo dano": mais dano dos inimigos e mais inimigos | Dano de contato e dos golpes dos líderes ×1,2 (`CONFIG.enemies.damageMult`) e ondas 20% mais cheias e frequentes (`spawnMult`); o `scaling.damage` de cada fase foi recalibrado com o bot, e os selvagens de Celadon subiram 4 níveis. O bot agora vence 35% a 60% das tentativas (antes 44% a 88%) e desmaia 3 a 4 vezes em cada uma (antes ~2) |
+| Poké Ball mais difícil | Chance de cair ×0,45 (`CONFIG.capture.dropChanceMultiplier`); os momentos garantidos continuam |
+| TM mais rara no level up | 12% → 4% (`CONFIG.progression.tmChance`). Agora **evoluir melhora o golpe**: Charmander → Charmeleon chega com o golpe do estágio novo, levando as melhorias |
+| Cenário com os sprites que já temos | O cenário de tiles do FireRed (Etapa 3, acima) |
+| Ícone da Poké Ball mais bonito | O sprite do item, com brilho dourado pulsando |
+| Ímã | Raro (0,15% por selvagem, 4% por elite ou Pokémon de líder, um por vez no mapa). Ao pegar, todo o XP do mapa voa até o treinador, acelerando, com rastro |
+
 ## 5. Decisões em aberto (do Fellipe)
 
 | | Pergunta | Recomendação | Trava |
 |---|---|---|---|
 | D1 | Pokémon em campo: GIF animado da Gen 5, sprite do FireRed (parado, mas no estilo do cenário) ou ícone da caixa (2 quadros, estilo "mini")? | GIF animado, porque é o que dá movimento. A vitrine mostra os três lado a lado para escolher olhando. | Etapa 3 |
-| D2 | Árvores e pedras do cenário: só decoração ou obstáculo de verdade? | Decoração no começo. Obstáculo muda o jogo: os inimigos precisariam desviar. | Etapa 3 |
+| D2 | Árvores e pedras do cenário: só decoração ou obstáculo de verdade? | Aplicado como padrão na 0.8: decoração, e o treinador para antes da borda. Obstáculo muda o jogo: os inimigos precisariam desviar. | Etapa 3 |
 | D3 | Selvagens com nível e curva de XP cúbica? | ✅ Feito na 0.7, com ajustes: nível acompanha a equipe; curva exponencial até o 20 e potência depois. | Etapa 4 |
 | D4 | Quem já tem save escolhe o treinador ao abrir o jogo, ou fica Menino até trocar em Opções? | ✅ Decidido: escolhe ao continuar (a tela aparece uma vez) e pode trocar em Opções. | Etapa 1 |
 | D5 | Próxima região? | Hoenn | Etapa 8 |

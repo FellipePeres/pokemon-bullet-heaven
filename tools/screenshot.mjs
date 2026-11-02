@@ -6,8 +6,8 @@
  * Uso:
  *   node tools/screenshot.mjs <roteiro> [--out pasta] [--size 1280x720]
  *
- * Roteiros: vitrine, treinador, jornada, opcoes, partida, golpes, estresse e
- * chefe (ver ROTEIROS abaixo).
+ * Roteiros: vitrine, treinador, jornada, opcoes, partida, golpes, estresse,
+ * chefe, cenario e outros (ver ROTEIROS abaixo).
  * Sem --out, as imagens vão para a pasta temporária do sistema (pbh-screens).
  * Para usar outro navegador: variável de ambiente CHROME_PATH.
  *
@@ -102,6 +102,25 @@ const ROTEIROS = {
   estresse: [
     { open: 'vitrine.html?estresse' }, { wait: 5000 },
     { log: 'JSON.stringify(window.vitrineStats)' }, { shot: 'estresse' }
+  ],
+  // os cenários de metatiles do FireRed, um por foto, na partida de verdade
+  cenario: [
+    { open: 'index.html' }, { wait: 500 },
+    { run: START_RUN }, { wait: 1800 }, { shot: 'cenario-rota' },
+    ...['forest', 'cave', 'pewter_gym', 'cerulean_gym', 'celadon_gym', 'saffron_gym', 'lorelei_room', 'champion_room'].flatMap((scene) => [
+      { run: `game.run.world.scene = '${scene}'` }, { wait: 1800 }, { shot: `cenario-${scene}` }
+    ])
+  ],
+  // Poké Ball e Ímã no chão; depois o Ímã puxando o XP do mapa
+  itens: [
+    { open: 'index.html' }, { wait: 500 },
+    { run: START_RUN }, { wait: 1200 },
+    { run: "import('./src/entities/Pickup.js').then(({ Pickup }) => { const r = game.run, p = r.player;" +
+           "r.spawner.update = () => {}; r.enemies.length = 0;" +
+           "r.pickups.push(new Pickup('ball', p.x - 260, p.y - 40), new Pickup('magnet', p.x + 160, p.y + 10));" +
+           "for (let i = 0; i < 40; i++) r.pickups.push(new Pickup('xp', p.x + Math.cos(i) * (200 + i * 12), p.y + Math.sin(i * 1.7) * (150 + i * 8), 2)); })" },
+    { wait: 700 }, { shot: 'itens-chao' },
+    { run: "game.run.pickups.find((x) => x.kind === 'magnet').x = game.run.player.x" }, { wait: 260 }, { shot: 'itens-ima', raw: true }
   ],
   // o líder entra e, antes de cada golpe, aparece o aviso no chão
   chefe: [

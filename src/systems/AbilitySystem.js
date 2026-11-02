@@ -301,7 +301,7 @@ export class AbilitySystem {
       this.run.zones.push(new Zone({
         kind: 'nova', x: enemy.x, y: enemy.y,
         radius: enemy.radius, maxRadius: s.area, growSpeed: s.speed,
-        damage: s.damage, knockback: s.knockback,
+        damage: s.damage * CONFIG.enemies.damageMult, knockback: s.knockback,
         type: ability.type, color: '#ff6b6b', hostile: true, abilityId,
         delay: CONFIG.fx.bossTelegraph, visualType: enemy.types[0]
       }));

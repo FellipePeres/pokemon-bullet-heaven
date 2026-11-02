@@ -29,8 +29,9 @@ export class Player {
     this.speed = speed;
     this.vx = move.x * speed;
     this.vy = move.y * speed;
-    this.x = clamp(this.x + this.vx * dt, 20, world.width - 20);
-    this.y = clamp(this.y + this.vy * dt, 20, world.height - 20);
+    const inset = CONFIG.arena.inset;
+    this.x = clamp(this.x + this.vx * dt, inset, world.width - inset);
+    this.y = clamp(this.y + this.vy * dt, inset, world.height - inset);
 
     this.moving = move.x !== 0 || move.y !== 0;
     if (move.x !== 0) this.facing = move.x > 0 ? 1 : -1;

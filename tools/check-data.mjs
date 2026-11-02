@@ -15,6 +15,9 @@ import { ASSET_MANIFEST } from '../src/data/assetManifest.js';
 import { TRAINER_LOOKS } from '../src/data/trainers.js';
 import { REGIONS } from '../src/data/regions.js';
 import { FX, ABILITY_FX, BOSS_WAVE_FX, STATUS_FX } from '../src/data/fx.js';
+import { SCENES, stageScenes } from '../src/data/scenery.js';
+import { SCENE_TILES } from '../src/data/sceneManifest.js';
+import { buildSceneGrid, TILE } from '../src/render/scenery.js';
 import { existsSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -126,6 +129,33 @@ noFx.length ? fail(`golpes sem efeito visual: ${noFx.map((a) => a.id).join(', ')
   : staleFx.length ? fail(`efeitos de golpes que não existem: ${staleFx.join(', ')}`)
   : brokenFx.length ? fail(`efeitos apontando para sprite inexistente: ${brokenFx.join(', ')}`)
   : ok(`${playable.length} golpes com efeito visual, ${Object.keys(FX).length} efeitos com sprite`);
+
+// ---- cenário (data/scenery.js + metatiles extraídas) ----
+const badSegments = Object.values(STAGES).flatMap((stage) =>
+  (stage.segments ?? []).filter((seg) => seg.scene && !SCENES[seg.scene]).map((seg) => `${stage.id}/${seg.name}=${seg.scene}`));
+const badSheets = Object.entries(SCENES)
+  .filter(([, recipe]) => !SCENE_TILES[recipe.sheet] || !ASSET_MANIFEST[`scene/${recipe.sheet}`]).map(([id]) => id);
+// recortes dos salões dentro do mapa original
+const rectsOf = (r) => [r.floor, r.center, r.block, r.top?.door, ...(r.props ?? [])].filter(Boolean);
+const badRects = Object.entries(SCENES).filter(([, r]) => SCENE_TILES[r.sheet]?.grid).flatMap(([id, r]) => {
+  const map = SCENE_TILES[r.sheet];
+  return rectsOf(r).filter(([x, y, w, h]) => x < 0 || y < 0 || x + w > map.width || y + h > map.height).map((rect) => `${id} [${rect}]`);
+});
+// toda metatile que os geradores usam precisa estar na tira extraída
+const missingTiles = [];
+for (const [id, recipe] of Object.entries(SCENES)) {
+  if (badSheets.includes(id) || badRects.some((b) => b.startsWith(id + ' '))) continue;
+  const known = new Set(SCENE_TILES[recipe.sheet].ids);
+  const grid = buildSceneGrid(id, Math.ceil(3400 / TILE), Math.ceil(2200 / TILE), 'check');
+  const missing = [...new Set(grid.cells)].filter((cell) => !known.has(cell));
+  if (missing.length) missingTiles.push(`${id}: ${missing.map((m) => '0x' + m.toString(16)).join(', ')}`);
+}
+const usedScenes = new Set(Object.values(STAGES).flatMap((stage) => stageScenes(stage)));
+badSegments.length ? fail(`trechos com cenário inexistente: ${badSegments.join(', ')}`)
+  : badSheets.length ? fail(`cenários sem tira de metatiles: ${badSheets.join(', ')} — rode tools/assets/extract.py`)
+  : badRects.length ? fail(`recortes fora do mapa: ${badRects.join(', ')}`)
+  : missingTiles.length ? fail(`metatiles fora da tira: ${missingTiles.join(' · ')}`)
+  : ok(`${Object.keys(SCENES).length} cenários do FireRed (${usedScenes.size} usados nas fases), todas as metatiles extraídas`);
 
 // pools de captura: mostra quanto de cada fase já está implementado
 console.log('\nPools de captura (espécies já implementadas / total da tabela):');

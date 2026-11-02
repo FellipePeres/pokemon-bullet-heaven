@@ -9,7 +9,8 @@
  * nenhum código de gameplay precisa mudar.
  *
  *   duration       tempo (s) de travessia antes do líder aparecer
- *   segments       trechos da jornada: { from, name, theme } — mudam o cenário
+ *   segments       trechos da jornada: { from, name, theme, scene? } — mudam o
+ *                  cenário (scene: um de data/scenery.js; sem ele, vale o tema)
  *                  e aparecem no HUD conforme você avança
  *   world          tamanho da arena
  *   scaling        o quanto os selvagens ficam mais fortes até o fim da fase
@@ -43,7 +44,7 @@ export const STAGES = {
       { from: 0,   name: 'Rota 1',               theme: 'grass' },
       { from: 80,  name: 'Rota 2',               theme: 'grass' },
       { from: 160, name: 'Floresta de Viridian', theme: 'forest' },
-      { from: 250, name: 'Ginásio de Pewter',    theme: 'gym' }
+      { from: 250, name: 'Ginásio de Pewter',    theme: 'gym', scene: 'pewter_gym' }
     ],
 
     waves: [
@@ -91,14 +92,14 @@ export const STAGES = {
     description: 'Monte Lua, Rota 4 e Cerulean — até o Ginásio da Misty.',
     duration: 330,
     world: { width: 3000, height: 2000, theme: 'cave' },
-    scaling: { hp: 3.2, speed: 0.34, damage: 0.7 },
+    scaling: { hp: 3.2, speed: 0.34, damage: 1.3 },
     unlockedBy: 'gym_1_pewter',
 
     segments: [
       { from: 0,   name: 'Monte Lua',           theme: 'cave' },
       { from: 110, name: 'Rota 4',              theme: 'grass' },
       { from: 210, name: 'Cidade de Cerulean',  theme: 'forest' },
-      { from: 280, name: 'Ginásio de Cerulean', theme: 'gym' }
+      { from: 280, name: 'Ginásio de Cerulean', theme: 'gym', scene: 'cerulean_gym' }
     ],
 
     waves: [
@@ -146,14 +147,14 @@ export const STAGES = {
     description: 'Rotas 5 e 6, a Caverna do Diglett e a Rota 11 — até o Ginásio do Lt. Surge.',
     duration: 345,
     world: { width: 3000, height: 2000, theme: 'grass' },
-    scaling: { hp: 3.0, speed: 0.3, damage: 0.75 },
+    scaling: { hp: 3.0, speed: 0.3, damage: 2.7 },
     unlockedBy: 'gym_2_cerulean',
 
     segments: [
       { from: 0, name: 'Rota 5', theme: 'grass' },
       { from: 85, name: 'Rota 6', theme: 'grass' },
       { from: 165, name: 'Caverna do Diglett', theme: 'cave' },
-      { from: 265, name: 'Ginásio de Vermilion', theme: 'gym' }
+      { from: 265, name: 'Ginásio de Vermilion', theme: 'gym', scene: 'vermilion_gym' }
     ],
 
     // nível dos selvagens: acompanha a equipe, chegando perto do ace do líder
@@ -207,30 +208,30 @@ export const STAGES = {
     description: 'Rota 9, o Túnel de Pedra e a Rota 8 — até o Ginásio da Erika.',
     duration: 360,
     world: { width: 3000, height: 2000, theme: 'grass' },
-    scaling: { hp: 3.5, speed: 0.3, damage: 0.9 },
+    scaling: { hp: 3.5, speed: 0.3, damage: 4.5 },
     unlockedBy: 'gym_3_vermilion',
 
     segments: [
       { from: 0, name: 'Rota 9', theme: 'grass' },
       { from: 90, name: 'Túnel de Pedra', theme: 'cave' },
       { from: 190, name: 'Rota 8', theme: 'grass' },
-      { from: 280, name: 'Ginásio de Celadon', theme: 'gym' }
+      { from: 280, name: 'Ginásio de Celadon', theme: 'gym', scene: 'celadon_gym' }
     ],
 
     // nível dos selvagens: acompanha a equipe, chegando perto do ace do líder
     // (os líderes têm os níveis do FireRed; ver CONFIG.enemies)
     waves: [
-      { from: 0, to: 100, interval: 0.99, batch: 4, maxAlive: 70, level: [23, 26], enemies: [{ id: 'spearow', weight: 3 }, { id: 'rattata', weight: 3 }, { id: 'ekans', weight: 3 }, { id: 'voltorb', weight: 2 }, { id: 'sandshrew', weight: 2 }] },
-      { from: 85, to: 200, interval: 0.9, batch: 4, maxAlive: 95, level: [25, 28], enemies: [{ id: 'zubat', weight: 4 }, { id: 'geodude_wild', weight: 4 }, { id: 'machop', weight: 3 }, { id: 'mankey', weight: 2 }] },
-      { from: 185, to: 290, interval: 0.77, batch: 5, maxAlive: 125, level: [27, 30], enemies: [{ id: 'growlithe', weight: 3 }, { id: 'meowth', weight: 3 }, { id: 'oddish', weight: 3 }, { id: 'pidgey', weight: 2 }, { id: 'drowzee', weight: 2 }] },
-      { from: 275, to: 352, interval: 0.72, batch: 6, maxAlive: 145, level: [29, 32], enemies: [{ id: 'gloom', weight: 3 }, { id: 'weepinbell', weight: 3 }, { id: 'tangela', weight: 2 }, { id: 'exeggcute', weight: 2 }, { id: 'paras', weight: 2 }, { id: 'bellsprout', weight: 2 }] }
+      { from: 0, to: 100, interval: 0.99, batch: 4, maxAlive: 70, level: [27, 30], enemies: [{ id: 'spearow', weight: 3 }, { id: 'rattata', weight: 3 }, { id: 'ekans', weight: 3 }, { id: 'voltorb', weight: 2 }, { id: 'sandshrew', weight: 2 }] },
+      { from: 85, to: 200, interval: 0.9, batch: 4, maxAlive: 95, level: [29, 32], enemies: [{ id: 'zubat', weight: 4 }, { id: 'geodude_wild', weight: 4 }, { id: 'machop', weight: 3 }, { id: 'mankey', weight: 2 }] },
+      { from: 185, to: 290, interval: 0.77, batch: 5, maxAlive: 125, level: [31, 34], enemies: [{ id: 'growlithe', weight: 3 }, { id: 'meowth', weight: 3 }, { id: 'oddish', weight: 3 }, { id: 'pidgey', weight: 2 }, { id: 'drowzee', weight: 2 }] },
+      { from: 275, to: 352, interval: 0.72, batch: 6, maxAlive: 145, level: [33, 36], enemies: [{ id: 'gloom', weight: 3 }, { id: 'weepinbell', weight: 3 }, { id: 'tangela', weight: 2 }, { id: 'exeggcute', weight: 2 }, { id: 'paras', weight: 2 }, { id: 'bellsprout', weight: 2 }] }
     ],
 
     elites: [
-      { at: 110, id: 'graveler', count: 1, level: 31 },
-      { at: 175, id: 'onix_elite', count: 1, level: 31 },
-      { at: 240, id: 'persian_elite', count: 2, level: 31 },
-      { at: 315, id: 'ninetales_elite', count: 2, level: 31 }
+      { at: 110, id: 'graveler', count: 1, level: 34 },
+      { at: 175, id: 'onix_elite', count: 1, level: 34 },
+      { at: 240, id: 'persian_elite', count: 2, level: 34 },
+      { at: 315, id: 'ninetales_elite', count: 2, level: 34 }
     ],
 
     leader: {
@@ -264,14 +265,14 @@ export const STAGES = {
     description: 'A Torre Pokémon, as Rotas 12 a 15 e a Zona Safári — até o Ginásio do Koga.',
     duration: 375,
     world: { width: 3200, height: 2100, theme: 'cave' },
-    scaling: { hp: 4.0, speed: 0.3, damage: 0.9 },
+    scaling: { hp: 4.0, speed: 0.3, damage: 4.4 },
     unlockedBy: 'gym_4_celadon',
 
     segments: [
       { from: 0, name: 'Torre Pokémon', theme: 'cave' },
       { from: 95, name: 'Rotas 12–15', theme: 'grass' },
       { from: 195, name: 'Zona Safári', theme: 'forest' },
-      { from: 295, name: 'Ginásio de Fuchsia', theme: 'gym' }
+      { from: 295, name: 'Ginásio de Fuchsia', theme: 'gym', scene: 'fuchsia_gym' }
     ],
 
     // nível dos selvagens: acompanha a equipe, chegando perto do ace do líder
@@ -322,14 +323,14 @@ export const STAGES = {
     description: 'A Usina, a Ciclovia e a Silph Co. — até o Ginásio da Sabrina.',
     duration: 390,
     world: { width: 3200, height: 2100, theme: 'cave' },
-    scaling: { hp: 7.0, speed: 0.3, damage: 1.4 },
+    scaling: { hp: 7.0, speed: 0.3, damage: 3.3 },
     unlockedBy: 'gym_5_fuchsia',
 
     segments: [
       { from: 0, name: 'Usina', theme: 'cave' },
       { from: 100, name: 'Rotas 16–18', theme: 'grass' },
-      { from: 200, name: 'Silph Co.', theme: 'gym' },
-      { from: 300, name: 'Ginásio de Saffron', theme: 'gym' }
+      { from: 200, name: 'Silph Co.', theme: 'gym', scene: 'saffron_gym' },
+      { from: 300, name: 'Ginásio de Saffron', theme: 'gym', scene: 'saffron_gym' }
     ],
 
     // nível dos selvagens: acompanha a equipe, chegando perto do ace do líder
@@ -384,14 +385,14 @@ export const STAGES = {
     description: 'As Rotas 19 e 20, as Ilhas Seafoam e a Mansão Pokémon — até o Ginásio do Blaine.',
     duration: 405,
     world: { width: 3300, height: 2200, theme: 'grass' },
-    scaling: { hp: 4.5, speed: 0.3, damage: 1.1 },
+    scaling: { hp: 4.5, speed: 0.3, damage: 3.6 },
     unlockedBy: 'gym_6_saffron',
 
     segments: [
       { from: 0, name: 'Rotas 19 e 20', theme: 'grass' },
       { from: 105, name: 'Ilhas Seafoam', theme: 'cave' },
-      { from: 205, name: 'Mansão Pokémon', theme: 'gym' },
-      { from: 305, name: 'Ginásio de Cinnabar', theme: 'gym' }
+      { from: 205, name: 'Mansão Pokémon', theme: 'gym', scene: 'cinnabar_gym' },
+      { from: 305, name: 'Ginásio de Cinnabar', theme: 'gym', scene: 'cinnabar_gym' }
     ],
 
     // nível dos selvagens: acompanha a equipe, chegando perto do ace do líder
@@ -443,14 +444,14 @@ export const STAGES = {
     description: 'A Rota 21, o Esconderijo Rocket e a Rota 22 — até o Ginásio do Giovanni.',
     duration: 420,
     world: { width: 3400, height: 2200, theme: 'grass' },
-    scaling: { hp: 3.2, speed: 0.3, damage: 0.85 },
+    scaling: { hp: 3.2, speed: 0.3, damage: 4.8 },
     unlockedBy: 'gym_7_cinnabar',
 
     segments: [
       { from: 0, name: 'Rota 21', theme: 'grass' },
-      { from: 110, name: 'Esconderijo Rocket', theme: 'gym' },
+      { from: 110, name: 'Esconderijo Rocket', theme: 'gym', scene: 'viridian_gym' },
       { from: 215, name: 'Rota 22', theme: 'grass' },
-      { from: 315, name: 'Ginásio de Viridian', theme: 'gym' }
+      { from: 315, name: 'Ginásio de Viridian', theme: 'gym', scene: 'viridian_gym' }
     ],
 
     // nível dos selvagens: acompanha a equipe, chegando perto do ace do líder
@@ -501,13 +502,13 @@ export const STAGES = {
     description: 'A Rota 23 e a Victory Road — até a sala da Lorelei.',
     duration: 300,
     world: { width: 3000, height: 2000, theme: 'cave' },
-    scaling: { hp: 4.0, speed: 0.3, damage: 0.9 },
+    scaling: { hp: 4.0, speed: 0.3, damage: 3.3 },
     unlockedBy: 'gym_8_viridian',
 
     segments: [
       { from: 0, name: 'Rota 23', theme: 'grass' },
       { from: 100, name: 'Victory Road', theme: 'cave' },
-      { from: 200, name: 'Sala da Lorelei', theme: 'gym' }
+      { from: 200, name: 'Sala da Lorelei', theme: 'gym', scene: 'lorelei_room' }
     ],
 
     // nível dos selvagens: acompanha a equipe, chegando perto do ace do líder
@@ -554,12 +555,12 @@ export const STAGES = {
     description: 'O corredor da Liga — até a sala do Bruno.',
     duration: 280,
     world: { width: 3000, height: 2000, theme: 'gym' },
-    scaling: { hp: 2.4, speed: 0.3, damage: 0.65 },
+    scaling: { hp: 2.4, speed: 0.3, damage: 5.0 },
     unlockedBy: 'e4_lorelei',
 
     segments: [
-      { from: 0, name: 'Corredor da Liga', theme: 'gym' },
-      { from: 180, name: 'Sala do Bruno', theme: 'gym' }
+      { from: 0, name: 'Corredor da Liga', theme: 'gym', scene: 'league_hall' },
+      { from: 180, name: 'Sala do Bruno', theme: 'gym', scene: 'bruno_room' }
     ],
 
     // nível dos selvagens: acompanha a equipe, chegando perto do ace do líder
@@ -605,12 +606,12 @@ export const STAGES = {
     description: 'O corredor da Liga — até a sala da Agatha.',
     duration: 280,
     world: { width: 3000, height: 2000, theme: 'cave' },
-    scaling: { hp: 2.9, speed: 0.3, damage: 0.75 },
+    scaling: { hp: 2.9, speed: 0.3, damage: 2.5 },
     unlockedBy: 'e4_bruno',
 
     segments: [
-      { from: 0, name: 'Corredor da Liga', theme: 'gym' },
-      { from: 180, name: 'Sala da Agatha', theme: 'cave' }
+      { from: 0, name: 'Corredor da Liga', theme: 'gym', scene: 'league_hall' },
+      { from: 180, name: 'Sala da Agatha', theme: 'cave', scene: 'agatha_room' }
     ],
 
     // nível dos selvagens: acompanha a equipe, chegando perto do ace do líder
@@ -655,12 +656,12 @@ export const STAGES = {
     description: 'O corredor da Liga — até a sala do Lance.',
     duration: 280,
     world: { width: 3000, height: 2000, theme: 'cave' },
-    scaling: { hp: 2.7, speed: 0.3, damage: 0.7 },
+    scaling: { hp: 2.7, speed: 0.3, damage: 2.3 },
     unlockedBy: 'e4_agatha',
 
     segments: [
-      { from: 0, name: 'Corredor da Liga', theme: 'gym' },
-      { from: 180, name: 'Sala do Lance', theme: 'cave' }
+      { from: 0, name: 'Corredor da Liga', theme: 'gym', scene: 'league_hall' },
+      { from: 180, name: 'Sala do Lance', theme: 'cave', scene: 'lance_room' }
     ],
 
     // nível dos selvagens: acompanha a equipe, chegando perto do ace do líder
@@ -705,12 +706,12 @@ export const STAGES = {
     description: 'O Platô Indigo — o desafio final da jornada.',
     duration: 240,
     world: { width: 3000, height: 2000, theme: 'gym' },
-    scaling: { hp: 2.4, speed: 0.3, damage: 0.65 },
+    scaling: { hp: 2.4, speed: 0.3, damage: 1.3 },
     unlockedBy: 'e4_lance',
 
     segments: [
-      { from: 0, name: 'Platô Indigo', theme: 'gym' },
-      { from: 150, name: 'Sala do Campeão', theme: 'gym' }
+      { from: 0, name: 'Platô Indigo', theme: 'gym', scene: 'league_hall' },
+      { from: 150, name: 'Sala do Campeão', theme: 'gym', scene: 'champion_room' }
     ],
 
     // nível dos selvagens: acompanha a equipe, chegando perto do ace do líder

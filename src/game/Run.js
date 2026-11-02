@@ -1,5 +1,6 @@
 import { CONFIG } from '../core/config.js';
 import { getStage, segmentAt } from '../data/stages.js';
+import { sceneOf } from '../data/scenery.js';
 import { Player } from '../entities/Player.js';
 import { Companion } from '../entities/Companion.js';
 import { SpatialGrid } from '../systems/SpatialGrid.js';
@@ -53,6 +54,7 @@ export class Run {
     this.trainerUpgrades = { ...(options.trainerUpgrades ?? {}) };
     this.upgrades = {};                        // mantido para compatibilidade de save
     this.segment = segmentAt(this.stage, 0);
+    this.world.scene = sceneOf(this.segment, this.world);
     this.evolutionQueue = [];
     this.stats = { kills: 0, captures: 0, damageDealt: 0, faints: 0, ballsDropped: 0 };
 
@@ -235,6 +237,7 @@ export class Run {
     if (segment !== this.segment) {
       this.segment = segment;
       this.world.theme = segment.theme ?? this.world.theme;
+      this.world.scene = sceneOf(segment, this.world);
       bus.emit(EVENTS.TOAST, { text: `Você chegou em ${segment.name}`, icon: 'stages' });
     }
 
@@ -453,6 +456,14 @@ export class Run {
           if (!companion.dead) companion.heal(pickup.value, stats.pokemonHpBonus);
         }
         burst(this.particles, this.player.x, this.player.y, '#57d18a', 10, 120, 3, 0.5);
+      } else if (pickup.kind === 'magnet') {
+        // todo o XP do mapa vem até o treinador
+        for (const orb of this.pickups) {
+          if (orb.kind === 'xp' && !orb.dead) { orb.magnetized = true; orb.age = 0; }
+        }
+        this.shake(3, 0.25);
+        burst(this.particles, this.player.x, this.player.y, '#63b3ff', 18, 260, 3, 0.6);
+        bus.emit(EVENTS.TOAST, { text: 'Ímã! Toda a experiência do mapa vem até você.', icon: 'magnet' });
       } else if (pickup.kind === 'ball') {
         this.pendingBall = true;
         bus.emit(EVENTS.BALL_PICKED, {});

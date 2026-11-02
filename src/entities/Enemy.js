@@ -1,4 +1,5 @@
 import { getEnemy } from '../data/enemies.js';
+import { CONFIG } from '../core/config.js';
 import { getAbility } from '../data/abilities.js';
 import { rand } from '../core/utils.js';
 
@@ -19,7 +20,7 @@ export class Enemy {
     this.maxHp = data.hp * scaling.hp;
     this.hp = this.maxHp;
     this.speed = data.speed * scaling.speed;
-    this.damage = data.damage * scaling.damage;
+    this.damage = data.damage * scaling.damage * CONFIG.enemies.damageMult;
     this.xp = data.xp * (scaling.xp ?? 1);
     this.level = level ?? data.level ?? null;
     this.elite = !!data.elite;

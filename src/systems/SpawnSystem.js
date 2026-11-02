@@ -68,8 +68,8 @@ export class SpawnSystem {
       if (t < wave.from || t > wave.to) return;
       this.waveTimers[i] -= dt;
       if (this.waveTimers[i] > 0) return;
-      this.waveTimers[i] = wave.interval;
-      if (run.enemies.length >= wave.maxAlive) return;
+      this.waveTimers[i] = wave.interval / CONFIG.enemies.spawnMult;
+      if (run.enemies.length >= wave.maxAlive * CONFIG.enemies.spawnMult) return;
 
       for (let n = 0; n < wave.batch; n++) {
         this.spawn(weightedPick(wave.enemies).id, null, pickLevel(wave.level));

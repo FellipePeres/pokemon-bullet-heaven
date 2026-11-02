@@ -19,7 +19,9 @@ Saída:
     assets/ui/text_window.png           moldura da caixa de texto (fatias de 8x8)
     assets/fx/<id>.png                  sprites de golpe (graphics/battle_anims)
     assets/pokemon/<dex>.png            Pokémon animados (GIFs da Gen 5 do Pokemon All)
+    assets/scenes/<id>.png              metatiles 16x16 de um mapa do FireRed (cenário)
     src/data/assetManifest.js           catálogo do que foi gerado
+    src/data/sceneManifest.js           quais metatiles cada tira tem, e o mapa dos salões
 
 Por que as cores vêm do .pal: os PNG do decomp são indexados com uma paleta
 provisória, e a cor de verdade está no .pal (JASC-PAL) que o jogo carrega.
@@ -27,6 +29,9 @@ O índice 0 é sempre transparente. Recortar pelo ÍNDICE, nunca pela cor:
 paletas com cores repetidas apagariam pixels que existem.
 """
 import argparse
+import json
+import re
+import struct
 import sys
 from pathlib import Path
 
@@ -35,6 +40,7 @@ from PIL import Image
 ROOT = Path(__file__).resolve().parents[2]
 ASSETS = ROOT / 'assets'
 MANIFEST = ROOT / 'src' / 'data' / 'assetManifest.js'
+SCENE_MANIFEST = ROOT / 'src' / 'data' / 'sceneManifest.js'
 
 # Os dois modelos de treinador. No decomp a Leaf se chama "green".
 # Os dois usam a mesma paleta (gObjectEventPal_Player, em event_object_movement.c).
@@ -252,6 +258,150 @@ def extract_pokemon(source, manifest):
         }
 
 
+# Ícones de item que o jogo desenha no chão: os do Pokemon All
+# (assets/items/default, do PokeAPI/sprites), copiados como estão.
+ITEMS = ['poke-ball', 'magnet']
+
+
+def extract_items(source, manifest):
+    for name in ITEMS:
+        image = Image.open(source / 'assets' / 'items' / 'default' / f'{name}.png').convert('RGBA')
+        manifest[f'item/{name}'] = {
+            'src': save(image, ASSETS / 'items' / f'{name}.png'),
+            'frameWidth': image.width, 'frameHeight': image.height, 'frames': 1,
+        }
+
+
+# Cenário: cada entrada é um mapa do FireRed. Sai uma tira com as metatiles
+# 16x16 que o mapa usa (na ordem do ID) e, nos salões, o próprio mapa: o
+# gerador do jogo (render/scenery.js) monta a arena com esses pedaços.
+#   id da tira: (layout no decomp, guardar o mapa?)
+SCENES = {
+    'route1':          ('Route1', False),
+    'viridian_forest': ('ViridianForest', False),
+    'mt_moon':         ('MtMoon_1F', False),
+    'pewter_gym':      ('PewterCity_Gym', True),
+    'cerulean_gym':    ('CeruleanCity_Gym', True),
+    'vermilion_gym':   ('VermilionCity_Gym', True),
+    'celadon_gym':     ('CeladonCity_Gym', True),
+    'fuchsia_gym':     ('FuchsiaCity_Gym', True),
+    'saffron_gym':     ('SaffronCity_Gym', True),
+    'cinnabar_gym':    ('CinnabarIsland_Gym', True),
+    'viridian_gym':    ('ViridianCity_Gym', True),
+    'lorelei_room':    ('PokemonLeague_LoreleisRoom', True),
+    'bruno_room':      ('PokemonLeague_BrunosRoom', True),
+    'agatha_room':     ('PokemonLeague_AgathasRoom', True),
+    'lance_room':      ('PokemonLeague_LancesRoom', True),
+    'champion_room':   ('PokemonLeague_ChampionsRoom', True),
+}
+PRIMARY_TILES = 640       # tiles do tileset primário; os do secundário vêm depois
+PRIMARY_METATILES = 640   # idem para as metatiles
+PRIMARY_PALS = 7          # paletas 0-6 do primário, 7-12 do secundário
+
+
+class Tileset:
+    """Tileset primário + secundário de um mapa: tiles 8x8, paletas e metatiles."""
+
+    def __init__(self, decomp, primary, secondary):
+        folders = [decomp / 'data' / 'tilesets' / kind / name
+                   for kind, name in (('primary', primary), ('secondary', secondary))]
+        pals = [self._palettes(folder) for folder in folders]
+        self.pals = pals[0][:PRIMARY_PALS] + pals[1][PRIMARY_PALS:]
+        self.tiles = self._tiles(folders[0])
+        self.tiles += [bytes(64)] * (PRIMARY_TILES - len(self.tiles))
+        self.tiles += self._tiles(folders[1])
+        self.metatiles = self._metatiles(folders[0])
+        self.metatiles += [(0,) * 8] * (PRIMARY_METATILES - len(self.metatiles))
+        self.metatiles += self._metatiles(folders[1])
+
+    @staticmethod
+    def _palettes(folder):
+        return [read_pal(folder / 'palettes' / f'{i:02d}.pal') for i in range(16)]
+
+    @staticmethod
+    def _tiles(folder):
+        image = Image.open(folder / 'tiles.png')
+        if image.mode != 'P':
+            raise ValueError(f'{folder}/tiles.png não é indexado')
+        data, width = image.tobytes(), image.width
+        return [bytes(data[(ty * 8 + y) * width + tx * 8 + x] & 15 for y in range(8) for x in range(8))
+                for ty in range(image.height // 8) for tx in range(width // 8)]
+
+    @staticmethod
+    def _metatiles(folder):
+        raw = (folder / 'metatiles.bin').read_bytes()
+        return [struct.unpack_from('<8H', raw, i) for i in range(0, len(raw), 16)]
+
+    def metatile(self, mid):
+        """Metatile 16x16: 4 tiles da camada de baixo e 4 da de cima (índice 0 da de cima é vazado)."""
+        image = Image.new('RGBA', (16, 16))
+        pixels = image.load()
+        for layer in range(2):
+            for k in range(4):
+                entry = self.metatiles[mid][layer * 4 + k]
+                tile = self.tiles[entry & 0x3FF]
+                hflip, vflip, pal = entry & 0x400, entry & 0x800, self.pals[(entry >> 12) & 15]
+                ox, oy = (k % 2) * 8, (k // 2) * 8
+                for y in range(8):
+                    for x in range(8):
+                        c = tile[(7 - y if vflip else y) * 8 + (7 - x if hflip else x)]
+                        if c or not layer:
+                            pixels[ox + x, oy + y] = pal[c] + (255,)
+        return image
+
+
+def snake(name):
+    """gTileset_PalletTown -> pallet_town (o nome da pasta no decomp)."""
+    return re.sub(r'(?<!^)(?=[A-Z])', '_', name.replace('gTileset_', '')).lower()
+
+
+def extract_scenes(decomp, manifest):
+    layouts = {l['name']: l for l in json.loads((decomp / 'data/layouts/layouts.json').read_text())['layouts'] if l}
+    scenes = {}
+    for key, (name, keep_grid) in SCENES.items():
+        layout = layouts[f'{name}_Layout']
+        tileset = Tileset(decomp, snake(layout['primary_tileset']), snake(layout['secondary_tileset']))
+        raw = (decomp / layout['blockdata_filepath']).read_bytes()
+        grid = [struct.unpack_from('<H', raw, i * 2)[0] & 0x3FF for i in range(layout['width'] * layout['height'])]
+        ids = sorted(set(grid))
+        manifest[f'scene/{key}'] = {
+            'src': save(strip([tileset.metatile(mid) for mid in ids]), ASSETS / 'scenes' / f'{key}.png'),
+            'frameWidth': 16, 'frameHeight': 16, 'frames': len(ids),
+        }
+        scenes[key] = {'ids': ids}
+        if keep_grid:
+            scenes[key].update(width=layout['width'], height=layout['height'], grid=grid)
+    write_scene_manifest(scenes)
+
+
+def write_scene_manifest(scenes):
+    lines = [
+        '/**',
+        ' * METATILES DO CENÁRIO — gerado por tools/assets/extract.py. Não edite à mão.',
+        ' *',
+        ' * Por tira (asset scene/<id>): `ids` diz qual metatile do FireRed está em',
+        ' * cada quadro; nos salões, `grid` é o mapa original (IDs, linha a linha).',
+        ' */',
+        'export const SCENE_TILES = {',
+    ]
+    for key, scene in scenes.items():
+        lines.append(f"  {key}: {{")
+        lines.append(f"    ids: [{', '.join(f'0x{i:X}' for i in scene['ids'])}],")
+        if 'grid' in scene:
+            w = scene['width']
+            rows = [', '.join(f'0x{i:X}' for i in scene['grid'][y * w:(y + 1) * w]) for y in range(scene['height'])]
+            lines.append(f"    width: {w}, height: {scene['height']},")
+            lines.append('    grid: [')
+            lines += [f'      {row},' for row in rows]
+            lines.append('    ]')
+        else:
+            lines[-1] = lines[-1].rstrip(',')
+        lines.append('  },')
+    lines[-1] = '  }'
+    lines.append('};')
+    SCENE_MANIFEST.write_text('\n'.join(lines) + '\n', encoding='utf-8')
+
+
 def extract_ui(decomp, manifest):
     # A caixa de texto clássica do FireRed: moldura `type2` com a paleta `stdpal_0`.
     windows = decomp / 'graphics' / 'text_window'
@@ -299,7 +449,9 @@ def main():
     extract_portraits(decomp, manifest)
     extract_fx(decomp, manifest)
     extract_pokemon(args.fonte, manifest)
+    extract_items(args.fonte, manifest)
     extract_ui(decomp, manifest)
+    extract_scenes(decomp, manifest)
     write_manifest(manifest)
     print(f'{len(manifest)} assets gerados; catálogo em {MANIFEST.relative_to(ROOT).as_posix()}')
 

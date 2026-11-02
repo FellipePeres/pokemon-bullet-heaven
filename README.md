@@ -74,9 +74,10 @@ mantém tudo — golpe, melhorias e proporção de vida.
 **TMs — a linha de 3 golpes.** Cada espécie tem a própria linha de evolução de
 golpe. Charmander é `Ember → Flamethrower → Fire Blast`; Pidgey é
 `Gust → Wing Attack → Hurricane`; Machop é `Karate Chop → Seismic Toss → Cross Chop`.
-Quando uma TM aparece no level up, ela sobe o golpe atual para **o próximo da linha
-daquele Pokémon** — nunca um golpe aleatório de outro — e **leva junto todas as
-melhorias já investidas**. Trocar de golpe nunca é um downgrade.
+O golpe sobe principalmente na **evolução** (Charmeleon já chega com Flamethrower)
+e, mais raramente, por uma TM no level up. Nos dois casos ele vai para **o próximo
+da linha daquele Pokémon** — nunca um golpe aleatório de outro — e **leva junto
+todas as melhorias já investidas**. Trocar de golpe nunca é um downgrade.
 
 **Captura.** Inimigos derrotados podem deixar uma Poké Ball. Ao coletar, o jogo
 pausa e oferece três Pokémon sorteados pela tabela de chances daquela fase. Cada
@@ -104,6 +105,10 @@ Perder devolve você ao início da fase com a equipe como estava ao entrar nela.
 - **52 golpes** com o sprite da animação do FireRed, no máximo 4 por tipo, sobre 7
   comportamentos genéricos (projétil, arco, órbita, aura, zona de chão, onda de
   choque e raio em corrente).
+- **Cenário do FireRed**: cada trecho da jornada é montado com as metatiles do lugar
+  (a grama e as árvores da Rota 1, a mata da Floresta de Viridian, o Monte Lua) e
+  cada ginásio e sala da Liga tem o visual do mapa original. O andar continua livre.
+- **Ímã**: raro, cai de alguns Pokémon e, ao ser pego, puxa todo o XP do mapa até você.
 - **Pokédex de Kanto** (151) que se preenche conforme você captura e evolui.
 - **12 conquistas** com recompensa em Shards.
 - A dificuldade e a quantidade de inimigos sobem fase a fase: os selvagens ganham
@@ -169,8 +174,9 @@ Sprites, ícones de item e insígnias vêm do repositório público
 animados (Gen V) na interface e arte oficial nas telas grandes. Sem internet, o
 jogo desenha versões procedurais e a interface cai para ícones simples.
 
-Os treinadores (andar, correr e retratos) e a caixa de texto vêm do FireRed, pelo
-decomp [pret/pokefirered](https://github.com/pret/pokefirered), e ficam em `assets/`.
+Os treinadores (andar, correr e retratos), os golpes, o cenário e a caixa de texto vêm
+do FireRed, pelo decomp [pret/pokefirered](https://github.com/pret/pokefirered), e ficam
+em `assets/`.
 A procedência de cada arquivo está em [assets/PROVENIENCIA.md](assets/PROVENIENCIA.md).
 
 > **Projeto de fã, sem fins lucrativos.** Pokémon e todos os nomes relacionados são

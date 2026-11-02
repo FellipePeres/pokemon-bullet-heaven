@@ -3,7 +3,7 @@
  * Nada de número mágico espalhado pelo gameplay: se precisar ajustar, ajuste aqui.
  */
 export const CONFIG = {
-  version: '0.7.0',
+  version: '0.8.0',
 
   canvas: { width: 1280, height: 720 },
 
@@ -13,6 +13,9 @@ export const CONFIG = {
    * sem suavização, para a arte continuar nítida.
    */
   render: { pixelScale: 2 },
+
+  // O treinador para um pouco antes da borda: ali ficam a mata e as paredes do cenário
+  arena: { inset: 96 },
 
   /**
    * Efeitos visuais dos golpes. Os tetos existem porque a horda é grande e o
@@ -76,7 +79,9 @@ export const CONFIG = {
      */
     upgradeEveryLevels: 3,
     /** Chance de uma das opções do nível ser uma TM (troca da habilidade base). */
-    tmChance: 0.12,
+    // O golpe melhora sobretudo na evolução; a TM no level up é um bônus raro
+    // (pedido do Fellipe na 0.8: antes era 12%).
+    tmChance: 0.04,
     /**
      * Divisão de XP por Pokémon (pesos normalizados).
      * Com a equipe cheia (3 ativos + 3 reservas) isso resulta exatamente em
@@ -101,6 +106,10 @@ export const CONFIG = {
    * soma XP. Fase sem nível nas ondas (1 e 2) fica como sempre foi.
    */
   enemies: {
+    // dificuldade geral (0.8, "muito fácil, quase não tomo dano"): valem para
+    // todas as fases por cima da calibragem de cada uma
+    damageMult: 1.2,        // dano de contato e dos golpes dos líderes (por fase: scaling.damage)
+    spawnMult: 1.2,         // ondas: levas mais frequentes e mais inimigos vivos
     referenceLevel: 5,
     hpGrowth: 1.075,
     damageGrowth: 1.035,
@@ -109,7 +118,11 @@ export const CONFIG = {
 
   capture: {
     choices: 3,
-    dropChanceMultiplier: 1, // multiplicador global da chance de Poké Ball
+    // Poké Ball mais rara (pedido do Fellipe na 0.8); as garantidas da fase continuam
+    dropChanceMultiplier: 0.45,
+    // Ímã: puxa todo o XP do mapa até o treinador. Bem raro; um por vez no chão.
+    magnetChance: 0.0015,
+    magnetChanceElite: 0.04,
     potionChance: 0.04       // chance de um selvagem comum deixar uma poção
   },
 

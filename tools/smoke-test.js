@@ -19,6 +19,7 @@ import { maxHpFor } from '../src/systems/stats.js';
 import { hpRatio } from '../src/systems/stats.js';
 import { nextMoveFor, moveLineOf } from '../src/data/tms.js';
 import { getPokemon } from '../src/data/pokemon.js';
+import { Pickup } from '../src/entities/Pickup.js';
 
 let failures = 0;
 
@@ -50,7 +51,7 @@ for (const starter of ['charmander', 'bulbasaur', 'squirtle']) {
 // ------------------------------------------- 2. jornada encadeada (campanha)
 console.log('\n[jornada — equipe e build passam de fase em fase]');
 {
-  // A fase é desafiadora de propósito: o bot vence ~60% das tentativas
+  // A fase é desafiadora de propósito: o bot vence ~50% das tentativas
   // (tools/balance.mjs) e perder devolve ao início com a mesma equipe, então o
   // teste também repete. Mas uma equipe ruim montada na Fase 1 perde a Fase 2
   // todas as vezes (~1 jornada em 15): aí começa uma jornada nova, até 3.
@@ -258,6 +259,7 @@ console.log('\n[evolução]');
   const run = new Run('gym_1_pewter', { starter: 'charmander' });
   const member = run.team.members[0];
   member.level = 15;
+  member.upgrades.ember_damage = 2;
   run.progression.addXpTo(member, run.progression.xpToNext(15) + 1);
 
   check('Charmander evolui no nível 16', member.pokemonId === 'charmeleon',
@@ -265,7 +267,31 @@ console.log('\n[evolução]');
   check('a evolução entra na fila para a tela aparecer', run.evolutionQueue.length === 1);
   check('evoluir não cura de graça',
         member.hp <= maxHpFor(member, run.playerStats.pokemonHpBonus));
-  check('o golpe e as melhorias continuam com ele', member.abilities[0] === 'ember');
+  // evoluir melhora o golpe (0.8): Charmeleon chega com Flamethrower, levando as melhorias
+  check('evoluir melhora o golpe e leva as melhorias',
+        member.abilities[0] === 'flamethrower' && member.upgrades.flamethrower_damage === 2 && !member.upgrades.ember_damage,
+        `${member.abilities[0]} ${JSON.stringify(member.upgrades)}`);
+}
+
+// ---------------------------------------------- 5.7 Ímã
+console.log('\n[Ímã]');
+{
+  const run = new Run('gym_1_pewter', { starter: 'charmander' });
+  run.spawner.update = () => {};   // sem inimigos: só o XP e o Ímã no mapa
+  const { x, y } = run.player;
+  const far = [[x + 1200, y + 800], [x - 1300, y - 700], [x + 900, y - 850]]
+    .map(([px, py]) => new Pickup('xp', px, py, 5));
+  run.pickups.push(...far, new Pickup('magnet', x + 30, y));
+  let gained = 0;
+  const addXp = run.progression.addXp.bind(run.progression);
+  run.progression.addXp = (amount) => { gained += amount; addXp(amount); };
+  for (let t = 0; t < 4; t += DT) {
+    if (run.state === 'levelup') resolveLevelUp(run);
+    run.update(DT, { x: 0, y: 0 });   // o treinador fica parado
+  }
+  check('o Ímã puxa todo o XP do mapa', far.every((orb) => orb.dead),
+        `${far.filter((orb) => orb.dead).length}/${far.length} coletados`);
+  check('o XP puxado conta para a equipe', gained >= 15, `${gained} de XP`);
 }
 
 // ------------------------------------------------------- 6. upgrades/dados
