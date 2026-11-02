@@ -1,4 +1,5 @@
 /** Efeitos puramente visuais (não causam dano). */
+import { CONFIG } from '../core/config.js';
 
 export class FloatingText {
   constructor(x, y, text, color = '#fff', size = 14) {
@@ -22,12 +23,13 @@ export class FloatingText {
 
 /** Linha do raio (chain) ou rastro rápido. */
 export class Beam {
-  constructor(points, color = '#f8d030', width = 4, life = 0.18) {
+  constructor(points, color = '#f8d030', width = 4, life = 0.18, abilityId = null) {
     this.points = points;      // [{x,y}, ...]
     this.color = color;
     this.width = width;
     this.life = life;
     this.maxLife = life;
+    this.abilityId = abilityId;
     this.dead = false;
   }
   update(dt) {
@@ -38,7 +40,7 @@ export class Beam {
 
 /** Arco do golpe corpo a corpo. */
 export class SlashArc {
-  constructor(owner, angle, range, arc, color, life = 0.22) {
+  constructor(owner, angle, range, arc, color, life = 0.22, abilityId = null) {
     this.owner = owner;
     this.angle = angle;
     this.range = range;
@@ -46,12 +48,31 @@ export class SlashArc {
     this.color = color;
     this.life = life;
     this.maxLife = life;
+    this.abilityId = abilityId;
     this.x = owner.x;
     this.y = owner.y;
     this.dead = false;
   }
   update(dt) {
     if (this.owner && !this.owner.dead) { this.x = this.owner.x; this.y = this.owner.y; }
+    this.life -= dt;
+    if (this.life <= 0) this.dead = true;
+  }
+}
+
+/** Sprite de golpe que toca uma vez e some (acertos, estouros). Ver data/fx.js. */
+export class SpriteFx {
+  constructor(x, y, fxId, { life = 0.3, scale = 1, angle = 0 } = {}) {
+    this.x = x;
+    this.y = y;
+    this.fxId = fxId;
+    this.life = life;
+    this.maxLife = life;
+    this.scale = scale;
+    this.angle = angle;
+    this.dead = false;
+  }
+  update(dt) {
     this.life -= dt;
     if (this.life <= 0) this.dead = true;
   }
@@ -79,8 +100,9 @@ export class Particle {
   }
 }
 
-/** Gera um pequeno estouro de partículas. */
+/** Gera um pequeno estouro de partículas (com teto: a horda é grande). */
 export function burst(list, x, y, color, count = 8, speed = 140, size = 3, life = 0.5) {
+  count = Math.min(count, CONFIG.fx.maxParticles - list.length);
   for (let i = 0; i < count; i++) {
     const a = Math.random() * Math.PI * 2;
     const s = speed * (0.4 + Math.random() * 0.8);

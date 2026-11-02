@@ -60,19 +60,19 @@ export const POKEMON = {
   },
   oddish: {
     id: 'oddish', dex: 43, name: 'Oddish', types: ['grass', 'poison'],
-    abilities: ['acid'], moveLine: ['acid', 'mega_drain', 'petal_dance'], role: 'Aura tóxica', rarity: 'common', power: 1, hp: 100,
+    abilities: ['mega_drain'], moveLine: ['mega_drain',  'toxic',  'solar_beam'], role: 'Aura tóxica', rarity: 'common', power: 1, hp: 100,
     description: 'Nuvem de veneno constante — ótima contra inimigos corpo a corpo.',
     evolution: { to: 'gloom', level: 21 }
   },
   poliwag: {
     id: 'poliwag', dex: 60, name: 'Poliwag', types: ['water'],
-    abilities: ['bubble'], moveLine: ['bubble', 'water_pulse', 'hydro_pump'], role: 'Desaceleração', rarity: 'common', power: 1, hp: 115,
+    abilities: ['water_gun'], moveLine: ['water_gun',  'water_pulse',  'hydro_pump'], role: 'Desaceleração', rarity: 'common', power: 1, hp: 115,
     description: 'Bolhas em leque que seguram o avanço da horda.',
     evolution: { to: 'poliwhirl', level: 25 }
   },
   bellsprout: {
     id: 'bellsprout', dex: 69, name: 'Bellsprout', types: ['grass', 'poison'],
-    abilities: ['leech_field'], moveLine: ['leech_field', 'razor_leaf', 'solar_beam'], role: 'Zona de chão', rarity: 'common', power: 1, hp: 92,
+    abilities: ['vine_whip'], moveLine: ['vine_whip',  'razor_leaf',  'solar_beam'], role: 'Zona de chão', rarity: 'common', power: 1, hp: 92,
     description: 'Campos de vinhas que ficam no chão causando dano por tempo.',
     evolution: { to: 'weepinbell', level: 21 }
   },
@@ -84,7 +84,7 @@ export const POKEMON = {
   },
   ponyta: {
     id: 'ponyta', dex: 77, name: 'Ponyta', types: ['fire'],
-    abilities: ['flame_wheel'], moveLine: ['flame_wheel', 'fire_spin', 'fire_blast'], role: 'Defesa de perímetro', rarity: 'uncommon', power: 1, hp: 112,
+    abilities: ['ember'], moveLine: ['ember',  'fire_spin',  'fire_blast'], role: 'Defesa de perímetro', rarity: 'uncommon', power: 1, hp: 112,
     description: 'Chamas orbitais que protegem quem está perto de você.',
     evolution: { to: 'rapidash', level: 40 }
   },
@@ -102,7 +102,7 @@ export const POKEMON = {
   },
   staryu: {
     id: 'staryu', dex: 120, name: 'Staryu', types: ['water'],
-    abilities: ['bubble'], moveLine: ['bubble', 'water_pulse', 'ice_beam'], role: 'Desaceleração', rarity: 'uncommon', power: 1.05, hp: 105,
+    abilities: ['water_gun'], moveLine: ['water_gun',  'water_pulse',  'ice_beam'], role: 'Desaceleração', rarity: 'uncommon', power: 1.05, hp: 105,
     description: 'Jatos rápidos que seguram quem chega perto.',
     evolution: { to: 'starmie', level: 30, method: 'stone', item: 'Pedra da Água' }
   },
@@ -167,24 +167,24 @@ export const POKEMON = {
   },
   spearow: {
     id: 'spearow', dex: 21, name: 'Spearow', types: ['normal', 'flying'],
-    abilities: ['peck'], moveLine: ['peck', 'wing_attack', 'drill_peck'], role: 'Dano rápido', rarity: 'common', power: 1.05, hp: 88,
+    abilities: ['peck'], moveLine: ['peck',  'wing_attack',  'hurricane'], role: 'Dano rápido', rarity: 'common', power: 1.05, hp: 88,
     description: 'Bicadas rápidas e precisas.',
     evolution: { to: 'fearow', level: 20 }
   },
   fearow: {
     id: 'fearow', dex: 22, name: 'Fearow', types: ['normal', 'flying'],
-    abilities: ['wing_attack'], moveLine: ['peck', 'wing_attack', 'drill_peck'], role: 'Dano rápido', rarity: 'evolved', power: 1.6, hp: 145,
+    abilities: ['wing_attack'], moveLine: ['peck',  'wing_attack',  'hurricane'], role: 'Dano rápido', rarity: 'evolved', power: 1.6, hp: 145,
     description: 'Bico perfurante em velocidade absurda.'
   },
   zubat: {
     id: 'zubat', dex: 41, name: 'Zubat', types: ['poison', 'flying'],
-    abilities: ['leech_life'], moveLine: ['leech_life', 'air_cutter', 'sludge_bomb'], role: 'Corpo a corpo', rarity: 'common', power: 1, hp: 88,
+    abilities: ['leech_life'], moveLine: ['leech_life',  'wing_attack',  'sludge_bomb'], role: 'Corpo a corpo', rarity: 'common', power: 1, hp: 88,
     description: 'Drena quem chega perto do treinador.',
     evolution: { to: 'golbat', level: 22 }
   },
   golbat: {
     id: 'golbat', dex: 42, name: 'Golbat', types: ['poison', 'flying'],
-    abilities: ['air_cutter'], moveLine: ['leech_life', 'air_cutter', 'sludge_bomb'], role: 'Corpo a corpo', rarity: 'evolved', power: 1.55, hp: 155,
+    abilities: ['wing_attack'], moveLine: ['leech_life',  'wing_attack',  'sludge_bomb'], role: 'Corpo a corpo', rarity: 'evolved', power: 1.55, hp: 155,
     description: 'Mordidas que drenam a horda inteira.'
   },
   ekans: {
@@ -228,24 +228,24 @@ export const POKEMON = {
   },
   magikarp: {
     id: 'magikarp', dex: 129, name: 'Magikarp', types: ['water'],
-    abilities: ['splash'], moveLine: ['splash', 'flail', 'hydro_pump'], role: 'Aposta de longo prazo', rarity: 'common', power: 0.35, hp: 70,
+    abilities: ['quick_attack'], moveLine: ['quick_attack',  'twister',  'hydro_pump'], role: 'Aposta de longo prazo', rarity: 'common', power: 0.35, hp: 70,
     description: 'Praticamente inútil — até chegar ao nível 20.',
     evolution: { to: 'gyarados', level: 20 }
   },
   gyarados: {
     id: 'gyarados', dex: 130, name: 'Gyarados', types: ['water', 'flying'],
-    abilities: ['hydro_pump'], moveLine: ['splash', 'flail', 'hydro_pump'], role: 'Dano massivo', rarity: 'evolved', power: 2.0, hp: 250,
+    abilities: ['hydro_pump'], moveLine: ['quick_attack',  'twister',  'hydro_pump'], role: 'Dano massivo', rarity: 'evolved', power: 2.0, hp: 250,
     description: 'A recompensa por ter apostado no Magikarp.'
   },
   jigglypuff: {
     id: 'jigglypuff', dex: 39, name: 'Jigglypuff', types: ['fairy'],
-    abilities: ['sing'], moveLine: ['sing', 'disarming_voice', 'hyper_voice'], role: 'Controle', rarity: 'common', power: 0.9, hp: 140,
+    abilities: ['quick_attack'], moveLine: ['quick_attack',  'disarming_voice',  'hyper_voice'], role: 'Controle', rarity: 'common', power: 0.9, hp: 140,
     description: 'Canção que deixa a horda inteira lenta.',
     evolution: { to: 'wigglytuff', level: 30, method: 'stone', item: 'Pedra da Lua' }
   },
   wigglytuff: {
     id: 'wigglytuff', dex: 40, name: 'Wigglytuff', types: ['fairy'],
-    abilities: ['disarming_voice'], moveLine: ['sing', 'disarming_voice', 'hyper_voice'], role: 'Controle', rarity: 'evolved', power: 1.5, hp: 215,
+    abilities: ['disarming_voice'], moveLine: ['quick_attack',  'disarming_voice',  'hyper_voice'], role: 'Controle', rarity: 'evolved', power: 1.5, hp: 215,
     description: 'Área de controle enorme e muita vida.'
   },
   clefairy: {
@@ -261,13 +261,13 @@ export const POKEMON = {
   },
   paras: {
     id: 'paras', dex: 46, name: 'Paras', types: ['bug', 'grass'],
-    abilities: ['leech_field'], moveLine: ['leech_field', 'mega_drain', 'petal_dance'], role: 'Zona de chão', rarity: 'common', power: 1, hp: 100,
+    abilities: ['leech_life'], moveLine: ['leech_life',  'mega_drain',  'solar_beam'], role: 'Zona de chão', rarity: 'common', power: 1, hp: 100,
     description: 'Esporos que ficam no chão envenenando.',
     evolution: { to: 'parasect', level: 24 }
   },
   parasect: {
     id: 'parasect', dex: 47, name: 'Parasect', types: ['bug', 'grass'],
-    abilities: ['mega_drain'], moveLine: ['leech_field', 'mega_drain', 'petal_dance'], role: 'Zona de chão', rarity: 'evolved', power: 1.55, hp: 165,
+    abilities: ['mega_drain'], moveLine: ['leech_life',  'mega_drain',  'solar_beam'], role: 'Zona de chão', rarity: 'evolved', power: 1.55, hp: 165,
     description: 'Campos de esporos muito maiores.'
   },
 
@@ -339,40 +339,40 @@ export const POKEMON = {
   },
   gloom: {
     id: 'gloom', dex: 44, name: 'Gloom', types: ['grass', 'poison'],
-    abilities: ['mega_drain'], moveLine: ['acid', 'mega_drain', 'petal_dance'], role: 'Aura tóxica', rarity: 'evolved',
+    abilities: ['toxic'], moveLine: ['mega_drain',  'toxic',  'solar_beam'], role: 'Aura tóxica', rarity: 'evolved',
     power: 1.35, hp: 150,
     description: 'A nuvem tóxica fica bem maior.',
     evolution: { to: 'vileplume', level: 32, method: 'stone', item: 'Pedra das Folhas' }
   },
   vileplume: {
     id: 'vileplume', dex: 45, name: 'Vileplume', types: ['grass', 'poison'],
-    abilities: ['petal_dance'], moveLine: ['acid', 'mega_drain', 'petal_dance'], role: 'Aura tóxica', rarity: 'evolved',
+    abilities: ['solar_beam'], moveLine: ['mega_drain',  'toxic',  'solar_beam'], role: 'Aura tóxica', rarity: 'evolved',
     power: 1.85, hp: 195,
     description: 'Forma final: veneno constante em área enorme.'
   },
   poliwhirl: {
     id: 'poliwhirl', dex: 61, name: 'Poliwhirl', types: ['water'],
-    abilities: ['water_pulse'], moveLine: ['bubble', 'water_pulse', 'hydro_pump'], role: 'Desaceleração', rarity: 'evolved',
+    abilities: ['water_pulse'], moveLine: ['water_gun',  'water_pulse',  'hydro_pump'], role: 'Desaceleração', rarity: 'evolved',
     power: 1.35, hp: 160,
     description: 'Mais bolhas e desaceleração mais pesada.',
     evolution: { to: 'poliwrath', level: 36, method: 'stone', item: 'Pedra da Água' }
   },
   poliwrath: {
     id: 'poliwrath', dex: 62, name: 'Poliwrath', types: ['water', 'fighting'],
-    abilities: ['hydro_pump'], moveLine: ['bubble', 'water_pulse', 'hydro_pump'], role: 'Desaceleração', rarity: 'evolved',
+    abilities: ['hydro_pump'], moveLine: ['water_gun',  'water_pulse',  'hydro_pump'], role: 'Desaceleração', rarity: 'evolved',
     power: 1.85, hp: 215,
     description: 'Forma final: segura a horda inteira no lugar.'
   },
   weepinbell: {
     id: 'weepinbell', dex: 70, name: 'Weepinbell', types: ['grass', 'poison'],
-    abilities: ['razor_leaf'], moveLine: ['leech_field', 'razor_leaf', 'solar_beam'], role: 'Zona de chão', rarity: 'evolved',
+    abilities: ['razor_leaf'], moveLine: ['vine_whip',  'razor_leaf',  'solar_beam'], role: 'Zona de chão', rarity: 'evolved',
     power: 1.4, hp: 135,
     description: 'Campos de vinha maiores e mais duradouros.',
     evolution: { to: 'victreebel', level: 32, method: 'stone', item: 'Pedra das Folhas' }
   },
   victreebel: {
     id: 'victreebel', dex: 71, name: 'Victreebel', types: ['grass', 'poison'],
-    abilities: ['solar_beam'], moveLine: ['leech_field', 'razor_leaf', 'solar_beam'], role: 'Zona de chão', rarity: 'evolved',
+    abilities: ['solar_beam'], moveLine: ['vine_whip',  'razor_leaf',  'solar_beam'], role: 'Zona de chão', rarity: 'evolved',
     power: 1.9, hp: 180,
     description: 'Forma final: o chão inteiro vira armadilha.'
   },
@@ -391,7 +391,7 @@ export const POKEMON = {
   },
   rapidash: {
     id: 'rapidash', dex: 78, name: 'Rapidash', types: ['fire'],
-    abilities: ['fire_spin'], moveLine: ['flame_wheel', 'fire_spin', 'fire_blast'], role: 'Defesa de perímetro', rarity: 'evolved',
+    abilities: ['fire_spin'], moveLine: ['ember',  'fire_spin',  'fire_blast'], role: 'Defesa de perímetro', rarity: 'evolved',
     power: 1.8, hp: 165,
     description: 'Chamas orbitais muito mais largas e rápidas.'
   },
@@ -429,7 +429,7 @@ export const POKEMON = {
   },
   starmie: {
     id: 'starmie', dex: 121, name: 'Starmie', types: ['water', 'psychic'],
-    abilities: ['ice_beam'], moveLine: ['bubble', 'water_pulse', 'ice_beam'], role: 'Desaceleração', rarity: 'evolved',
+    abilities: ['ice_beam'], moveLine: ['water_gun',  'water_pulse',  'ice_beam'], role: 'Desaceleração', rarity: 'evolved',
     power: 1.85, hp: 165,
     description: 'Forma final: jatos rápidos e implacáveis.'
   },

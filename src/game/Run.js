@@ -9,7 +9,8 @@ import { ProgressionSystem } from '../systems/ProgressionSystem.js';
 import { TeamSystem } from '../systems/TeamSystem.js';
 import { CaptureSystem } from '../systems/CaptureSystem.js';
 import { damageEnemy, damageArea } from '../systems/combat.js';
-import { burst, FloatingText } from '../entities/effects.js';
+import { burst, FloatingText, SpriteFx } from '../entities/effects.js';
+import { abilityFx, zoneFx } from '../data/fx.js';
 import { bus, EVENTS } from '../core/events.js';
 import { typeColor } from '../data/types.js';
 import { maxHpFor } from '../systems/stats.js';
@@ -72,6 +73,34 @@ export class Run {
 
     this.pendingBall = false;
     this.levelUpMember = null;   // Pokémon que está com a tela de melhoria aberta
+
+    // ---- efeitos ----
+    this.shakeTime = 0;
+    this.shakeDuration = 1;
+    this.shakePower = 0;
+    this.fxBudget = 0;           // sprites de acerto que ainda cabem neste quadro
+  }
+
+  /** Tremor de tela (o Renderer aplica). Desligável em Opções. */
+  shake(power, duration = 0.25) {
+    if (!CONFIG.fx.screenShake) return;
+    if (this.shakeTime <= 0 || power >= this.shakePower) {
+      this.shakePower = power;
+      this.shakeDuration = duration;
+      this.shakeTime = duration;
+    }
+  }
+
+  /**
+   * Sprite de golpe que toca uma vez (acertos, explosões). Tem teto por quadro
+   * e no total: com a horda grande, o excesso é só ruído e pesa no navegador.
+   * Devolve false quando não coube (quem chamou pode usar partículas).
+   */
+  spawnFx(x, y, fxId, opts) {
+    if (!fxId || this.fxBudget <= 0 || this.effects.length >= CONFIG.fx.maxEffects) return false;
+    this.fxBudget--;
+    this.effects.push(new SpriteFx(x, y, fxId, opts));
+    return true;
   }
 
   /* ================= equipe e companheiros ================= */
@@ -184,6 +213,8 @@ export class Run {
     if (this.state !== 'running') return;
 
     this.time += dt;
+    this.fxBudget = CONFIG.fx.impactsPerFrame;
+    if (this.shakeTime > 0) this.shakeTime = Math.max(0, this.shakeTime - dt);
     this.grid.rebuild(this.enemies);
 
     this.player.update(dt, move, this.playerStats, this.world);
@@ -311,7 +342,10 @@ export class Run {
           type: p.type, effects: p.effects, knockback: p.knockback,
           from: { x: p.x - p.vx * 0.01, y: p.y - p.vy * 0.01 }
         });
-        burst(this.particles, p.x, p.y, p.color, 3, 90, 2, 0.25);
+        // o acerto do golpe (sprite do FireRed); sem espaço, umas faíscas
+        if (!this.spawnFx(p.x, p.y, abilityFx(p.abilityId)?.hit, { life: 0.28, scale: 0.75 })) {
+          burst(this.particles, p.x, p.y, p.color, 3, 90, 2, 0.25);
+        }
 
         if (p.pierce > 0) p.pierce--;
         else { p.dead = true; break; }
@@ -322,7 +356,9 @@ export class Run {
         damageArea(this, p.x, p.y, p.explode.area, p.damage * p.explode.ratio, {
           type: p.type, effects: p.effects, knockback: 120
         });
-        burst(this.particles, p.x, p.y, p.color, 16, 220, 4, 0.5);
+        this.spawnFx(p.x, p.y, 'explosion', { life: 0.35, scale: 1.5 });
+        burst(this.particles, p.x, p.y, p.color, 10, 220, 4, 0.5);
+        this.shake(2, 0.15);
         p.explode = null;
       }
     }
@@ -355,7 +391,12 @@ export class Run {
       zone.update(dt);
 
       if (zone.kind === 'nova') {
+        if (zone.delay > 0) continue;   // ainda é só o aviso no chão
         if (zone.hostile) {
+          if (!zone.started) {
+            zone.started = true;
+            this.shake(zoneFx(zone)?.shake ?? 4, 0.3);
+          }
           // a onda do chefe atinge os Pokémon em campo, não o treinador
           for (const companion of this.companions) {
             if (companion.dead || zone.hits.has(companion)) continue;

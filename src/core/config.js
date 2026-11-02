@@ -3,7 +3,7 @@
  * Nada de número mágico espalhado pelo gameplay: se precisar ajustar, ajuste aqui.
  */
 export const CONFIG = {
-  version: '0.5.0',
+  version: '0.6.0',
 
   canvas: { width: 1280, height: 720 },
 
@@ -13,6 +13,18 @@ export const CONFIG = {
    * sem suavização, para a arte continuar nítida.
    */
   render: { pixelScale: 2 },
+
+  /**
+   * Efeitos visuais dos golpes. Os tetos existem porque a horda é grande e o
+   * jogo precisa rodar leve no navegador.
+   */
+  fx: {
+    screenShake: true,        // tremor de tela (desligável em Opções)
+    impactsPerFrame: 6,       // sprites de acerto novos por quadro, no máximo
+    maxEffects: 160,          // efeitos vivos (números, acertos, raios), no máximo
+    maxParticles: 360,        // partículas vivas, no máximo
+    bossTelegraph: 0.7        // segundos de aviso no chão antes do golpe do líder
+  },
 
   /** O treinador não luta e não tem vida: ele só guia a equipe pelo mapa. */
   trainer: {

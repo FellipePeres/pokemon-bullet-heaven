@@ -8,6 +8,7 @@ import { getTrainerUpgrade } from '../data/trainerUpgrades.js';
 import { applyModifiers, weightedPickMany } from '../core/utils.js';
 import { bus, EVENTS } from '../core/events.js';
 import { maxHpFor, xpToNextLevel } from './stats.js';
+import { transferUpgrades } from './moves.js';
 
 /** Opção usada quando não há mais upgrades disponíveis para aquele Pokémon. */
 const HEAL_FALLBACK = {
@@ -200,33 +201,7 @@ export class ProgressionSystem {
     if (!newAbility || !oldAbility || oldAbility === newAbility) return;
 
     member.abilities[0] = newAbility;
-
-    const migrated = {};
-    let orphanStacks = 0;
-    for (const [upId, stacks] of Object.entries(member.upgrades)) {
-      if (!upId.startsWith(`${oldAbility}_`)) {
-        migrated[upId] = stacks;
-        continue;
-      }
-      const suffix = upId.slice(oldAbility.length + 1);
-      const target = `${newAbility}_${suffix}`;
-      if (UPGRADES[target]) {
-        migrated[target] = Math.min(stacks + (migrated[target] ?? 0), UPGRADES[target].maxStacks);
-      } else {
-        orphanStacks += stacks;
-      }
-    }
-
-    // o que não existe na habilidade nova é convertido em potência
-    const damageId = `${newAbility}_damage`;
-    if (orphanStacks && UPGRADES[damageId]) {
-      migrated[damageId] = Math.min(
-        (migrated[damageId] ?? 0) + orphanStacks,
-        UPGRADES[damageId].maxStacks
-      );
-    }
-
-    member.upgrades = migrated;
+    member.upgrades = transferUpgrades(member.upgrades, oldAbility, newAbility);
     this.run.rebuildCompanionAbilities(member);
 
     const ability = getAbility(newAbility);

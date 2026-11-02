@@ -116,6 +116,7 @@ export function killEnemy(run, enemy, opts = {}) {
     run.pickups.push(new Pickup('heal', enemy.x - 6, enemy.y, 18));
   }
 
+  if (enemy.boss) run.shake?.(7, 0.45);   // o Pokémon do líder caiu
   bus.emit(EVENTS.ENEMY_KILLED, { enemy, run });
 }
 

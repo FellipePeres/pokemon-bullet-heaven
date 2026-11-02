@@ -7,6 +7,7 @@ import { moveLineOf } from '../data/tms.js';
 import { getTrainerLook } from '../data/trainers.js';
 import { spriteUrl, artworkUrl, pokemonImg, badgeUrl } from '../render/sprites.js';
 import { assetUrl } from '../render/assets.js';
+import { saveOptions } from '../save/options.js';
 import { typeColor, typeName } from '../data/types.js';
 import { CONFIG } from '../core/config.js';
 import { iconHTML } from '../render/icons.js';
@@ -464,7 +465,7 @@ export class Menus {
         <div class="node-body"><h4>${title}</h4><p>${description}</p></div>
       `;
       const btn = create('button', 'icon-btn', value);
-      btn.onclick = () => { onClick(); this.buildOptions(); };
+      btn.onclick = () => { onClick(); saveOptions(); this.buildOptions(); };
       node.appendChild(btn);
       list.appendChild(node);
     };
@@ -483,6 +484,11 @@ export class Menus {
       'Vale para a próxima partida. A divisão de XP se ajusta sozinha.',
       String(CONFIG.team.activeSlots),
       () => { CONFIG.team.activeSlots = CONFIG.team.activeSlots >= 4 ? 1 : CONFIG.team.activeSlots + 1; });
+
+    option('📳', 'Tremor de tela',
+      'A tela treme em explosões, no Earthquake e nos golpes dos líderes.',
+      CONFIG.fx.screenShake ? 'Ligado' : 'Desligado',
+      () => { CONFIG.fx.screenShake = !CONFIG.fx.screenShake; });
 
     option('🎞️', 'Sprites animados na interface',
       'GIFs da Gen V nos menus e no HUD. Desligue se preferir imagens estáticas.',

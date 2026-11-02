@@ -1,5 +1,7 @@
+import { CONFIG } from '../core/config.js';
 import { getAbility } from '../data/abilities.js';
 import { getUpgrade } from '../data/upgrades.js';
+import { abilityFx } from '../data/fx.js';
 import { applyModifiers, deepClone, clamp } from '../core/utils.js';
 import { typeColor } from '../data/types.js';
 import { Projectile, Orb } from '../entities/projectiles.js';
@@ -203,7 +205,7 @@ export class AbilitySystem {
     if (!target) return false;
 
     const a = Math.atan2(target.y - companion.y, target.x - companion.x);
-    run.effects.push(new SlashArc(companion, a, s.range, s.arc, inst.color, s.duration ?? 0.2));
+    run.effects.push(new SlashArc(companion, a, s.range, s.arc, inst.color, s.duration ?? 0.2, inst.abilityId));
 
     for (const enemy of enemiesInRadius(run, companion.x, companion.y, s.range)) {
       let diff = Math.atan2(enemy.y - companion.y, enemy.x - companion.x) - a;
@@ -227,6 +229,9 @@ export class AbilitySystem {
       damage: s.damage, knockback: s.knockback, effects: inst.effects,
       type: inst.ability.type, color: inst.color, abilityId: inst.abilityId
     }));
+    // Earthquake e afins tremem a tela, mais fraco que os golpes de chefe
+    const shake = abilityFx(inst.abilityId)?.shake;
+    if (shake) this.run.shake(shake * 0.6, 0.22);
     return true;
   }
 
@@ -258,7 +263,7 @@ export class AbilitySystem {
       damage *= 0.85; // cada salto perde um pouco de força
     }
 
-    run.effects.push(new Beam(points, inst.color, 4, s.duration ?? 0.18));
+    run.effects.push(new Beam(points, inst.color, 4, s.duration ?? 0.18, inst.abilityId));
     return true;
   }
 
@@ -292,11 +297,13 @@ export class AbilitySystem {
     if (!ability) return;
     const s = ability.base;
     if (ability.behavior === 'nova') {
+      // a onda sai depois de um aviso no chão, para dar tempo de reagir
       this.run.zones.push(new Zone({
         kind: 'nova', x: enemy.x, y: enemy.y,
         radius: enemy.radius, maxRadius: s.area, growSpeed: s.speed,
         damage: s.damage, knockback: s.knockback,
-        type: ability.type, color: '#ff6b6b', hostile: true, abilityId
+        type: ability.type, color: '#ff6b6b', hostile: true, abilityId,
+        delay: CONFIG.fx.bossTelegraph, visualType: enemy.types[0]
       }));
     }
   }

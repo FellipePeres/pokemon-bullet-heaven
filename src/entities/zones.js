@@ -22,15 +22,22 @@ export class Zone {
       owner: null,
       abilityId: null,
       hostile: false,
+      delay: 0,            // aviso no chão antes de a onda sair (golpes de líder)
+      visualType: null,    // tipo de quem usou (o golpe genérico do líder muda de cara)
       dead: false
     }, opts);
     this.tick = 0;
     this.age = 0;
+    this.seed = Math.random() * 1000;   // onde ficam os sprites espalhados pela área
     this.hits = new Set(); // usado pela nova (um acerto por inimigo)
   }
 
   update(dt) {
     this.age += dt;
+    if (this.delay > 0) {
+      this.delay -= dt;
+      return;
+    }
     if (this.kind === 'aura') {
       if (!this.owner || this.owner.dead) { this.dead = true; return; }
       this.x = this.owner.x;

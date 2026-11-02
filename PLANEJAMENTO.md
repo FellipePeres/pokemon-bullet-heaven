@@ -90,11 +90,16 @@ quando o Fellipe mandar**, porque o push publica o jogo.
 |---|---|---|---|
 | 0 | Fundação: extrator, carregador, vitrine e estrutura por região | 0.5 | ✅ feita (2026-11-02) |
 | 1 | Treinador: Menino ou Menina | 0.5 | 🟡 feita; falta a partida do Fellipe |
-| 2 | Golpes com sprite | 0.6 | ⏳ |
+| 2 | Golpes com sprite (e no máximo 4 por tipo) | 0.6 | ✅ feita (2026-11-02) |
 | 3 | Pokémon animados e cenário de tiles | 0.7 | ⏳ |
 | 4 | Fases 3 a 8, Elite Four e Campeão | 0.8 → 1.0 | ⏳ |
 | 5 | Som | 1.0 | ⏳ |
-| 6 | Outras regiões | 1.x | ⏳ |
+| 6 | Acabamento: opções salvas, controle, celular, desempenho, assets locais | 0.6 → 1.0 | ⏳ |
+| 7 | Final da jornada: Hall da Fama e créditos | 1.0 | ⏳ |
+| 8 | Outras regiões | 1.x | ⏳ |
+
+Kanto completo (a 1.0) é o fim das etapas 2 a 7. Os itens pequenos da Etapa 6
+(opções salvas, controle) podem entrar antes, junto de qualquer outra etapa.
 
 ### Etapa 0 — Fundação
 
@@ -143,6 +148,18 @@ Vem antes de qualquer sprite, para nada ter que ser refeito depois.
   apresentação do líder).
 
 ### Etapa 2 — Golpes com sprite
+
+**Feita na 0.6**, com uma mudança pedida no meio: **no máximo 4 golpes por tipo**,
+reaproveitados pelas espécies, para o jogo ficar leve. Saíram 12 golpes (Fire
+Ring, Flame Wheel, Whirlpool, Bubble, Splash, Leech Field, Petal Dance, Sing,
+Flail, Air Cutter, Drill Peck, Acid) e entraram 10 dos tipos novos (Mud-Slap,
+Bone Club, Lick, Night Shade, Shadow Ball, Twister, Dragon Breath, Outrage,
+Powder Snow, Blizzard). O visual de cada golpe ficou em `data/fx.js`, e não em
+`abilities.js`, para trocar sprite sem mexer em balanceamento. Medido: 60 FPS e
+~2 ms por quadro com 245 inimigos.
+
+O plano original, para referência:
+
 
 - Cada golpe ganha um campo `vfx` em `abilities.js`, que aponta para efeitos de um
   catálogo em `src/data/fx.js` (folha, tamanho do quadro, quantidade, velocidade,
@@ -240,6 +257,26 @@ Conteúdo que entra junto:
   Breath → Outrage) e Terra (Mud-Slap → Bonemerang → Earthquake).
 - Talvez um comportamento novo, `beam` (raio contínuo para Hyper Beam e Solar
   Beam), se o projétil não der a sensação certa.
+- **9 espécies não estão em tabela de captura nenhuma** (levantamento de
+  2026-11-02): Venonat, Farfetch'd, Doduo, Seel, Onix, Hitmonlee, Hitmonchan,
+  Lickitung e Goldeen. Sem elas a Pokédex não fecha. Persian e Venomoth vêm por
+  evolução (de Meowth e de Venonat). Proposta (D7), com os lugares do FireRed:
+  - Goldeen na Fase 3 (pesca);
+  - Onix na Fase 4 (Túnel de Pedra);
+  - Venonat na Fase 5 (Rotas 12–15 e Zona Safári);
+  - Doduo na Fase 6 (Rotas 16–18);
+  - Seel na Fase 7 (Ilhas Seafoam);
+  - por presente, como no jogo: Farfetch'd (a troca de Vermilion, Fase 3),
+    Lickitung (a troca da Rota 18, Fase 6) e Hitmonlee **ou** Hitmonchan (o
+    prêmio do Dojo de Saffron, Fase 6, escolhendo um dos dois).
+- **Presentes da fase** (`stage.gifts`, novo mecanismo genérico): um Pokémon
+  oferecido num momento da fase ou na vitória. Serve aos presentes acima, ao
+  Lapras da Silph, ao Eevee de Celadon e aos fósseis.
+- **Lendários**: Articuno, Zapdos, Moltres, Mewtwo e Mew estão na tabela da
+  fase 9, mas, como no jogo, deveriam ser encontros especiais. Proposta: um
+  chefe opcional que, derrotado, pode ser capturado.
+- **Apresentação do líder**: hoje a fala dele é só um aviso no canto. Ela passa
+  a abrir com o retrato e a caixa de texto do FireRed, antes do time entrar.
 
 **Curva de dificuldade** (rascunho; os números finais saem da medição)
 
@@ -299,7 +336,34 @@ Os arquivos já estão no Pokemon All, em OGG, prontos para o navegador.
   uma regra dos navegadores.
 - Gritos e efeitos são baratos e podem entrar já junto das etapas 2 e 3.
 
-### Etapa 6 — Outras regiões
+### Etapa 6 — Acabamento
+
+Levantamento de 2026-11-02:
+
+- ✅ **Opções salvas** (0.6): ficam no navegador (`save/options.js`), com o
+  tremor de tela como opção nova.
+- **Controle (gamepad).** Hoje é só teclado. A Gamepad API do navegador é
+  barata: analógico para andar, botões para trocar e pausar.
+- **Celular (D8).** Joystick virtual na tela e uma interface que caiba na tela
+  pequena. O site é público, e hoje no celular o jogo não é jogável.
+- ✅ **Desempenho medido** (0.6): `vitrine.html?estresse` deu 60 FPS e ~2 ms por
+  quadro com 245 inimigos. Medir de novo com os Pokémon animados (Etapa 3).
+- **Assets locais.** Os sprites de Pokémon, itens e insígnias ainda vêm do
+  raw.githubusercontent.com a cada partida. Com a Etapa 3 o canvas fica local;
+  falta a interface (HUD, menus, Pokédex).
+- **Publicar.** A 0.5 está numa branch local; o site roda a 0.4. Publicar é
+  merge na `main` + push, quando o Fellipe mandar.
+
+### Etapa 7 — Final da jornada
+
+- Hoje, depois do Campeão, não acontece nada.
+- **Hall da Fama como no FireRed**: a equipe que venceu, um Pokémon por vez,
+  com o retrato do treinador, e depois créditos curtos.
+- O perfil guarda os times campeões, para revê-los no menu.
+- **Pós-jogo (D9, depois da 1.0)**: revanche dos líderes com níveis maiores e
+  os lendários como chefes opcionais.
+
+### Etapa 8 — Outras regiões
 
 A Etapa 0 deixa a estrutura pronta, então cada região nova é só dado e assets:
 faixa da Pokédex, iniciais, campanha (rotas, ginásios, Elite Four), tabelas de
@@ -329,8 +393,14 @@ região, da Etapa 0, serve para as duas respostas.
 | D2 | Árvores e pedras do cenário: só decoração ou obstáculo de verdade? | Decoração no começo. Obstáculo muda o jogo: os inimigos precisariam desviar. | Etapa 3 |
 | D3 | Selvagens com nível e curva de XP cúbica? | Sim (ver Etapa 4). | Etapa 4, antes da Fase 5 |
 | D4 | Quem já tem save escolhe o treinador ao abrir o jogo, ou fica Menino até trocar em Opções? | ✅ Decidido: escolhe ao continuar (a tela aparece uma vez) e pode trocar em Opções. | Etapa 1 |
-| D5 | Próxima região? | Hoenn | Etapa 6 |
+| D5 | Próxima região? | Hoenn | Etapa 8 |
 | D6 | Músicas novas do FireRed: renderizar (numa cópia temporária do Pokemon All, ou com o Braga) ou ficar com as 3 prontas por enquanto? | Renderizar as das rotas e a da batalha contra selvagem. | Etapa 5 |
+| D7 | Onde entram as 9 espécies que não estão em tabela nenhuma? | Os lugares do FireRed e os presentes (ver Etapa 4). As porcentagens nas tabelas são suas. | Etapa 4 |
+| D8 | Celular e controle importam? | Controle já (é barato); celular depois de Kanto fechado. | Etapa 6 |
+| D9 | Final e pós-jogo | Hall da Fama e créditos na 1.0; revanche dos líderes e lendários depois. | Etapa 7 |
+
+Enquanto uma decisão não vem, a recomendação vale como padrão. O que foi feito
+assim fica anotado como "padrão até o Fellipe decidir".
 
 ## 6. Depois de Kanto
 

@@ -139,12 +139,12 @@ const SPECIAL_UPGRADES = [
     modifiers: { 'effect.burn.dps': { mult: 0.6 }, 'effect.burn.duration': { mult: 0.3 } }
   },
   {
-    id: 'ember_fire_ring',
+    id: 'ember_fire_spin',
     scope: 'ability', abilityId: 'ember',
-    name: 'EVOLUÇÃO: Fire Ring',
-    description: 'Um anel de fogo passa a girar em volta do Pokémon, queimando quem chega perto.',
+    name: 'EVOLUÇÃO: Fire Spin',
+    description: 'Chamas passam a girar em volta do Pokémon, queimando quem chega perto.',
     icon: 'evolution', maxStacks: 1, weight: 4, rarity: 'evolution',
-    grantsAbility: 'fire_ring',
+    grantsAbility: 'fire_spin',
     requires: { upgrade: 'ember_damage', stacks: 2 }
   },
   {
@@ -156,21 +156,21 @@ const SPECIAL_UPGRADES = [
     modifiers: { knockback: { mult: 0.6 }, 'effect.slow.factor': { mult: -0.15 } }
   },
   {
-    id: 'water_gun_whirlpool',
+    id: 'water_gun_pulse',
     scope: 'ability', abilityId: 'water_gun',
-    name: 'EVOLUÇÃO: Whirlpool',
-    description: 'Redemoinhos passam a orbitar o Pokémon, empurrando e segurando a horda.',
+    name: 'EVOLUÇÃO: Water Pulse',
+    description: 'Ondas d\'água passam a sair do Pokémon, empurrando e segurando a horda.',
     icon: 'evolution', maxStacks: 1, weight: 4, rarity: 'evolution',
-    grantsAbility: 'whirlpool',
+    grantsAbility: 'water_pulse',
     requires: { upgrade: 'water_gun_damage', stacks: 2 }
   },
   {
-    id: 'vine_whip_leech',
+    id: 'vine_whip_drain',
     scope: 'ability', abilityId: 'vine_whip',
-    name: 'EVOLUÇÃO: Leech Field',
-    description: 'As vinhas passam a ficar no chão, envenenando e segurando os inimigos.',
+    name: 'EVOLUÇÃO: Mega Drain',
+    description: 'Um campo de drenagem passa a cercar o Pokémon, envenenando quem entra.',
     icon: 'evolution', maxStacks: 1, weight: 4, rarity: 'evolution',
-    grantsAbility: 'leech_field',
+    grantsAbility: 'mega_drain',
     requires: { upgrade: 'vine_whip_damage', stacks: 2 }
   },
   {
@@ -211,3 +211,10 @@ for (const ability of Object.values(ABILITIES)) {
 for (const up of SPECIAL_UPGRADES) UPGRADES[up.id] = up;
 
 export const getUpgrade = (id) => UPGRADES[id];
+
+/** Melhorias que mudaram de nome na 0.6, junto com o golpe extra que concedem. */
+export const RENAMED_UPGRADES = {
+  ember_fire_ring: 'ember_fire_spin',
+  water_gun_whirlpool: 'water_gun_pulse',
+  vine_whip_leech: 'vine_whip_drain'
+};

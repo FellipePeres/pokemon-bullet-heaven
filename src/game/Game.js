@@ -8,6 +8,7 @@ import { HUD } from '../ui/HUD.js';
 import { Menus } from '../ui/Menus.js';
 import { toast } from '../ui/dom.js';
 import { preloadAssets } from '../render/assets.js';
+import { loadOptions } from '../save/options.js';
 import { SaveManager } from '../save/SaveManager.js';
 import {
   createProfile, normalizeProfile, ProfileTracker,
@@ -27,6 +28,8 @@ import { TRAINER_UPGRADES, getTrainerUpgrade, nextCost } from '../data/trainerUp
  */
 export class Game {
   constructor(canvas) {
+    loadOptions();   // preferências do menu Opções, guardadas no navegador
+
     // ---- perfil (progresso permanente) ----
     const local = SaveManager.loadLocal();
     this.profile = local ? normalizeProfile(local.profile) : createProfile();

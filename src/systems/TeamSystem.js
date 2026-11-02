@@ -3,6 +3,7 @@ import { getPokemon } from '../data/pokemon.js';
 import { bus, EVENTS } from '../core/events.js';
 import { uid } from '../core/utils.js';
 import { maxHpFor } from './stats.js';
+import { migrateMember } from './moves.js';
 
 /**
  * Equipe do jogador.
@@ -167,6 +168,7 @@ export class TeamSystem {
         abilities: [...(m.abilities ?? getPokemon(m.pokemonId).abilities)],
         upgrades: { ...(m.upgrades ?? {}) }
       };
+      migrateMember(member);   // golpes e melhorias de saves de versões antigas
       // ao começar uma fase nova a equipe chega descansada
       if (healAll) {
         member.fainted = false;

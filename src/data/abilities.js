@@ -47,15 +47,6 @@ export const ABILITIES = {
     effects: { burn: { dps: 4, duration: 2.5 } }
   },
 
-  fire_ring: {
-    id: 'fire_ring',
-    name: 'Fire Ring',
-    type: 'fire',
-    behavior: 'aura',
-    description: 'Um anel de fogo permanece ao redor do Pokémon e queima quem entra.',
-    base: { damage: 9, area: 96, tickRate: 0.45 },
-    effects: { burn: { dps: 4, duration: 2 } }
-  },
 
   vine_whip: {
     id: 'vine_whip',
@@ -66,15 +57,6 @@ export const ABILITIES = {
     base: { damage: 15, cooldown: 1.35, range: 138, arc: 1.4, knockback: 175, duration: 0.22 }
   },
 
-  leech_field: {
-    id: 'leech_field',
-    name: 'Leech Field',
-    type: 'grass',
-    behavior: 'ground_zone',
-    description: 'Cria um campo de vinhas no chão que envenena e segura os inimigos.',
-    base: { damage: 7, cooldown: 3.0, area: 88, duration: 4.5, tickRate: 0.5, range: 300, count: 1 },
-    effects: { poison: { dps: 5, duration: 3 }, slow: { factor: 0.55, duration: 0.8 } }
-  },
 
   water_gun: {
     id: 'water_gun',
@@ -89,15 +71,6 @@ export const ABILITIES = {
     effects: { slow: { factor: 0.6, duration: 1.2 } }
   },
 
-  whirlpool: {
-    id: 'whirlpool',
-    name: 'Whirlpool',
-    type: 'water',
-    behavior: 'orbit',
-    description: 'Redemoinhos giram ao redor do Pokémon, empurrando quem encosta.',
-    base: { damage: 11, count: 2, area: 78, size: 14, speed: 2.4, knockback: 90, tickRate: 0.5 },
-    effects: { slow: { factor: 0.7, duration: 0.8 } }
-  },
 
 
   /* =============== GOLPES BÁSICOS DE SELVAGENS =============== */
@@ -138,26 +111,6 @@ export const ABILITIES = {
     base: { damage: 14, cooldown: 1.2, range: 120, arc: 1.3, knockback: 60, duration: 0.2 },
     effects: { poison: { dps: 3, duration: 2 } }
   },
-  sing: {
-    id: 'sing',
-    name: 'Sing',
-    type: 'normal',
-    behavior: 'aura',
-    description: 'Canção que deixa tudo ao redor lento e sonolento.',
-    base: { damage: 4, area: 104, tickRate: 0.7 },
-    effects: { slow: { factor: 0.45, duration: 1.6 } }
-  },
-  splash: {
-    id: 'splash',
-    name: 'Splash',
-    type: 'water',
-    behavior: 'projectile',
-    description: 'Praticamente inútil... até Magikarp evoluir.',
-    base: {
-      damage: 3, cooldown: 1.6, count: 1, speed: 240, range: 200,
-      pierce: 0, size: 6, duration: 1, spread: 0.3, knockback: 10
-    }
-  },
 
   /* ======================= POKÉMON CAPTURÁVEIS ======================= */
   gust: {
@@ -169,38 +122,8 @@ export const ABILITIES = {
     base: { damage: 14, cooldown: 2.6, area: 140, speed: 260, knockback: 220, size: 16 }
   },
 
-  bubble: {
-    id: 'bubble',
-    name: 'Bubble',
-    type: 'water',
-    behavior: 'projectile',
-    description: 'Várias bolhas lentas que reduzem a velocidade dos inimigos.',
-    base: {
-      damage: 7, cooldown: 1.3, count: 3, speed: 250, range: 300,
-      pierce: 0, size: 7, duration: 1.6, spread: 0.55, knockback: 20
-    },
-    effects: { slow: { factor: 0.5, duration: 1.6 } }
-  },
 
-  acid: {
-    id: 'acid',
-    name: 'Acid',
-    type: 'poison',
-    behavior: 'aura',
-    description: 'Nuvem tóxica constante ao redor do Pokémon.',
-    base: { damage: 5, area: 84, tickRate: 0.6 },
-    effects: { poison: { dps: 6, duration: 3 } }
-  },
 
-  flame_wheel: {
-    id: 'flame_wheel',
-    name: 'Flame Wheel',
-    type: 'fire',
-    behavior: 'orbit',
-    description: 'Chamas giratórias que queimam quem encosta.',
-    base: { damage: 10, count: 2, area: 70, size: 13, speed: 3.0, knockback: 40, tickRate: 0.45 },
-    effects: { burn: { dps: 5, duration: 2 } }
-  },
 
   thunder_shock: {
     id: 'thunder_shock',
@@ -399,14 +322,6 @@ export const ABILITIES = {
     description: 'Golpe de asa em arco largo, empurrando quem está perto.',
     base: { damage: 26, cooldown: 0.95, range: 158, arc: 1.9, knockback: 210, duration: 0.2 }
   },
-  air_cutter: {
-    id: 'air_cutter', name: 'Air Cutter', type: 'flying', behavior: 'projectile', tier: 'tm',
-    description: 'Lâminas de vento que cortam vários inimigos em linha.',
-    base: {
-      damage: 22, cooldown: 1.0, count: 2, speed: 480, range: 360,
-      pierce: 4, size: 10, duration: 1.4, spread: 0.26, knockback: 60
-    }
-  },
   hyper_fang: {
     id: 'hyper_fang', name: 'Hyper Fang', type: 'normal', behavior: 'melee_arc', tier: 'tm',
     description: 'Mordida brutal que arremessa o alvo para longe.',
@@ -474,11 +389,6 @@ export const ABILITIES = {
     base: { damage: 22, cooldown: 1.8, area: 185, speed: 400, knockback: 120, size: 16 },
     effects: { slow: { factor: 0.6, duration: 1.2 } }
   },
-  flail: {
-    id: 'flail', name: 'Flail', type: 'normal', behavior: 'melee_arc', tier: 'tm',
-    description: 'Sacudida desesperada — muito melhor que Splash.',
-    base: { damage: 24, cooldown: 0.9, range: 132, arc: 1.7, knockback: 150, duration: 0.2 }
-  },
 
   /* ==================== GOLPES DE TM — NÍVEL 3 ==================== */
   fire_blast: {
@@ -505,14 +415,6 @@ export const ABILITIES = {
     description: 'Tempestade que arremessa toda a horda para longe.',
     base: { damage: 52, cooldown: 2.4, area: 260, speed: 460, knockback: 420, size: 22 }
   },
-  drill_peck: {
-    id: 'drill_peck', name: 'Drill Peck', type: 'flying', behavior: 'projectile', tier: 'tm3',
-    description: 'Broca giratória que perfura fileiras inteiras.',
-    base: {
-      damage: 48, cooldown: 0.9, count: 2, speed: 700, range: 420,
-      pierce: 6, size: 12, duration: 1.4, spread: 0.16, knockback: 90
-    }
-  },
   sludge_bomb: {
     id: 'sludge_bomb', name: 'Sludge Bomb', type: 'poison', behavior: 'projectile', tier: 'tm3',
     description: 'Bombas tóxicas que explodem e deixam veneno pesado.',
@@ -522,11 +424,6 @@ export const ABILITIES = {
       area: 96, explodeDamage: 0.75
     },
     effects: { poison: { dps: 24, duration: 4 } }
-  },
-  petal_dance: {
-    id: 'petal_dance', name: 'Petal Dance', type: 'grass', behavior: 'orbit', tier: 'tm3',
-    description: 'Redemoinho de pétalas girando sem parar ao redor.',
-    base: { damage: 34, count: 5, area: 92, size: 22, speed: 3.6, knockback: 120, tickRate: 0.3 }
   },
   thunder: {
     id: 'thunder', name: 'Thunder', type: 'electric', behavior: 'chain', tier: 'tm3',
@@ -543,6 +440,115 @@ export const ABILITIES = {
     id: 'hyper_voice', name: 'Hyper Voice', type: 'normal', behavior: 'nova', tier: 'tm3',
     description: 'Grito que sacode a arena inteira.',
     base: { damage: 46, cooldown: 1.7, area: 245, speed: 520, knockback: 220, size: 20 }
+  },
+
+  /* ============ TIPOS NOVOS: TERRA, FANTASMA, DRAGÃO E GELO ============
+     No máximo 4 golpes por tipo (pedido do Fellipe na 0.6, para o jogo ficar
+     leve no navegador): cada tipo tem um golpe de base, um de TM e um final,
+     reaproveitados por todas as espécies daquele tipo. */
+  mud_slap: {
+    id: 'mud_slap',
+    name: 'Mud-Slap',
+    type: 'ground',
+    behavior: 'projectile',
+    description: 'Joga lama no alvo, que fica lento.',
+    base: {
+      damage: 14, cooldown: 1.0, count: 1, speed: 380, range: 320,
+      pierce: 1, size: 9, duration: 1.3, spread: 0.25, knockback: 50
+    },
+    effects: { slow: { factor: 0.55, duration: 1.4 } }
+  },
+  bone_club: {
+    id: 'bone_club',
+    name: 'Bone Club',
+    type: 'ground',
+    behavior: 'projectile',
+    tier: 'tm',
+    description: 'Arremessa um osso girando que atravessa a fila de inimigos.',
+    base: {
+      damage: 30, cooldown: 1.1, count: 1, speed: 420, range: 360,
+      pierce: 4, size: 12, duration: 1.5, spread: 0.2, knockback: 120
+    }
+  },
+  lick: {
+    id: 'lick',
+    name: 'Lick',
+    type: 'ghost',
+    behavior: 'melee_arc',
+    description: 'Uma lambida fantasmagórica que paralisa quem está perto.',
+    base: { damage: 16, cooldown: 1.0, range: 120, arc: 1.4, knockback: 90, duration: 0.2 },
+    effects: { slow: { factor: 0.55, duration: 1.2 } }
+  },
+  night_shade: {
+    id: 'night_shade',
+    name: 'Night Shade',
+    type: 'ghost',
+    behavior: 'chain',
+    tier: 'tm',
+    description: 'Uma sombra que salta de inimigo em inimigo.',
+    base: { damage: 30, cooldown: 1.5, chains: 4, range: 340, area: 200, duration: 0.2 }
+  },
+  shadow_ball: {
+    id: 'shadow_ball',
+    name: 'Shadow Ball',
+    type: 'ghost',
+    behavior: 'projectile',
+    tier: 'tm',
+    description: 'Esfera de sombra que persegue o alvo e explode em área.',
+    base: {
+      damage: 52, cooldown: 1.4, count: 1, speed: 360, range: 440,
+      pierce: 2, size: 18, duration: 2.2, spread: 0.15, knockback: 120,
+      homing: 0.6, area: 96, explodeDamage: 0.6
+    }
+  },
+  twister: {
+    id: 'twister',
+    name: 'Twister',
+    type: 'dragon',
+    behavior: 'nova',
+    description: 'Um redemoinho de vento que se abre em volta do Pokémon.',
+    base: { damage: 16, cooldown: 2.4, area: 150, speed: 280, knockback: 200, size: 16 }
+  },
+  dragon_breath: {
+    id: 'dragon_breath',
+    name: 'Dragon Breath',
+    type: 'dragon',
+    behavior: 'projectile',
+    tier: 'tm',
+    description: 'Sopro de dragão que atravessa inimigos e os deixa lentos.',
+    base: {
+      damage: 30, cooldown: 1.2, count: 1, speed: 400, range: 380,
+      pierce: 3, size: 14, duration: 1.6, spread: 0.3, knockback: 80
+    },
+    effects: { slow: { factor: 0.6, duration: 1.2 } }
+  },
+  outrage: {
+    id: 'outrage',
+    name: 'Outrage',
+    type: 'dragon',
+    behavior: 'melee_arc',
+    tier: 'tm',
+    description: 'Fúria em arco largo que arremessa tudo em volta.',
+    base: { damage: 80, cooldown: 1.25, range: 172, arc: 2.6, knockback: 360, duration: 0.26 }
+  },
+  powder_snow: {
+    id: 'powder_snow',
+    name: 'Powder Snow',
+    type: 'ice',
+    behavior: 'nova',
+    description: 'Neve fina em volta do Pokémon, que deixa a horda lenta.',
+    base: { damage: 12, cooldown: 2.2, area: 150, speed: 260, knockback: 80, size: 16 },
+    effects: { slow: { factor: 0.5, duration: 1.6 } }
+  },
+  blizzard: {
+    id: 'blizzard',
+    name: 'Blizzard',
+    type: 'ice',
+    behavior: 'nova',
+    tier: 'tm',
+    description: 'Nevasca enorme que congela quase tudo na tela.',
+    base: { damage: 50, cooldown: 2.6, area: 260, speed: 420, knockback: 260, size: 22 },
+    effects: { slow: { factor: 0.4, duration: 2.2 } }
   },
 
   /* ======================= HABILIDADES DE INIMIGOS ======================= */
@@ -577,3 +583,24 @@ export const ABILITIES = {
 };
 
 export const getAbility = (id) => ABILITIES[id];
+
+/**
+ * GOLPES QUE SAÍRAM na 0.6 (no máximo 4 por tipo). Saves antigos ainda podem
+ * trazê-los: quem tinha recebe o golpe da mesma posição (`tier`: 0 base, 1 TM,
+ * 2 final) na linha nova da espécie. Os três que eram o golpe extra dos
+ * iniciais viram o extra novo (`extra`). As melhorias são transferidas.
+ */
+export const RETIRED_ABILITIES = {
+  flame_wheel: { tier: 0 },
+  bubble: { tier: 0 },
+  splash: { tier: 0 },
+  sing: { tier: 0 },
+  acid: { tier: 0 },
+  leech_field: { tier: 0, extra: 'mega_drain' },
+  flail: { tier: 1 },
+  air_cutter: { tier: 1 },
+  petal_dance: { tier: 2 },
+  drill_peck: { tier: 2 },
+  fire_ring: { tier: 1, extra: 'fire_spin' },
+  whirlpool: { tier: 1, extra: 'water_pulse' }
+};

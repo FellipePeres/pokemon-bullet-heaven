@@ -14,6 +14,7 @@ import { CAPTURE_POOLS, poolEntries } from '../src/data/capturePools.js';
 import { ASSET_MANIFEST } from '../src/data/assetManifest.js';
 import { TRAINER_LOOKS } from '../src/data/trainers.js';
 import { REGIONS } from '../src/data/regions.js';
+import { FX, ABILITY_FX, BOSS_WAVE_FX, STATUS_FX } from '../src/data/fx.js';
 import { existsSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -104,6 +105,23 @@ for (const region of Object.values(REGIONS)) {
     ok(`região ${region.name}: ${region.campaign.length} etapas, iniciais, treinadores e retratos válidos`);
   }
 }
+
+// ---- efeitos dos golpes (data/fx.js) ----
+const fxSheetOk = (fxId) => FX[fxId] && ASSET_MANIFEST[FX[fxId].sheet ?? `fx/${fxId}`];
+const playable = Object.values(ABILITIES).filter((a) => !a.hostile);
+const noFx = playable.filter((a) => !ABILITY_FX[a.id]);
+const staleFx = Object.keys(ABILITY_FX).filter((id) => !ABILITIES[id]);
+const fxRefs = [
+  ...Object.entries(ABILITY_FX),
+  ...Object.entries(BOSS_WAVE_FX).map(([type, vfx]) => [`líder ${type}`, vfx]),
+  ['status', STATUS_FX], ['fixos', { telegraph: 'x_sign', explosion: 'explosion' }]
+];
+const brokenFx = fxRefs.flatMap(([id, vfx]) =>
+  Object.entries(vfx).filter(([, value]) => typeof value === 'string' && !fxSheetOk(value)).map(([key, value]) => `${id}.${key}=${value}`));
+noFx.length ? fail(`golpes sem efeito visual: ${noFx.map((a) => a.id).join(', ')}`)
+  : staleFx.length ? fail(`efeitos de golpes que não existem: ${staleFx.join(', ')}`)
+  : brokenFx.length ? fail(`efeitos apontando para sprite inexistente: ${brokenFx.join(', ')}`)
+  : ok(`${playable.length} golpes com efeito visual, ${Object.keys(FX).length} efeitos com sprite`);
 
 // pools de captura: mostra quanto de cada fase já está implementado
 console.log('\nPools de captura (espécies já implementadas / total da tabela):');

@@ -2,11 +2,25 @@ import { CONFIG } from '../core/config.js';
 import { clamp } from '../core/utils.js';
 import { drawPokemon, drawPokeball } from './sprites.js';
 import { typeColor } from '../data/types.js';
-import { FloatingText, Beam, SlashArc } from '../entities/effects.js';
+import { FloatingText, Beam, SlashArc, SpriteFx } from '../entities/effects.js';
 import { maxHpFor } from '../systems/stats.js';
 import { getSheet, drawFrame } from './assets.js';
 import { trainerFrame } from './trainer.js';
 import { getTrainerLook } from '../data/trainers.js';
+
+import { drawFx } from './fx.js';
+import { abilityFx, zoneFx, STATUS_FX } from '../data/fx.js';
+import { getAbility } from '../data/abilities.js';
+
+const STATUS_ORDER = ['burn', 'poison', 'slow'];
+const STATUS_COLORS = { burn: '#ff7a3d', poison: '#c060d0', slow: '#63b3ff' };
+
+/** Golpe com melhoria de tamanho fica maior na tela, em degraus de meio. */
+function sizeScale(abilityId, size) {
+  const base = getAbility(abilityId)?.base?.size;
+  if (!base || size <= base) return 1;
+  return Math.min(2, Math.round((size / base) * 2) / 2);
+}
 
 /** Onde ficam os pés do treinador em relação ao centro dele (o raio de colisão). */
 const TRAINER_FEET = 14;
@@ -87,6 +101,11 @@ export class Renderer {
     ctx.fillStyle = '#05070e';
     ctx.fillRect(0, 0, this.width, this.height);
     ctx.translate(-cam.x, -cam.y);
+    if (run.shakeTime > 0) {
+      // tremor de tela (explosões, Earthquake, chefes), desligável em Opções
+      const power = run.shakePower * (run.shakeTime / run.shakeDuration);
+      ctx.translate(Math.round((Math.random() - 0.5) * 2 * power), Math.round((Math.random() - 0.5) * 2 * power));
+    }
     ctx.fillStyle = this._pattern(run.world.theme);
     ctx.fillRect(0, 0, run.world.width, run.world.height);
 
@@ -109,33 +128,102 @@ export class Renderer {
 
   /* ----------------------------- camadas ----------------------------- */
 
+  /**
+   * Áreas: aura (acompanha o Pokémon), zona no chão e onda (nova).
+   * Com o sprite do golpe carregado, a cor do tipo vira só um fundo leve e os
+   * sprites fazem o efeito; sem ele, fica o desenho de antes.
+   */
   _drawZones(ctx, run) {
     for (const zone of run.zones) {
       if (zone.dead) continue;
       const color = zone.color ?? '#fff';
+      const fx = zoneFx(zone);
+
       if (zone.kind === 'nova') {
-        const progress = zone.radius / zone.maxRadius;
+        if (zone.delay > 0) { this._drawTelegraph(ctx, zone); continue; }
+        const fade = Math.max(0, 1 - zone.radius / zone.maxRadius);
         ctx.strokeStyle = color;
-        ctx.globalAlpha = Math.max(0, 1 - progress) * 0.9;
-        ctx.lineWidth = 8;
+        ctx.globalAlpha = fade * (fx ? 0.45 : 0.9);
+        ctx.lineWidth = fx ? 4 : 8;
         ctx.beginPath();
         ctx.arc(zone.x, zone.y, zone.radius, 0, Math.PI * 2);
         ctx.stroke();
         ctx.globalAlpha = 1;
+        if (fx?.ring) {
+          this._ringSprites(ctx, fx.ring, zone, zone.radius, fx.count ?? 10,
+                            { alpha: Math.min(1, fade * 1.6), radial: true, turn: 0.4 });
+        }
         continue;
       }
+
+      const fadeIn = Math.min(1, zone.age / 0.2);
+      const fadeOut = zone.life === Infinity ? 1 : Math.min(1, zone.life / 0.4);
+      const fade = fadeIn * fadeOut;
       const pulse = 0.14 + Math.sin(zone.age * 5) * 0.03;
-      ctx.globalAlpha = pulse + (zone.kind === 'aura' ? 0.06 : 0.1);
+      ctx.globalAlpha = (pulse + (zone.kind === 'aura' ? 0.06 : 0.1)) * (fx ? 0.55 : 1) * fade;
       ctx.fillStyle = color;
       ctx.beginPath();
       ctx.arc(zone.x, zone.y, zone.radius, 0, Math.PI * 2);
       ctx.fill();
-      ctx.globalAlpha = 0.55;
+      ctx.globalAlpha = 0.55 * fade * (fx ? 0.6 : 1);
       ctx.strokeStyle = color;
       ctx.lineWidth = 2;
       ctx.stroke();
       ctx.globalAlpha = 1;
+      if (!fx) continue;
+
+      if (fx.ring) {
+        // aura: sprites ao longo da borda, girando devagar
+        const count = Math.max(6, Math.min(16, Math.round((Math.PI * 2 * zone.radius) / 52)));
+        this._ringSprites(ctx, fx.ring, zone, zone.radius, count, { alpha: fade, turn: 0.6 });
+      }
+      if (fx.center) drawFx(ctx, fx.center, zone.x, zone.y, { t: zone.age, alpha: fade });
+      if (fx.scatter) {
+        // zona: sprites espalhados pela área, em posições fixas por zona
+        const count = Math.max(4, Math.min(12, Math.round((zone.radius * zone.radius) / 1100)));
+        for (let i = 0; i < count; i++) {
+          const a = zone.seed + i * 2.39996;   // ângulo de ouro: espalha sem amontoar
+          const d = zone.radius * 0.82 * Math.sqrt((i + 0.5) / count);
+          drawFx(ctx, fx.scatter, zone.x + Math.cos(a) * d, zone.y + Math.sin(a) * d,
+                 { t: zone.age + i * 0.17, alpha: fade });
+        }
+      }
     }
+  }
+
+  /** Sprites distribuídos num círculo (bordas de aura, frente da onda). */
+  _ringSprites(ctx, fxId, zone, radius, count, { alpha = 1, radial = false, turn = 0 } = {}) {
+    for (let i = 0; i < count; i++) {
+      const a = (i / count) * Math.PI * 2 + zone.age * turn;
+      drawFx(ctx, fxId, zone.x + Math.cos(a) * radius, zone.y + Math.sin(a) * radius,
+             { t: zone.age + i * 0.11, angle: radial ? a : 0, alpha });
+    }
+  }
+
+  /**
+   * Aviso no chão antes do golpe do líder: a área que a onda vai cobrir, com
+   * um anel que cresce até a hora do golpe e o "X" do Rock Tomb no centro.
+   */
+  _drawTelegraph(ctx, zone) {
+    const progress = 1 - zone.delay / CONFIG.fx.bossTelegraph;
+    ctx.save();
+    ctx.fillStyle = '#ff3b30';
+    ctx.globalAlpha = 0.1 + progress * 0.18;
+    ctx.beginPath();
+    ctx.arc(zone.x, zone.y, zone.maxRadius, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = '#ff6b5e';
+    ctx.globalAlpha = 0.75;
+    ctx.lineWidth = 3;
+    ctx.setLineDash([10, 8]);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.arc(zone.x, zone.y, Math.max(1, zone.maxRadius * progress), 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.restore();
+    drawFx(ctx, 'x_sign', zone.x, zone.y, { alpha: 0.45 + 0.45 * Math.abs(Math.sin(zone.age * 9)) });
   }
 
   _drawPickups(ctx, run) {
@@ -223,17 +311,21 @@ export class Renderer {
     ctx.fillText(`${companion.member.level}`, x + w - 12, y - 3);
   }
 
+  /** Status em cima do inimigo: queimadura, veneno e lentidão (sprite, ou bolinha). */
   _drawStatusMarks(ctx, enemy, size) {
-    const marks = [];
-    if (enemy.status.burn) marks.push('#ff7a3d');
-    if (enemy.status.poison) marks.push('#c060d0');
-    if (enemy.status.slow) marks.push('#63b3ff');
-    marks.forEach((color, i) => {
-      ctx.fillStyle = color;
-      ctx.beginPath();
-      ctx.arc(enemy.x - 8 + i * 8, enemy.y - size * 0.4, 3, 0, Math.PI * 2);
-      ctx.fill();
-    });
+    let i = 0;
+    for (const status of STATUS_ORDER) {
+      if (!enemy.status[status]) continue;
+      const x = enemy.x - 8 + i * 12;
+      const y = enemy.y - size * 0.45;
+      if (!drawFx(ctx, STATUS_FX[status], x, y, { frame: 0, scale: 0.5 })) {
+        ctx.fillStyle = STATUS_COLORS[status];
+        ctx.beginPath();
+        ctx.arc(x, y, 3, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      i++;
+    }
   }
 
   _drawEnemyHp(ctx, enemy, size) {
@@ -359,6 +451,9 @@ export class Renderer {
   _drawOrbs(ctx, run) {
     for (const orb of run.orbs) {
       if (orb.dead) continue;
+      const fx = abilityFx(orb.abilityId);
+      if (fx?.body && drawFx(ctx, fx.body, orb.x, orb.y,
+          { t: run.time + orb.angle, scale: sizeScale(orb.abilityId, orb.size) })) continue;
       const grad = ctx.createRadialGradient(orb.x, orb.y, 0, orb.x, orb.y, orb.size);
       grad.addColorStop(0, '#ffffff');
       grad.addColorStop(0.45, orb.color);
@@ -373,8 +468,9 @@ export class Renderer {
   _drawProjectiles(ctx, run) {
     for (const p of run.projectiles) {
       if (p.dead) continue;
-      // rastro
-      ctx.globalAlpha = 0.35;
+      const fx = abilityFx(p.abilityId);
+      // rastro curto na cor do tipo
+      ctx.globalAlpha = fx ? 0.22 : 0.35;
       ctx.strokeStyle = p.color;
       ctx.lineWidth = p.size * 0.9;
       ctx.lineCap = 'round';
@@ -384,6 +480,10 @@ export class Renderer {
       ctx.stroke();
       ctx.globalAlpha = 1;
 
+      if (fx?.body && drawFx(ctx, fx.body, p.x, p.y,
+          { t: p.age, angle: Math.atan2(p.vy, p.vx), scale: sizeScale(p.abilityId, p.size) })) continue;
+
+      // reserva: bola de luz na cor do tipo
       const grad = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.size);
       grad.addColorStop(0, '#ffffff');
       grad.addColorStop(0.5, p.color);
@@ -400,27 +500,24 @@ export class Renderer {
       if (fx.dead) continue;
       const t = fx.life / fx.maxLife;
 
-      if (fx instanceof Beam) {
-        ctx.globalAlpha = t;
-        ctx.strokeStyle = fx.color;
-        ctx.lineWidth = fx.width;
-        ctx.lineJoin = 'round';
-        ctx.beginPath();
-        fx.points.forEach((pt, i) => (i ? ctx.lineTo(pt.x, pt.y) : ctx.moveTo(pt.x, pt.y)));
-        ctx.stroke();
-        ctx.globalAlpha = t * 0.6;
-        ctx.strokeStyle = '#ffffff';
-        ctx.lineWidth = fx.width * 0.4;
-        ctx.stroke();
-        ctx.globalAlpha = 1;
+      if (fx instanceof SpriteFx) {
+        drawFx(ctx, fx.fxId, fx.x, fx.y, { progress: 1 - t, scale: fx.scale, angle: fx.angle });
+      } else if (fx instanceof Beam) {
+        this._drawBeam(ctx, fx, t);
       } else if (fx instanceof SlashArc) {
-        ctx.globalAlpha = t * 0.8;
+        const vfx = abilityFx(fx.abilityId);
+        ctx.globalAlpha = t * (vfx ? 0.35 : 0.8);
         ctx.strokeStyle = fx.color;
-        ctx.lineWidth = 9;
+        ctx.lineWidth = vfx ? 5 : 9;
         ctx.beginPath();
         ctx.arc(fx.x, fx.y, fx.range * (1.1 - t * 0.25), fx.angle - fx.arc / 2, fx.angle + fx.arc / 2);
         ctx.stroke();
         ctx.globalAlpha = 1;
+        if (vfx?.slash) {
+          const reach = fx.range * 0.72;
+          drawFx(ctx, vfx.slash, fx.x + Math.cos(fx.angle) * reach, fx.y + Math.sin(fx.angle) * reach,
+                 { progress: 1 - t, angle: fx.angle });
+        }
       } else if (fx instanceof FloatingText) {
         ctx.globalAlpha = Math.min(1, t * 1.6);
         ctx.font = `bold ${fx.size}px Trebuchet MS, sans-serif`;
@@ -433,6 +530,45 @@ export class Renderer {
         ctx.globalAlpha = 1;
       }
     }
+  }
+
+  /**
+   * Raio entre os alvos: zigue-zague que muda a cada quadro, como faísca, com
+   * o sprite do golpe em cada alvo e, no Thunder, o raio caindo do céu.
+   */
+  _drawBeam(ctx, beam, t) {
+    const pts = beam.points;
+    ctx.save();
+    ctx.lineJoin = 'round';
+    ctx.beginPath();
+    ctx.moveTo(pts[0].x, pts[0].y);
+    for (let i = 0; i < pts.length - 1; i++) {
+      const a = pts[i];
+      const b = pts[i + 1];
+      const dx = b.x - a.x;
+      const dy = b.y - a.y;
+      const len = Math.hypot(dx, dy) || 1;
+      const steps = Math.max(2, Math.round(len / 26));
+      for (let k = 1; k < steps; k++) {
+        const jitter = (Math.random() - 0.5) * 18;
+        ctx.lineTo(a.x + (dx * k) / steps - (dy / len) * jitter, a.y + (dy * k) / steps + (dx / len) * jitter);
+      }
+      ctx.lineTo(b.x, b.y);
+    }
+    ctx.globalAlpha = t;
+    ctx.strokeStyle = beam.color;
+    ctx.lineWidth = beam.width + 2;
+    ctx.stroke();
+    ctx.globalAlpha = t * 0.85;
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = Math.max(1.5, beam.width * 0.4);
+    ctx.stroke();
+    ctx.restore();
+
+    const vfx = abilityFx(beam.abilityId);
+    if (!vfx) return;
+    for (let i = 1; i < pts.length; i++) drawFx(ctx, vfx.node, pts[i].x, pts[i].y, { progress: 1 - t });
+    if (vfx.strike && pts[1]) drawFx(ctx, vfx.strike, pts[1].x, pts[1].y + 10, { alpha: t });
   }
 
   _drawParticles(ctx, run) {

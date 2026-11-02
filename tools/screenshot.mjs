@@ -6,7 +6,8 @@
  * Uso:
  *   node tools/screenshot.mjs <roteiro> [--out pasta] [--size 1280x720]
  *
- * Roteiros: vitrine, treinador, jornada, opcoes, partida (ver ROTEIROS abaixo).
+ * Roteiros: vitrine, treinador, jornada, opcoes, partida, golpes, estresse e
+ * chefe (ver ROTEIROS abaixo).
  * Sem --out, as imagens vão para a pasta temporária do sistema (pbh-screens).
  * Para usar outro navegador: variável de ambiente CHROME_PATH.
  *
@@ -50,6 +51,24 @@ const ROTEIROS = {
     { hold: ['KeyW', 'KeyD'] }, { wait: 600 }, { shot: 'partida-diagonal' },
     { hold: ['KeyS'] }, { wait: 600 }, { shot: 'partida-baixo' },
     { hold: [] }, { wait: 400 }, { shot: 'partida-parado' }
+  ],
+  // os 52 golpes, 6 por foto, numa partida de verdade (vitrine.html?golpes=N)
+  golpes: Array.from({ length: 9 }, (_, i) => [
+    { open: `vitrine.html?golpes=${i}` }, { wait: 1600 }, { shot: `golpes-${i}` }
+  ]).flat(),
+  // ~250 inimigos e golpes pesados: imprime FPS e milissegundos por quadro
+  estresse: [
+    { open: 'vitrine.html?estresse' }, { wait: 5000 },
+    { log: 'JSON.stringify(window.vitrineStats)' }, { shot: 'estresse' }
+  ],
+  // o líder entra e, antes de cada golpe, aparece o aviso no chão
+  chefe: [
+    { open: 'index.html' }, { wait: 500 },
+    { run: START_RUN }, { wait: 300 },
+    { run: 'game.run.time = game.run.stage.duration + 0.5' }, { wait: 2500 },
+    // força o golpe do líder agora: primeiro o aviso, depois a onda
+    { run: 'game.run.boss.abilities.forEach((a) => { a.timer = 0; })' }, { wait: 350 }, { shot: 'chefe-aviso' },
+    { wait: 650 }, { shot: 'chefe-onda' }
   ]
 };
 
@@ -238,6 +257,8 @@ async function main() {
         await delay(step.wait);
       } else if (step.run) {
         await evaluate(step.run);
+      } else if (step.log) {
+        console.log(`${step.log} => ${await evaluate(step.log)}`);
       } else if (step.hold) {
         await evaluate(`game.input.keys.clear(); ${JSON.stringify(step.hold)}.forEach((k) => game.input.keys.add(k))`);
       } else if (step.shot) {

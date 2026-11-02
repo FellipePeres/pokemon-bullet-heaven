@@ -68,6 +68,63 @@ PORTRAITS = {
 }
 
 
+# Sprites de golpe (graphics/battle_anims/sprites). Quais sprites cada golpe do
+# FireRed usa está no `loadspritegfx` de data/battle_anim_scripts.s; a etiqueta
+# vira arquivo por src/data/battle_anim.h + src/graphics.c.
+#   id: (png, paleta, largura do quadro, altura do quadro)
+# A paleta é o nome de um .pal da pasta; quando não existe .pal com esse nome,
+# o jogo usa a paleta gravada no próprio PNG (regra do build). None = mesmo
+# nome do PNG. As folhas do decomp são tiras verticais; saem horizontais.
+FX = {
+    'small_ember':   ('small_ember', None, 32, 32),        # Ember, Flamethrower, Fire Blast
+    'fire':          ('fire', None, 32, 32),               # chama grande
+    'spinning_fire': ('spinning_fire', 'fire', 32, 32),    # Fire Spin, Flame Wheel
+    'explosion':     ('explosion', None, 32, 32),
+    'water_orb':     ('water_orb', 'water_impact', 16, 16),  # Whirlpool, Hydro Pump
+    'water_impact':  ('water_impact', None, 32, 32),
+    'bubble':        ('bubble', 'rain_drops', 16, 16),     # Bubble, Bubble Beam
+    'poison_bubble': ('poison_bubble', None, 16, 16),      # Sludge Bomb, Acid, Poison Sting
+    'toxic_bubble':  ('toxic_bubble', 'poison_bubble', 16, 16),  # Toxic
+    'leaf':          ('leaf', None, 16, 16),               # Razor Leaf (a folha girando)
+    'razor_leaf':    ('razor_leaf', None, 32, 16),
+    'whip_hit':      ('slam_hit', 'whip_hit', 32, 32),     # Vine Whip
+    'slam_hit':      ('slam_hit', None, 32, 32),
+    'green_sparkle': ('green_sparkle', None, 16, 16),
+    'rocks':         ('rocks', None, 32, 32),              # Rock Throw, Rock Slide
+    'mud_sand':      ('mud_sand_1', 'mud_sand', 16, 16),
+    'flying_dirt':   ('flying_dirt', None, 32, 16),
+    'impact':        ('impact', None, 32, 32),             # o acerto genérico
+    'cut':           ('cut', 'impact', 32, 32),
+    'scratch':       ('scratch', 'impact', 32, 32),
+    'hands':         ('hands_and_feet', None, 32, 32),     # Karate Chop, Cross Chop
+    'cross_impact':  ('cross_impact', None, 32, 32),
+    'fang_attack':   ('fang_attack', None, 32, 32),        # Hyper Fang, Poison Fang
+    'needle':        ('needle', None, 16, 16),             # Poison Sting, Twineedle
+    'gust':          ('gust', None, 32, 64),               # Gust, Wing Attack
+    'gold_ring':     ('gold_ring', None, 16, 32),           # Psybeam
+    'blue_ring':     ('gold_ring', 'blue_ring_2', 16, 32), # Water Pulse
+    'orbs':          ('orbs', None, 16, 16),               # Solar Beam, Hyper Beam
+    'ice_crystal':   ('ice_crystals_0', 'ice_crystals', 16, 16),  # Ice Beam
+    'metal_sound':   ('metal_sound_waves', None, 32, 64),
+    'magenta_heart': ('magenta_heart', None, 16, 16),
+    'pink_orb':      ('pink_orb', None, 16, 16),
+    'purple_ring':   ('gold_ring', 'purple_ring', 16, 32),  # Psychic: o anel com a paleta roxa
+    'blue_star':     ('blue_star', None, 32, 32),          # Mega Drain, Leech Life
+    'spark':         ('spark_2', None, 16, 16),            # Thunder Shock, Thunderbolt
+    'shock':         ('shock_3', None, 32, 32),            # Thunderbolt
+    'lightning':     ('lightning', 'lightning_2', 32, 160),  # Thunder: o raio inteiro
+    'spider_web':    ('spider_web', None, 64, 64),
+    'x_sign':        ('x_sign', 'hollow_orb', 64, 64),     # o alvo do Rock Tomb
+    'bone':          ('bone', None, 32, 32),               # Bone Club
+    'tongue':        ('tongue', None, 16, 16),             # Lick
+    'shadow_ball':   ('shadow_ball', None, 32, 32),        # Shadow Ball
+    'purple_flame':  ('purple_flame', None, 16, 32),       # Night Shade
+    'ghostly_spirit': ('ghostly_spirit', None, 32, 32),
+    'ice_chunk':     ('ice_chunk', None, 32, 32),          # Blizzard
+    'hail':          ('hail', None, 16, 16),               # Powder Snow
+}
+
+
 def read_pal(path):
     """Paleta JASC-PAL: cabeçalho de 3 linhas e uma cor RGB por linha."""
     lines = Path(path).read_text().split('\n')
@@ -138,6 +195,30 @@ def extract_portraits(decomp, manifest):
         }
 
 
+def png_palette(png):
+    """A paleta gravada no próprio PNG (as 16 primeiras cores)."""
+    raw = Image.open(png).getpalette()[:48]
+    return [tuple(raw[i:i + 3]) for i in range(0, 48, 3)]
+
+
+def extract_fx(decomp, manifest):
+    sprites = decomp / 'graphics' / 'battle_anims' / 'sprites'
+    for game_id, (png, palette, width, height) in FX.items():
+        palette = palette or png
+        pal_file = sprites / f'{palette}.pal'
+        colors = read_pal(pal_file) if pal_file.exists() else png_palette(sprites / f'{palette}.png')
+        image = paint(sprites / f'{png}.png', colors)
+        # tira vertical do decomp -> quadros (linha a linha, da esquerda para a direita)
+        cells = [image.crop((x, y, x + width, y + height))
+                 for y in range(0, image.height, height)
+                 for x in range(0, image.width, width)]
+        cells = [cell for cell in cells if cell.getbbox()]   # quadro vazio não entra
+        manifest[f'fx/{game_id}'] = {
+            'src': save(strip(cells), ASSETS / 'fx' / f'{game_id}.png'),
+            'frameWidth': width, 'frameHeight': height, 'frames': len(cells),
+        }
+
+
 def extract_ui(decomp, manifest):
     # A caixa de texto clássica do FireRed: moldura `type2` com a paleta `stdpal_0`.
     windows = decomp / 'graphics' / 'text_window'
@@ -182,6 +263,7 @@ def main():
     manifest = {}
     extract_trainers(decomp, manifest)
     extract_portraits(decomp, manifest)
+    extract_fx(decomp, manifest)
     extract_ui(decomp, manifest)
     write_manifest(manifest)
     print(f'{len(manifest)} assets gerados; catálogo em {MANIFEST.relative_to(ROOT).as_posix()}')

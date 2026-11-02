@@ -6,6 +6,7 @@
  * Uso: npm run smoke
  */
 import { Run } from '../src/game/Run.js';
+import { simulate, spendLevel, resolveLevelUp, DT } from './bot.mjs';
 import { STAGES } from '../src/data/stages.js';
 import { UPGRADES } from '../src/data/upgrades.js';
 import { ABILITIES } from '../src/data/abilities.js';
@@ -19,7 +20,6 @@ import { hpRatio } from '../src/systems/stats.js';
 import { nextMoveFor, moveLineOf } from '../src/data/tms.js';
 import { getPokemon } from '../src/data/pokemon.js';
 
-const DT = 1 / 60;
 let failures = 0;
 
 function check(label, condition, extra = '') {
@@ -28,112 +28,13 @@ function check(label, condition, extra = '') {
   console.log(`${ok ? '  OK  ' : ' FALHA'} | ${label}${extra ? ` — ${extra}` : ''}`);
 }
 
-/** Gasta um nível pendente escolhendo uma melhoria ao acaso. */
-function spendLevel(run, member) {
-  const choices = run.progression.rollChoices(member);
-  if (!choices.length) throw new Error('Level up sem opções!');
-  // TM é sempre uma escolha forte: o jogador virtual pega quando aparece
-  const pick = choices.find((c) => c.scope === 'tm')
-    ?? choices[Math.floor(Math.random() * choices.length)];
-  run.progression.applyUpgrade(pick.id, member);
-  member.pendingLevels = Math.max(0, member.pendingLevels - 1);
-}
-
-/** Fecha a tela de melhoria quando o Pokémon não tem mais níveis guardados. */
-function resolveLevelUp(run) {
-  spendLevel(run, run.levelUpMember);
-  if (run.levelUpMember.pendingLevels <= 0) {
-    run.levelUpMember = null;
-    run.state = 'running';
-  }
-}
-
-/**
- * Roda uma partida inteira com um "jogador virtual":
- * foge em círculos, desvia para pegar Poké Balls, resolve melhorias e capturas.
- */
-function simulate(stageId, starter, { maxSeconds = 600, journey = null } = {}) {
-  const run = new Run(stageId, journey ? { team: journey.team } : { starter });
-
-  let levelUps = 0;
-  let captures = 0;
-  let ballsDropped = 0;
-  let steps = 0;
-  const seenBalls = new Set();
-  let lastBenchSpend = 0;
-
-  while (run.time < maxSeconds && steps < maxSeconds / DT) {
-    steps++;
-
-    const ball = run.pickups.find((p) => p.kind === 'ball' && !p.dead);
-    let move;
-    if (ball) {
-      const dx = ball.x - run.player.x;
-      const dy = ball.y - run.player.y;
-      const d = Math.hypot(dx, dy) || 1;
-      move = { x: dx / d, y: dy / d };
-    } else {
-      const angle = run.time * 0.9;
-      move = { x: Math.cos(angle), y: Math.sin(angle) };
-    }
-    run.update(DT, move);
-
-    for (const p of run.pickups) {
-      if (p.kind === 'ball' && !seenBalls.has(p)) { seenBalls.add(p); ballsDropped++; }
-    }
-
-    if (run.state === 'evolution') { run.evolutionQueue.shift(); if (!run.evolutionQueue.length) run.state = 'running'; continue; }
-    if (run.state === 'levelup') { resolveLevelUp(run); levelUps++; continue; }
-
-    if (run.state === 'capture') {
-      const options = run.captureSystem.rollChoices();
-      if (options.length) {
-        if (run.team.isFull) run.captureSystem.captureReplacing(run.team.members[5].uid, options[0].id);
-        else run.captureSystem.capture(options[0].id);
-        captures++;
-      }
-      run.pendingBall = false;
-      run.state = 'running';
-      continue;
-    }
-
-    // troca Pokémon machucado por um descansado (a reserva se cura sozinha)
-    if (run.team.swapReady) {
-      const hurt = run.team.activeMembers
-        .map((m) => ({ m, r: hpRatio(m, run.playerStats.pokemonHpBonus) }))
-        .sort((a, b) => a.r - b.r)[0];
-      if (hurt && hurt.r < 0.4) {
-        const fresh = run.team.reserve
-          .filter((m) => !m.fainted && hpRatio(m, run.playerStats.pokemonHpBonus) > 0.7)
-          .sort((a, b) => hpRatio(b) - hpRatio(a))[0];
-        if (fresh) {
-          run.team.selectedSlot = run.team.active.indexOf(hurt.m);
-          run.team.swapIn(fresh.uid);
-        }
-      }
-    }
-
-    // de tempos em tempos o jogador clica no ▲ dos Pokémon da reserva
-    if (run.time - lastBenchSpend > 12) {
-      lastBenchSpend = run.time;
-      for (const member of run.team.reserve) {
-        while (member.pendingLevels > 0 && !member.fainted) { spendLevel(run, member); levelUps++; }
-      }
-    }
-
-    if (run.state === 'victory' || run.state === 'defeat') break;
-  }
-
-  return { run, levelUps, captures, ballsDropped, steps };
-}
-
 const teamLevels = (run) => run.team.members.map((m) => m.level).join('/');
 
 console.log('\n=== POKÉMON BULLET HEAVEN — teste de fumaça ===\n');
 
 // ---------------------------------------------------------------- 1. iniciais
 for (const starter of ['charmander', 'bulbasaur', 'squirtle']) {
-  const { run, captures, ballsDropped } = simulate('gym_1_pewter', starter, { maxSeconds: 400 });
+  const { run, captures, ballsDropped } = simulate('gym_1_pewter', starter, { maxSeconds: 600 });   // folga para a luta contra o líder
   console.log(`\n[${POKEMON[starter].name}] estado final: ${run.state} · t=${run.time.toFixed(0)}s`);
   check('inimigos apareceram', run.stats.kills > 0, `${run.stats.kills} abates`);
   check('Pokémon sobem de nível individualmente', run.team.members.some((m) => m.level > 1),
@@ -155,13 +56,14 @@ console.log('\n[jornada — equipe e build passam de fase em fase]');
 
     // A fase é desafiadora de propósito (o jogador virtual ganha ~60% das vezes)
     // e perder devolve ao início com a equipe intacta — então o teste também
-    // repete, como um jogador faria. Falha só se não passar em 4 tentativas.
+    // repete, como um jogador faria. O bot vence ~60% das tentativas
+    // (tools/balance.mjs), então 6 seguidas perdidas já indicam problema.
     let result = null;
     let attempts = 0;
     do {
       attempts++;
       result = simulate(stageId, 'charmander', { maxSeconds: stage.duration + 240, journey });
-    } while (result.run.state !== 'victory' && attempts < 4);
+    } while (result.run.state !== 'victory' && attempts < 6);
 
     const { run, captures, ballsDropped } = result;
     check(`${stage.name}: líder derrotado`, run.state === 'victory',
@@ -272,16 +174,37 @@ console.log('\n[habilidades — cada comportamento precisa causar dano]');
   }
 
   CONFIG.debug.godMode = true;
-  const orbit = probe('flame_wheel', 1);
+  const orbit = probe('fire_spin', 1);
   const firstAngle = orbit.orbs[0]?.angle ?? 0;
   for (let i = 0; i < 30; i++) step(orbit);
   CONFIG.debug.godMode = false;
   check('orbes giram ao redor do Pokémon', Math.abs((orbit.orbs[0]?.angle ?? 0) - firstAngle) > 0.5,
         `variação de ${((orbit.orbs[0]?.angle ?? 0) - firstAngle).toFixed(2)} rad`);
 
-  const aura = probe('fire_ring', 1);
+  const aura = probe('mega_drain', 1);
   const zone = aura.zones.find((z) => z.kind === 'aura');
   check('aura acompanha o Pokémon', !!zone && Math.hypot(zone.x - zone.owner.x, zone.y - zone.owner.y) < 1);
+
+  // no máximo 4 golpes por tipo (0.6), sem contar os golpes dos líderes
+  const perType = {};
+  for (const a of Object.values(ABILITIES)) if (!a.hostile) perType[a.type] = (perType[a.type] ?? 0) + 1;
+  const crowded = Object.entries(perType).filter(([, n]) => n > 4);
+  check('no máximo 4 golpes por tipo', !crowded.length,
+        crowded.map(([t, n]) => `${t}: ${n}`).join(', ') || `${Object.keys(perType).length} tipos`);
+
+  // save de antes da 0.6: golpes que saíram viram o equivalente, com as melhorias
+  const legacyRun = new Run('gym_1_pewter', { team: { members: [
+    { uid: 'a', pokemonId: 'charmander', level: 12, abilities: ['ember', 'fire_ring'],
+      upgrades: { ember_damage: 2, ember_fire_ring: 1, fire_ring_damage: 2 } },
+    { uid: 'b', pokemonId: 'ponyta', level: 20, abilities: ['flame_wheel'], upgrades: { flame_wheel_damage: 3 } }
+  ], active: ['a', 'b'] } });
+  const [oldChar, oldPony] = legacyRun.team.members;
+  check('save antigo: o golpe extra do inicial vira o novo, com as melhorias',
+        oldChar.abilities.join() === 'ember,fire_spin' && oldChar.upgrades.ember_fire_spin === 1 &&
+        oldChar.upgrades.fire_spin_damage === 2 && !oldChar.upgrades.fire_ring_damage,
+        `${oldChar.abilities.join(' + ')}`);
+  check('save antigo: golpe que saiu vira o da mesma posição na linha nova',
+        oldPony.abilities[0] === 'ember' && oldPony.upgrades.ember_damage === 3, oldPony.abilities.join());
 
   const immune = probe('thunder_shock', 3, 'geodude_wild');
   check('tabela de tipos é aplicada (Elétrico x Terrestre = 0)', immune.stats.damageDealt === 0,

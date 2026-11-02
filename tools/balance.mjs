@@ -1,0 +1,84 @@
+/**
+ * BALANCEAMENTO — joga a campanha várias vezes com o jogador virtual e mede.
+ *
+ * Uso:
+ *   node tools/balance.mjs [--runs 8] [--starter charmander] [--until gym_2_cerulean]
+ *
+ * Cada jornada joga as fases em ordem, levando a equipe de uma para a outra
+ * como no jogo; uma derrota repete a fase com a equipe do começo dela (até 3
+ * tentativas). Por fase, mostra:
+ *   vitórias     tentativas vencidas / tentativas
+ *   no líder     nível médio da equipe quando o líder aparece, e o do ace dele
+ *   luta         quanto tempo o time do líder levou para cair
+ *   desmaios     média por tentativa
+ *   pico         maior número de inimigos vivos ao mesmo tempo
+ *
+ * Alvo (PLANEJAMENTO, Etapa 4): o bot vence ~60% das tentativas, porque o
+ * Fellipe joga melhor que ele, e chega ao líder perto do nível do ace dele.
+ * Regra do projeto: mexa em uma alavanca por vez, meça, repita.
+ */
+import { simulate } from './bot.mjs';
+import { STAGES } from '../src/data/stages.js';
+import { getRegion } from '../src/data/regions.js';
+import { getEnemy } from '../src/data/enemies.js';
+
+const args = process.argv.slice(2);
+const arg = (name, fallback) => {
+  const i = args.indexOf(`--${name}`);
+  return i === -1 ? fallback : args[i + 1];
+};
+const RUNS = Number(arg('runs', 8));
+const STARTER = arg('starter', null);
+const UNTIL = arg('until', null);
+const STARTERS = ['charmander', 'bulbasaur', 'squirtle'];
+const MAX_ATTEMPTS = 3;
+
+const stages = [];
+for (const entry of getRegion('kanto').campaign) {
+  if (entry.comingSoon) break;
+  stages.push(STAGES[entry.stage]);
+  if (entry.stage === UNTIL) break;
+}
+
+const stats = new Map(stages.map((s) => [s.id, { tries: 0, wins: 0, levels: [], fights: [], faints: [], peaks: [], blocked: 0 }]));
+const avg = (list) => (list.length ? list.reduce((a, b) => a + b, 0) / list.length : NaN);
+const started = Date.now();
+
+for (let r = 0; r < RUNS; r++) {
+  const starter = STARTER ?? STARTERS[r % STARTERS.length];
+  let journey = null;
+  for (const stage of stages) {
+    const s = stats.get(stage.id);
+    let won = false;
+    for (let attempt = 0; attempt < MAX_ATTEMPTS && !won; attempt++) {
+      const result = simulate(stage.id, starter, { maxSeconds: stage.duration + 300, journey });
+      const { run } = result;
+      s.tries++;
+      s.faints.push(run.stats.faints);
+      s.peaks.push(result.peakEnemies);
+      if (result.levelsAtBoss?.length) s.levels.push(avg(result.levelsAtBoss));
+      if (run.state === 'victory') {
+        won = true;
+        s.wins++;
+        s.fights.push(run.time - result.bossAt);
+        journey = { team: run.team.serialize() };
+      }
+    }
+    if (!won) { s.blocked++; break; }   // a jornada para aqui
+  }
+  process.stdout.write('.');
+}
+
+console.log(`\n\nBALANCEAMENTO — ${RUNS} jornada(s), ${((Date.now() - started) / 1000).toFixed(0)}s\n`);
+console.log('fase                 vitórias        no líder (ace)   luta    desmaios  pico');
+for (const stage of stages) {
+  const s = stats.get(stage.id);
+  const ace = Math.max(...(stage.bossTeam ?? []).map((id) => getEnemy(id)?.level ?? 0));
+  const rate = s.tries ? Math.round((s.wins / s.tries) * 100) : 0;
+  console.log(
+    `${stage.id.padEnd(20)} ${`${s.wins}/${s.tries} (${rate}%)`.padEnd(15)} ` +
+    `${avg(s.levels).toFixed(1).padStart(5)} (${ace || '?'})`.padEnd(17) +
+    `${avg(s.fights).toFixed(0).padStart(4)}s  ${avg(s.faints).toFixed(1).padStart(6)}  ${Math.round(avg(s.peaks)).toString().padStart(5)}` +
+    (s.blocked ? `   ${s.blocked} jornada(s) parada(s) aqui` : '')
+  );
+}

@@ -17,13 +17,15 @@ import { getAbility } from './abilities.js';
 export const TM_NUMBERS = {
   razor_leaf: 22, solar_beam: 22, flamethrower: 38, fire_blast: 38,
   bubble_beam: 11, hydro_pump: 14, water_pulse: 3, ice_beam: 13,
-  wing_attack: 43, hurricane: 15, drill_peck: 47, air_cutter: 40,
+  wing_attack: 43, hurricane: 15,
   hyper_fang: 5, hyper_beam: 15, bug_bite: 28, psybeam: 33, psychic_wave: 29,
   twineedle: 6, sludge_bomb: 36, poison_fang: 6, toxic: 6,
-  mega_drain: 21, petal_dance: 22, rock_slide: 48, earthquake: 26,
+  mega_drain: 21, rock_slide: 48, earthquake: 26,
   fire_spin: 20, thunderbolt: 24, thunder: 25,
-  seismic_toss: 19, cross_chop: 1, flail: 8,
-  disarming_voice: 45, hyper_voice: 49
+  seismic_toss: 19, cross_chop: 1,
+  disarming_voice: 45, hyper_voice: 49,
+  bone_club: 28, night_shade: 30, shadow_ball: 30,
+  twister: 2, dragon_breath: 2, outrage: 2, blizzard: 14
 };
 
 export const tmNumber = (abilityId) => TM_NUMBERS[abilityId] ?? 0;

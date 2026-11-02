@@ -6,13 +6,19 @@ import { trainerFrame } from './render/trainer.js';
 import { drawPokemon, preload } from './render/sprites.js';
 import { Renderer } from './render/Renderer.js';
 import { facingDir } from './entities/Player.js';
+import { Run } from './game/Run.js';
+import { ABILITIES } from './data/abilities.js';
+import { typeColor } from './data/types.js';
 
 /**
  * VITRINE — conferência visual (vitrine.html).
  *
- * Desenha os assets com o mesmo código da partida, numa cena fixa: é o que o
- * tools/screenshot.mjs fotografa antes de cada entrega. Cresce a cada etapa
- * (golpes, Pokémon animados, cenário).
+ * Desenha os assets com o mesmo código da partida: é o que o
+ * tools/screenshot.mjs fotografa antes de cada entrega. Três modos:
+ *   vitrine.html              treinadores, 8 direções, proporção e retratos
+ *   vitrine.html?golpes=N     laboratório: uma partida de verdade com 6 golpes
+ *                             do grupo N (0 a 8) acertando inimigos em volta
+ *   vitrine.html?estresse     ~250 inimigos e golpes pesados, medindo o FPS
  */
 const canvas = document.getElementById('vitrine');
 const ctx = canvas.getContext('2d');
@@ -125,4 +131,90 @@ function draw(now) {
 }
 
 const circle = { dir: 'down' };
-requestAnimationFrame(draw);
+
+/* ======================= laboratório de golpes ======================= */
+
+const TYPE_ORDER = ['fire', 'water', 'grass', 'normal', 'flying', 'poison', 'bug', 'electric',
+  'rock', 'ground', 'fighting', 'psychic', 'ice', 'ghost', 'dragon', 'fairy'];
+const PLAYABLE = Object.values(ABILITIES)
+  .filter((a) => !a.hostile)
+  .sort((a, b) => TYPE_ORDER.indexOf(a.type) - TYPE_ORDER.indexOf(b.type));
+/** Os golpes em grupos de 6, um grupo por foto. */
+export const GROUPS = Array.from({ length: Math.ceil(PLAYABLE.length / 6) },
+  (_, i) => PLAYABLE.slice(i * 6, i * 6 + 6).map((a) => a.id));
+const STRESS = ['thunder', 'fire_blast', 'hurricane', 'razor_leaf', 'toxic', 'fire_spin'];
+const TYPE_SPECIES = {
+  fire: 'charmander', water: 'squirtle', grass: 'bulbasaur', electric: 'pikachu', flying: 'pidgey',
+  poison: 'ekans', bug: 'caterpie', rock: 'geodude', fighting: 'machop', psychic: 'abra'
+};
+
+/**
+ * Uma partida de verdade (mesmo Run e mesmo Renderer do jogo) com a equipe
+ * invencível e os inimigos repostos em volta. Sem ondas, sem chefe.
+ */
+function lab(abilities, { enemies, durable }) {
+  CONFIG.team.activeSlots = 6;
+  CONFIG.debug.godMode = true;
+  const run = new Run('gym_1_pewter', { starter: 'charmander', trainer: 'red' });
+  run.spawner.update = () => {};
+  abilities.forEach((abilityId, i) => {
+    const species = TYPE_SPECIES[ABILITIES[abilityId].type] ?? 'rattata';
+    const member = i === 0 ? run.team.members[0] : run.team.add(species);
+    member.level = 20;
+    member.abilities = [abilityId];
+  });
+  run.rebuildCompanionAbilities();
+  run.refreshStats();
+
+  const renderer = new Renderer(canvas);
+  const keepEnemies = () => {
+    while (run.enemies.length < enemies) {
+      const a = Math.random() * Math.PI * 2;
+      const d = 150 + Math.random() * 380;
+      const enemy = run.spawner.spawnAt(Math.random() < 0.5 ? 'rattata' : 'spearow',
+        run.player.x + Math.cos(a) * d, run.player.y + Math.sin(a) * d * 0.7);
+      if (durable) { enemy.maxHp = enemy.hp = 600; }
+      enemy.speed *= 0.4;
+    }
+  };
+
+  const samples = [];
+  let last = 0;
+  const frame = (now) => {
+    const t0 = performance.now();
+    const dt = last ? Math.min(0.05, (now - last) / 1000) : 1 / 60;
+    last = now;
+    keepEnemies();
+    run.update(dt, { x: 0, y: 0 });
+    // a vitrine não pausa: subir de nível, capturar e evoluir ficam de fora
+    run.state = 'running';
+    run.levelUpMember = null;
+    run.pendingBall = false;
+    run.evolutionQueue.length = 0;
+    run.team.members.forEach((m) => { m.pendingLevels = 0; });
+    renderer.render(run);
+
+    // legenda: os golpes em cena, na cor do tipo
+    abilities.forEach((id, i) => text(ABILITIES[id].name, 16, 26 + i * 18, { size: 14, color: typeColor(ABILITIES[id].type) }));
+
+    samples.push({ ms: performance.now() - t0, dt });
+    if (samples.length > 120) samples.shift();
+    const ms = samples.reduce((n, s) => n + s.ms, 0) / samples.length;
+    const fps = samples.length / samples.reduce((n, s) => n + s.dt, 0);
+    window.vitrineStats = {
+      fps: Math.round(fps), msPorQuadro: Number(ms.toFixed(2)), inimigos: run.enemies.length,
+      projeteis: run.projectiles.length, efeitos: run.effects.length, particulas: run.particles.length, zonas: run.zones.length
+    };
+    if (!durable) {
+      text(`${window.vitrineStats.fps} FPS · ${window.vitrineStats.msPorQuadro} ms por quadro · ${run.enemies.length} inimigos`,
+        1264, 26, { size: 15, align: 'right', color: '#ffcb05' });
+    }
+    requestAnimationFrame(frame);
+  };
+  requestAnimationFrame(frame);
+}
+
+const params = new URLSearchParams(location.search);
+if (params.has('golpes')) lab(GROUPS[Number(params.get('golpes')) || 0] ?? GROUPS[0], { enemies: 40, durable: true });
+else if (params.has('estresse')) lab(STRESS, { enemies: 250, durable: false });
+else requestAnimationFrame(draw);

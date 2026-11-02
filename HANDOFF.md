@@ -5,7 +5,7 @@
 > decisão foi tomada e o que falta fazer. O `README.md` é o manual de uso;
 > este aqui é o contexto de desenvolvimento.
 
-**Versão atual:** `0.5.0` · **Última atualização:** 2026-11-02
+**Versão atual:** `0.6.0` · **Última atualização:** 2026-11-02
 **Stack:** HTML + CSS + JavaScript puro (ES Modules). Sem backend, sem build, sem dependências.
 **Repositório:** https://github.com/FellipePeres/pokemon-bullet-heaven (público)
 **Jogo no ar:** https://fellipeperes.github.io/pokemon-bullet-heaven/
@@ -40,12 +40,19 @@ npm run smoke:ui             # interface: DOM simulado a partir do index.html re
 
 npm run screens -- <roteiro> --out <pasta>   # screenshots no Chrome sem janela
 npm run assets               # regera os sprites a partir do Pokemon All (Python + Pillow)
+npm run balance -- --runs 12 # joga a campanha com o bot e mede vitórias, níveis e lutas
 ```
 
 Os testes são a rede de segurança do projeto — **rode sempre que mexer em
 balanceamento, dados ou interface**. `smoke` usa um "jogador virtual" que foge da
 horda em círculos, desvia para pegar Poké Balls, troca Pokémon machucado por
 descansado, escolhe melhorias e prefere TMs.
+
+**Balanceamento (desde a 0.6).** `tools/balance.mjs` joga a campanha inteira
+várias vezes com o jogador virtual (`tools/bot.mjs`, o mesmo do `smoke`), levando a
+equipe de uma fase para a outra, e mostra por fase: vitórias por tentativa, nível
+da equipe quando o líder aparece, duração da luta, desmaios e pico de inimigos.
+Na 0.6: Fase 1 com 67% e Fase 2 com 61% de vitórias, nível ~16 e ~21 no líder.
 
 **Conferência visual (desde a 0.5).** `tools/screenshot.mjs` abre o jogo no Chrome
 (ou Edge) sem janela, executa um roteiro (`vitrine`, `treinador`, `jornada`,
@@ -287,9 +294,9 @@ O `AbilitySystem` conhece 7 comportamentos. Habilidade nova quase sempre reusa u
 |---|---|---|
 | `projectile` | dispara projéteis no alvo (pierce, homing, explosão) | Ember, Hydro Pump |
 | `melee_arc` | golpe em arco perto do Pokémon | Vine Whip, Cross Chop |
-| `orbit` | orbes girando em volta | Flame Wheel, Petal Dance |
-| `aura` | área permanente com dano por tick | Fire Ring, Mega Drain |
-| `ground_zone` | área no chão, no alvo, por alguns segundos | Leech Field, Toxic |
+| `orbit` | orbes girando em volta | Fire Spin |
+| `aura` | área permanente com dano por tick | Mega Drain |
+| `ground_zone` | área no chão, no alvo, por alguns segundos | Toxic, String Shot |
 | `nova` | onda que se expande do Pokémon | Gust, Earthquake |
 | `chain` | raio que salta entre inimigos | Thunder Shock, Thunder |
 
@@ -299,6 +306,22 @@ area, arc, spread, tickRate, chains, knockback, homing, explodeDamage` +
 
 Os upgrades genéricos (dano, recarga, quantidade, área, perfuração...) são
 **gerados automaticamente** para toda habilidade nova em `upgrades.js`.
+
+**No máximo 4 golpes por tipo** (pedido do Fellipe na 0.6, para o jogo ficar leve
+no navegador): cada tipo tem base, TM e final, reaproveitados pelas espécies. São
+52 golpes jogáveis em 16 tipos; o `smoke` falha se algum tipo passar de 4. Os
+golpes dos líderes são à parte: `boss_shockwave` é um golpe só, que muda de cara
+conforme o tipo de quem usa (`BOSS_WAVE_FX`).
+
+**Golpes que saíram** ficam em `RETIRED_ABILITIES` (`abilities.js`): um save antigo
+que ainda tenha um deles recebe o golpe da mesma posição na linha nova da espécie,
+com as melhorias transferidas (`migrateMember` em `systems/moves.js`). Nunca
+reaproveite o id de um golpe que saiu.
+
+**Visual dos golpes** (`data/fx.js`): `ABILITY_FX` diz que sprite cada golpe usa
+(corpo, acerto, borda da aura, frente da onda, nó do raio, golpe no alvo) e `FX`
+diz como cada sprite anima. O sprite vem da animação do próprio golpe no FireRed.
+O `check-data` confere que todo golpe tem visual e todo visual tem sprite.
 
 ---
 
@@ -317,6 +340,7 @@ Procedência e como regerar: `assets/PROVENIENCIA.md`.
 | Treinador andando e correndo | `assets/trainers/{red,leaf}.png`, 18 quadros de 16x32 |
 | Retratos (escolha, mapa, Opções) | `assets/trainers/portraits/<id>.png`: Red, Leaf, Oak, os 8 líderes, a Elite Four e o rival |
 | Caixa de texto do FireRed | `assets/ui/text_window.png`, usada como `border-image` (`.fr-window`) |
+| Sprites de golpe | `assets/fx/<id>.png`: 46 folhas tiradas de `graphics/battle_anims/sprites` (ver `FX` em `extract.py`) |
 
 - Tudo é pixel art em **escala inteira, sem suavização** (`CONFIG.render.pixelScale`,
   hoje 2). `render/assets.js` carrega sob demanda e, enquanto a folha não carrega,
@@ -451,7 +475,16 @@ tipo, som e o polimento de troca e captura.
   arredonda a posição. Coordenada quebrada com `imageSmoothingEnabled = false`
   desenha pixels de larguras diferentes.
 - **Paleta do decomp:** o PNG traz uma paleta provisória; a cor certa está no
-  `.pal`. Recorte a transparência pelo índice 0, nunca pela cor.
+  `.pal`. Recorte a transparência pelo índice 0, nunca pela cor. Nos sprites de
+  golpe, quando não existe `.pal` com o nome, o jogo usa a paleta do próprio PNG.
+- **Nomes repetidos em `fx.js`:** `FX` (sprites) e `ABILITY_FX` (golpes) têm
+  chaves iguais de propósito (`ember`, `gust`, `bubble`...). Ao remover um golpe,
+  mexa só no `ABILITY_FX`: na 0.6 um script apagou o efeito `bubble` no lugar do
+  golpe, e o `check-data` pegou.
+- **Desempenho:** gradiente criado por projétil a cada quadro era o desenho mais
+  caro; agora é sprite. Efeitos, acertos e partículas têm teto (`CONFIG.fx`).
+  Medido na `vitrine.html?estresse` (Chrome sem janela): 60 FPS e ~2 ms por
+  quadro com 245 inimigos, 88 efeitos e 351 partículas.
 
 ---
 
@@ -467,6 +500,7 @@ tipo, som e o polimento de troca e captura.
 | 3d | ícones de item em vez de emoji | `icons.js` + sprites de item/insígnia |
 | 4 | jogo muito fácil; TM tem que ser a linha do próprio Pokémon; UI do treinador feia; Shards coletáveis | `moveLine` de 3 golpes por espécie, dificuldade recalibrada (63%), treinador redesenhado, conquistas com botão de coletar |
 | 5 | fases que faltam com dificuldade crescente; sprites de golpe; escolher menino ou menina; tudo ambientado com sprites (movimento continua livre, só o cenário espelha o FireRed); outras regiões em breve | `PLANEJAMENTO.md`; etapas 0 e 1 (0.5): extrator do Pokemon All, vitrine e screenshots, progresso por região, tela do treinador com o Oak, Red/Leaf em jogo, retratos dos líderes; conserto da insígnia |
+| 6 | jogo leve no navegador: no máximo 4 golpes por tipo, reaproveitando; otimizar; todo o conteúdo (fases e Pokémon novos) | etapa 2 (0.6): 52 golpes em 16 tipos (Terra, Fantasma, Dragão e Gelo novos), sprites do FireRed em todos, aviso no chão antes do golpe do líder, tremor de tela, opções salvas, vitrine de golpes e de estresse; migração dos saves |
 
 ---
 

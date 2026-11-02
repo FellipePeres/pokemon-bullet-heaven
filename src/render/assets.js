@@ -40,25 +40,29 @@ export function preloadAssets(keys) {
 /**
  * Desenha um quadro da folha com o ponto de apoio em (x, y).
  * O padrão apoia pelo meio dos pés (anchorX 0.5, anchorY 1).
+ * `rotation` (radianos) gira em volta do ponto de apoio.
  */
 export function drawFrame(ctx, sheet, frame, x, y, opts = {}) {
-  const { scale = 1, flipX = false, anchorX = 0.5, anchorY = 1, alpha = 1 } = opts;
+  const { scale = 1, flipX = false, anchorX = 0.5, anchorY = 1, alpha = 1, rotation = 0 } = opts;
   const { frameWidth: w, frameHeight: h } = sheet.def;
   const dw = w * scale;
   const dh = h * scale;
-  // posição inteira: pixel art em coordenada quebrada sai com pixels tortos
-  const left = Math.round(x - dw * anchorX);
-  const top = Math.round(y - dh * anchorY);
+  const sx = frame * w;
 
-  ctx.save();
   ctx.imageSmoothingEnabled = false;
-  ctx.globalAlpha *= alpha;
-  if (flipX) {
-    ctx.translate(left + dw, top);
-    ctx.scale(-1, 1);
-    ctx.drawImage(sheet.img, frame * w, 0, w, h, 0, 0, dw, dh);
+  const previousAlpha = ctx.globalAlpha;
+  ctx.globalAlpha = previousAlpha * alpha;
+
+  if (!rotation && !flipX) {
+    // o caso comum, sem save/restore: posição inteira, senão a pixel art sai torta
+    ctx.drawImage(sheet.img, sx, 0, w, h, Math.round(x - dw * anchorX), Math.round(y - dh * anchorY), dw, dh);
   } else {
-    ctx.drawImage(sheet.img, frame * w, 0, w, h, left, top, dw, dh);
+    ctx.save();
+    ctx.translate(Math.round(x), Math.round(y));
+    if (rotation) ctx.rotate(rotation);
+    if (flipX) ctx.scale(-1, 1);
+    ctx.drawImage(sheet.img, sx, 0, w, h, -dw * anchorX, -dh * anchorY, dw, dh);
+    ctx.restore();
   }
-  ctx.restore();
+  ctx.globalAlpha = previousAlpha;
 }
