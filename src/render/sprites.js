@@ -1,5 +1,6 @@
 import { CONFIG } from '../core/config.js';
 import { typeColor } from '../data/types.js';
+import { getSheet, drawFrame } from './assets.js';
 
 /**
  * SPRITES
@@ -11,6 +12,14 @@ import { typeColor } from '../data/types.js';
  * depois: basta colocar "assets/sprites/<dex>.png" e ligar CONFIG.sprites.useLocal.
  */
 const cache = new Map();
+
+/**
+ * Pokémon animados (folhas geradas dos GIFs da Gen 5): pixel do GIF -> pixel da
+ * tela, e a altura mínima e máxima em relação ao tamanho pedido.
+ */
+const ANIM_SCALE = 0.8;
+const ANIM_MIN_HEIGHT = 0.8;
+const ANIM_MAX_HEIGHT = 1.6;
 
 function load(dex) {
   const entry = { img: new Image(), ready: false, failed: false };
@@ -101,8 +110,10 @@ export function preload(dexNumbers) {
  * opts: { facing, types, size, flash, alpha, shadow }
  */
 export function drawPokemon(ctx, dex, x, y, size, opts = {}) {
-  const { facing = 1, types = ['normal'], flash = 0, alpha = 1, shadow = true } = opts;
-  const img = getSprite(dex);
+  const { facing = 1, types = ['normal'], flash = 0, alpha = 1, shadow = true, time = 0 } = opts;
+  const feet = y + size * 0.42;
+  // os sprites olham para a esquerda: olhar para a direita é espelhar
+  const flipX = facing > 0;
 
   ctx.save();
   ctx.globalAlpha = alpha;
@@ -110,17 +121,32 @@ export function drawPokemon(ctx, dex, x, y, size, opts = {}) {
   if (shadow) {
     ctx.fillStyle = 'rgba(0,0,0,0.28)';
     ctx.beginPath();
-    ctx.ellipse(x, y + size * 0.42, size * 0.35, size * 0.14, 0, 0, Math.PI * 2);
+    ctx.ellipse(x, feet, size * 0.35, size * 0.14, 0, 0, Math.PI * 2);
     ctx.fill();
   }
 
-  if (img) {
-    ctx.translate(x, y);
-    ctx.scale(facing >= 0 ? 1 : -1, 1);
-    ctx.imageSmoothingEnabled = false;
-    ctx.drawImage(img, -size / 2, -size / 2, size, size);
+  let centerY = y;
+  const anim = getSheet(`pokemon/${dex}`);
+  if (anim) {
+    // o GIF da Gen 5 animado; a altura acompanha o tamanho do Pokémon, presa entre
+    // limites para o Onix não cobrir a tela e o Caterpie não sumir na horda
+    const { frameHeight, frames, fps = 12 } = anim.def;
+    const height = Math.min(size * ANIM_MAX_HEIGHT, Math.max(size * ANIM_MIN_HEIGHT, frameHeight * ANIM_SCALE));
+    const frame = Math.floor(time * fps) % frames;
+    drawFrame(ctx, anim, frame, x, feet + 2, { scale: height / frameHeight, flipX });
+    centerY = feet - height / 2;
   } else {
-    drawProceduralPokemon(ctx, x, y, size, typeColor(types[0]), facing);
+    const img = getSprite(dex);
+    if (img) {
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.scale(flipX ? -1 : 1, 1);
+      ctx.imageSmoothingEnabled = false;
+      ctx.drawImage(img, -size / 2, -size / 2, size, size);
+      ctx.restore();
+    } else {
+      drawProceduralPokemon(ctx, x, y, size, typeColor(types[0]), facing);
+    }
   }
 
   // flash branco ao levar dano
@@ -129,7 +155,7 @@ export function drawPokemon(ctx, dex, x, y, size, opts = {}) {
     ctx.globalCompositeOperation = 'lighter';
     ctx.fillStyle = '#ffffff';
     ctx.beginPath();
-    ctx.arc(img ? 0 : x, img ? 0 : y, size * 0.34, 0, Math.PI * 2);
+    ctx.arc(x, centerY, size * 0.34, 0, Math.PI * 2);
     ctx.fill();
   }
 

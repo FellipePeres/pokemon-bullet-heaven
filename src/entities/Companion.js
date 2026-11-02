@@ -24,6 +24,7 @@ export class Companion {
     this.facing = 1;
     this.kind = 'companion';
     this.bob = Math.random() * Math.PI * 2;
+    this.animPhase = Math.random() * 5;   // cada um começa a animação num ponto
     this.spawnTime = 0;
     this.invulnTimer = 0;
     this.hitFlash = 0;

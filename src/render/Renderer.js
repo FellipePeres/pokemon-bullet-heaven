@@ -272,7 +272,7 @@ export class Renderer {
         // inimigo
         const size = 42 * (actor.scale ?? 1);
         drawPokemon(ctx, actor.data.dex, actor.x, actor.y, size, {
-          facing: -actor.facing, types: actor.types, flash: actor.hitFlash
+          facing: actor.facing, types: actor.types, flash: actor.hitFlash, time: run.time + actor.animPhase
         });
         this._drawStatusMarks(ctx, actor, size);
         if (actor.elite || actor.boss) this._drawEnemyHp(ctx, actor, size);
@@ -282,12 +282,26 @@ export class Renderer {
         const spawning = actor.spawnTime < 0.35;
         const blinking = actor.invulnTimer > 0 && Math.floor(actor.invulnTimer * 20) % 2 === 0;
         drawPokemon(ctx, actor.data.dex, actor.x, actor.y + bob, 46, {
-          facing: actor.facing, types: actor.data.types, flash: actor.hitFlash,
+          facing: actor.facing, types: actor.data.types, flash: actor.hitFlash, time: run.time + actor.animPhase,
           alpha: spawning ? actor.spawnTime / 0.35 : blinking ? 0.55 : 1
         });
+        if (spawning) this._drawSendOut(ctx, actor);
         this._drawCompanionBar(ctx, actor, run);
       }
     }
+  }
+
+  /** Entrada em campo: a Poké Ball abre num clarão e o Pokémon aparece. */
+  _drawSendOut(ctx, companion) {
+    const k = companion.spawnTime / 0.35;
+    ctx.save();
+    ctx.globalAlpha = 1 - k;
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath();
+    ctx.arc(companion.x, companion.y, 8 + k * 34, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+    drawPokeball(ctx, companion.x, companion.y + 14 - k * 18, 14, k * 7);
   }
 
   /** Barra de vida e nível do Pokémon em campo. */

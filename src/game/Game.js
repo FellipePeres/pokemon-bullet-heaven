@@ -225,6 +225,7 @@ export class Game {
     options.campaignStarter = this.campaign.starter;
 
     this.run = new Run(stageId, options);
+    this.preloadStage(stage);
     this.runEnded = false;
     this.levelUpOpen = false;
     this.captureOpen = false;
@@ -240,6 +241,19 @@ export class Game {
     this.hud.signature = '';
     this.input.clear();
     this.menus.showGame();
+  }
+
+  /** Começa a carregar os Pokémon animados que a fase vai mostrar (equipe, selvagens, líder). */
+  preloadStage(stage) {
+    const enemyIds = [
+      ...stage.waves.flatMap((wave) => wave.enemies.map((e) => e.id)),
+      ...(stage.elites ?? []).map((e) => e.id),
+      ...(stage.bossTeam ?? []),
+      ...Object.values(stage.bossTeamByStarter ?? {}).flat()
+    ];
+    const dexes = new Set(enemyIds.map((id) => ENEMIES[id]?.dex).filter(Boolean));
+    for (const member of this.run.team.members) dexes.add(getPokemon(member.pokemonId).dex);
+    preloadAssets([...dexes].map((dex) => `pokemon/${dex}`));
   }
 
   quitToMenu() {

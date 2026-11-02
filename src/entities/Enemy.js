@@ -34,6 +34,7 @@ export class Enemy {
     this.kvx = 0;             // velocidade de empurrão (knockback)
     this.kvy = 0;
     this.wobble = rand(0, Math.PI * 2);
+    this.animPhase = rand(0, 5);   // cada um começa a animação num ponto: a horda não se mexe junta
     this.stateTimer = rand(0, 1.2);
     this.dashing = false;
     this.dashX = 0;

@@ -17,6 +17,8 @@ Saída:
     assets/trainers/<id>.png            andar + correr, 18 quadros de 16x32
     assets/trainers/portraits/<id>.png  retratos 64x64
     assets/ui/text_window.png           moldura da caixa de texto (fatias de 8x8)
+    assets/fx/<id>.png                  sprites de golpe (graphics/battle_anims)
+    assets/pokemon/<dex>.png            Pokémon animados (GIFs da Gen 5 do Pokemon All)
     src/data/assetManifest.js           catálogo do que foi gerado
 
 Por que as cores vêm do .pal: os PNG do decomp são indexados com uma paleta
@@ -219,6 +221,37 @@ def extract_fx(decomp, manifest):
         }
 
 
+# Pokémon animados: os GIFs da Gen 5 que o Pokemon All guarda (a mesma arte que a
+# interface já mostra), virados folha de quadros para o canvas, que não anima GIF.
+POKEDEX_RANGE = range(1, 152)   # Kanto; regiões novas estendem a faixa
+MAX_FRAMES = 36                 # animações mais longas são amostradas (mais leve)
+
+
+def extract_pokemon(source, manifest):
+    gifs = source / 'assets' / 'pokemon' / 'battle' / 'front'
+    for dex in POKEDEX_RANGE:
+        gif = Image.open(gifs / f'{dex}.gif')
+        frames, durations = [], []
+        for i in range(getattr(gif, 'n_frames', 1)):
+            gif.seek(i)
+            frames.append(gif.convert('RGBA'))
+            durations.append(gif.info.get('duration', 80) or 80)
+        step = -(-len(frames) // MAX_FRAMES)   # divisão para cima
+        frames = frames[::step]
+        fps = max(1, round(1000 / (sum(durations) / len(durations)) / step))
+        # todos os quadros recortados na mesma caixa: a união do que aparece em cada um
+        boxes = [f.getbbox() for f in frames if f.getbbox()]
+        box = (min(b[0] for b in boxes), min(b[1] for b in boxes), max(b[2] for b in boxes), max(b[3] for b in boxes))
+        cells = [f.crop(box) for f in frames]
+        # com paleta (8 bits) a folha fica com menos da metade do tamanho; cada GIF
+        # já usa no máximo 256 cores, então quase sempre não se perde nada
+        sheet = strip(cells).quantize(colors=256, method=Image.Quantize.FASTOCTREE)
+        manifest[f'pokemon/{dex}'] = {
+            'src': save(sheet, ASSETS / 'pokemon' / f'{dex}.png'),
+            'frameWidth': cells[0].width, 'frameHeight': cells[0].height, 'frames': len(cells), 'fps': fps,
+        }
+
+
 def extract_ui(decomp, manifest):
     # A caixa de texto clássica do FireRed: moldura `type2` com a paleta `stdpal_0`.
     windows = decomp / 'graphics' / 'text_window'
@@ -242,8 +275,9 @@ def write_manifest(manifest):
     ]
     for key in sorted(manifest):
         entry = manifest[key]
+        fps = f", fps: {entry['fps']}" if 'fps' in entry else ''
         lines.append(f"  '{key}': {{ src: '{entry['src']}', frameWidth: {entry['frameWidth']}, "
-                     f"frameHeight: {entry['frameHeight']}, frames: {entry['frames']} }},")
+                     f"frameHeight: {entry['frameHeight']}, frames: {entry['frames']}{fps} }},")
     lines[-1] = lines[-1].rstrip(',')
     lines.append('};')
     MANIFEST.write_text('\n'.join(lines) + '\n', encoding='utf-8')
@@ -264,6 +298,7 @@ def main():
     extract_trainers(decomp, manifest)
     extract_portraits(decomp, manifest)
     extract_fx(decomp, manifest)
+    extract_pokemon(args.fonte, manifest)
     extract_ui(decomp, manifest)
     write_manifest(manifest)
     print(f'{len(manifest)} assets gerados; catálogo em {MANIFEST.relative_to(ROOT).as_posix()}')
