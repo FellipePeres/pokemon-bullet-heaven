@@ -113,6 +113,8 @@ export const CAPTURE_POOLS = {
     species: {
       // Ilhas Seafoam no FireRed — padrão até o Fellipe decidir (PLANEJAMENTO, D7)
       seel: 3,
+      // 0.11: mais variedade ("são poucos a disposição"); Staryu é pesca de Seafoam
+      staryu: 3, persian: 0.5, venomoth: 0.5,
       golbat: 2.5, graveler: 2.5, kadabra: 2.5, haunter: 2.5, machoke: 2.5,
       ivysaur: 2, charmeleon: 2, wartortle: 2, arcanine: 2, ninetales: 2,
       rapidash: 2, magneton: 2, weezing: 2, muk: 2, rhydon: 2,
@@ -130,6 +132,8 @@ export const CAPTURE_POOLS = {
     id: 'phase8',
     name: 'Viridian',
     species: {
+      // 0.11: mais variedade
+      arbok: 1, parasect: 0.5,
       pidgeot: 1, fearow: 1, raichu: 1, sandslash: 1, nidoqueen: 1, nidoking: 1,
       clefable: 1, wigglytuff: 1, vileplume: 1.5, victreebel: 1.5,
       arcanine: 2, ninetales: 2, golduck: 1.5, poliwrath: 1.5, alakazam: 2,
@@ -165,14 +169,35 @@ export const CAPTURE_POOLS = {
   }
 };
 
+/** A ordem das tabelas na jornada (para acumular as anteriores). */
+const ORDER = ['phase1', 'phase2', 'phase3', 'phase4', 'phase5', 'phase6', 'phase7', 'phase8', 'phase9'];
+
 /**
- * Entradas válidas de um pool: só as espécies que já existem no jogo.
- * O peso é a própria porcentagem da tabela — o sorteio normaliza sozinho.
+ * Os iniciais que o jogador não escolheu: raros, a partir da Fase 3 (0.11, mais
+ * variedade). Quem filtra o inicial do próprio jogador é o CaptureSystem.
+ */
+export const STARTER_CAPTURES = { bulbasaur: 0.8, charmander: 0.8, squirtle: 0.8 };
+
+/**
+ * Entradas válidas de um pool: só as espécies que já existem no jogo. O peso é
+ * a própria porcentagem da tabela — o sorteio normaliza sozinho.
+ *
+ * Desde a 0.11 a tabela de uma fase acumula as das fases anteriores, com metade
+ * do peso (as espécies de antes continuam aparecendo, mais raras), e da Fase 3
+ * em diante entram os iniciais (STARTER_CAPTURES).
  */
 export function poolEntries(poolId) {
   const pool = CAPTURE_POOLS[poolId];
   if (!pool) return [];
-  return Object.entries(pool.species)
+  const weights = { ...pool.species };
+  const index = ORDER.indexOf(poolId);
+  for (const earlier of ORDER.slice(0, Math.max(0, index))) {
+    for (const [id, weight] of Object.entries(CAPTURE_POOLS[earlier].species)) {
+      if (!(id in pool.species)) weights[id] = Math.max(weights[id] ?? 0, weight * 0.5);
+    }
+  }
+  if (index >= 2) Object.assign(weights, STARTER_CAPTURES);
+  return Object.entries(weights)
     .filter(([id]) => POKEMON[id])
     .map(([id, weight]) => ({ pokemon: POKEMON[id], weight }));
 }

@@ -62,6 +62,8 @@ export class Run {
     this._settleTerrain();
     this.evolutionQueue = [];
     this.stats = { kills: 0, captures: 0, damageDealt: 0, faints: 0, ballsDropped: 0 };
+    // Pokémon mandados para o PC nesta partida (vão para o PC da jornada se a fase for vencida)
+    this.pc = [...(options.pc ?? [])];
 
     // ---- sistemas ----
     this.grid = new SpatialGrid(100);
@@ -498,6 +500,7 @@ export class Run {
           if (orb.kind === 'xp' && !orb.dead) { orb.magnetized = true; orb.age = 0; }
         }
         this.shake(3, 0.25);
+        bus.emit(EVENTS.MAGNET_PICKED, {});
         burst(this.particles, this.player.x, this.player.y, '#63b3ff', 18, 260, 3, 0.6);
         bus.emit(EVENTS.TOAST, { text: 'Ímã! Toda a experiência do mapa vem até você.', icon: 'magnet' });
       } else if (pickup.kind === 'ball') {
@@ -574,6 +577,7 @@ export class Run {
       time: Math.round(this.time),
       trainerUpgrades: { ...this.trainerUpgrades },
       team: this.team.serialize(),
+      pc: this.pc,
       stats: { ...this.stats }
     };
   }

@@ -21,6 +21,10 @@
  *   bossTeam       time do líder, enfrentado em sequência
  *   capturePool    id da tabela de chances de captura (data/capturePools.js)
  *   ballChance     multiplicador da chance de drop de Poké Ball
+ *   xpScale        multiplica o XP de cada selvagem (0.11: as fases ficaram com 3:30
+ *                  até o líder, ~4 min com a luta; menos inimigos, cada um vale mais)
+ *   music          a música da fase (assets/music, data/musicTracks.js); leaderMusic
+ *                  toca quando o líder entra
  *   maxBalls       teto de Poké Balls da fase (controla o ritmo das capturas)
  *   scriptedBalls  segundos em que uma Poké Ball aparece garantida (0.10: só uma,
  *                  na Fase 1, para o inicial ganhar companhia; o resto é sorte)
@@ -37,29 +41,31 @@ export const STAGES = {
     type: 'gym',
     icon: 'tm-rock',
     description: 'Rota 1, Rota 2 e a Floresta de Viridian — até o Ginásio de Pewter.',
-    duration: 300,
+    music: 'mus_route1', leaderMusic: 'mus_vs_gym_leader',
+    duration: 210,
+    xpScale: 1.2,   // a fase foi encurtada para 210s (era 300s): cada inimigo vale mais XP
     world: { width: 2800, height: 1900, theme: 'grass' },
     scaling: { hp: 1.8, speed: 0.3, damage: 0.18 },
 
     segments: [
       { from: 0,   name: 'Rota 1',               theme: 'grass' },
-      { from: 80,  name: 'Rota 2',               theme: 'grass' },
-      { from: 160, name: 'Floresta de Viridian', theme: 'forest' },
-      { from: 250, name: 'Ginásio de Pewter',    theme: 'gym', scene: 'pewter_gym' }
+      { from: 56,  name: 'Rota 2',               theme: 'grass' },
+      { from: 112, name: 'Floresta de Viridian', theme: 'forest' },
+      { from: 175, name: 'Ginásio de Pewter',    theme: 'gym', scene: 'pewter_gym' }
     ],
 
     waves: [
-      { from: 0,   to: 85,  interval: 1.5,  batch: 1, maxAlive: 24, enemies: [{ id: 'rattata', weight: 6 }, { id: 'caterpie', weight: 3 }] },
-      { from: 70,  to: 165, interval: 1.1, batch: 1, maxAlive: 34, enemies: [{ id: 'rattata', weight: 5 }, { id: 'spearow', weight: 4 }, { id: 'weedle', weight: 3 }] },
-      { from: 150, to: 255, interval: 0.95, batch: 2, maxAlive: 60, enemies: [{ id: 'caterpie', weight: 4 }, { id: 'weedle', weight: 4 }, { id: 'spearow', weight: 3 }, { id: 'ekans', weight: 3 }, { id: 'zubat', weight: 2 }] },
-      { from: 240, to: 288, interval: 0.95, batch: 4, maxAlive: 78, enemies: [{ id: 'geodude_wild', weight: 5 }, { id: 'sandshrew', weight: 4 }, { id: 'zubat', weight: 3 }, { id: 'spearow', weight: 2 }] }
+      { from: 0, to: 59, interval: 1.25,  batch: 1, maxAlive: 24, enemies: [{ id: 'rattata', weight: 6 }, { id: 'caterpie', weight: 3 }] },
+      { from: 49, to: 115, interval: 0.92, batch: 1, maxAlive: 34, enemies: [{ id: 'rattata', weight: 5 }, { id: 'spearow', weight: 4 }, { id: 'weedle', weight: 3 }] },
+      { from: 105, to: 178, interval: 0.79, batch: 2, maxAlive: 60, enemies: [{ id: 'caterpie', weight: 4 }, { id: 'weedle', weight: 4 }, { id: 'spearow', weight: 3 }, { id: 'ekans', weight: 3 }, { id: 'zubat', weight: 2 }] },
+      { from: 168, to: 202, interval: 0.79, batch: 4, maxAlive: 78, enemies: [{ id: 'geodude_wild', weight: 5 }, { id: 'sandshrew', weight: 4 }, { id: 'zubat', weight: 3 }, { id: 'spearow', weight: 2 }] }
     ],
 
     elites: [
-      { at: 125, id: 'raticate', count: 1 },   // 0.10: mais tarde (com poucas capturas, a equipe ainda é de 2)
-      { at: 165, id: 'raticate', count: 2 },
-      { at: 195, id: 'primeape', count: 1 },
-      { at: 265, id: 'graveler', count: 2 }
+      { at: 88, id: 'raticate', count: 1 },   // 0.10: mais tarde (com poucas capturas, a equipe ainda é de 2)
+      { at: 115, id: 'raticate', count: 2 },
+      { at: 136, id: 'primeape', count: 1 },
+      { at: 186, id: 'graveler', count: 2 }
     ],
 
     leader: {
@@ -77,7 +83,7 @@ export const STAGES = {
     capturePool: 'phase1',
     ballChance: 1,
     maxBalls: 3,
-    scriptedBalls: [45, 140],
+    scriptedBalls: [31, 98],
     reward: { shards: 140 }
   },
 
@@ -91,30 +97,32 @@ export const STAGES = {
     type: 'gym',
     icon: 'tm-water',
     description: 'Monte Lua, Rota 4 e Cerulean — até o Ginásio da Misty.',
-    duration: 330,
+    music: 'mus_mt_moon', leaderMusic: 'mus_vs_gym_leader',
+    duration: 210,
+    xpScale: 1.25,   // a fase foi encurtada para 210s (era 330s): cada inimigo vale mais XP
     world: { width: 3000, height: 2000, theme: 'cave' },
     scaling: { hp: 2.9, speed: 0.34, damage: 1.0 },
     unlockedBy: 'gym_1_pewter',
 
     segments: [
       { from: 0,   name: 'Monte Lua',           theme: 'cave' },
-      { from: 110, name: 'Rota 4',              theme: 'grass' },
-      { from: 210, name: 'Cidade de Cerulean',  theme: 'forest' },
-      { from: 280, name: 'Ginásio de Cerulean', theme: 'gym', scene: 'cerulean_gym' }
+      { from: 70, name: 'Rota 4',              theme: 'grass' },
+      { from: 134, name: 'Cidade de Cerulean',  theme: 'forest' },
+      { from: 178, name: 'Ginásio de Cerulean', theme: 'gym', scene: 'cerulean_gym' }
     ],
 
     waves: [
-      { from: 0,   to: 115, interval: 1.2, batch: 2, maxAlive: 45,  enemies: [{ id: 'zubat', weight: 6 }, { id: 'geodude_wild', weight: 3 }, { id: 'paras', weight: 3 }, { id: 'clefairy', weight: 2 }] },
-      { from: 100, to: 215, interval: 1.0, batch: 3, maxAlive: 70,  enemies: [{ id: 'spearow', weight: 5 }, { id: 'ekans', weight: 4 }, { id: 'mankey', weight: 4 }, { id: 'sandshrew', weight: 3 }] },
-      { from: 200, to: 285, interval: 0.85, batch: 4, maxAlive: 110,  enemies: [{ id: 'psyduck', weight: 5 }, { id: 'goldeen', weight: 4 }, { id: 'krabby', weight: 4 }, { id: 'mankey', weight: 2 }] },
-      { from: 275, to: 322, interval: 0.8, batch: 5, maxAlive: 115, enemies: [{ id: 'shellder', weight: 5 }, { id: 'tentacool', weight: 5 }, { id: 'horsea', weight: 4 }, { id: 'krabby', weight: 3 }] }
+      { from: 0, to: 73, interval: 0.96, batch: 2, maxAlive: 45,  enemies: [{ id: 'zubat', weight: 6 }, { id: 'geodude_wild', weight: 3 }, { id: 'paras', weight: 3 }, { id: 'clefairy', weight: 2 }] },
+      { from: 64, to: 137, interval: 0.8, batch: 3, maxAlive: 70,  enemies: [{ id: 'spearow', weight: 5 }, { id: 'ekans', weight: 4 }, { id: 'mankey', weight: 4 }, { id: 'sandshrew', weight: 3 }] },
+      { from: 127, to: 181, interval: 0.68, batch: 4, maxAlive: 110,  enemies: [{ id: 'psyduck', weight: 5 }, { id: 'goldeen', weight: 4 }, { id: 'krabby', weight: 4 }, { id: 'mankey', weight: 2 }] },
+      { from: 175, to: 205, interval: 0.64, batch: 5, maxAlive: 115, enemies: [{ id: 'shellder', weight: 5 }, { id: 'tentacool', weight: 5 }, { id: 'horsea', weight: 4 }, { id: 'krabby', weight: 3 }] }
     ],
 
     elites: [
-      { at: 90,  id: 'golbat', count: 1 },
-      { at: 165, id: 'parasect', count: 2 },
-      { at: 240, id: 'primeape', count: 2 },
-      { at: 300, id: 'seaking', count: 2 }
+      { at: 57,  id: 'golbat', count: 1 },
+      { at: 105, id: 'parasect', count: 2 },
+      { at: 153, id: 'primeape', count: 2 },
+      { at: 191, id: 'seaking', count: 2 }
     ],
 
     leader: {
@@ -145,32 +153,34 @@ export const STAGES = {
     type: 'gym',
     icon: 'tm-electric',
     description: 'Rotas 5 e 6, a Caverna do Diglett e a Rota 11 — até o Ginásio do Lt. Surge.',
-    duration: 345,
+    music: 'mus_vermillion', leaderMusic: 'mus_vs_gym_leader',
+    duration: 210,
+    xpScale: 1.28,   // a fase foi encurtada para 210s (era 345s): cada inimigo vale mais XP
     world: { width: 3000, height: 2000, theme: 'grass' },
     scaling: { hp: 3.0, speed: 0.3, damage: 2.3 },
     unlockedBy: 'gym_2_cerulean',
 
     segments: [
       { from: 0, name: 'Rota 5', theme: 'grass' },
-      { from: 85, name: 'Rota 6', theme: 'grass' },
-      { from: 165, name: 'Caverna do Diglett', theme: 'cave' },
-      { from: 265, name: 'Ginásio de Vermilion', theme: 'gym', scene: 'vermilion_gym' }
+      { from: 52, name: 'Rota 6', theme: 'grass' },
+      { from: 100, name: 'Caverna do Diglett', theme: 'cave' },
+      { from: 161, name: 'Ginásio de Vermilion', theme: 'gym', scene: 'vermilion_gym' }
     ],
 
     // nível dos selvagens: acompanha a equipe, chegando perto do ace do líder
     // (os líderes têm os níveis do FireRed; ver CONFIG.enemies)
     waves: [
-      { from: 0, to: 95, interval: 1.08, batch: 3, maxAlive: 50, level: [17, 20], enemies: [{ id: 'meowth', weight: 5 }, { id: 'pidgey', weight: 4 }, { id: 'oddish', weight: 4 }, { id: 'mankey', weight: 2 }] },
-      { from: 80, to: 175, interval: 0.9, batch: 4, maxAlive: 80, level: [19, 22], enemies: [{ id: 'meowth', weight: 3 }, { id: 'psyduck', weight: 4 }, { id: 'oddish', weight: 3 }, { id: 'pidgey', weight: 3 }, { id: 'mankey', weight: 3 }] },
-      { from: 160, to: 270, interval: 0.81, batch: 5, maxAlive: 115, level: [21, 24], enemies: [{ id: 'diglett', weight: 6 }, { id: 'ekans', weight: 3 }, { id: 'spearow', weight: 3 }, { id: 'drowzee', weight: 3 }] },
-      { from: 255, to: 338, interval: 0.72, batch: 6, maxAlive: 130, level: [23, 26], enemies: [{ id: 'voltorb', weight: 5 }, { id: 'magnemite', weight: 5 }, { id: 'pikachu', weight: 3 }, { id: 'diglett', weight: 2 }] }
+      { from: 0, to: 58, interval: 0.84, batch: 3, maxAlive: 50, level: [17, 20], enemies: [{ id: 'meowth', weight: 5 }, { id: 'pidgey', weight: 4 }, { id: 'oddish', weight: 4 }, { id: 'mankey', weight: 2 }] },
+      { from: 49, to: 107, interval: 0.7, batch: 4, maxAlive: 80, level: [19, 22], enemies: [{ id: 'meowth', weight: 3 }, { id: 'psyduck', weight: 4 }, { id: 'oddish', weight: 3 }, { id: 'pidgey', weight: 3 }, { id: 'mankey', weight: 3 }] },
+      { from: 97, to: 164, interval: 0.63, batch: 5, maxAlive: 115, level: [21, 24], enemies: [{ id: 'diglett', weight: 6 }, { id: 'ekans', weight: 3 }, { id: 'spearow', weight: 3 }, { id: 'drowzee', weight: 3 }] },
+      { from: 155, to: 206, interval: 0.56, batch: 6, maxAlive: 130, level: [23, 26], enemies: [{ id: 'voltorb', weight: 5 }, { id: 'magnemite', weight: 5 }, { id: 'pikachu', weight: 3 }, { id: 'diglett', weight: 2 }] }
     ],
 
     elites: [
-      { at: 100, id: 'primeape', count: 1, level: 25 },
-      { at: 180, id: 'dugtrio_elite', count: 2, level: 25 },
-      { at: 240, id: 'raticate', count: 2, level: 25 },
-      { at: 300, id: 'electrode_elite', count: 2, level: 25 }
+      { at: 61, id: 'primeape', count: 1, level: 25 },
+      { at: 110, id: 'dugtrio_elite', count: 2, level: 25 },
+      { at: 146, id: 'raticate', count: 2, level: 25 },
+      { at: 183, id: 'electrode_elite', count: 2, level: 25 }
     ],
 
     leader: {
@@ -186,7 +196,7 @@ export const STAGES = {
     bossTeam: ['lt_surge_voltorb', 'lt_surge_pikachu', 'lt_surge_raichu'],
     // presentes (como as trocas e o Dojo do FireRed): oferecidos uma vez, na hora marcada
     gifts: [
-      { at: 150, choices: ['farfetchd'], title: 'A troca de Vermilion: um Farfetch\'d quer entrar para a sua equipe!' }
+      { at: 91, choices: ['farfetchd'], title: 'A troca de Vermilion: um Farfetch\'d quer entrar para a sua equipe!' }
     ],
 
     capturePool: 'phase3',
@@ -205,32 +215,34 @@ export const STAGES = {
     type: 'gym',
     icon: 'tm-grass',
     description: 'Rota 9, o Túnel de Pedra e a Rota 8 — até o Ginásio da Erika.',
-    duration: 360,
+    music: 'mus_celadon', leaderMusic: 'mus_vs_gym_leader',
+    duration: 210,
+    xpScale: 1.31,   // a fase foi encurtada para 210s (era 360s): cada inimigo vale mais XP
     world: { width: 3000, height: 2000, theme: 'grass' },
-    scaling: { hp: 3.5, speed: 0.3, damage: 4.6 },
+    scaling: { hp: 3.5, speed: 0.3, damage: 5.2 },
     unlockedBy: 'gym_3_vermilion',
 
     segments: [
       { from: 0, name: 'Rota 9', theme: 'grass' },
-      { from: 90, name: 'Túnel de Pedra', theme: 'cave' },
-      { from: 190, name: 'Rota 8', theme: 'grass' },
-      { from: 280, name: 'Ginásio de Celadon', theme: 'gym', scene: 'celadon_gym' }
+      { from: 52, name: 'Túnel de Pedra', theme: 'cave' },
+      { from: 111, name: 'Rota 8', theme: 'grass' },
+      { from: 163, name: 'Ginásio de Celadon', theme: 'gym', scene: 'celadon_gym' }
     ],
 
     // nível dos selvagens: acompanha a equipe, chegando perto do ace do líder
     // (os líderes têm os níveis do FireRed; ver CONFIG.enemies)
     waves: [
-      { from: 0, to: 100, interval: 0.99, batch: 4, maxAlive: 70, level: [27, 30], enemies: [{ id: 'spearow', weight: 3 }, { id: 'rattata', weight: 3 }, { id: 'ekans', weight: 3 }, { id: 'voltorb', weight: 2 }, { id: 'sandshrew', weight: 2 }] },
-      { from: 85, to: 200, interval: 0.9, batch: 4, maxAlive: 95, level: [29, 32], enemies: [{ id: 'zubat', weight: 4 }, { id: 'geodude_wild', weight: 4 }, { id: 'machop', weight: 3 }, { id: 'mankey', weight: 2 }] },
-      { from: 185, to: 290, interval: 0.77, batch: 5, maxAlive: 125, level: [31, 34], enemies: [{ id: 'growlithe', weight: 3 }, { id: 'meowth', weight: 3 }, { id: 'oddish', weight: 3 }, { id: 'pidgey', weight: 2 }, { id: 'drowzee', weight: 2 }] },
-      { from: 275, to: 352, interval: 0.72, batch: 6, maxAlive: 145, level: [33, 36], enemies: [{ id: 'gloom', weight: 3 }, { id: 'weepinbell', weight: 3 }, { id: 'tangela', weight: 2 }, { id: 'exeggcute', weight: 2 }, { id: 'paras', weight: 2 }, { id: 'bellsprout', weight: 2 }] }
+      { from: 0, to: 58, interval: 0.76, batch: 4, maxAlive: 70, level: [27, 30], enemies: [{ id: 'spearow', weight: 3 }, { id: 'rattata', weight: 3 }, { id: 'ekans', weight: 3 }, { id: 'voltorb', weight: 2 }, { id: 'sandshrew', weight: 2 }] },
+      { from: 50, to: 117, interval: 0.69, batch: 4, maxAlive: 95, level: [29, 32], enemies: [{ id: 'zubat', weight: 4 }, { id: 'geodude_wild', weight: 4 }, { id: 'machop', weight: 3 }, { id: 'mankey', weight: 2 }] },
+      { from: 108, to: 169, interval: 0.59, batch: 5, maxAlive: 125, level: [31, 34], enemies: [{ id: 'growlithe', weight: 3 }, { id: 'meowth', weight: 3 }, { id: 'oddish', weight: 3 }, { id: 'pidgey', weight: 2 }, { id: 'drowzee', weight: 2 }] },
+      { from: 160, to: 205, interval: 0.55, batch: 6, maxAlive: 145, level: [33, 36], enemies: [{ id: 'gloom', weight: 3 }, { id: 'weepinbell', weight: 3 }, { id: 'tangela', weight: 2 }, { id: 'exeggcute', weight: 2 }, { id: 'paras', weight: 2 }, { id: 'bellsprout', weight: 2 }] }
     ],
 
     elites: [
-      { at: 110, id: 'graveler', count: 1, level: 34 },
-      { at: 175, id: 'onix_elite', count: 1, level: 34 },
-      { at: 240, id: 'persian_elite', count: 2, level: 34 },
-      { at: 315, id: 'ninetales_elite', count: 2, level: 34 }
+      { at: 64, id: 'graveler', count: 1, level: 34 },
+      { at: 102, id: 'onix_elite', count: 1, level: 34 },
+      { at: 140, id: 'persian_elite', count: 2, level: 34 },
+      { at: 184, id: 'ninetales_elite', count: 2, level: 34 }
     ],
 
     leader: {
@@ -261,33 +273,35 @@ export const STAGES = {
     type: 'gym',
     icon: 'tm-poison',
     description: 'A Torre Pokémon, as Rotas 12 a 15 e a Zona Safári — até o Ginásio do Koga.',
-    duration: 375,
+    music: 'mus_fuchsia', leaderMusic: 'mus_vs_gym_leader',
+    duration: 210,
+    xpScale: 1.34,   // a fase foi encurtada para 210s (era 375s): cada inimigo vale mais XP
     world: { width: 3200, height: 2100, theme: 'cave' },
-    scaling: { hp: 4.0, speed: 0.3, damage: 7.0 },
+    scaling: { hp: 4.0, speed: 0.3, damage: 7.2 },
     unlockedBy: 'gym_4_celadon',
 
     segments: [
       { from: 0, name: 'Torre Pokémon', theme: 'cave' },
-      { from: 95, name: 'Rotas 12–15', theme: 'grass' },
-      { from: 195, name: 'Zona Safári', theme: 'forest' },
-      { from: 295, name: 'Ginásio de Fuchsia', theme: 'gym', scene: 'fuchsia_gym' }
+      { from: 53, name: 'Rotas 12–15', theme: 'grass' },
+      { from: 109, name: 'Zona Safári', theme: 'forest' },
+      { from: 165, name: 'Ginásio de Fuchsia', theme: 'gym', scene: 'fuchsia_gym' }
     ],
 
     // nível dos selvagens: acompanha a equipe, chegando perto do ace do líder
     // (os líderes têm os níveis do FireRed; ver CONFIG.enemies)
     waves: [
-      { from: 0, to: 105, interval: 0.9, batch: 4, maxAlive: 85, level: [28, 31], enemies: [{ id: 'gastly', weight: 6 }, { id: 'haunter', weight: 2 }, { id: 'cubone', weight: 3 }, { id: 'zubat', weight: 2 }] },
-      { from: 90, to: 205, interval: 0.81, batch: 5, maxAlive: 115, level: [30, 33], enemies: [{ id: 'venonat', weight: 4 }, { id: 'gloom', weight: 3 }, { id: 'pidgeotto', weight: 3 }, { id: 'bellsprout', weight: 2 }, { id: 'ditto', weight: 1 }] },
-      { from: 190, to: 300, interval: 0.77, batch: 5, maxAlive: 140, level: [32, 35], enemies: [{ id: 'rhyhorn', weight: 3 }, { id: 'exeggcute', weight: 3 }, { id: 'nidorino', weight: 2 }, { id: 'nidorina', weight: 2 }, { id: 'venonat', weight: 2 }, { id: 'doduo', weight: 2 }, { id: 'paras', weight: 2 }] },
-      { from: 285, to: 367, interval: 0.68, batch: 6, maxAlive: 160, level: [34, 37], enemies: [{ id: 'koffing', weight: 5 }, { id: 'grimer', weight: 4 }, { id: 'venonat', weight: 3 }, { id: 'arbok', weight: 3 }] }
+      { from: 0, to: 59, interval: 0.67, batch: 4, maxAlive: 85, level: [28, 31], enemies: [{ id: 'gastly', weight: 6 }, { id: 'haunter', weight: 2 }, { id: 'cubone', weight: 3 }, { id: 'zubat', weight: 2 }] },
+      { from: 50, to: 115, interval: 0.61, batch: 5, maxAlive: 115, level: [30, 33], enemies: [{ id: 'venonat', weight: 4 }, { id: 'gloom', weight: 3 }, { id: 'pidgeotto', weight: 3 }, { id: 'bellsprout', weight: 2 }, { id: 'ditto', weight: 1 }] },
+      { from: 106, to: 168, interval: 0.58, batch: 5, maxAlive: 140, level: [32, 35], enemies: [{ id: 'rhyhorn', weight: 3 }, { id: 'exeggcute', weight: 3 }, { id: 'nidorino', weight: 2 }, { id: 'nidorina', weight: 2 }, { id: 'venonat', weight: 2 }, { id: 'doduo', weight: 2 }, { id: 'paras', weight: 2 }] },
+      { from: 160, to: 206, interval: 0.51, batch: 6, maxAlive: 160, level: [34, 37], enemies: [{ id: 'koffing', weight: 5 }, { id: 'grimer', weight: 4 }, { id: 'venonat', weight: 3 }, { id: 'arbok', weight: 3 }] }
     ],
 
     elites: [
-      { at: 120, id: 'marowak_elite', count: 1, level: 36 },
-      { at: 210, id: 'kangaskhan_elite', count: 1, level: 36 },
-      { at: 250, id: 'tauros_elite', count: 2, level: 36 },
-      { at: 300, id: 'scyther_elite', count: 2, level: 36 },
-      { at: 340, id: 'weezing_elite', count: 2, level: 36 }
+      { at: 67, id: 'marowak_elite', count: 1, level: 36 },
+      { at: 118, id: 'kangaskhan_elite', count: 1, level: 36 },
+      { at: 140, id: 'tauros_elite', count: 2, level: 36 },
+      { at: 168, id: 'scyther_elite', count: 2, level: 36 },
+      { at: 190, id: 'weezing_elite', count: 2, level: 36 }
     ],
 
     leader: {
@@ -318,32 +332,34 @@ export const STAGES = {
     type: 'gym',
     icon: 'tm-psychic',
     description: 'A Usina, a Ciclovia e a Silph Co. — até o Ginásio da Sabrina.',
-    duration: 390,
+    music: 'mus_silph', leaderMusic: 'mus_vs_gym_leader',
+    duration: 210,
+    xpScale: 1.36,   // a fase foi encurtada para 210s (era 390s): cada inimigo vale mais XP
     world: { width: 3200, height: 2100, theme: 'cave' },
-    scaling: { hp: 7.0, speed: 0.3, damage: 4.8 },
+    scaling: { hp: 7.0, speed: 0.3, damage: 5.2 },
     unlockedBy: 'gym_5_fuchsia',
 
     segments: [
       { from: 0, name: 'Usina', theme: 'cave' },
-      { from: 100, name: 'Rotas 16–18', theme: 'grass' },
-      { from: 200, name: 'Silph Co.', theme: 'gym', scene: 'saffron_gym' },
-      { from: 300, name: 'Ginásio de Saffron', theme: 'gym', scene: 'saffron_gym' }
+      { from: 54, name: 'Rotas 16–18', theme: 'grass' },
+      { from: 108, name: 'Silph Co.', theme: 'gym', scene: 'saffron_gym' },
+      { from: 162, name: 'Ginásio de Saffron', theme: 'gym', scene: 'saffron_gym' }
     ],
 
     // nível dos selvagens: acompanha a equipe, chegando perto do ace do líder
     // (os líderes têm os níveis do FireRed; ver CONFIG.enemies)
     waves: [
-      { from: 0, to: 110, interval: 0.9, batch: 4, maxAlive: 95, level: [33, 36], enemies: [{ id: 'voltorb', weight: 4 }, { id: 'magnemite', weight: 4 }, { id: 'pikachu', weight: 2 }, { id: 'magneton', weight: 1 }] },
-      { from: 95, to: 210, interval: 0.81, batch: 5, maxAlive: 125, level: [35, 38], enemies: [{ id: 'doduo', weight: 4 }, { id: 'fearow', weight: 3 }, { id: 'rattata', weight: 3 }, { id: 'grimer', weight: 2 }] },
-      { from: 195, to: 310, interval: 0.72, batch: 5, maxAlive: 150, level: [37, 40], enemies: [{ id: 'koffing', weight: 3 }, { id: 'arbok', weight: 3 }, { id: 'grimer', weight: 2 }, { id: 'drowzee', weight: 3 }, { id: 'machop', weight: 2 }, { id: 'machoke', weight: 1 }, { id: 'zubat', weight: 2 }] },
-      { from: 295, to: 382, interval: 0.68, batch: 6, maxAlive: 170, level: [39, 42], enemies: [{ id: 'drowzee', weight: 3 }, { id: 'kadabra', weight: 2 }, { id: 'slowpoke', weight: 3 }, { id: 'jynx', weight: 1 }] }
+      { from: 0, to: 59, interval: 0.66, batch: 4, maxAlive: 95, level: [33, 36], enemies: [{ id: 'voltorb', weight: 4 }, { id: 'magnemite', weight: 4 }, { id: 'pikachu', weight: 2 }, { id: 'magneton', weight: 1 }] },
+      { from: 51, to: 113, interval: 0.59, batch: 5, maxAlive: 125, level: [35, 38], enemies: [{ id: 'doduo', weight: 4 }, { id: 'fearow', weight: 3 }, { id: 'rattata', weight: 3 }, { id: 'grimer', weight: 2 }] },
+      { from: 105, to: 167, interval: 0.53, batch: 5, maxAlive: 150, level: [37, 40], enemies: [{ id: 'koffing', weight: 3 }, { id: 'arbok', weight: 3 }, { id: 'grimer', weight: 2 }, { id: 'drowzee', weight: 3 }, { id: 'machop', weight: 2 }, { id: 'machoke', weight: 1 }, { id: 'zubat', weight: 2 }] },
+      { from: 159, to: 206, interval: 0.5, batch: 6, maxAlive: 170, level: [39, 42], enemies: [{ id: 'drowzee', weight: 3 }, { id: 'kadabra', weight: 2 }, { id: 'slowpoke', weight: 3 }, { id: 'jynx', weight: 1 }] }
     ],
 
     elites: [
-      { at: 120, id: 'electabuzz_elite', count: 1, level: 41 },
-      { at: 190, id: 'dodrio_elite', count: 2, level: 41 },
-      { at: 260, id: 'muk_elite', count: 2, level: 41 },
-      { at: 330, id: 'hypno_elite', count: 2, level: 41 }
+      { at: 65, id: 'electabuzz_elite', count: 1, level: 41 },
+      { at: 102, id: 'dodrio_elite', count: 2, level: 41 },
+      { at: 140, id: 'muk_elite', count: 2, level: 41 },
+      { at: 178, id: 'hypno_elite', count: 2, level: 41 }
     ],
 
     leader: {
@@ -359,8 +375,8 @@ export const STAGES = {
     bossTeam: ['sabrina_kadabra', 'sabrina_mr_mime', 'sabrina_venomoth', 'sabrina_alakazam'],
     // presentes (como as trocas e o Dojo do FireRed): oferecidos uma vez, na hora marcada
     gifts: [
-      { at: 150, choices: ['lickitung'], title: 'Uma troca na Rota 18: Lickitung quer entrar para a sua equipe!' },
-      { at: 240, choices: ['hitmonlee', 'hitmonchan'], title: 'O Dojo de Saffron: escolha o seu prêmio!' }
+      { at: 81, choices: ['lickitung'], title: 'Uma troca na Rota 18: Lickitung quer entrar para a sua equipe!' },
+      { at: 129, choices: ['hitmonlee', 'hitmonchan'], title: 'O Dojo de Saffron: escolha o seu prêmio!' }
     ],
 
     capturePool: 'phase6',
@@ -379,34 +395,36 @@ export const STAGES = {
     type: 'gym',
     icon: 'tm-fire',
     description: 'As Rotas 19 e 20, as Ilhas Seafoam e a Mansão Pokémon — até o Ginásio do Blaine.',
-    duration: 405,
+    music: 'mus_cinnabar', leaderMusic: 'mus_vs_gym_leader',
+    duration: 210,
+    xpScale: 1.39,   // a fase foi encurtada para 210s (era 405s): cada inimigo vale mais XP
     world: { width: 3300, height: 2200, theme: 'grass' },
     scaling: { hp: 4.5, speed: 0.3, damage: 6.0 },
     unlockedBy: 'gym_6_saffron',
 
     segments: [
       { from: 0, name: 'Rotas 19 e 20', theme: 'grass' },
-      { from: 105, name: 'Ilhas Seafoam', theme: 'cave' },
-      { from: 205, name: 'Mansão Pokémon', theme: 'gym', scene: 'cinnabar_gym' },
-      { from: 305, name: 'Ginásio de Cinnabar', theme: 'gym', scene: 'cinnabar_gym' }
+      { from: 54, name: 'Ilhas Seafoam', theme: 'cave' },
+      { from: 106, name: 'Mansão Pokémon', theme: 'gym', scene: 'cinnabar_gym' },
+      { from: 158, name: 'Ginásio de Cinnabar', theme: 'gym', scene: 'cinnabar_gym' }
     ],
 
     // nível dos selvagens: acompanha a equipe, chegando perto do ace do líder
     // (os líderes têm os níveis do FireRed; ver CONFIG.enemies)
     waves: [
-      { from: 0, to: 115, interval: 0.85, batch: 5, maxAlive: 110, level: [38, 41], enemies: [{ id: 'tentacool', weight: 6 }, { id: 'horsea', weight: 3 }, { id: 'shellder', weight: 3 }, { id: 'staryu', weight: 2 }, { id: 'krabby', weight: 2 }] },
-      { from: 100, to: 215, interval: 0.77, batch: 5, maxAlive: 140, level: [40, 43], enemies: [{ id: 'seel', weight: 4 }, { id: 'golduck', weight: 2 }, { id: 'psyduck', weight: 2 }, { id: 'zubat', weight: 3 }, { id: 'slowpoke', weight: 3 }, { id: 'krabby', weight: 2 }] },
-      { from: 200, to: 315, interval: 0.72, batch: 6, maxAlive: 165, level: [42, 45], enemies: [{ id: 'growlithe', weight: 3 }, { id: 'ponyta', weight: 3 }, { id: 'grimer', weight: 3 }, { id: 'koffing', weight: 3 }, { id: 'rattata', weight: 2 }, { id: 'vulpix', weight: 2 }, { id: 'ditto', weight: 1 }] },
-      { from: 300, to: 397, interval: 0.68, batch: 6, maxAlive: 185, level: [44, 47], enemies: [{ id: 'ponyta', weight: 3 }, { id: 'growlithe', weight: 3 }, { id: 'vulpix', weight: 3 }] }
+      { from: 0, to: 60, interval: 0.61, batch: 5, maxAlive: 110, level: [38, 41], enemies: [{ id: 'tentacool', weight: 6 }, { id: 'horsea', weight: 3 }, { id: 'shellder', weight: 3 }, { id: 'staryu', weight: 2 }, { id: 'krabby', weight: 2 }] },
+      { from: 52, to: 111, interval: 0.55, batch: 5, maxAlive: 140, level: [40, 43], enemies: [{ id: 'seel', weight: 4 }, { id: 'golduck', weight: 2 }, { id: 'psyduck', weight: 2 }, { id: 'zubat', weight: 3 }, { id: 'slowpoke', weight: 3 }, { id: 'krabby', weight: 2 }] },
+      { from: 104, to: 163, interval: 0.52, batch: 6, maxAlive: 165, level: [42, 45], enemies: [{ id: 'growlithe', weight: 3 }, { id: 'ponyta', weight: 3 }, { id: 'grimer', weight: 3 }, { id: 'koffing', weight: 3 }, { id: 'rattata', weight: 2 }, { id: 'vulpix', weight: 2 }, { id: 'ditto', weight: 1 }] },
+      { from: 156, to: 206, interval: 0.49, batch: 6, maxAlive: 185, level: [44, 47], enemies: [{ id: 'ponyta', weight: 3 }, { id: 'growlithe', weight: 3 }, { id: 'vulpix', weight: 3 }] }
     ],
 
     elites: [
-      { at: 110, id: 'tentacruel_elite', count: 1, level: 46 },
-      { at: 180, id: 'dewgong_elite', count: 2, level: 46 },
-      { at: 230, id: 'cloyster_elite', count: 1, level: 46 },
-      { at: 280, id: 'weezing_elite', count: 2, level: 46 },
-      { at: 330, id: 'magmar_elite', count: 2, level: 46 },
-      { at: 370, id: 'rapidash_elite', count: 2, level: 46 }
+      { at: 57, id: 'tentacruel_elite', count: 1, level: 46 },
+      { at: 93, id: 'dewgong_elite', count: 2, level: 46 },
+      { at: 119, id: 'cloyster_elite', count: 1, level: 46 },
+      { at: 145, id: 'weezing_elite', count: 2, level: 46 },
+      { at: 171, id: 'magmar_elite', count: 2, level: 46 },
+      { at: 192, id: 'rapidash_elite', count: 2, level: 46 }
     ],
 
     leader: {
@@ -437,33 +455,35 @@ export const STAGES = {
     type: 'gym',
     icon: 'tm-ground',
     description: 'A Rota 21, o Esconderijo Rocket e a Rota 22 — até o Ginásio do Giovanni.',
-    duration: 420,
+    music: 'mus_rocket_hideout', leaderMusic: 'mus_vs_gym_leader',
+    duration: 210,
+    xpScale: 1.41,   // a fase foi encurtada para 210s (era 420s): cada inimigo vale mais XP
     world: { width: 3400, height: 2200, theme: 'grass' },
-    scaling: { hp: 3.2, speed: 0.3, damage: 9.8 },
+    scaling: { hp: 3.2, speed: 0.3, damage: 12.5 },
     unlockedBy: 'gym_7_cinnabar',
 
     segments: [
       { from: 0, name: 'Rota 21', theme: 'grass' },
-      { from: 110, name: 'Esconderijo Rocket', theme: 'gym', scene: 'viridian_gym' },
-      { from: 215, name: 'Rota 22', theme: 'grass' },
-      { from: 315, name: 'Ginásio de Viridian', theme: 'gym', scene: 'viridian_gym' }
+      { from: 55, name: 'Esconderijo Rocket', theme: 'gym', scene: 'viridian_gym' },
+      { from: 108, name: 'Rota 22', theme: 'grass' },
+      { from: 158, name: 'Ginásio de Viridian', theme: 'gym', scene: 'viridian_gym' }
     ],
 
     // nível dos selvagens: acompanha a equipe, chegando perto do ace do líder
     // (os líderes têm os níveis do FireRed; ver CONFIG.enemies)
     waves: [
-      { from: 0, to: 120, interval: 0.85, batch: 5, maxAlive: 120, level: [43, 46], enemies: [{ id: 'tangela', weight: 3 }, { id: 'tentacool', weight: 3 }, { id: 'pidgeotto', weight: 3 }, { id: 'rattata', weight: 2 }] },
-      { from: 105, to: 225, interval: 0.77, batch: 5, maxAlive: 150, level: [45, 48], enemies: [{ id: 'arbok', weight: 3 }, { id: 'koffing', weight: 2 }, { id: 'grimer', weight: 2 }, { id: 'zubat', weight: 2 }, { id: 'machoke', weight: 2 }, { id: 'drowzee', weight: 2 }, { id: 'rattata', weight: 2 }] },
-      { from: 210, to: 325, interval: 0.72, batch: 6, maxAlive: 175, level: [47, 50], enemies: [{ id: 'mankey', weight: 3 }, { id: 'nidorino', weight: 3 }, { id: 'nidorina', weight: 3 }, { id: 'fearow', weight: 2 }, { id: 'ponyta', weight: 2 }] },
-      { from: 310, to: 412, interval: 0.63, batch: 6, maxAlive: 200, level: [49, 52], enemies: [{ id: 'rhyhorn', weight: 3 }, { id: 'diglett', weight: 3 }, { id: 'sandslash', weight: 2 }, { id: 'cubone', weight: 2 }, { id: 'nidorino', weight: 2 }] }
+      { from: 0, to: 60, interval: 0.6, batch: 5, maxAlive: 120, level: [43, 46], enemies: [{ id: 'tangela', weight: 3 }, { id: 'tentacool', weight: 3 }, { id: 'pidgeotto', weight: 3 }, { id: 'rattata', weight: 2 }] },
+      { from: 52, to: 112, interval: 0.54, batch: 5, maxAlive: 150, level: [45, 48], enemies: [{ id: 'arbok', weight: 3 }, { id: 'koffing', weight: 2 }, { id: 'grimer', weight: 2 }, { id: 'zubat', weight: 2 }, { id: 'machoke', weight: 2 }, { id: 'drowzee', weight: 2 }, { id: 'rattata', weight: 2 }] },
+      { from: 105, to: 162, interval: 0.51, batch: 6, maxAlive: 175, level: [47, 50], enemies: [{ id: 'mankey', weight: 3 }, { id: 'nidorino', weight: 3 }, { id: 'nidorina', weight: 3 }, { id: 'fearow', weight: 2 }, { id: 'ponyta', weight: 2 }] },
+      { from: 155, to: 206, interval: 0.45, batch: 6, maxAlive: 200, level: [49, 52], enemies: [{ id: 'rhyhorn', weight: 3 }, { id: 'diglett', weight: 3 }, { id: 'sandslash', weight: 2 }, { id: 'cubone', weight: 2 }, { id: 'nidorino', weight: 2 }] }
     ],
 
     elites: [
-      { at: 130, id: 'rhydon_elite', count: 1, level: 51 },
-      { at: 200, id: 'nidoking_elite', count: 1, level: 51 },
-      { at: 260, id: 'nidoqueen_elite', count: 1, level: 51 },
-      { at: 330, id: 'dugtrio_elite', count: 2, level: 51 },
-      { at: 380, id: 'marowak_elite', count: 2, level: 51 }
+      { at: 65, id: 'rhydon_elite', count: 1, level: 51 },
+      { at: 100, id: 'nidoking_elite', count: 1, level: 51 },
+      { at: 130, id: 'nidoqueen_elite', count: 1, level: 51 },
+      { at: 165, id: 'dugtrio_elite', count: 2, level: 51 },
+      { at: 190, id: 'marowak_elite', count: 2, level: 51 }
     ],
 
     leader: {
@@ -494,30 +514,32 @@ export const STAGES = {
     type: 'gym',
     icon: 'tm-ice',
     description: 'A Rota 23 e a Victory Road — até a sala da Lorelei.',
-    duration: 300,
+    music: 'mus_victory_road', leaderMusic: 'mus_vs_gym_leader',
+    duration: 210,
+    xpScale: 1.2,   // a fase foi encurtada para 210s (era 300s): cada inimigo vale mais XP
     world: { width: 3000, height: 2000, theme: 'cave' },
-    scaling: { hp: 4.0, speed: 0.3, damage: 3.8 },
+    scaling: { hp: 4.0, speed: 0.3, damage: 4.6 },
     unlockedBy: 'gym_8_viridian',
 
     segments: [
       { from: 0, name: 'Rota 23', theme: 'grass' },
-      { from: 100, name: 'Victory Road', theme: 'cave' },
-      { from: 200, name: 'Sala da Lorelei', theme: 'gym', scene: 'lorelei_room' }
+      { from: 70, name: 'Victory Road', theme: 'cave' },
+      { from: 140, name: 'Sala da Lorelei', theme: 'gym', scene: 'lorelei_room' }
     ],
 
     // nível dos selvagens: acompanha a equipe, chegando perto do ace do líder
     // (os líderes têm os níveis do FireRed; ver CONFIG.enemies)
     waves: [
-      { from: 0, to: 110, interval: 0.81, batch: 5, maxAlive: 130, level: [48, 51], enemies: [{ id: 'arbok', weight: 3 }, { id: 'fearow', weight: 3 }, { id: 'mankey', weight: 3 }, { id: 'machoke', weight: 2 }, { id: 'cubone', weight: 2 }] },
-      { from: 95, to: 210, interval: 0.72, batch: 6, maxAlive: 170, level: [50, 53], enemies: [{ id: 'geodude_wild', weight: 3 }, { id: 'machoke', weight: 3 }, { id: 'zubat', weight: 2 }, { id: 'kadabra', weight: 1 }, { id: 'sandslash', weight: 2 }] },
-      { from: 195, to: 292, interval: 0.68, batch: 6, maxAlive: 200, level: [52, 55], enemies: [{ id: 'seel', weight: 3 }, { id: 'shellder', weight: 3 }, { id: 'jynx', weight: 2 }, { id: 'slowpoke', weight: 3 }] }
+      { from: 0, to: 77, interval: 0.68, batch: 5, maxAlive: 130, level: [48, 51], enemies: [{ id: 'arbok', weight: 3 }, { id: 'fearow', weight: 3 }, { id: 'mankey', weight: 3 }, { id: 'machoke', weight: 2 }, { id: 'cubone', weight: 2 }] },
+      { from: 66, to: 147, interval: 0.6, batch: 6, maxAlive: 170, level: [50, 53], enemies: [{ id: 'geodude_wild', weight: 3 }, { id: 'machoke', weight: 3 }, { id: 'zubat', weight: 2 }, { id: 'kadabra', weight: 1 }, { id: 'sandslash', weight: 2 }] },
+      { from: 136, to: 204, interval: 0.57, batch: 6, maxAlive: 200, level: [52, 55], enemies: [{ id: 'seel', weight: 3 }, { id: 'shellder', weight: 3 }, { id: 'jynx', weight: 2 }, { id: 'slowpoke', weight: 3 }] }
     ],
 
     elites: [
-      { at: 120, id: 'primeape', count: 2, level: 54 },
-      { at: 200, id: 'golbat', count: 2, level: 54 },
-      { at: 250, id: 'dewgong_elite', count: 2, level: 54 },
-      { at: 280, id: 'cloyster_elite', count: 1, level: 54 }
+      { at: 84, id: 'primeape', count: 2, level: 54 },
+      { at: 140, id: 'golbat', count: 2, level: 54 },
+      { at: 175, id: 'dewgong_elite', count: 2, level: 54 },
+      { at: 196, id: 'cloyster_elite', count: 1, level: 54 }
     ],
 
     leader: {
@@ -546,28 +568,30 @@ export const STAGES = {
     type: 'gym',
     icon: 'tm-fighting',
     description: 'O corredor da Liga — até a sala do Bruno.',
-    duration: 280,
+    music: 'mus_trainer_tower', leaderMusic: 'mus_vs_gym_leader',
+    duration: 210,
+    xpScale: 1.15,   // a fase foi encurtada para 210s (era 280s): cada inimigo vale mais XP
     world: { width: 3000, height: 2000, theme: 'gym' },
-    scaling: { hp: 2.4, speed: 0.3, damage: 7.8 },
+    scaling: { hp: 2.4, speed: 0.3, damage: 10 },
     unlockedBy: 'e4_lorelei',
 
     segments: [
       { from: 0, name: 'Corredor da Liga', theme: 'gym', scene: 'league_hall' },
-      { from: 180, name: 'Sala do Bruno', theme: 'gym', scene: 'bruno_room' }
+      { from: 135, name: 'Sala do Bruno', theme: 'gym', scene: 'bruno_room' }
     ],
 
     // nível dos selvagens: acompanha a equipe, chegando perto do ace do líder
     // (os líderes têm os níveis do FireRed; ver CONFIG.enemies)
     waves: [
-      { from: 0, to: 140, interval: 0.77, batch: 6, maxAlive: 160, level: [53, 56], enemies: [{ id: 'machop', weight: 3 }, { id: 'machoke', weight: 4 }, { id: 'mankey', weight: 3 }, { id: 'geodude_wild', weight: 2 }] },
-      { from: 125, to: 272, interval: 0.68, batch: 6, maxAlive: 200, level: [55, 58], enemies: [{ id: 'machoke', weight: 4 }, { id: 'rhyhorn', weight: 2 }, { id: 'sandslash', weight: 2 }, { id: 'mankey', weight: 2 }] }
+      { from: 0, to: 105, interval: 0.67, batch: 6, maxAlive: 160, level: [53, 56], enemies: [{ id: 'machop', weight: 3 }, { id: 'machoke', weight: 4 }, { id: 'mankey', weight: 3 }, { id: 'geodude_wild', weight: 2 }] },
+      { from: 94, to: 204, interval: 0.59, batch: 6, maxAlive: 200, level: [55, 58], enemies: [{ id: 'machoke', weight: 4 }, { id: 'rhyhorn', weight: 2 }, { id: 'sandslash', weight: 2 }, { id: 'mankey', weight: 2 }] }
     ],
 
     elites: [
-      { at: 100, id: 'onix_elite', count: 2, level: 57 },
-      { at: 170, id: 'hitmonlee_elite', count: 1, level: 57 },
-      { at: 200, id: 'hitmonchan_elite', count: 1, level: 57 },
-      { at: 250, id: 'machamp_elite', count: 2, level: 57 }
+      { at: 75, id: 'onix_elite', count: 2, level: 57 },
+      { at: 128, id: 'hitmonlee_elite', count: 1, level: 57 },
+      { at: 150, id: 'hitmonchan_elite', count: 1, level: 57 },
+      { at: 188, id: 'machamp_elite', count: 2, level: 57 }
     ],
 
     leader: {
@@ -596,27 +620,29 @@ export const STAGES = {
     type: 'gym',
     icon: 'tm-ghost',
     description: 'O corredor da Liga — até a sala da Agatha.',
-    duration: 280,
+    music: 'mus_poke_tower', leaderMusic: 'mus_vs_gym_leader',
+    duration: 210,
+    xpScale: 1.15,   // a fase foi encurtada para 210s (era 280s): cada inimigo vale mais XP
     world: { width: 3000, height: 2000, theme: 'cave' },
-    scaling: { hp: 2.9, speed: 0.3, damage: 3.25 },
+    scaling: { hp: 2.9, speed: 0.3, damage: 3.8 },
     unlockedBy: 'e4_bruno',
 
     segments: [
       { from: 0, name: 'Corredor da Liga', theme: 'gym', scene: 'league_hall' },
-      { from: 180, name: 'Sala da Agatha', theme: 'cave', scene: 'agatha_room' }
+      { from: 135, name: 'Sala da Agatha', theme: 'cave', scene: 'agatha_room' }
     ],
 
     // nível dos selvagens: acompanha a equipe, chegando perto do ace do líder
     // (os líderes têm os níveis do FireRed; ver CONFIG.enemies)
     waves: [
-      { from: 0, to: 140, interval: 0.77, batch: 6, maxAlive: 160, level: [55, 58], enemies: [{ id: 'gastly', weight: 5 }, { id: 'haunter', weight: 3 }, { id: 'zubat', weight: 2 }, { id: 'arbok', weight: 2 }] },
-      { from: 125, to: 272, interval: 0.68, batch: 6, maxAlive: 200, level: [57, 60], enemies: [{ id: 'haunter', weight: 4 }, { id: 'gastly', weight: 3 }, { id: 'arbok', weight: 2 }, { id: 'kadabra', weight: 1 }] }
+      { from: 0, to: 105, interval: 0.67, batch: 6, maxAlive: 160, level: [55, 58], enemies: [{ id: 'gastly', weight: 5 }, { id: 'haunter', weight: 3 }, { id: 'zubat', weight: 2 }, { id: 'arbok', weight: 2 }] },
+      { from: 94, to: 204, interval: 0.59, batch: 6, maxAlive: 200, level: [57, 60], enemies: [{ id: 'haunter', weight: 4 }, { id: 'gastly', weight: 3 }, { id: 'arbok', weight: 2 }, { id: 'kadabra', weight: 1 }] }
     ],
 
     elites: [
-      { at: 100, id: 'golbat', count: 2, level: 59 },
-      { at: 170, id: 'arbok_elite', count: 2, level: 59 },
-      { at: 230, id: 'gengar_elite', count: 2, level: 59 }
+      { at: 75, id: 'golbat', count: 2, level: 59 },
+      { at: 128, id: 'arbok_elite', count: 2, level: 59 },
+      { at: 172, id: 'gengar_elite', count: 2, level: 59 }
     ],
 
     leader: {
@@ -645,27 +671,29 @@ export const STAGES = {
     type: 'gym',
     icon: 'tm-dragon',
     description: 'O corredor da Liga — até a sala do Lance.',
-    duration: 280,
+    music: 'mus_sevii_dungeon', leaderMusic: 'mus_vs_gym_leader',
+    duration: 210,
+    xpScale: 1.15,   // a fase foi encurtada para 210s (era 280s): cada inimigo vale mais XP
     world: { width: 3000, height: 2000, theme: 'cave' },
-    scaling: { hp: 2.7, speed: 0.3, damage: 2.3 },
+    scaling: { hp: 2.7, speed: 0.3, damage: 2.8 },
     unlockedBy: 'e4_agatha',
 
     segments: [
       { from: 0, name: 'Corredor da Liga', theme: 'gym', scene: 'league_hall' },
-      { from: 180, name: 'Sala do Lance', theme: 'cave', scene: 'lance_room' }
+      { from: 135, name: 'Sala do Lance', theme: 'cave', scene: 'lance_room' }
     ],
 
     // nível dos selvagens: acompanha a equipe, chegando perto do ace do líder
     // (os líderes têm os níveis do FireRed; ver CONFIG.enemies)
     waves: [
-      { from: 0, to: 140, interval: 0.77, batch: 6, maxAlive: 160, level: [57, 60], enemies: [{ id: 'dratini', weight: 4 }, { id: 'dragonair', weight: 2 }, { id: 'seadra', weight: 3 }, { id: 'horsea', weight: 3 }] },
-      { from: 125, to: 272, interval: 0.68, batch: 6, maxAlive: 200, level: [59, 62], enemies: [{ id: 'dragonair', weight: 4 }, { id: 'seadra', weight: 3 }, { id: 'kingler', weight: 2 }] }
+      { from: 0, to: 105, interval: 0.67, batch: 6, maxAlive: 160, level: [57, 60], enemies: [{ id: 'dratini', weight: 4 }, { id: 'dragonair', weight: 2 }, { id: 'seadra', weight: 3 }, { id: 'horsea', weight: 3 }] },
+      { from: 94, to: 204, interval: 0.59, batch: 6, maxAlive: 200, level: [59, 62], enemies: [{ id: 'dragonair', weight: 4 }, { id: 'seadra', weight: 3 }, { id: 'kingler', weight: 2 }] }
     ],
 
     elites: [
-      { at: 100, id: 'gyarados_elite', count: 2, level: 61 },
-      { at: 170, id: 'aerodactyl_elite', count: 2, level: 61 },
-      { at: 230, id: 'gyarados_elite', count: 2, level: 61 }
+      { at: 75, id: 'gyarados_elite', count: 2, level: 61 },
+      { at: 128, id: 'aerodactyl_elite', count: 2, level: 61 },
+      { at: 172, id: 'gyarados_elite', count: 2, level: 61 }
     ],
 
     leader: {
@@ -694,27 +722,29 @@ export const STAGES = {
     type: 'gym',
     icon: 'badge',
     description: 'O Platô Indigo — o desafio final da jornada.',
-    duration: 240,
+    music: 'mus_encounter_rival', leaderMusic: 'mus_vs_champion',
+    duration: 210,
+    xpScale: 1.07,   // a fase foi encurtada para 210s (era 240s): cada inimigo vale mais XP
     world: { width: 3000, height: 2000, theme: 'gym' },
-    scaling: { hp: 2.4, speed: 0.3, damage: 2.4 },
+    scaling: { hp: 2.4, speed: 0.3, damage: 2.1 },
     unlockedBy: 'e4_lance',
 
     segments: [
       { from: 0, name: 'Platô Indigo', theme: 'gym', scene: 'league_hall' },
-      { from: 150, name: 'Sala do Campeão', theme: 'gym', scene: 'champion_room' }
+      { from: 131, name: 'Sala do Campeão', theme: 'gym', scene: 'champion_room' }
     ],
 
     // nível dos selvagens: acompanha a equipe, chegando perto do ace do líder
     // (os líderes têm os níveis do FireRed; ver CONFIG.enemies)
     waves: [
-      { from: 0, to: 120, interval: 0.77, batch: 6, maxAlive: 170, level: [59, 62], enemies: [{ id: 'golduck', weight: 3 }, { id: 'kadabra', weight: 3 }, { id: 'magneton', weight: 3 }, { id: 'kingler', weight: 2 }, { id: 'ditto', weight: 1 }] },
-      { from: 105, to: 232, interval: 0.68, batch: 6, maxAlive: 210, level: [61, 64], enemies: [{ id: 'rhyhorn', weight: 2 }, { id: 'sandslash', weight: 2 }, { id: 'golduck', weight: 2 }, { id: 'seadra', weight: 2 }, { id: 'machoke', weight: 2 }] }
+      { from: 0, to: 105, interval: 0.72, batch: 6, maxAlive: 170, level: [59, 62], enemies: [{ id: 'golduck', weight: 3 }, { id: 'kadabra', weight: 3 }, { id: 'magneton', weight: 3 }, { id: 'kingler', weight: 2 }, { id: 'ditto', weight: 1 }] },
+      { from: 92, to: 203, interval: 0.64, batch: 6, maxAlive: 210, level: [61, 64], enemies: [{ id: 'rhyhorn', weight: 2 }, { id: 'sandslash', weight: 2 }, { id: 'golduck', weight: 2 }, { id: 'seadra', weight: 2 }, { id: 'machoke', weight: 2 }] }
     ],
 
     elites: [
-      { at: 90, id: 'kadabra_elite', count: 2, level: 63 },
-      { at: 150, id: 'magneton_elite', count: 2, level: 63 },
-      { at: 200, id: 'golduck_elite', count: 2, level: 63 }
+      { at: 79, id: 'kadabra_elite', count: 2, level: 63 },
+      { at: 131, id: 'magneton_elite', count: 2, level: 63 },
+      { at: 175, id: 'golduck_elite', count: 2, level: 63 }
     ],
 
     leader: {

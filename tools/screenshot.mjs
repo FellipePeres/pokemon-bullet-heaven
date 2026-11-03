@@ -130,6 +130,26 @@ const ROTEIROS = {
     { run: "game.newGame(); game.chooseTrainer('red'); game.chooseStarter('squirtle'); game.campaign.clearedStages.push('gym_1_pewter'); game.menus.show('screen-title')" },
     { wait: 900 }, { shot: 'titulo-com-save' }
   ],
+  // o PC do lobby (equipe de 6 e 3 guardados) e a tela de equipe cheia na partida
+  pc: [
+    { open: 'index.html' }, { wait: 500 },
+    { run: "game.newGame(); game.chooseTrainer('leaf'); game.chooseStarter('bulbasaur'); game.campaign.clearedStages.push('gym_1_pewter', 'gym_2_cerulean');" +
+           "import('./src/game/Run.js').then(({ Run }) => { const r = new Run('gym_3_vermilion', { starter: 'bulbasaur' });" +
+           "['pidgey', 'pikachu', 'geodude', 'oddish', 'zubat'].forEach((id) => r.team.add(id, 22)); r.team.members[0].level = 24;" +
+           "r.captureSystem.captureToPC('meowth'); r.captureSystem.captureToPC('psyduck'); r.captureSystem.captureToPC('growlithe');" +
+           "game.campaign.journey = { team: r.team.serialize(), pc: r.pc }; game.openCampaign(); })" },
+    { wait: 1200 }, { shot: 'pc-lobby' },
+    { run: "game.menus.showModal('modal-pc')" }, { wait: 700 }, { shot: 'pc-modal' },
+    { run: "game.menus.pcSelected = game.campaign.journey.team.members[2].uid; game.menus.buildPC()" }, { wait: 400 }, { shot: 'pc-selecionado' },
+    { run: "game.menus.closeModal(); game.startStage('gym_3_vermilion')" }, { wait: 1500 },
+    { run: "game.run.state = 'capture'; game.captureOpen = true; game.pickCapture('meowth')" }, { wait: 800 }, { shot: 'pc-captura', raw: true }
+  ],
+  // as conquistas em níveis, com algumas prontas para coletar e outras já subidas de degrau
+  conquistas: [
+    { open: 'index.html' }, { wait: 500 },
+    { run: "Object.assign(game.profile.stats, { totalCaptures: 12, totalKills: 640, runsPlayed: 6, stagesCleared: 2, badges: 2, maxRunLevel: 24, evolutions: 3 }); game.profile.achievements.tiers = { catcher: 1, hunter: 1, runs: 1 }; game.menus.showModal('modal-achievements')" },
+    { wait: 800 }, { shot: 'conquistas' }
+  ],
   // todas as telas, uma por foto: para conferir o visual (use antes e depois de mexer no CSS)
   telas: [
     { open: 'index.html' }, { wait: 1200 }, { shot: 'tela-01-titulo' },

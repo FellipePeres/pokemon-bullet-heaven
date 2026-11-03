@@ -399,6 +399,11 @@ button { font: inherit; color: inherit; }
 }
 #btn-continue:not(:disabled) .title-seal { color: var(--gba-frame); border-color: var(--gba-frame); }
 
+/* a engrenagem fora do título e da partida (lá ela mora nos atalhos de cada um) */
+#gear-btn.gear-float { position: absolute; top: 18px; right: 18px; z-index: 30; }
+#app[data-screen="screen-title"] .gear-float,
+#app[data-screen="game"] .gear-float { display: none; }
+
 /* --- atalhos no canto --- */
 .title-corner {
   position: absolute;
@@ -1023,7 +1028,53 @@ button { font: inherit; color: inherit; }
 .stats-chip { font-size: 15px; font-weight: 600; }
 #kill-count::before { content: '⚔ '; color: var(--hp-low); }
 #ball-count::before { content: '◓ '; color: var(--gba-gold); }
-.stats-chip .icon-btn { min-width: 30px; height: 30px; font-size: 12px; }
+.stats-chip .icon-btn { min-width: 30px; height: 30px; font-size: 12px; padding: 0 6px; }
+
+/* ============ o mixer de volume (Opções) ============
+   A barra em degraus e a Poké Ball de manopla, como no Pokemon All. */
+.volume-row { display: flex; align-items: center; gap: 12px; margin-top: 8px; }
+.volume-value { min-width: 48px; font-weight: 700; color: var(--gba-frame); text-align: right; }
+.volume-slider {
+  --fill: 60%;
+  flex: 1;
+  height: 22px;
+  appearance: none;
+  -webkit-appearance: none;
+  background: transparent;
+  cursor: pointer;
+}
+.volume-slider::-webkit-slider-runnable-track {
+  height: 12px;
+  border: 2px solid var(--gba-frame);
+  border-radius: 2px;
+  background:
+    repeating-linear-gradient(90deg, transparent 0 6px, rgba(0, 0, 0, .12) 6px 8px),
+    linear-gradient(90deg, var(--gba-frame) var(--fill), var(--gba-button) var(--fill));
+}
+.volume-slider::-moz-range-track {
+  height: 12px;
+  border: 2px solid var(--gba-frame);
+  border-radius: 2px;
+  background:
+    repeating-linear-gradient(90deg, transparent 0 6px, rgba(0, 0, 0, .12) 6px 8px),
+    linear-gradient(90deg, var(--gba-frame) var(--fill), var(--gba-button) var(--fill));
+}
+.volume-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 26px;
+  height: 26px;
+  margin-top: -9px;
+  border: none;
+  background: url(../assets/items/poke-ball.png) center / 38px 38px no-repeat;
+  image-rendering: pixelated;
+}
+.volume-slider::-moz-range-thumb {
+  width: 26px;
+  height: 26px;
+  border: none;
+  background: url(../assets/items/poke-ball.png) center / 38px 38px no-repeat;
+  image-rendering: pixelated;
+}
 
 /* ====== equipe no HUD ====== */
 #team-hud { display: flex; flex-direction: column; align-items: center; gap: 10px; }
@@ -1416,3 +1467,68 @@ button { font: inherit; color: inherit; }
   object-fit: contain;
   image-rendering: pixelated;
 }
+
+/* ================= CONQUISTAS EM NÍVEIS =================
+   O degrau em algarismo romano e uma Poké Ball por degrau: cheia nos
+   coletados, piscando no que está pronto para coletar. */
+.tier-badge {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 1px 6px 0;
+  font-family: var(--font-arcade);
+  font-size: 9px;
+  color: var(--gba-frame);
+  background: var(--gba-button);
+  border: 2px solid var(--gba-frame);
+  border-radius: 2px;
+  vertical-align: 2px;
+}
+.tier-pips { display: inline-flex; gap: 3px; margin-right: 6px; vertical-align: -3px; }
+.tier-pip {
+  width: 14px;
+  height: 14px;
+  background: url(../assets/items/poke-ball.png) center / 21px 21px no-repeat;
+  image-rendering: pixelated;
+  filter: grayscale(1) opacity(.35);
+}
+.tier-pip.on { filter: none; }
+.tier-pip.ready { filter: none; animation: pulse-up 1s steps(2) infinite; }
+
+
+/* ================================ PC ================================
+   A equipe em cima e o PC embaixo, cada Pokémon numa caixinha do jogo. */
+.pc-title {
+  margin: 4px 0 8px;
+  font-family: var(--font-arcade);
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--gba-frame);
+  text-shadow: 2px 2px 0 var(--gba-shade);
+}
+.pc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); gap: 8px; margin-bottom: 14px; }
+.pc-mon {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 6px 4px;
+  font-family: var(--font-pixel);
+  color: var(--gba-ink);
+  background: var(--gba-button);
+  border: 2px solid var(--gba-shade);
+  border-radius: 3px;
+  box-shadow: var(--relief);
+  cursor: pointer;
+  transition: transform .1s var(--ease);
+}
+.pc-mon:hover { transform: translateY(-2px); border-color: var(--gba-frame); }
+.pc-mon img { width: 56px; height: 56px; object-fit: contain; image-rendering: pixelated; }
+.pc-mon b { font-size: 14px; }
+.pc-mon span { font-family: var(--font-arcade); font-size: 8px; color: var(--gba-frame); }
+.pc-mon.selected { border-color: var(--poke-red); box-shadow: inset 0 0 0 2px var(--poke-red); transform: translateY(-3px); }
+.pc-mon.disabled { opacity: .55; cursor: not-allowed; }
+.pc-actions { display: flex; justify-content: center; min-height: 0; margin: -4px 0 12px; }
+.pc-actions:empty { display: none; }
+.pc-empty { grid-column: 1 / -1; font-size: 15px; color: var(--gba-ink-soft); padding: 10px 4px; border-top: 3px dotted var(--gba-shade); }
+/* na tela de "equipe cheia", a caixinha de mandar o novo para o PC */
+.card.to-pc { box-shadow: inset 0 0 0 3px var(--gba-frame); }

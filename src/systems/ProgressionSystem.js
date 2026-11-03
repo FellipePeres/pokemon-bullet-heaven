@@ -245,6 +245,7 @@ export class ProgressionSystem {
     if (upgradeId.startsWith('tm:')) {
       this.learnTM(member, upgradeId.slice(3));
       run.refreshStats();
+      bus.emit(EVENTS.UPGRADE_TAKEN, { upgrade: { id: upgradeId, scope: 'tm' }, member });
       return;
     }
 

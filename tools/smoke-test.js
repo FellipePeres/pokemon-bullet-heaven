@@ -20,6 +20,7 @@ import { hpRatio } from '../src/systems/stats.js';
 import { nextMoveFor, moveLineOf } from '../src/data/tms.js';
 import { getPokemon } from '../src/data/pokemon.js';
 import { Pickup } from '../src/entities/Pickup.js';
+import { swapWithPC } from '../src/systems/pc.js';
 
 let failures = 0;
 
@@ -354,6 +355,45 @@ console.log('\n[captura, espadinha e troca]');
   check('a troca põe quem entra no lugar do slot escolhido', run.team.active[1] === entering && !run.team.active.includes(leaving));
 }
 
+// ---------------------------------------------- 5.10 PC e capturas
+console.log('\n[PC e capturas]');
+{
+  const run = new Run('gym_3_vermilion', { starter: 'charmander', campaignStarter: 'charmander' });
+  run.team.members[0].level = 30;
+  const offered = run.captureSystem.rollChoices();
+  check('cada Poké Ball oferece 4 opções', offered.length === CONFIG.capture.choices && CONFIG.capture.choices === 4,
+        offered.map((p) => p.name).join(', '));
+  // o inicial do próprio jogador nunca volta como captura; os outros dois podem
+  const species = new Set();
+  for (let i = 0; i < 300; i++) run.captureSystem.rollChoices().forEach((p) => species.add(p.id));
+  check('o próprio inicial não aparece na Poké Ball', !species.has('charmander'));
+  check('as fases acumulam as espécies das anteriores', species.has('caterpie') && species.has('zubat'),
+        `${species.size} espécies vistas`);
+
+  while (!run.team.isFull) run.team.add('pidgey', 20) ?? run.team.add('rattata', 20);
+  const leaving = run.team.members[1];
+  run.captureSystem.captureReplacing(leaving.uid, 'meowth');
+  check('equipe cheia: quem sai vai para o PC', run.pc.some((m) => m.uid === leaving.uid) && run.team.has('meowth'));
+  const sizeBefore = run.team.members.length;
+  run.captureSystem.captureToPC('psyduck');
+  check('ou o novo vai direto para o PC, sem mexer na equipe',
+        run.pc.some((m) => m.pokemonId === 'psyduck') && run.team.members.length === sizeBefore && !run.team.has('psyduck'));
+  check('o PC da partida vai no autosave', run.serialize().pc.length === 2);
+
+  // no lobby: trocar, retirar e depositar
+  const journey = { team: run.team.serialize(), pc: run.pc.map((m) => ({ ...m })) };
+  const out = journey.team.members[0].uid;
+  const into = journey.pc[0].uid;
+  check('trocar um da equipe por um do PC', swapWithPC(journey, out, into, 6)
+        && journey.team.members.some((m) => m.uid === into) && journey.pc.some((m) => m.uid === out)
+        && journey.team.active.includes(into));
+  check('com a equipe cheia, só retirar não dá', !swapWithPC(journey, null, journey.pc[0].uid, 6));
+  check('depositar abre vaga, e aí retirar dá', swapWithPC(journey, journey.team.members[0].uid, null, 6)
+        && swapWithPC(journey, null, journey.pc[0].uid, 6));
+  const solo = { team: { members: [journey.team.members[0]], active: [journey.team.members[0].uid] }, pc: [] };
+  check('a equipe nunca fica vazia', !swapWithPC(solo, solo.team.members[0].uid, null, 6));
+}
+
 // ------------------------------------------------------- 6. upgrades/dados
 console.log('\n[dados]');
 {
@@ -383,7 +423,7 @@ console.log('\n[conteúdo]');
 {
   // presentes da Fase 6, um de cada vez: a troca do Lickitung e o Dojo de Saffron
   const dojo = new Run('gym_6_saffron', { starter: 'charmander' });
-  dojo.time = 241;
+  dojo.time = STAGES.gym_6_saffron.gifts[1].at + 1;   // depois dos dois presentes, antes do líder
   dojo.update(DT, { x: 0, y: 0 });
   const first = dojo.captureSystem.rollChoices().map((p) => p.id).join(',');
   dojo.pendingGift = null;

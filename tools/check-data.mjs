@@ -163,13 +163,16 @@ badSegments.length ? fail(`trechos com cenário inexistente: ${badSegments.join(
   : ok(`${Object.keys(SCENES).length} cenários do FireRed (${usedScenes.size} usados nas fases), todas as metatiles extraídas`);
 
 // pools de captura: mostra quanto de cada fase já está implementado
-console.log('\nPools de captura (espécies já implementadas / total da tabela):');
+// desde a 0.11 cada fase acumula as anteriores (metade do peso) e, da Fase 3 em diante, os iniciais
+console.log('\nPools de captura (espécies da própria tabela + as que vêm das anteriores):');
 for (const [id, pool] of Object.entries(CAPTURE_POOLS)) {
-  const total = Object.keys(pool.species).length;
-  const ready = poolEntries(id).length;
-  const chance = poolEntries(id).reduce((sum, e) => sum + e.weight, 0);
-  const bar = ready === total ? '✔' : '…';
-  console.log(`  ${bar} ${id.padEnd(8)} ${String(ready).padStart(2)}/${total} espécies · ${chance.toFixed(1)}% da tabela disponível`);
+  const own = Object.keys(pool.species);
+  const missing = own.filter((species) => !POKEMON[species]);
+  const entries = poolEntries(id);
+  const bar = missing.length ? '…' : '✔';
+  console.log(`  ${bar} ${id.padEnd(8)} ${String(entries.length).padStart(3)} espécies ` +
+              `(${own.length - missing.length} da tabela + ${entries.length - (own.length - missing.length)} de antes)` +
+              (missing.length ? ` · faltam: ${missing.join(', ')}` : ''));
 }
 
 console.log(`\n=== ${problems === 0 ? 'DADOS OK' : problems + ' PROBLEMA(S)'} ===\n`);

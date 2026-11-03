@@ -8,12 +8,13 @@ import { CONFIG } from '../core/config.js';
  */
 const KEY = 'pbh.options';
 
+// Desde a 0.11 os Pokémon ativos são sempre 3 e os sprites ficam sempre
+// ligados (pedido do Fellipe): essas opções saíram, e o que estiver guardado
+// delas é ignorado.
 const OPTIONS = {
-  activeSlots: [CONFIG.team, 'activeSlots'],
-  animatedUI: [CONFIG.sprites, 'useAnimatedUI'],
-  remoteSprites: [CONFIG.sprites, 'useRemote'],
   autosave: [CONFIG.save, 'useLocalStorage'],
-  screenShake: [CONFIG.fx, 'screenShake']
+  screenShake: [CONFIG.fx, 'screenShake'],
+  musicVolume: [CONFIG.audio, 'musicVolume']
 };
 
 /** Aplica em CONFIG as opções guardadas (as que existirem e tiverem o tipo certo). */

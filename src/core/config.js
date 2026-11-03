@@ -3,7 +3,7 @@
  * Nada de número mágico espalhado pelo gameplay: se precisar ajustar, ajuste aqui.
  */
 export const CONFIG = {
-  version: '0.10.1',
+  version: '0.11.0',
 
   canvas: { width: 1280, height: 720 },
 
@@ -13,6 +13,9 @@ export const CONFIG = {
    * sem suavização, para a arte continuar nítida.
    */
   render: { pixelScale: 2 },
+
+  // Música (o mixer em Opções): 0 a 1
+  audio: { musicVolume: 0.6 },
 
   // O treinador para um pouco antes da borda: ali ficam a mata e as paredes do cenário
   arena: { inset: 96 },
@@ -127,7 +130,7 @@ export const CONFIG = {
   },
 
   capture: {
-    choices: 3,
+    choices: 4,              // opções por Poké Ball (0.11: eram 3)
     levelsBehindTeam: 3,     // quem entra chega com a média da equipe menos isso
     // Poké Ball rara (pedidos do Fellipe: ×0,45 na 0.8, ×0,15 na 0.9, ×0,07 na
     // 0.10, quando as garantidas também saíram: sobrou uma, na Fase 1)

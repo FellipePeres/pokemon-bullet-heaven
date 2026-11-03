@@ -5,7 +5,7 @@
 > decisão foi tomada e o que falta fazer. O `README.md` é o manual de uso;
 > este aqui é o contexto de desenvolvimento.
 
-**Versão atual:** `0.10.1` · **Última atualização:** 2026-11-02
+**Versão atual:** `0.11.0` · **Última atualização:** 2026-11-03
 **Stack:** HTML + CSS + JavaScript puro (ES Modules). Sem backend, sem build, sem dependências.
 **Repositório:** https://github.com/FellipePeres/pokemon-bullet-heaven (público)
 **Jogo no ar:** https://fellipeperes.github.io/pokemon-bullet-heaven/
@@ -120,6 +120,7 @@ src/
     scenery.js        receitas dos 17 cenários (rota, floresta, caverna, salões)
     assetManifest.js  GERADO pelo extrator: tamanho e quadros de cada folha
     sceneManifest.js  GERADO pelo extrator: metatiles de cada cenário e o mapa dos salões
+    musicTracks.js    GERADO por render_music.py: onde começa e acaba o loop de cada música
     types.js          tipos, cores e tabela de efetividade
     kanto.js          nomes da Pokédex 1-151
     achievements.js   12 conquistas e suas recompensas em Shards
@@ -133,6 +134,7 @@ src/
     SpawnSystem.js    ondas, elites, Poké Balls roteirizadas, time do líder
     SpatialGrid.js    grade espacial (evita colisão O(n²))
     terrain.js        gera o cenário de cada trecho e diz o que bloqueia (colisão)
+    pc.js             o PC da jornada: trocar, retirar e depositar
     stats.js          vida máxima, XP por nível, multiplicador de dano por nível
   game/
     Run.js            uma partida: estado, loop, colisões, condições de fim
@@ -150,6 +152,8 @@ src/
     Menus.js          menu, mapa, modais (Pokédex, conquistas, equipe, loja, opções)
     dom.js            helpers de DOM e toasts
     pad.js            o controle nas telas: foco nos alvos clicáveis da camada de cima
+  audio/
+    music.js          a música: uma faixa por vez, loop do jogo, troca suave, volume
     backdrop.js       o fundo dos menus: um trecho de rota montado pelo gerador do cenário
     titleMenu.js      o menu da tela de título: ↑ ↓ e Enter, Poké Ball de ponteiro
   save/
@@ -163,6 +167,7 @@ tools/
   balance.mjs         mede a dificuldade fase a fase (ver seção 5)
   screenshot.mjs      screenshots no Chrome sem janela (DevTools Protocol, sem dependências)
   assets/extract.py   gera assets/ a partir do decomp do FireRed no Pokemon All
+  assets/render_music.py  renderiza as músicas do FireRed (cópia do sintetizador do Pokemon All)
 ```
 
 **Regra do projeto: `/data` é conteúdo, `/systems` é comportamento.**
@@ -190,7 +195,13 @@ confirmar com ele**.
 - O treinador **não tem vida nem nível**. Só guia a equipe.
 - Cada Pokémon tem **vida e nível próprios**. Inimigo que encosta em um Pokémon
   bate nele; se alcança o treinador, o Pokémon ativo mais próximo o defende.
-- **3 Pokémon ativos** ao mesmo tempo, equipe de até 6 (`CONFIG.team`).
+- **3 Pokémon ativos** ao mesmo tempo, equipe de até 6 (`CONFIG.team`). Desde a
+  0.11 isso é fixo (a opção saiu), e os sprites ficam sempre ligados.
+- **PC** (0.11): com a equipe cheia, a captura pergunta se o novo entra (e quem
+  vai para o PC) ou se ele vai direto para o PC. Os depósitos da partida
+  (`run.pc`, no autosave) entram no PC da jornada (`journey.pc`) quando a fase é
+  vencida, como a equipe. No lobby, `swapWithPC` (`systems/pc.js`) troca,
+  retira e deposita; a equipe nunca fica vazia.
 - Pokémon que desmaia **fica fora até o fim da fase** (item Revive virá depois).
   Um da reserva entra automaticamente no lugar. **Os 6 desmaiados = derrota.**
 - Reserva regenera vida sozinha (2,5 HP/s) — trocar é a principal sustentação.
@@ -255,6 +266,10 @@ Nunca voltar bônus globais para o pool de level up — foi pedido explícito.
   builds de longo alcance matavam longe e nunca capturavam.
 - A chance de cair é ×0,07 (`CONFIG.capture.dropChanceMultiplier`; ×0,45 na
   0.8, ×0,15 na 0.9): pegar Pokémon novo é raro, a pedido do Fellipe.
+- **Mais opções** (0.11): cada Poké Ball oferece 4 espécies; a tabela de uma
+  fase acumula as das anteriores com metade do peso (`poolEntries`); os dois
+  iniciais que o jogador não escolheu entram raros da Fase 3 em diante
+  (`STARTER_CAPTURES`; o próprio inicial é filtrado no `CaptureSystem`).
 - **Quem entra chega perto da equipe** (0.9): capturado ou presente, o novato tem
   a média de nível da equipe menos 3. Antes entrava no nível 1 e, numa equipe de
   nível 20, desmaiava na hora (parecia que a captura não tinha funcionado).
@@ -288,6 +303,15 @@ Nunca voltar bônus globais para o pool de level up — foi pedido explícito.
   **fúria** abaixo da metade da vida (`enemy.enraged`: mais rápido, golpes e
   invocações mais seguidos, rajada maior; brilho vermelho e "furioso!" na barra).
   Os líderes também invocam um Pokémon a mais, com mais frequência.
+- **Duração fixa** (0.11, "uma média de 4 min, não crescente"): todas as fases
+  têm 3:30 até o líder (`duration: 210`), ~4 min com a luta. A linha do tempo foi
+  comprimida; as levas ficaram ×1/√f mais densas e cada selvagem vale ×1/√f de XP
+  (`stage.xpScale`), para a equipe chegar ao líder no mesmo nível de antes.
+- **Música** (0.11): cada fase tem `music` e `leaderMusic`. `Game._updateMusic`
+  escolhe a faixa a cada quadro (lobby, fase, líder, vitória, Hall da Fama) e
+  `audio/music.js` toca com loop sem emenda (Web Audio, pontos do loop do jogo em
+  `data/musicTracks.js`). O volume é o `CONFIG.audio.musicVolume`, salvo nas
+  opções; na pausa a música abaixa.
 - O chefe final é o **time do líder, enfrentado em sequência** (`bossTeam`),
   terminando no ace. Vencer dá insígnia + Shards.
 - A **jornada carrega equipe, níveis e build** de uma fase para a próxima
@@ -335,36 +359,35 @@ Valores em `src/core/config.js` (o que não estiver lá está em `/data`):
 | Líderes | vida ×4, dano ×1,6, golpes a cada 60% do tempo, Rajada, fúria abaixo de 50% (`CONFIG.enemies.boss`) |
 | Nível de quem entra na equipe | média da equipe − 3 |
 | Shards por fase | 120 (+180 na 1ª vez) |
-| Duração das fases | 300s a 420s (Fases 1 a 8); 280s a 300s (Elite Four); 240s (Campeão) |
+| Duração das fases | 3:30 até o líder em todas (~4 min com a luta), desde a 0.11 |
+| Opções por Poké Ball | 4 (tabelas acumuladas; os outros iniciais raros da Fase 3 em diante) |
 | Selvagens por nível (Fase 3+) | vida ×1,075 e dano ×1,035 por nível acima do 5; XP +8% por nível |
 
-**Dificuldade medida** (0.10, com o jogador virtual novo, que escolhe as melhorias
-que mais dão dano e desvia: o Fellipe passava fácil onde o bot antigo perdia;
-`npm run balance` em blocos encadeados com `--save`/`--load`, 12 a 18 jornadas
-por bloco). A meta é ~40–50% para o bot: quem joga bem vence mais.
+**Dificuldade medida** (0.11: fases de 3:30 até o líder, 4 opções por Poké Ball e
+tabelas acumuladas; jogador virtual esperto, `npm run balance` em blocos
+encadeados). A meta é ~40–50% para o bot: quem joga bem vence mais.
 
 | Etapa | Vitórias do bot | Nível no líder (ace) | Luta com o líder | Desmaios | Pico de inimigos | `scaling` (vida / dano) |
 |---|---|---|---|---|---|---|
-| Fase 1 (Brock) | ~40% ¹ | 22 (14) | 28s | 2,2 | 57 | 1,8 / 0,18 |
-| Fase 2 (Misty) | 43% | 29 (21) | 27s | 3,4 | 92 | 2,9 / 1,0 |
-| Fase 3 (Lt. Surge) | 47% | 39 (24) | 21s | 3,3 | 78 | 3,0 / 2,3 |
-| Fase 4 (Erika) | 76% \* | 48 (29) | 23s | 1,6 | 94 | 3,5 / 4,6 |
-| Fase 5 (Koga) | 39% | 54 (43) | 31s | 3,9 | 92 | 4,0 / 7,0 |
-| Fase 6 (Sabrina) | 60% | 60 (43) | 46s | 3,0 | 117 | 7,0 / 4,8 |
-| Fase 7 (Blaine) | 48% | 67 (47) | 40s | 3,5 | 117 | 4,5 / 6,0 |
-| Fase 8 (Giovanni) | 67% \* | 76 (50) | 50s | 2,5 | 120 | 3,2 / 9,8 |
-| Lorelei | 36% | 84 (54) | 63s | 4,4 | 174 | 4,0 / 3,8 |
-| Bruno | 75% \* | 88 (56) | 61s | 2,4 | 105 | 2,4 / 7,8 |
-| Agatha | 50% | 96 (58) | 67s | 3,6 | 105 | 2,9 / 3,25 |
-| Lance | 58% | 100 (60) | 83s | 3,8 | 137 | 2,7 / 2,3 |
-| Campeão | 42% | 106 (63) | 88s | 4,2 | 133 | 2,4 / 2,4 |
+| Fase 1 (Brock) | 25% ¹ | 21 (14) | 24s | 2,5 | 60 | 1,8 / 0,18 |
+| Fase 2 (Misty) | 44% | 27 (21) | 41s | 3,8 | 93 | 2,9 / 1,0 |
+| Fase 3 (Lt. Surge) | 46% | 37 (24) | 22s | 3,7 | 108 | 3,0 / 2,3 |
+| Fase 4 (Erika) | 68% \* | 46 (29) | 26s | 2,1 | 105 | 3,5 / 5,2 |
+| Fase 5 (Koga) | 81% \* | 52 (43) | 36s | 1,6 | 109 | 4,0 / 7,2 |
+| Fase 6 (Sabrina) | 88% \* | 59 (43) | 46s | 1,6 | 154 | 7,0 / 5,2 |
+| Fase 7 (Blaine) | 42% | 68 (47) | 39s | 4,0 | 143 | 4,5 / 6,0 |
+| Fase 8 (Giovanni) | 79% \* | 74 (50) | 32s | 2,1 | 141 | 3,2 / 12,5 |
+| Lorelei | 46% | 80 (54) | 59s | 3,9 | 184 | 4,0 / 4,6 |
+| Bruno | 92% \* | 87 (56) | 49s | 1,8 | 120 | 2,4 / 10 |
+| Agatha | 52% | 95 (58) | 63s | 3,9 | 110 | 2,9 / 3,8 |
+| Lance | 79% \* | 94 (60) | 71s | 2,1 | 139 | 2,7 / 2,8 |
+| Campeão | 26% \* | 104 (63) | 73s | 4,7 | 145 | 2,4 / 2,1 |
 
-Média: 51%. As lutas contra os líderes duram de 21 s (Fase 3) a 88 s (Campeão).
-¹ Por inicial, medido à parte depois de aliviar as ondas da Fase 1 para equipes
-de 2: Charmander ~10% (fogo contra pedra é o caminho difícil, como no FireRed),
-Bulbasaur ~35%, Squirtle ~75%; o time do Brock também perdeu um pouco de vida,
-dano e invocações nos dados. \* Depois da medição, o dano dessas três subiu um
-pouco: Erika 4,0 → 4,6, Giovanni 9,0 → 9,8 e Bruno 7,0 → 7,8.
+Média medida: 59% (as 4 opções por Poké Ball deixaram as equipes mais fortes).
+¹ Charmander contra o Brock é o caminho difícil (~10%); Bulbasaur ~35%, Squirtle
+~75%. \* Depois da medição, o dano dessas subiu (e o do Campeão desceu) para
+voltar à meta: Erika 4,6 → 5,2, Koga 6,2 → 7,2, Sabrina 4,2 → 5,2, Giovanni
+11 → 12,5, Bruno 8,6 → 10, Lance 2,3 → 2,8, Campeão 2,4 → 2,1.
 
 Por cima do `scaling` de cada fase valem o `CONFIG.enemies` (dano ×1,3, vida ×1,2,
 ondas ×1,2) e o reforço dos líderes. **A variação entre medições é grande**: a
@@ -457,6 +480,7 @@ Procedência e como regerar: `assets/PROVENIENCIA.md`.
 | Moldura das janelas e dos botões | `assets/ui/window-frame.png` (3x, fatia 24) e `window-frame-button.png` (2x, fatia 16): a `text_window` do FireRed, copiadas do Pokemon All |
 | Fontes | `assets/fonts/`: Press Start 2P e Pixelify Sans (licença OFL), as do Pokemon All |
 | Fundo da tela de título | `assets/ui/title-background.webp`: arte do Fellipe (a clareira à noite cercada pela horda) |
+| Músicas | `assets/music/*.ogg`: 17 do FireRed (`tools/assets/render_music.py`) e o tema do lobby do Pokemon All; 7 MB ao todo, cada uma carregada quando toca |
 
 - Tudo é pixel art em **escala inteira, sem suavização** (`CONFIG.render.pixelScale`,
   hoje 2). `render/assets.js` carrega sob demanda e, enquanto a folha não carrega,
@@ -497,17 +521,17 @@ botão Continuar). Estrutura:
     "shards": 620,
     "trainerUpgrades": { "meta_speed": 2 },
     "pokedex": { "caught": [4, 5, 25] },            // só capturados/evoluídos
-    "achievements": { "unlocked": [], "claimed": [], "progress": {} },
+    "achievements": { "tiers": { "catcher": 2 }, "notified": { "catcher": 3 } },  // degraus coletados (0.11)
     "stats": { "totalKills": 0, "badges": 1, "...": 0 },
     "region": "kanto",                               // região da jornada atual
     "regions": {
       "kanto": {
         "starter": "charmander", "clearedStages": ["gym_1_pewter"], "badges": ["Insígnia Pedra"],
-        "journey": { "team": { "members": [], "active": [] }, "level": 18 }
+        "journey": { "team": { "members": [], "active": [] }, "level": 18, "pc": [] }  // pc: 0.11
       }
     }
   },
-  "run": { "stageId": "...", "time": 95, "team": {}, "trainerUpgrades": {}, "stats": {} }
+  "run": { "stageId": "...", "time": 95, "team": {}, "pc": [], "trainerUpgrades": {}, "stats": {} }
 }
 ```
 
@@ -590,6 +614,12 @@ tipo, som e o polimento de troca e captura.
 - **Novato no nível 1:** quem entra na equipe tem que vir perto do nível dela
   (`CaptureSystem.newMemberLevel`), senão parece que a captura falhou.
 - **Inimigo nascendo dentro de árvore:** todo spawn passa por `terrain.place`.
+- **Som antes do clique:** o navegador bloqueia áudio até um gesto do jogador. O
+  `MusicPlayer` guarda a faixa pedida e só cria o `AudioContext` no primeiro
+  clique ou tecla.
+- **Conquistas de saves antigos:** as da 0.10 (`unlocked`/`claimed`) ficaram no
+  save só como histórico; as em níveis começam do zero (dá para coletar de novo
+  os primeiros degraus, uma vez).
 - **Moldura borrada:** `border-image` ignora `image-rendering`. As molduras já vêm
   ampliadas no arquivo, e a largura da borda tem de ser igual à fatia (24 px na
   janela, 16 px no botão); outro valor reescala e borra.
@@ -652,6 +682,7 @@ tipo, som e o polimento de troca e captura.
 | 7 | (primeira partida) muito fácil, quase não toma dano: mais dano e mais inimigos; Poké Ball mais rara; TM mais rara, o golpe melhora na evolução; cenário com os sprites que temos; ícone bonito para a Poké Ball; Ímã raro que puxa todo o XP | 0.8: dano ×1,2 e ondas ×1,2 com o `scaling.damage` de cada fase recalibrado (bot vence 35% a 60%, contra 44% a 88% antes, e desmaia 3 a 4 vezes por tentativa); bola ×0,45; TM 4% e evolução que melhora o golpe; cenário de tiles do FireRed em 17 lugares (Etapa 3); sprites de item para Poké Ball e Ímã |
 | 8 | Poké Ball 3x mais rara; ícone de vida vira Poção; sugestões para o XP; Clefairy capturada "bugada"; obstáculos bloqueiam jogador e inimigos; inimigos com um pouco mais de vida; líderes bem mais fortes; Ímã menor e mais raro; troca que às vezes troca o Pokémon errado; espadinha para o Pokémon só acompanhar | 0.9: bola ×0,15; Poção no chão; captura e presentes entram com a média da equipe − 3; colisão com o cenário (`systems/terrain.js`) pela colisão dos mapas do FireRed; vida ×1,15; líderes ×2,5 de vida, ×1,4 de dano, golpes mais frequentes; Ímã em 1x, 0,05%/1,5%; HUD no `pointerdown` e selo "⇄ sai"; botão de ataque por Pokémon; 6 sugestões de XP no PLANEJAMENTO (D10) |
 | 9 | Poké Balls ainda demais, as garantidas atrapalham; jogo levemente mais difícil; líderes muito fáceis (o bot não joga como um humano); remodelar o front copiando o UX do Pokemon All; publicar | 0.10: só a Fase 1 com garantidas, tetos menores, bola ×0,07; dano ×1,3 e vida ×1,2; líderes com vida ×4, Rajada mirando o treinador e fúria; bot que escolhe bem as melhorias e desvia; identidade visual do Pokemon All (molduras do FireRed, fontes em pixel, logo próprio, fundo com o cenário do jogo); site publicado |
+| 10 | fases de ~4 min fixas; música no lobby e em cada fase, do Pokemon All, com volume num botão sempre no canto; Opções sem ativos e sem sprites; conquistas em níveis; mais Pokémon à disposição; PC no lobby | 0.11: 3:30 até o líder em todas (linha do tempo comprimida, XP compensado); 17 músicas do FireRed renderizadas com a cópia do sintetizador do Pokemon All + o tema do lobby, Web Audio com loop do jogo, mixer em Opções e engrenagem em toda tela; 20 conquistas com 99 degraus; 4 opções por Poké Ball, tabelas acumuladas e os outros iniciais; PC (captura com equipe cheia e trocas no lobby) |
 
 ---
 

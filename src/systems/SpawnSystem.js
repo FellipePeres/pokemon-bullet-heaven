@@ -207,7 +207,7 @@ export class SpawnSystem {
     if (!isBoss) {
       const ramp = this.scaling;
       const byLevel = levelScaling(level);
-      scaling = { hp: ramp.hp * byLevel.hp, speed: ramp.speed, damage: ramp.damage * byLevel.damage, xp: byLevel.xp };
+      scaling = { hp: ramp.hp * byLevel.hp, speed: ramp.speed, damage: ramp.damage * byLevel.damage, xp: byLevel.xp * (this.stage.xpScale ?? 1) };
     }
     const enemy = new Enemy(enemyId, x, y, scaling, level);
     // nasce fora das árvores, pedras e paredes

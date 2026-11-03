@@ -208,7 +208,7 @@ const options = game.run.captureSystem.rollChoices();
 game.captureOpen = true;
 game.pickCapture(options[0]?.id ?? 'pikachu');
 check('equipe cheia pede para escolher quem sai',
-      registry.get('capture-subtitle').textContent.includes('Quem sai'),
+      registry.get('capture-subtitle').textContent.includes('vai para o PC'),
       registry.get('capture-subtitle').textContent);
 game.resolveCapture();
 
@@ -261,12 +261,22 @@ const claimable = game.tracker.claimableAchievements;
 check('conquistas concluídas ficam disponíveis para coletar', claimable.length > 0,
       `${claimable.length} para coletar`);
 if (claimable.length) {
+  const achievement = claimable[0];
+  const tierBefore = game.tracker.tierState(achievement).claimed;
   const before = game.profile.shards;
-  const gained = game.claimAchievement(claimable[0].id);
+  const gained = game.claimAchievement(achievement.id);
   check('coletar a conquista credita os Shards', gained > 0 && game.profile.shards === before + gained,
         `+${gained} Shards`);
-  check('a mesma conquista não pode ser coletada duas vezes',
-        game.claimAchievement(claimable[0].id) === 0);
+  // conquistas em níveis (0.11): coletar sobe um degrau, e o próximo pede um objetivo maior
+  const after = game.tracker.tierState(achievement);
+  check('coletar sobe exatamente um degrau, com objetivo maior',
+        after.claimed === tierBefore + 1 && (after.complete || after.next.goal > achievement.tiers[tierBefore].goal),
+        `${achievement.name}: degrau ${after.claimed}, próximo objetivo ${after.next?.goal ?? '—'}`);
+  // sem alcançar o próximo objetivo, não há o que coletar
+  const value = game.profile.stats[achievement.stat];
+  game.profile.stats[achievement.stat] = after.next ? after.next.goal - 1 : value;
+  check('o mesmo degrau não pode ser coletado duas vezes', game.claimAchievement(achievement.id) === 0);
+  game.profile.stats[achievement.stat] = value;
 }
 
 // loja do treinador

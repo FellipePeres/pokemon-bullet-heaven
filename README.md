@@ -39,6 +39,7 @@ uma equipe de seis, evoluída, com golpes melhorados e sinergias que você escol
 | Trocar o Pokémon em campo | `1` – `6` (ou clique no card) |
 | Escolher quem sai na troca (o card marcado "⇄ sai") | `Tab` ou clique no card |
 | Ligar ou desligar o ataque de um Pokémon em campo | botão da espadinha no card (desligado, ele só acompanha) |
+| Opções e volume da música | a engrenagem no canto (na partida, ao lado da pausa) |
 | Gastar os níveis acumulados de um Pokémon | botão `▲` no card |
 | Pausar / fechar janela | `ESC` |
 | Controle (gamepad) | analógico ou direcional anda · LB/RB escolhem o slot · X/Y/B põem a reserva em campo · Start pausa · nas telas, direcional e A |
@@ -115,6 +116,13 @@ Perder devolve você ao início da fase com a equipe como estava ao entrar nela.
   você e uma fase de fúria abaixo da metade da vida.
 - **Visual de GBA**: as janelas e botões do FireRed, fontes em pixel e o fundo dos
   menus montado com o próprio cenário do jogo.
+- **Música do FireRed**: uma por fase, a do líder, a da vitória e o tema do lobby,
+  com volume ajustável.
+- **PC**: com a equipe cheia, quem sai (ou quem chega) vai para o PC, e no mapa da
+  jornada você monta a equipe da próxima fase.
+- **Conquistas em níveis**: 20 conquistas, cada uma com vários degraus — ao coletar,
+  ela volta com um objetivo maior e mais Shards.
+- Fases de cerca de 4 minutos.
 - **Pokédex de Kanto** (151) que se preenche conforme você captura e evolui.
 - **12 conquistas** com recompensa em Shards.
 - A dificuldade e a quantidade de inimigos sobem fase a fase: os selvagens ganham

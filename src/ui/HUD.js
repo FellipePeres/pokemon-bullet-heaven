@@ -32,6 +32,11 @@ export class HUD {
 
   _bindStaticButtons() {
     el('btn-pause').onclick = () => this.game.togglePause();
+    // a engrenagem na partida: pausa e abre as Opções (o volume) por cima
+    el('btn-hud-options').onclick = () => {
+      if (this.game.run?.state === 'running') this.game.togglePause();
+      this.game.menus.showModal('modal-options');
+    };
     el('btn-resume').onclick = () => this.game.togglePause();
     el('btn-quit').onclick = () => this.game.quitToMenu();
     el('btn-save-run').onclick = () => this.game.saveToFile();
@@ -329,10 +334,16 @@ export class HUD {
   }
 
   /** Segunda etapa: equipe cheia, escolher quem sai. */
-  showReplace(pokemon, members, onPick) {
+  showReplace(pokemon, members, onPick, onSendToPC = null) {
     const row = clear(el('capture-choices'));
-    el('capture-subtitle').textContent = `Equipe cheia. Quem sai para ${pokemon.name} entrar?`;
+    el('capture-subtitle').textContent = `Equipe cheia. Quem vai para o PC para ${pokemon.name} entrar?`;
     el('capture-skip').textContent = 'Cancelar';
+    if (onSendToPC) {
+      // o novo vai direto para o PC: a equipe fica como está e ele espera no lobby
+      const pc = this._pokemonCard(pokemon, onSendToPC, `Mandar ${pokemon.name} para o PC`);
+      pc.classList.add('to-pc');
+      row.appendChild(pc);
+    }
 
     members.forEach((member) => {
       const data = getPokemon(member.pokemonId);

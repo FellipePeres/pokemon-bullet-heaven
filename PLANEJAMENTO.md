@@ -93,7 +93,7 @@ quando o Fellipe mandar**, porque o push publica o jogo.
 | 2 | Golpes com sprite (e no máximo 4 por tipo) | 0.6 | ✅ feita (2026-11-02) |
 | 3 | Pokémon animados e cenário de tiles | 0.7 → 0.8 | ✅ feita (2026-11-02): Pokémon animados na 0.7, cenário de tiles na 0.8 |
 | 4 | Fases 3 a 8, Elite Four e Campeão | 0.7 | ✅ feita (2026-11-02); falta só os lendários como encontros especiais |
-| 5 | Som | 1.0 | ⏳ |
+| 5 | Som | 1.0 | 🔶 música feita (0.11): uma por fase, a do lobby, a do líder e a da vitória, com o mixer de volume; faltam gritos e efeitos |
 | 6 | Acabamento: opções salvas, controle, celular, desempenho, assets locais, identidade visual | 0.6 → 1.0 | 🔶 opções, desempenho, controle e identidade visual (0.10) feitos; faltam celular e assets locais |
 | 7 | Final da jornada: Hall da Fama e créditos | 0.7 | ✅ feita (2026-11-02); o pós-jogo (D9) fica para depois |
 | 8 | Outras regiões | 1.x | ⏳ |
@@ -391,12 +391,19 @@ Os arquivos já estão no Pokemon All, em OGG, prontos para o navegador.
   líder.
 - **Efeitos** (255): acerto (com limite por segundo), subir de nível, Poké Ball,
   evolução e menus.
-- **Música**: as 3 prontas cobrem o líder (`mus_vs_gym_leader`) e a vitória. As
-  das rotas, da floresta, da caverna e da batalha contra selvagem precisam ser
-  renderizadas do MIDI pelo `render_sound.py` do Pokemon All, rodando numa **cópia
-  temporária** e nunca dentro dele, ou pedindo ao Braga (D6).
-- Controle de volume em Opções. O áudio só começa depois do primeiro clique, que é
-  uma regra dos navegadores.
+- ✅ **Música** (0.11): o sintetizador do Pokemon All (o m4a do FireRed em Python)
+  foi copiado para `tools/assets/render_music.py` e roda aqui, lendo o decomp de lá.
+  O Pokemon All só guardava as partituras de 3 músicas; as outras vêm do decomp
+  público pret/pokefirered, no mesmo commit. Uma faixa por fase (Rota 1, Monte Lua,
+  Vermilion, Celadon, Fuchsia, Silph, Cinnabar, Esconderijo Rocket, Victory Road,
+  Trainer Tower, Torre Pokémon, cavernas das Sevii, tema do rival), a do líder
+  (`mus_vs_gym_leader`, e `mus_vs_champion` no Campeão), a da vitória, a do Hall
+  da Fama e, no lobby, o tema do Pokemon All. Loop sem emenda pela Web Audio, nos
+  pontos do jogo; 22 kHz (o mixer do GBA toca a 13 kHz), 7 MB ao todo, cada uma
+  carregada só quando toca.
+- ✅ **Volume** (0.11): o mixer em Opções, aberto pela engrenagem que fica no canto
+  de toda tela, também na partida (pausa e abre por cima). A música começa no
+  primeiro clique ou tecla, que é uma regra dos navegadores; na pausa ela abaixa.
 - Gritos e efeitos são baratos e podem entrar já junto das etapas 2 e 3.
 
 ### Etapa 6 — Acabamento
@@ -538,6 +545,17 @@ Com menos Poké Balls, a equipe da Fase 1 fica com 2 ou 3 Pokémon e as ondas
 dela foram aliviadas (os elites também chegam mais tarde): a dificuldade passou
 a estar nos líderes. Com o bot novo, metade das derrotas da Fase 1 é no Brock.
 
+### Quarto retorno (0.11)
+
+| Pedido | O que mudou |
+|---|---|
+| Fases de ~4 min, fixas, e não crescentes (antes 5 a 7 min) | Todas com 3:30 até o líder (~4 min com a luta). A linha do tempo de cada fase foi comprimida por inteiro (ondas, elites, trechos, presentes); as levas ficaram um pouco mais densas e cada selvagem vale mais XP (`stage.xpScale`), então a equipe chega ao líder no mesmo nível de antes |
+| Música no lobby e uma por fase, do Pokemon All; volume num botão sempre no canto, também na fase | Etapa 5, acima |
+| Opções: Pokémon ativos sempre 3, sprites sempre ligados | As três opções saíram (o que estava salvo delas é ignorado); ficaram treinador, tremor, autosave e apagar, mais o volume |
+| Conquistas mais robustas, em níveis (5, 10, 20, 50, 100, 151...) | 20 conquistas e 99 degraus (`data/achievements.js`): ao coletar, a mesma conquista volta com um objetivo maior e mais Shards. Contadores novos: elites, Pokémon de líderes, evoluções, melhorias, TMs, Ímãs, dano, vitórias sem desmaio, Shards ganhos, melhorias compradas, campeões |
+| Mais Pokémon à disposição | Cada Poké Ball oferece 4 opções (eram 3); cada fase acumula as espécies das anteriores com metade do peso; os dois iniciais que você não escolheu aparecem, raros, da Fase 3 em diante; Staryu, Arbok, Parasect, Venomoth e Persian entraram nas tabelas. Capturáveis: 144 das 151 (as 7 de fora vêm por evolução ou presente) |
+| PC no lobby | Com a equipe cheia, a captura pergunta: o novo entra e um da equipe vai para o PC, ou o novo vai direto para o PC (antes, quem saía se perdia). No mapa da jornada, o botão PC troca, retira e deposita (`systems/pc.js`). O PC é da jornada (`journey.pc`) e, como a equipe, só avança quando a fase é vencida |
+
 ## 5. Decisões em aberto (do Fellipe)
 
 | | Pergunta | Recomendação | Trava |
@@ -547,7 +565,7 @@ a estar nos líderes. Com o bot novo, metade das derrotas da Fase 1 é no Brock.
 | D3 | Selvagens com nível e curva de XP cúbica? | ✅ Feito na 0.7, com ajustes: nível acompanha a equipe; curva exponencial até o 20 e potência depois. | Etapa 4 |
 | D4 | Quem já tem save escolhe o treinador ao abrir o jogo, ou fica Menino até trocar em Opções? | ✅ Decidido: escolhe ao continuar (a tela aparece uma vez) e pode trocar em Opções. | Etapa 1 |
 | D5 | Próxima região? | Hoenn | Etapa 8 |
-| D6 | Músicas novas do FireRed: renderizar (numa cópia temporária do Pokemon All, ou com o Braga) ou ficar com as 3 prontas por enquanto? | Renderizar as das rotas e a da batalha contra selvagem. | Etapa 5 |
+| D6 | Músicas novas do FireRed: renderizar (numa cópia temporária do Pokemon All, ou com o Braga) ou ficar com as 3 prontas por enquanto? | ✅ Feito na 0.11: a cópia do sintetizador roda neste repositório, com as partituras do decomp público. | Etapa 5 |
 | D7 | Onde entram as 9 espécies que não estão em tabela nenhuma? | Aplicado como padrão na 0.7 (lugares do FireRed com peso 3, e os presentes). As porcentagens são suas: é só mudar em `capturePools.js`. | Etapa 4 |
 | D8 | Celular e controle importam? | Controle feito na 0.7 (padrão); celular depois de Kanto fechado. | Etapa 6 |
 | D9 | Final e pós-jogo | Hall da Fama e créditos na 1.0; revanche dos líderes e lendários depois. | Etapa 7 |

@@ -26,6 +26,8 @@ import { TRAINER_LOOKS, getTrainerLook } from '../data/trainers.js';
 import { POKEMON, getPokemon } from '../data/pokemon.js';
 import { ENEMIES } from '../data/enemies.js';
 import { TRAINER_UPGRADES, getTrainerUpgrade, nextCost } from '../data/trainerUpgrades.js';
+import { MusicPlayer } from '../audio/music.js';
+import { swapWithPC } from '../systems/pc.js';
 
 /**
  * GAME — junta tudo: perfil, telas, partida e loop principal.
@@ -49,6 +51,8 @@ export class Game {
     this.hud = new HUD(this);
     this.menus = new Menus(this);
     this.padNav = new PadNavigator();
+    this.music = new MusicPlayer();
+    this.hallOpen = false;
 
     this.run = null;
     this.runEnded = false;
@@ -94,7 +98,24 @@ export class Game {
       }
     }
 
+    this._updateMusic();
     requestAnimationFrame((next) => this.loop(next));
+  }
+
+  /**
+   * A música que deveria tocar agora: o tema do lobby nos menus, a da fase na
+   * partida, a do líder quando ele entra, a da vitória no resultado e a do Hall
+   * da Fama. A pausa só abaixa o volume.
+   */
+  _updateMusic() {
+    const run = this.run;
+    let track = 'lobby-theme';
+    if (this.hallOpen) track = 'mus_hall_of_fame';
+    else if (run?.state === 'victory') track = 'mus_victory_gym_leader';
+    else if (run && (run.boss || run.pendingIntro)) track = run.stage.leaderMusic ?? 'mus_vs_gym_leader';
+    else if (run) track = run.stage.music ?? 'lobby-theme';
+    this.music.play(track);
+    this.music.duck(run?.state === 'paused');
   }
 
   _handleRunState() {
@@ -215,7 +236,7 @@ export class Game {
     const journey = this.campaign.journey;
     let options;
     if (snapshot) {
-      options = { team: snapshot.team };
+      options = { team: snapshot.team, pc: snapshot.pc };
     } else if (journey) {
       options = { team: journey.team };
     } else {
@@ -370,11 +391,13 @@ export class Game {
   /** Abre o Hall da Fama de uma equipe campeã; `then` roda ao fechar. */
   showHallOfFame(entry, then = null) {
     const look = getTrainerLook(entry.trainer);
+    this.hallOpen = true;
     this.hud.showHallOfFame(entry, {
       trainerName: look.name,
       portrait: assetUrl(look.portrait),
       regionName: getRegion(entry.region).name
     }, () => {
+      this.hallOpen = false;
       this.hud.hideHallOfFame();
       then?.();
     });
@@ -428,9 +451,13 @@ export class Game {
   pickCapture(pokemonId) {
     const run = this.run;
     if (run.team.isFull) {
-      // equipe cheia: escolher quem sai
+      // equipe cheia: quem sai vai para o PC — ou o novo vai direto para lá
       this.hud.showReplace(getPokemon(pokemonId), run.team.members, (memberUid) => {
         run.captureSystem.captureReplacing(memberUid, pokemonId);
+        this.tracker.registerCaught(getPokemon(pokemonId).dex);
+        this.resolveCapture();
+      }, () => {
+        run.captureSystem.captureToPC(pokemonId);
         this.tracker.registerCaught(getPokemon(pokemonId).dex);
         this.resolveCapture();
       });
@@ -465,8 +492,11 @@ export class Game {
       teamSize: run.team.members.length,
       stats: run.stats,
       time: run.time,
-      // vitória leva a equipe e a build para a próxima fase
-      journey: { team: run.team.serialize(), upgrades: { ...run.upgrades }, level: bestLevel }
+      // vitória leva a equipe, a build e o PC para a próxima fase
+      journey: {
+        team: run.team.serialize(), upgrades: { ...run.upgrades }, level: bestLevel,
+        pc: [...(this.campaign.journey?.pc ?? []), ...run.pc]
+      }
     });
 
     this.pendingRun = null;
@@ -519,6 +549,20 @@ export class Game {
         affordable: cost !== null && this.profile.shards >= cost
       };
     });
+  }
+
+  /* ================================= PC ================================= */
+
+  /** O PC da jornada (Pokémon guardados fora da equipe). */
+  get pcBox() {
+    return this.campaign.journey?.pc ?? [];
+  }
+
+  /** No lobby: troca um da equipe por um do PC (ver systems/pc.js). */
+  pcSwap(teamUid, pcUid) {
+    const ok = swapWithPC(this.campaign.journey, teamUid, pcUid, CONFIG.team.maxSize);
+    if (ok) this.autosave();
+    return ok;
   }
 
   /** Coleta os Shards de uma conquista concluída. */

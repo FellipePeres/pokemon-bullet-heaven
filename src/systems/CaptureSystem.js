@@ -3,6 +3,7 @@ import { poolEntries } from '../data/capturePools.js';
 import { CONFIG } from '../core/config.js';
 import { weightedPickMany } from '../core/utils.js';
 import { bus, EVENTS } from '../core/events.js';
+import { TeamSystem } from './TeamSystem.js';
 
 /**
  * Captura: independente do combate.
@@ -23,8 +24,10 @@ export class CaptureSystem {
     const gift = this.run.pendingGift;
     if (gift) return gift.choices.map(getPokemon).filter((p) => p && !this.run.team.has(p.id));
 
+    // o inicial do próprio jogador não volta como captura (os outros dois sim, raros)
+    const own = this.run.campaignStarter;
     const pool = poolEntries(this.run.stage.capturePool)
-      .filter((entry) => !entry.pokemon.starter && !this.run.team.has(entry.pokemon.id));
+      .filter((entry) => entry.pokemon.id !== own && !this.run.team.has(entry.pokemon.id));
 
     if (!pool.length) return [];
     return weightedPickMany(pool, count).map((entry) => entry.pokemon);
@@ -49,17 +52,33 @@ export class CaptureSystem {
     return member;
   }
 
-  /** Substitui um membro existente (equipe cheia). */
+  /** Equipe cheia: o novo entra e quem sai vai para o PC (0.11; antes ele se perdia). */
   captureReplacing(oldUid, pokemonId) {
+    const leaving = this.run.team.members.find((m) => m.uid === oldUid);
     const member = this.run.team.replaceMember(oldUid, pokemonId, this.newMemberLevel());
-    if (member) this._registerCapture(pokemonId);
+    if (!member) return null;
+    if (leaving) this._deposit(leaving);
+    this._registerCapture(pokemonId);
     return member;
   }
 
-  _registerCapture(pokemonId) {
+  /** Equipe cheia: o novo vai direto para o PC, e a equipe fica como está. */
+  captureToPC(pokemonId) {
+    const member = this.run.team.createMember(pokemonId, this.newMemberLevel());
+    this._deposit(member);
+    this._registerCapture(pokemonId, true);
+    return member;
+  }
+
+  /** Guarda no PC da partida; vai para o PC da jornada quando a fase é vencida. */
+  _deposit(member) {
+    this.run.pc.push(TeamSystem.serializeMember({ ...member, fainted: false }));
+  }
+
+  _registerCapture(pokemonId, toPC = false) {
     const data = getPokemon(pokemonId);
     this.run.stats.captures++;
     bus.emit(EVENTS.POKEMON_CAPTURED, { pokemonId, dex: data.dex, name: data.name });
-    bus.emit(EVENTS.TOAST, { text: `${data.name} entrou para a equipe!`, icon: 'ball' });
+    bus.emit(EVENTS.TOAST, { text: toPC ? `${data.name} foi para o PC!` : `${data.name} entrou para a equipe!`, icon: 'ball' });
   }
 }

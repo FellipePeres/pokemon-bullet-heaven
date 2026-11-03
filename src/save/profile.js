@@ -23,9 +23,13 @@ export function createProfile() {
       caught: []
     },
     achievements: {
-      unlocked: [],   // objetivo alcançado
-      claimed: [],    // shards já coletados pelo jogador
-      progress: {}
+      // degraus coletados de cada conquista (data/achievements.js): { catcher: 2, ... }
+      tiers: {},
+      // até que degrau o jogador já foi avisado (o aviso sai uma vez por degrau)
+      notified: {},
+      // das conquistas antigas (antes da 0.11), guardadas só para não perder o histórico
+      unlocked: [],
+      claimed: []
     },
     /** Shards e melhorias permanentes do treinador (ver data/trainerUpgrades.js). */
     shards: 0,
@@ -40,7 +44,19 @@ export function createProfile() {
       fullTeams: 0,
       badges: 0,
       dexCaught: 0,
-      playTime: 0
+      playTime: 0,
+      // desde a 0.11, para as conquistas em níveis
+      elitesDefeated: 0,
+      leaderPokemonDefeated: 0,
+      evolutions: 0,
+      upgradesPicked: 0,
+      tmsLearned: 0,
+      magnets: 0,
+      damageDealt: 0,
+      flawlessClears: 0,
+      shardsEarned: 0,
+      champions: 0,
+      trainerUpgradesBought: 0
     },
     // equipes campeãs (Hall da Fama): { date, trainer, region, team: [{ pokemonId, level }] }
     hallOfFame: [],
@@ -104,7 +120,12 @@ export function normalizeProfile(loaded) {
     ...base,
     ...rest,
     pokedex: { ...base.pokedex, ...(loaded.pokedex ?? {}) },
-    achievements: { ...base.achievements, ...(loaded.achievements ?? {}) },
+    achievements: {
+      ...base.achievements,
+      ...(loaded.achievements ?? {}),
+      tiers: { ...(loaded.achievements?.tiers ?? {}) },
+      notified: { ...(loaded.achievements?.notified ?? {}) }
+    },
     trainerUpgrades: { ...base.trainerUpgrades, ...(loaded.trainerUpgrades ?? {}) },
     // saves antigos guardavam "coins"; vira shards sem perder nada
     shards: loaded.shards ?? loaded.coins ?? base.shards,
@@ -112,6 +133,11 @@ export function normalizeProfile(loaded) {
     region: REGIONS[loaded.region] ? loaded.region : base.region,
     regions
   };
+}
+
+/** I, II, III... — o degrau de uma conquista. */
+export function roman(n) {
+  return ['', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'][n] ?? String(n);
 }
 
 /**
@@ -130,12 +156,23 @@ export class ProfileTracker {
   }
 
   _bind() {
-    bus.on(EVENTS.ENEMY_KILLED, () => { this.profile.stats.totalKills++; });
+    const stats = () => this.profile.stats;
+    bus.on(EVENTS.ENEMY_KILLED, ({ enemy }) => {
+      stats().totalKills++;
+      if (enemy?.boss) stats().leaderPokemonDefeated++;
+      else if (enemy?.elite) stats().elitesDefeated++;
+    });
     bus.on(EVENTS.POKEMON_CAPTURED, ({ dex }) => {
-      this.profile.stats.totalCaptures++;
+      stats().totalCaptures++;
       this.registerCaught(dex);
       this.checkAchievements();
     });
+    bus.on(EVENTS.POKEMON_EVOLVED, () => { stats().evolutions++; });
+    bus.on(EVENTS.UPGRADE_TAKEN, ({ upgrade }) => {
+      if (upgrade?.scope === 'tm') stats().tmsLearned++;
+      else stats().upgradesPicked++;
+    });
+    bus.on(EVENTS.MAGNET_PICKED, () => { stats().magnets++; this.checkAchievements(); });
   }
 
   /** Capturar (ou escolher como inicial) registra na Pokédex. */
@@ -151,53 +188,68 @@ export class ProfileTracker {
   /** Crédito de Shards (fases concluídas, conquistas coletadas). */
   addShards(amount) {
     if (!amount) return 0;
+    if (amount > 0) this.profile.stats.shardsEarned = (this.profile.stats.shardsEarned ?? 0) + Math.round(amount);
     this.profile.shards = Math.max(0, Math.round((this.profile.shards ?? 0) + amount));
     bus.emit(EVENTS.SHARDS_EARNED, { amount, total: this.profile.shards });
     return amount;
   }
 
-  /** Conquistas concluídas e ainda não coletadas. */
-  get claimableAchievements() {
-    const { unlocked, claimed } = this.profile.achievements;
-    return ACHIEVEMENTS.filter((a) => unlocked.includes(a.id) && !claimed.includes(a.id));
+  /**
+   * Em que degrau uma conquista está: quantos já foram coletados, o próximo
+   * (null quando completa), o valor do contador e se dá para coletar agora.
+   */
+  tierState(achievement) {
+    const claimed = this.profile.achievements.tiers[achievement.id] ?? 0;
+    const next = achievement.tiers[claimed] ?? null;
+    const value = this.profile.stats[achievement.stat] ?? 0;
+    return { claimed, next, value, complete: !next, claimable: !!next && value >= next.goal };
   }
 
-  /** Coleta os Shards de uma conquista concluída. */
+  /** Conquistas com um degrau alcançado e ainda não coletado. */
+  get claimableAchievements() {
+    return ACHIEVEMENTS.filter((a) => this.tierState(a).claimable);
+  }
+
+  /** Coleta os Shards do degrau atual; a conquista volta com o próximo objetivo. */
   claimAchievement(id) {
-    const { unlocked, claimed } = this.profile.achievements;
-    if (!unlocked.includes(id) || claimed.includes(id)) return 0;
     const achievement = ACHIEVEMENTS.find((a) => a.id === id);
-    const amount = achievement?.reward?.shards ?? achievement?.reward?.coins ?? CONFIG.shards.perAchievement;
-    claimed.push(id);
-    this.addShards(amount);
-    return amount;
+    if (!achievement) return 0;
+    const state = this.tierState(achievement);
+    if (!state.claimable) return 0;
+    this.profile.achievements.tiers[id] = state.claimed + 1;
+    return this.addShards(state.next.shards);
   }
 
   refreshDexCount() {
     this.profile.stats.dexCaught = this.profile.pokedex.caught.length;
   }
 
-  /** Verifica todas as conquistas e devolve as recém-desbloqueadas. */
-  checkAchievements() {
-    const unlockedNow = [];
-    const { unlocked } = this.profile.achievements;
+  /** Contadores que se calculam a partir do perfil (e não de eventos). */
+  refreshDerivedStats() {
+    const p = this.profile;
+    p.stats.champions = p.hallOfFame?.length ?? 0;
+    p.stats.trainerUpgradesBought = Object.values(p.trainerUpgrades ?? {}).reduce((sum, v) => sum + (v ?? 0), 0);
+    this.refreshDexCount();
+  }
 
+  /** Avisa (uma vez por degrau) as conquistas que ficaram prontas para coletar; devolve essas. */
+  checkAchievements() {
+    this.refreshDerivedStats();
+    const ready = [];
+    const { notified } = this.profile.achievements;
     for (const achievement of ACHIEVEMENTS) {
-      const value = this.profile.stats[achievement.stat] ?? 0;
-      this.profile.achievements.progress[achievement.id] = value;
-      if (unlocked.includes(achievement.id)) continue;
-      if (value >= achievement.goal) {
-        // Conquista concluída: os Shards ficam guardados para o jogador
-        // coletar na aba Conquistas (não entram sozinhos).
-        unlocked.push(achievement.id);
-        unlockedNow.push(achievement);
-        bus.emit(EVENTS.TOAST, {
-          text: `Conquista concluída: ${achievement.name} — colete os Shards!`,
-          icon: achievement.icon
-        });
-      }
+      const state = this.tierState(achievement);
+      if (!state.claimable) continue;
+      ready.push(achievement);
+      const tier = state.claimed + 1;
+      if ((notified[achievement.id] ?? 0) >= tier) continue;
+      notified[achievement.id] = tier;
+      bus.emit(EVENTS.TOAST, {
+        text: `Conquista: ${achievement.name} ${roman(tier)} — colete os Shards!`,
+        icon: achievement.icon
+      });
     }
-    return unlockedNow;
+    return ready;
   }
 
   /** Aplica o resultado de uma partida ao perfil. */
@@ -207,7 +259,9 @@ export class ProfileTracker {
     p.stats.runsPlayed++;
     p.stats.playTime += Math.round(time ?? 0);
     p.stats.maxRunLevel = Math.max(p.stats.maxRunLevel, level ?? 0);
+    p.stats.damageDealt = Math.round((p.stats.damageDealt ?? 0) + (stats?.damageDealt ?? 0));
     if (teamSize >= CONFIG.team.maxSize) p.stats.fullTeams++;
+    if (victory && (stats?.faints ?? 0) === 0) p.stats.flawlessClears = (p.stats.flawlessClears ?? 0) + 1;
 
     if (victory) {
       p.stats.stagesCleared++;

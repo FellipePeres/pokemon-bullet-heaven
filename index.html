@@ -40,6 +40,10 @@
     </button>
   </aside>
 
+  <!-- a engrenagem de Opções (e do volume) no canto de toda tela; no título e na
+       partida ela mora nos atalhos de lá -->
+  <button id="gear-btn" class="corner-btn gear-float" data-modal="modal-options" title="Opções e volume"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M19.4 13a7.6 7.6 0 0 0 0-2l2.1-1.6-2-3.4-2.5 1a7.7 7.7 0 0 0-1.7-1L15 3.3h-4l-.4 2.7a7.7 7.7 0 0 0-1.7 1l-2.5-1-2 3.4L6.5 11a7.6 7.6 0 0 0 0 2l-2.1 1.6 2 3.4 2.5-1a7.7 7.7 0 0 0 1.7 1l.4 2.7h4l.4-2.7a7.7 7.7 0 0 0 1.7-1l2.5 1 2-3.4zM13 15.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z" transform="translate(-1 0)"/></svg><span class="corner-label">Opções</span></button>
+
   <!-- ============================================================
        MENU PRINCIPAL
        ============================================================ -->
@@ -135,6 +139,7 @@
     <div id="campaign-list" class="stage-list"></div>
 
     <div class="row-buttons">
+      <button id="btn-pc" class="menu-btn ghost" data-modal="modal-pc">PC</button>
       <button id="btn-hall" class="menu-btn ghost hidden">Hall da Fama</button>
       <button id="btn-save-campaign" class="menu-btn ghost">Salvar Jogo (.json)</button>
       <button class="menu-btn ghost back" data-back="screen-title">Menu Principal</button>
@@ -163,6 +168,7 @@
           <span id="kill-count">0</span>
           <span id="ball-count">0</span>
           <button id="btn-pause" class="icon-btn" title="Pausar (ESC)">❚❚</button>
+          <button id="btn-hud-options" class="icon-btn" title="Opções e volume"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M19.4 13a7.6 7.6 0 0 0 0-2l2.1-1.6-2-3.4-2.5 1a7.7 7.7 0 0 0-1.7-1L15 3.3h-4l-.4 2.7a7.7 7.7 0 0 0-1.7 1l-2.5-1-2 3.4L6.5 11a7.6 7.6 0 0 0 0 2l-2.1 1.6 2 3.4 2.5-1a7.7 7.7 0 0 0 1.7 1l.4 2.7h4l.4-2.7a7.7 7.7 0 0 0 1.7-1l2.5 1 2-3.4zM13 15.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z" transform="translate(-1 0)"/></svg></button>
         </div>
       </div>
 
@@ -320,6 +326,24 @@
           melhora só o Pokémon.
         </p>
         <div id="trainer-list" class="node-list"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- O PC do lobby: troque Pokémon entre a equipe e o PC entre uma fase e outra -->
+  <div id="modal-pc" class="modal hidden">
+    <div class="modal-card wide">
+      <header class="modal-head">
+        <h3><span class="ui-icon"><img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/pokemon-box-link.png" alt="" /></span>PC</h3>
+        <span class="modal-sub" id="pc-sub">Escolha um da equipe e um do PC para trocar.</span>
+        <button class="icon-btn close" data-close>✕</button>
+      </header>
+      <div class="modal-body">
+        <h4 class="pc-title" id="pc-team-title">Equipe</h4>
+        <div id="pc-team" class="pc-grid"></div>
+        <div class="pc-actions" id="pc-actions"></div>
+        <h4 class="pc-title" id="pc-box-title">PC</h4>
+        <div id="pc-box" class="pc-grid"></div>
       </div>
     </div>
   </div>

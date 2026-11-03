@@ -39,6 +39,15 @@ salões, e quais metatiles bloqueiam o caminho pela colisão do mapa) sai em
 Os PNG do decomp são indexados com uma paleta provisória; as cores de verdade estão
 nos `.pal`. O índice 0 é transparente, e o recorte é sempre pelo índice, nunca pela cor.
 
+## Músicas (`tools/assets/render_music.py`)
+
+| Saída | Origem |
+|---|---|
+| `music/mus_*.ogg` | as músicas do FireRed renderizadas pelo motor de som do jogo (o m4a), com o sintetizador copiado do Pokemon All (`extracted/pokefirered/tools/render_sound.py` de lá). Instrumentos, samples e `midi.cfg` vêm do decomp do Pokemon All (só leitura); as partituras que ele não guardou, do decomp público pret/pokefirered no commit `c75f352` |
+| `music/lobby-theme.ogg` | o tema do lobby do Pokemon All (`src/app/assets/lobby-theme.ogg`), copiado como está |
+
+`src/data/musicTracks.js` guarda onde cada loop começa e acaba.
+
 ## Copiados do Pokemon All (interface)
 
 | Saída | Origem |

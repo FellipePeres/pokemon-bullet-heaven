@@ -1,8 +1,9 @@
-import { el, create, clear, show, hide } from './dom.js';
+import { el, create, clear, show, hide, toast } from './dom.js';
 import { getPokemon } from '../data/pokemon.js';
 import { getAbility } from '../data/abilities.js';
 import { STAGES, isStageUnlocked } from '../data/stages.js';
-import { ACHIEVEMENTS } from '../data/achievements.js';
+import { ACHIEVEMENTS, TOTAL_ACHIEVEMENT_TIERS } from '../data/achievements.js';
+import { roman } from '../save/profile.js';
 import { moveLineOf } from '../data/tms.js';
 import { getTrainerLook } from '../data/trainers.js';
 import { spriteUrl, artworkUrl, pokemonImg, badgeUrl } from '../render/sprites.js';
@@ -10,13 +11,13 @@ import { assetUrl } from '../render/assets.js';
 import { saveOptions } from '../save/options.js';
 import { typeColor, typeName } from '../data/types.js';
 import { CONFIG } from '../core/config.js';
-import { iconHTML } from '../render/icons.js';
+import { iconHTML, itemUrl } from '../render/icons.js';
 import { formatTime } from '../core/utils.js';
 import { maxHpFor } from '../systems/stats.js';
 import { TitleMenu } from './titleMenu.js';
 
 const SCREENS = ['screen-title', 'screen-trainer', 'screen-starter', 'screen-campaign'];
-const MODALS = ['modal-pokedex', 'modal-achievements', 'modal-team', 'modal-trainer', 'modal-options', 'modal-help'];
+const MODALS = ['modal-pokedex', 'modal-achievements', 'modal-team', 'modal-trainer', 'modal-options', 'modal-help', 'modal-pc'];
 
 /**
  * Telas fora da partida.
@@ -98,7 +99,8 @@ export class Menus {
       'modal-achievements': () => this.buildAchievements(),
       'modal-team': () => this.buildTeamDetail(),
       'modal-trainer': () => this.buildTrainer(),
-      'modal-options': () => this.buildOptions()
+      'modal-options': () => this.buildOptions(),
+      'modal-pc': () => { this.pcSelected = null; this.buildPC(); }
     };
     builders[id]?.();
     show(el(id));
@@ -126,7 +128,7 @@ export class Menus {
       ['pokedex', 'Pokédex', `${profile.pokedex.caught.length}/${this.game.region.dex.length}`],
       ['badge', 'Insígnias', String(profile.stats.badges)],
       ['stages', 'Fases', String(this.game.campaign.clearedStages.length)],
-      ['achievements', 'Conquistas', `${profile.achievements.unlocked.length}/${ACHIEVEMENTS.length}`]
+      ['achievements', 'Conquistas', `${Object.values(profile.achievements.tiers ?? {}).reduce((a, b) => a + b, 0)}/${TOTAL_ACHIEVEMENT_TIERS}`]
     ];
     for (const [icon, label, value] of pills) {
       strip.appendChild(create('span', 'pill', `${iconHTML(icon, 18)} ${label} <b>${value}</b>`));
@@ -217,6 +219,9 @@ export class Menus {
     el('campaign-subtitle').textContent = journey
       ? 'Sua equipe e sua build continuam de uma fase para a outra. Uma derrota devolve você ao início da fase.'
       : 'Comece pela Rota 1. A partir dela sua equipe cresce e segue com você.';
+
+    // o botão do PC diz quantos estão guardados
+    el('btn-pc').textContent = this.game.pcBox.length ? `PC (${this.game.pcBox.length})` : 'PC';
 
     // faixa com a equipe atual
     const teamStrip = clear(el('campaign-team'));
@@ -336,47 +341,117 @@ export class Menus {
 
   buildAchievements() {
     const list = clear(el('achievements-list'));
-    const { unlocked, claimed } = this.game.profile.achievements;
-    const stats = this.game.profile.stats;
-    const pending = this.game.tracker.claimableAchievements.length;
+    const tracker = this.game.tracker;
+    const pending = tracker.claimableAchievements.length;
 
     el('achievements-sub').innerHTML = pending
-      ? `${iconHTML('shards', 15)} <b style="color:var(--yellow)">${pending} conquista(s) para coletar</b>`
-      : 'Conclua objetivos para ganhar Shards.';
+      ? `${iconHTML('shards', 15)} <b>${pending} conquista(s) para coletar</b> — cada uma volta com um objetivo maior`
+      : 'Cada conquista tem degraus: ao coletar, ela volta com um objetivo maior e mais Shards.';
 
-    for (const achievement of ACHIEVEMENTS) {
-      const value = stats[achievement.stat] ?? 0;
-      const done = unlocked.includes(achievement.id);
-      const taken = claimed.includes(achievement.id);
-      const progress = Math.min(1, value / achievement.goal);
-      const reward = achievement.reward?.shards ?? 0;
+    // primeiro as que dá para coletar, depois as em andamento, por fim as completas
+    const rank = (state) => (state.claimable ? 0 : state.complete ? 2 : 1);
+    const rows = ACHIEVEMENTS.map((achievement) => ({ achievement, state: tracker.tierState(achievement) }))
+      .sort((a, b) => rank(a.state) - rank(b.state));
 
-      const node = create('div', `node achievement ${done ? (taken ? 'claimed' : 'claimable') : 'locked'}`);
+    for (const { achievement, state } of rows) {
+      const tier = state.complete ? achievement.tiers.length : state.claimed + 1;
+      const goal = (state.next ?? achievement.tiers.at(-1)).goal;
+      const progress = Math.min(1, state.value / goal);
+      const pips = achievement.tiers
+        .map((_, k) => `<i class="tier-pip${k < state.claimed ? ' on' : ''}${k === state.claimed && state.claimable ? ' ready' : ''}"></i>`)
+        .join('');
+
+      const node = create('div', `node achievement ${state.claimable ? 'claimable' : state.complete ? 'claimed' : ''}`);
       node.innerHTML = `
         <div class="node-icon">${iconHTML(achievement.icon, 30)}</div>
         <div class="node-body">
-          <h4>${achievement.name}</h4>
-          <p>${achievement.description}</p>
+          <h4>${achievement.name} <span class="tier-badge">${roman(tier)}</span></h4>
+          <p>${achievement.description(goal)}</p>
           <div class="bar xp" style="margin-top:6px"><i style="width:${progress * 100}%"></i></div>
-          <div class="node-meta">${Math.min(value, achievement.goal)} / ${achievement.goal}</div>
+          <div class="node-meta"><span class="tier-pips">${pips}</span> ${Math.min(state.value, goal).toLocaleString('pt-BR')} / ${goal.toLocaleString('pt-BR')}</div>
         </div>
       `;
 
-      if (done && !taken) {
+      if (state.claimable) {
         const btn = create('button', 'claim-btn');
-        btn.innerHTML = `<span>coletar</span><b>${iconHTML('shards', 14)} ${reward}</b>`;
+        btn.innerHTML = `<span>coletar</span><b>${iconHTML('shards', 14)} ${state.next.shards}</b>`;
         btn.onclick = () => {
           this.game.claimAchievement(achievement.id);
           this.buildAchievements();
           this.refreshTitle();
         };
         node.appendChild(btn);
+      } else if (state.complete) {
+        node.appendChild(create('div', 'node-state done', '✔ completa'));
       } else {
-        node.appendChild(create('div', `node-state ${taken ? 'done' : ''}`,
-          taken ? '\u2714 coletado' : `${iconHTML('shards', 14)} ${reward}`));
+        node.appendChild(create('div', 'node-state', `${iconHTML('shards', 14)} ${state.next.shards}`));
       }
-
       list.appendChild(node);
+    }
+  }
+
+  /* ================================== PC ================================== */
+
+  /**
+   * O PC do lobby: a equipe em cima, o PC embaixo. Toque um da equipe para
+   * escolher quem sai; toque um do PC para trocar com ele (ou só retirar, se a
+   * equipe tiver vaga). A equipe da jornada é a que entra na próxima fase.
+   */
+  buildPC() {
+    const game = this.game;
+    const team = game.campaign.journey?.team?.members ?? [];
+    const box = game.pcBox;
+    const selected = team.find((m) => m.uid === this.pcSelected) ?? null;
+    const max = CONFIG.team.maxSize;
+
+    el('pc-team-title').textContent = `Equipe (${team.length}/${max})`;
+    el('pc-box-title').textContent = `PC (${box.length})`;
+    el('pc-sub').textContent = !team.length
+      ? 'Vença a primeira fase para a sua equipe passar a ser guardada na jornada.'
+      : selected
+        ? `${getPokemon(selected.pokemonId).name} vai sair: escolha quem entra do PC, ou deposite.`
+        : 'Escolha um da equipe para sair, ou um do PC para entrar. Vale para a próxima fase.';
+
+    const card = (member, onClick, extra = '') => {
+      const data = getPokemon(member.pokemonId);
+      const node = create('button', `pc-mon${extra}`);
+      node.type = 'button';
+      node.appendChild(pokemonImg(data.dex, { alt: data.name }));
+      node.appendChild(create('b', '', data.name));
+      node.appendChild(create('span', '', `Nv.${member.level}`));
+      node.onclick = onClick;
+      return node;
+    };
+
+    const teamRow = clear(el('pc-team'));
+    for (const member of team) {
+      teamRow.appendChild(card(member, () => {
+        this.pcSelected = this.pcSelected === member.uid ? null : member.uid;
+        this.buildPC();
+      }, member.uid === this.pcSelected ? ' selected' : ''));
+    }
+
+    const actions = clear(el('pc-actions'));
+    if (selected && team.length > 1) {
+      const deposit = create('button', 'icon-btn', `Depositar ${getPokemon(selected.pokemonId).name}`);
+      deposit.onclick = () => { game.pcSwap(selected.uid, null); this.pcSelected = null; this.buildPC(); this.buildCampaign(); };
+      actions.appendChild(deposit);
+    }
+
+    const boxRow = clear(el('pc-box'));
+    if (!box.length) {
+      boxRow.appendChild(create('p', 'pc-empty',
+        'O PC está vazio. Com a equipe cheia, quem você capturar (ou quem sair dela) vem para cá.'));
+    }
+    for (const member of box) {
+      const canTake = selected || team.length < max;
+      boxRow.appendChild(card(member, () => {
+        if (!canTake) { toast('Equipe cheia: escolha antes quem sai.', 'team'); return; }
+        game.pcSwap(selected?.uid ?? null, member.uid);
+        this.pcSelected = null;
+        this.buildPC();
+        this.buildCampaign();
+      }, canTake ? '' : ' disabled'));
     }
   }
 
@@ -474,11 +549,12 @@ export class Menus {
 
   buildOptions() {
     const list = clear(el('options-list'));
+    const icon = (item) => `<span class="ui-icon"><img src="${itemUrl(item)}" alt="" /></span>`;
 
-    const option = (icon, title, description, value, onClick) => {
+    const option = (iconHTML, title, description, value, onClick) => {
       const node = create('div', 'node');
       node.innerHTML = `
-        <div class="node-icon">${icon}</div>
+        <div class="node-icon">${iconHTML}</div>
         <div class="node-body"><h4>${title}</h4><p>${description}</p></div>
       `;
       const btn = create('button', 'icon-btn', value);
@@ -486,6 +562,36 @@ export class Menus {
       node.appendChild(btn);
       list.appendChild(node);
     };
+
+    // o mixer: a música do lobby e das fases (a barra em degraus, a Poké Ball de manopla)
+    const music = create('div', 'node volume-node');
+    const percent = Math.round(CONFIG.audio.musicVolume * 100);
+    music.innerHTML = `
+      <div class="node-icon">${icon('poke-flute')}</div>
+      <div class="node-body">
+        <h4>Música</h4>
+        <p>O tema do lobby e a música de cada fase, do FireRed.</p>
+        <div class="volume-row">
+          <input type="range" class="volume-slider" min="0" max="100" step="5" value="${percent}" aria-label="Volume da música" />
+          <span class="volume-value">${percent === 0 ? 'Mudo' : `${percent}%`}</span>
+        </div>
+      </div>
+    `;
+    const slider = music.querySelector('.volume-slider');
+    const label = music.querySelector('.volume-value');
+    if (slider) {
+      // o quanto da barra fica preenchido (variável do CSS)
+      const fill = (v) => { if (typeof slider.style.setProperty === 'function') slider.style.setProperty('--fill', `${v}%`); };
+      fill(percent);
+      slider.oninput = () => {
+        const value = Number(slider.value);
+        this.game.music.setVolume(value / 100);
+        label.textContent = value === 0 ? 'Mudo' : `${value}%`;
+        fill(value);
+      };
+      slider.onchange = () => saveOptions();
+    }
+    list.appendChild(music);
 
     const looks = this.game.region.trainers;
     const trainer = getTrainerLook(this.game.profile.trainer);
@@ -497,32 +603,17 @@ export class Menus {
         this.game.autosave();
       });
 
-    option('👥', 'Pokémon ativos ao mesmo tempo',
-      'Vale para a próxima partida. A divisão de XP se ajusta sozinha.',
-      String(CONFIG.team.activeSlots),
-      () => { CONFIG.team.activeSlots = CONFIG.team.activeSlots >= 4 ? 1 : CONFIG.team.activeSlots + 1; });
-
-    option('📳', 'Tremor de tela',
+    option(icon('hard-stone'), 'Tremor de tela',
       'A tela treme em explosões, no Earthquake e nos golpes dos líderes.',
       CONFIG.fx.screenShake ? 'Ligado' : 'Desligado',
       () => { CONFIG.fx.screenShake = !CONFIG.fx.screenShake; });
 
-    option('🎞️', 'Sprites animados na interface',
-      'GIFs da Gen V nos menus e no HUD. Desligue se preferir imagens estáticas.',
-      CONFIG.sprites.useAnimatedUI ? 'Ligado' : 'Desligado',
-      () => { CONFIG.sprites.useAnimatedUI = !CONFIG.sprites.useAnimatedUI; });
-
-    option('🖼️', 'Sprites oficiais (online)',
-      'Baixa os sprites da PokeAPI. Desligado, o jogo desenha versões simplificadas.',
-      CONFIG.sprites.useRemote ? 'Ligado' : 'Desligado',
-      () => { CONFIG.sprites.useRemote = !CONFIG.sprites.useRemote; });
-
-    option('💾', 'Autosave no navegador',
+    option(icon('pokemon-box-link'), 'Autosave no navegador',
       'Guarda o progresso local para o botão Continuar. O arquivo .json continua sendo o save oficial.',
       CONFIG.save.useLocalStorage ? 'Ligado' : 'Desligado',
       () => { CONFIG.save.useLocalStorage = !CONFIG.save.useLocalStorage; });
 
-    option('🗑️', 'Apagar progresso local',
+    option(icon('escape-rope'), 'Apagar progresso local',
       'Remove o autosave do navegador. Não afeta os arquivos .json já salvos.',
       'Apagar',
       () => this.game.clearLocalProgress());

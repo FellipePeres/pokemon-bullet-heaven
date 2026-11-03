@@ -45,6 +45,7 @@ export const EVENTS = {
   SHARDS_EARNED: 'meta:shards',
   POKEMON_SWAPPED: 'team:swapped',
   BALL_PICKED: 'pickup:ball',
+  MAGNET_PICKED: 'pickup:magnet',
   STAGE_CLEARED: 'stage:cleared',
   STAGE_FAILED: 'stage:failed',
   BOSS_SPAWNED: 'stage:boss',

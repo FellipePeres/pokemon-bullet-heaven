@@ -155,14 +155,19 @@ export class TeamSystem {
     return replacement;
   }
 
+  /** Um membro no formato do save (o mesmo que o PC guarda). */
+  static serializeMember(m) {
+    return {
+      uid: m.uid, pokemonId: m.pokemonId, level: m.level, xp: Math.round(m.xp),
+      hp: Math.round(m.hp), fainted: m.fainted, pendingLevels: m.pendingLevels, attack: m.attack !== false,
+      abilities: [...m.abilities], upgrades: { ...m.upgrades }
+    };
+  }
+
   /** Serialização para o save. */
   serialize() {
     return {
-      members: this.members.map((m) => ({
-        uid: m.uid, pokemonId: m.pokemonId, level: m.level, xp: Math.round(m.xp),
-        hp: Math.round(m.hp), fainted: m.fainted, pendingLevels: m.pendingLevels, attack: m.attack !== false,
-        abilities: [...m.abilities], upgrades: { ...m.upgrades }
-      })),
+      members: this.members.map((m) => TeamSystem.serializeMember(m)),
       active: this.active.map((m) => (m ? m.uid : null))
     };
   }
