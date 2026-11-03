@@ -3,7 +3,7 @@
  * Nada de número mágico espalhado pelo gameplay: se precisar ajustar, ajuste aqui.
  */
 export const CONFIG = {
-  version: '0.11.4',
+  version: '0.11.5',
 
   canvas: { width: 1280, height: 720 },
 
@@ -128,6 +128,10 @@ export const CONFIG = {
       summonBonus: 1, summonIntervalMult: 0.7,
       enrageAt: 0.5, enrage: { speed: 1.3, cooldown: 0.65, summonInterval: 0.6, barrageExtra: 2 }
     },
+    // inimigo preso (0.11.5): dentro de um obstáculo por `insideFor` s, ou longe do
+    // treinador andando menos de `minMove` do esperado em `strikes` janelas de
+    // `window` s seguidas, é teleportado para um ponto livre
+    unstick: { insideFor: 0.5, window: 1.5, strikes: 2, minMove: 0.12, nearPlayer: 140 },
     referenceLevel: 5,
     hpGrowth: 1.075,
     damageGrowth: 1.035,

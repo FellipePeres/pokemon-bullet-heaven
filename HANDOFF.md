@@ -5,7 +5,7 @@
 > decisão foi tomada e o que falta fazer. O `README.md` é o manual de uso;
 > este aqui é o contexto de desenvolvimento.
 
-**Versão atual:** `0.11.4` · **Última atualização:** 2026-11-03
+**Versão atual:** `0.11.5` · **Última atualização:** 2026-11-03
 **Stack:** HTML + CSS + JavaScript puro (ES Modules). Sem backend, sem build, sem dependências.
 **Repositório:** https://github.com/FellipePeres/pokemon-bullet-heaven (público)
 **Jogo no ar:** https://fellipeperes.github.io/pokemon-bullet-heaven/
@@ -310,6 +310,14 @@ Nunca voltar bônus globais para o pool de level up — foi pedido explícito.
   contorna pelo lado. Os Pokémon da equipe, golpes e itens passam por cima. Ao
   mudar de trecho, quem ficou dentro de um obstáculo novo vai para o ponto livre
   mais perto (`Run._settleTerrain`).
+- **Inimigo preso** (0.11.5): a separação entre inimigos (`Run._updateEnemies`)
+  empurrava direto na posição e, na multidão, jogava inimigos para dentro das
+  árvores; agora passa por `terrain.move`. Rede de segurança (ideia do Fellipe,
+  `Run._unstick`, `CONFIG.enemies.unstick`): dentro de um obstáculo por 0,5 s, ou
+  longe do treinador quase sem sair do lugar por ~3 s (encurralado atrás de uma
+  árvore), o inimigo é teleportado para um ponto livre ao acaso — fora da tela, ou,
+  se for um líder, a 260–380 px. Medido: 0 quadros dentro de obstáculo em 3,7
+  milhões; todos os teleportes da amostra eram de inimigos com parede ao lado.
 - **Líderes** (0.10, "derrotei o Brock de maneira muito simples"):
   `CONFIG.enemies.boss` dá vida ×4, dano ×1,6 e golpes 40% mais frequentes que os
   dados, mais uma **Rajada** que todo líder tem (`leader_barrage`: leque de
@@ -346,6 +354,11 @@ Nunca voltar bônus globais para o pool de level up — foi pedido explícito.
   membro, cada uma com o time de 5 do FireRed) e o Campeão. Os times são os do
   FireRed, com os níveis dele; o do rival muda pelo seu inicial
   (`bossTeamByStarter`), como no jogo.
+- **Ajuste por inicial** (0.11.5, `stage.starterTuning`): onde um inicial sobra,
+  vida e dano dos inimigos e do líder sobem um pouco quando ele é o da jornada
+  (`SpawnSystem.spawnAt`, e `enemy.tilt` nos golpes do líder). Hoje só o Squirtle,
+  nas Fases 1 (×1,2), 6 (×1,2) e 7 (×1,15): ele vencia 100% delas, contra 13–67%
+  dos outros; com o ajuste, 45–56%, 24–31% e 50–83% (48 jornadas).
 - **Selvagens com nível** (0.7, só da Fase 3 em diante): cada onda tem `level:
   [mín, máx]`, que **acompanha a equipe** (alguns níveis abaixo dela no começo,
   perto do ace do líder no fim). Vida e dano crescem de forma composta por nível
@@ -714,6 +727,7 @@ tipo, som e o polimento de troca e captura.
 | 12 | todos os Pokémon são obtíveis?; a Fase 1 simples demais: mais espécies, poucos evoluídos, mais estágio 1 | as 151 têm caminho (141 captura, 3 iniciais, 4 presentes, 3 evolução), mas Mew (0,11% por bola, só na Liga) e companhia são impraticáveis — sugerido encontro de lendário no pós-jogo, aguardando o Fellipe; 0.11.2: Fase 1 com 28 espécies, 96% básicas |
 | 13 | golpes do Brock mais espaçados (spam de pedra); subir de nível cura 1/4 e evoluir cura tudo; Brock com um pouco menos de vida; teste de vitória com os iniciais | 0.11.3: `cooldownMult` 1,6 nos Pokémon do Brock e −10% de vida; `levelUpHeal` 0,25 e evolução com vida cheia. Bot na Fase 1: Charmander 2% → 69%, Bulbasaur 4% → 100%, Squirtle 64% → 100% — a cura é quase todo o efeito (só o Brock: 28%, 22%, 68%). Depois, "no começo é muito fácil": a cura só do nível 11 em diante (Fase 1: 48%, 63%, 94%); publicado |
 | 14 | ainda fácil com a cura: uma sugestão de cura por nível sem quebrar; o Fellipe escolheu 1/10 da vida máxima | 0.11.4: `levelUpHeal` 0,1 (do nível 11); Fases 1 a 3 com 43–100% e de 0 a 3,4 desmaios por tentativa (24 jornadas por inicial) |
+| 15 | investigar o inimigo preso (sugestão: teleporte aleatório quando travar); Squirtle fácil demais: inimigos um pouco mais fortes com ele | 0.11.5: a causa era o empurrão entre inimigos, que ignorava o cenário; rede de segurança com teleporte; `starterTuning` do Squirtle nas Fases 1, 6 e 7 |
 
 ---
 

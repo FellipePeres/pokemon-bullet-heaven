@@ -204,13 +204,20 @@ export class SpawnSystem {
     // Chefes têm vida definida direto nos dados: aplicar também a escala da fase
     // dobraria a dificuldade e tornaria o balanceamento impossível de prever.
     const isBoss = !!getEnemy(enemyId)?.boss;
-    let scaling = { hp: 1, speed: 1, damage: 1 };
+    // ajuste por inicial (0.11.5): na fase em que um inicial sobra, os inimigos
+    // (o líder também) ficam um pouco mais fortes quando ele é o da jornada
+    const tilt = this.stage.starterTuning?.[this.run.campaignStarter] ?? 1;
+    let scaling = { hp: tilt, speed: 1, damage: tilt };
     if (!isBoss) {
       const ramp = this.scaling;
       const byLevel = levelScaling(level);
-      scaling = { hp: ramp.hp * byLevel.hp, speed: ramp.speed, damage: ramp.damage * byLevel.damage, xp: byLevel.xp * (this.stage.xpScale ?? 1) };
+      scaling = {
+        hp: ramp.hp * byLevel.hp * tilt, speed: ramp.speed, damage: ramp.damage * byLevel.damage * tilt,
+        xp: byLevel.xp * (this.stage.xpScale ?? 1)
+      };
     }
     const enemy = new Enemy(enemyId, x, y, scaling, level);
+    enemy.tilt = tilt;   // os golpes do líder também
     // nasce fora das árvores, pedras e paredes
     this.run.terrain?.place(enemy, enemy.box);
     this.run.enemies.push(enemy);

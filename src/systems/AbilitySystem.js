@@ -307,7 +307,7 @@ export class AbilitySystem {
     const ability = getAbility(abilityId);
     if (!ability) return;
     const s = ability.base;
-    const damageMult = CONFIG.enemies.damageMult * (enemy.boss ? CONFIG.enemies.boss.damageMult : 1);
+    const damageMult = CONFIG.enemies.damageMult * (enemy.boss ? CONFIG.enemies.boss.damageMult : 1) * (enemy.tilt ?? 1);
     if (ability.behavior === 'projectile') {
       // leque mirando o treinador; o visual e o tipo são os do líder
       const type = enemy.types[0] ?? 'normal';

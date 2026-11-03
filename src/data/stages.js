@@ -25,6 +25,8 @@
  *                  até o líder, ~4 min com a luta; menos inimigos, cada um vale mais)
  *   music          a música da fase (assets/music, data/musicTracks.js); leaderMusic
  *                  toca quando o líder entra
+ *   starterTuning  { inicial: fator } — vida e dano dos inimigos (e do líder) multiplicados
+ *                  quando esse é o inicial da jornada; para a fase em que um inicial sobra
  *   maxBalls       teto de Poké Balls da fase (controla o ritmo das capturas)
  *   scriptedBalls  segundos em que uma Poké Ball aparece garantida (0.10: só uma,
  *                  na Fase 1, para o inicial ganhar companhia; o resto é sorte)
@@ -80,6 +82,8 @@ export const STAGES = {
     },
     bossTeam: ['brock_geodude', 'brock_onix'],
 
+    // o Squirtle sobrava aqui (0.11.5: 100% de vitórias quase sem desmaio, contra 43–67% dos outros)
+    starterTuning: { squirtle: 1.2 },
     capturePool: 'phase1',
     ballChance: 1,
     maxBalls: 3,
@@ -379,6 +383,8 @@ export const STAGES = {
       { at: 129, choices: ['hitmonlee', 'hitmonchan'], title: 'O Dojo de Saffron: escolha o seu prêmio!' }
     ],
 
+    // o Squirtle sobrava aqui (0.11.5: 100%, contra 13–22% dos outros)
+    starterTuning: { squirtle: 1.2 },
     capturePool: 'phase6',
     ballChance: 1,
     maxBalls: 2,
@@ -439,6 +445,8 @@ export const STAGES = {
     },
     bossTeam: ['blaine_growlithe', 'blaine_ponyta', 'blaine_rapidash', 'blaine_arcanine'],
 
+    // o Squirtle sobrava aqui (0.11.5: 100%: Água contra o Blaine)
+    starterTuning: { squirtle: 1.15 },
     capturePool: 'phase7',
     ballChance: 1,
     maxBalls: 2,

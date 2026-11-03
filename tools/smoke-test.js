@@ -21,6 +21,7 @@ import { nextMoveFor, moveLineOf } from '../src/data/tms.js';
 import { getPokemon } from '../src/data/pokemon.js';
 import { Pickup } from '../src/entities/Pickup.js';
 import { swapWithPC } from '../src/systems/pc.js';
+import { TILE } from '../src/systems/terrain.js';
 
 let failures = 0;
 
@@ -338,6 +339,33 @@ console.log('\n[obstáculos]');
   const inside = run.enemies.filter((e) => !e.dead && terrain.overlaps(e, e.box)).length;
   check('nenhum inimigo dentro de obstáculo', inside === 0, `${run.enemies.length} inimigos, ${inside} dentro`);
 
+  // inimigo preso (0.11.5): quem cai dentro de um obstáculo é tirado de lá
+  {
+    const probe = new Run('gym_1_pewter', { starter: 'charmander' });
+    probe.spawner.update = () => {};
+    const t = probe.terrain;
+    const enemy = probe.spawner.spawnAt('rattata', probe.player.x + 400, probe.player.y);
+    let solid = null;
+    for (let ty = 2; ty < 60 && !solid; ty++) {
+      for (let tx = 2; tx < 80 && !solid; tx++) {
+        const cx = (tx + 0.5) * TILE, cy = (ty + 0.5) * TILE - enemy.box.oy;
+        if (t.blocked(cx, cy + enemy.box.oy, enemy.box.hw, enemy.box.hh) && Math.hypot(cx - probe.player.x, cy - probe.player.y) > 300) solid = { x: cx, y: cy };
+      }
+    }
+    Object.assign(enemy, solid);
+    for (let i = 0; i < 60; i++) probe.update(1 / 60, { x: 0, y: 0 });
+    check('inimigo dentro de um obstáculo sai em até 1 s', !!solid && !enemy.dead && !t.overlaps(enemy, enemy.box));
+
+    // encurralado: longe do treinador e sem sair do lugar → teleporte para um ponto livre
+    const stuck = probe.spawner.spawnAt('rattata', probe.player.x - 500, probe.player.y);
+    stuck.update = () => 0;
+    const before = { x: stuck.x, y: stuck.y };
+    for (let i = 0; i < 60 * 4; i++) probe.update(1 / 60, { x: 0, y: 0 });
+    check('inimigo parado longe do treinador é teleportado',
+          Math.hypot(stuck.x - before.x, stuck.y - before.y) > 50 && !t.overlaps(stuck, stuck.box),
+          `andou ${Math.round(Math.hypot(stuck.x - before.x, stuck.y - before.y))} px`);
+  }
+
   // trocar de trecho tira quem ficou dentro do obstáculo novo
   run.world.scene = 'pewter_gym';
   run._settleTerrain();
@@ -414,6 +442,21 @@ console.log('\n[PC e capturas]');
         && swapWithPC(journey, null, journey.pc[0].uid, 6));
   const solo = { team: { members: [journey.team.members[0]], active: [journey.team.members[0].uid] }, pc: [] };
   check('a equipe nunca fica vazia', !swapWithPC(solo, solo.team.members[0].uid, null, 6));
+}
+
+// ---------------------------------------------- 5.11 ajuste por inicial
+console.log('\n[ajuste por inicial]');
+{
+  const stage = STAGES.gym_1_pewter;
+  const saved = stage.starterTuning;
+  stage.starterTuning = { squirtle: 1.2 };
+  const foe = (starter, id) => new Run('gym_1_pewter', { starter }).spawner.spawnAt(id, 0, 0, 5);
+  const base = foe('charmander', 'rattata'), tuned = foe('squirtle', 'rattata');
+  check('com o inicial ajustado, os selvagens têm mais vida e dano',
+        Math.abs(tuned.maxHp / base.maxHp - 1.2) < 1e-9 && Math.abs(tuned.damage / base.damage - 1.2) < 1e-9);
+  const boss = foe('charmander', 'brock_onix'), tunedBoss = foe('squirtle', 'brock_onix');
+  check('o líder também', Math.abs(tunedBoss.maxHp / boss.maxHp - 1.2) < 1e-9 && tunedBoss.tilt === 1.2 && boss.tilt === 1);
+  stage.starterTuning = saved;
 }
 
 // ------------------------------------------------------- 6. upgrades/dados

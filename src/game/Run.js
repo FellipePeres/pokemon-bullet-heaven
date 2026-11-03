@@ -295,13 +295,66 @@ export class Run {
           if (++count >= 6) break;
         }
       }
-      if (count) {
-        enemy.x += pushX * 6 * dt;
-        enemy.y += pushY * 6 * dt;
-      }
+      // o empurrão respeita o cenário: na multidão, ele jogava inimigos para
+      // dentro das árvores (o "inimigo preso" da 0.11.5)
+      if (count) this.terrain.move(enemy, pushX * 6 * dt, pushY * 6 * dt, enemy.box);
 
+      this._unstick(enemy, dt);
       this._enemyAttack(enemy);
     }
+  }
+
+  /**
+   * Rede de segurança contra inimigo preso (ideia do Fellipe, 0.11.5): quem está
+   * dentro de um obstáculo, ou quem fica alguns segundos sem sair do lugar longe
+   * do treinador (encurralado atrás de uma árvore), é teleportado para um ponto
+   * livre aleatório.
+   */
+  _unstick(enemy, dt) {
+    const rule = CONFIG.enemies.unstick;
+    if (this.terrain.overlaps(enemy, enemy.box)) {
+      enemy.insideFor = (enemy.insideFor ?? 0) + dt;
+      if (enemy.insideFor >= rule.insideFor) this._teleportEnemy(enemy);
+      return;
+    }
+    enemy.insideFor = 0;
+
+    const watch = enemy.stuckWatch ??= { t: 0, x: enemy.x, y: enemy.y, strikes: 0 };
+    watch.t += dt;
+    if (watch.t < rule.window) return;
+    const moved = Math.hypot(enemy.x - watch.x, enemy.y - watch.y);
+    const far = Math.hypot(enemy.x - this.player.x, enemy.y - this.player.y) > rule.nearPlayer;
+    watch.strikes = far && moved < enemy.speed * watch.t * rule.minMove ? watch.strikes + 1 : 0;
+    watch.t = 0;
+    watch.x = enemy.x;
+    watch.y = enemy.y;
+    if (watch.strikes >= rule.strikes) this._teleportEnemy(enemy);
+  }
+
+  /** Leva o inimigo para um ponto livre ao acaso: o chefe volta para perto da luta, os outros, para fora da tela. */
+  _teleportEnemy(enemy) {
+    const { player, world, terrain } = this;
+    const view = Math.hypot(CONFIG.canvas.width, CONFIG.canvas.height) / 2;
+    const [near, far] = enemy.boss ? [260, 380] : [view + 40, view + 160];
+    burst(this.particles, enemy.x, enemy.y, '#c8c8d8', 8, 120, 3, 0.4);
+    let spot = null;
+    for (let i = 0; i < 16 && !spot; i++) {
+      const a = Math.random() * Math.PI * 2;
+      const d = near + Math.random() * (far - near);
+      const x = Math.max(30, Math.min(world.width - 30, player.x + Math.cos(a) * d));
+      const y = Math.max(30, Math.min(world.height - 30, player.y + Math.sin(a) * d));
+      spot = terrain.freeSpot(x, y, enemy.box, 3);
+    }
+    if (spot) {
+      enemy.x = spot.x;
+      enemy.y = spot.y;
+    } else {
+      terrain.place(enemy, enemy.box);
+    }
+    enemy.kvx = 0;
+    enemy.kvy = 0;
+    enemy.insideFor = 0;
+    enemy.stuckWatch = null;
   }
 
   /**
