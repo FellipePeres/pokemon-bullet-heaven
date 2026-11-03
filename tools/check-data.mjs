@@ -17,7 +17,7 @@ import { REGIONS } from '../src/data/regions.js';
 import { FX, ABILITY_FX, BOSS_WAVE_FX, STATUS_FX } from '../src/data/fx.js';
 import { SCENES, stageScenes } from '../src/data/scenery.js';
 import { SCENE_TILES } from '../src/data/sceneManifest.js';
-import { buildSceneGrid, TILE } from '../src/render/scenery.js';
+import { buildSceneGrid, TILE } from '../src/systems/terrain.js';
 import { existsSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -143,18 +143,23 @@ const badRects = Object.entries(SCENES).filter(([, r]) => SCENE_TILES[r.sheet]?.
 });
 // toda metatile que os geradores usam precisa estar na tira extraída
 const missingTiles = [];
+const crowded = [];
 for (const [id, recipe] of Object.entries(SCENES)) {
   if (badSheets.includes(id) || badRects.some((b) => b.startsWith(id + ' '))) continue;
   const known = new Set(SCENE_TILES[recipe.sheet].ids);
   const grid = buildSceneGrid(id, Math.ceil(3400 / TILE), Math.ceil(2200 / TILE), 'check');
   const missing = [...new Set(grid.cells)].filter((cell) => !known.has(cell));
   if (missing.length) missingTiles.push(`${id}: ${missing.map((m) => '0x' + m.toString(16)).join(', ')}`);
+  // obstáculos demais deixam a arena sem espaço para fugir da horda
+  const blocked = grid.solid.reduce((sum, v) => sum + v, 0) / grid.solid.length;
+  if (blocked > 0.45) crowded.push(`${id} ${(blocked * 100).toFixed(0)}%`);
 }
 const usedScenes = new Set(Object.values(STAGES).flatMap((stage) => stageScenes(stage)));
 badSegments.length ? fail(`trechos com cenário inexistente: ${badSegments.join(', ')}`)
   : badSheets.length ? fail(`cenários sem tira de metatiles: ${badSheets.join(', ')} — rode tools/assets/extract.py`)
   : badRects.length ? fail(`recortes fora do mapa: ${badRects.join(', ')}`)
   : missingTiles.length ? fail(`metatiles fora da tira: ${missingTiles.join(' · ')}`)
+  : crowded.length ? fail(`cenários com obstáculo demais (mais de 45% bloqueado): ${crowded.join(', ')}`)
   : ok(`${Object.keys(SCENES).length} cenários do FireRed (${usedScenes.size} usados nas fases), todas as metatiles extraídas`);
 
 // pools de captura: mostra quanto de cada fase já está implementado

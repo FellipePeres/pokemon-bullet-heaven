@@ -7,6 +7,13 @@ import { maxHpFor, xpRatio } from '../systems/stats.js';
 import { CONFIG } from '../core/config.js';
 import { iconHTML } from '../render/icons.js';
 import { assetUrl } from '../render/assets.js';
+import { bus, EVENTS } from '../core/events.js';
+
+/** Espadinha do botão de ataque: lâmina, guarda e cabo. */
+const SWORD_SVG = '<svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true">' +
+  '<path d="M13.5 2.5 6.5 9.5" stroke="#eef3ff" stroke-width="2.6" stroke-linecap="square"/>' +
+  '<path d="M4.5 7.5l4 4" stroke="#e0a83e" stroke-width="2" stroke-linecap="round"/>' +
+  '<path d="M5.5 10.5 2.6 13.4" stroke="#8a5a2b" stroke-width="2.4" stroke-linecap="round"/></svg>';
 
 /**
  * HUD da partida: cards dos Pokémon ativos (vida, XP e nível de cada um),
@@ -55,7 +62,7 @@ export class HUD {
   _signature(run) {
     const team = run.team;
     return [
-      team.members.map((m) => `${m.uid}:${m.fainted ? 'f' : 'a'}:${m.pendingLevels > 0 ? 'p' : '-'}`).join(','),
+      team.members.map((m) => `${m.uid}:${m.fainted ? 'f' : 'a'}:${m.pendingLevels > 0 ? 'p' : '-'}:${m.attack === false ? 'x' : 'o'}`).join(','),
       team.active.map((m) => (m ? m.uid : '-')).join(','),
       team.selectedSlot,
       team.swapReady ? 1 : 0
@@ -102,12 +109,20 @@ export class HUD {
 
     const data = getPokemon(member.pokemonId);
     card.style.borderColor = typeColor(data.types[0]);
-    if (slot === run.team.selectedSlot) card.classList.add('selected');
-    card.title = `${data.name} — clique para escolher este slot como destino da troca`;
-    card.onclick = () => { run.team.selectedSlot = slot; this.signature = ''; };
+    // o slot marcado é quem sai na próxima troca (o selo "sai" deixa isso à vista)
+    if (slot === run.team.selectedSlot) {
+      card.classList.add('selected');
+      card.appendChild(create('span', 'swap-tag', '⇄ sai'));
+    }
+    card.title = `${data.name} — clique para ele ser quem sai na próxima troca`;
+    // no apertar, não no soltar: o HUD se refaz quando alguém sobe de nível e
+    // um clique que começasse antes e terminasse depois se perderia
+    card.onpointerdown = () => { run.team.selectedSlot = slot; this.signature = ''; };
 
     const index = run.team.members.indexOf(member);
     card.appendChild(create('span', 'key-hint', String(index + 1)));
+    card.appendChild(this._attackButton(run, member));
+    if (member.attack === false) card.classList.add('passive');
     card.appendChild(pokemonImg(data.dex, { alt: data.name }));
 
     const info = create('div', 'mon-info');
@@ -156,9 +171,12 @@ export class HUD {
     } else if (!run.team.swapReady) {
       node.classList.add('disabled');
       node.title = 'Troca em recarga';
+      node.onpointerdown = () => bus.emit(EVENTS.TOAST, { text: `Troca em recarga: ${run.team.swapTimer.toFixed(1)}s`, icon: 'swap' });
     } else {
-      node.title = `${data.name} — clique (ou tecla ${index + 1}) para entrar em campo`;
-      node.onclick = () => { if (run.team.swapIn(member.uid)) this.signature = ''; };
+      const leaving = run.team.active[run.team.selectedSlot];
+      const out = leaving ? ` no lugar de ${getPokemon(leaving.pokemonId).name}` : '';
+      node.title = `${data.name} — clique (ou tecla ${index + 1}) para entrar em campo${out}`;
+      node.onpointerdown = () => { if (run.team.swapIn(member.uid)) this.signature = ''; };
     }
 
     if (member.pendingLevels > 0) node.appendChild(this._levelButton(member));
@@ -172,9 +190,22 @@ export class HUD {
     const btn = create('button', 'level-btn', '▲');
     btn.title = `${member.pendingLevels} melhoria(s) disponível(is)`;
     if (member.pendingLevels > 1) btn.appendChild(create('span', 'count', String(member.pendingLevels)));
-    btn.onclick = (e) => {
+    btn.onpointerdown = (e) => {
       e.stopPropagation();
       this.game.openLevelUpFor(member);
+    };
+    return btn;
+  }
+
+  /** Espadinha: liga e desliga o ataque. Desligado, o Pokémon só acompanha o treinador. */
+  _attackButton(run, member) {
+    const on = member.attack !== false;
+    const btn = create('button', `attack-btn${on ? '' : ' off'}`, SWORD_SVG);
+    btn.title = on ? 'Atacando — clique para ele só acompanhar, sem atacar' : 'Só acompanhando — clique para voltar a atacar';
+    btn.onpointerdown = (e) => {
+      e.stopPropagation();
+      run.team.toggleAttack(member.uid);
+      this.signature = '';
     };
     return btn;
   }

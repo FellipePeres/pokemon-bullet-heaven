@@ -41,6 +41,7 @@ export class TeamSystem {
       hp: 0,
       fainted: false,
       pendingLevels: 0,
+      attack: true,           // a espadinha do HUD: desligado, ele só acompanha
       abilities: [...data.abilities],
       upgrades: {}            // upgrades de habilidade são por Pokémon
     };
@@ -63,10 +64,10 @@ export class TeamSystem {
   }
 
   /** Substitui um membro da equipe (usado quando a equipe está cheia). */
-  replaceMember(oldUid, pokemonId) {
+  replaceMember(oldUid, pokemonId, level = 1) {
     const index = this.members.findIndex((m) => m.uid === oldUid);
     if (index === -1) return null;
-    const newMember = this.createMember(pokemonId);
+    const newMember = this.createMember(pokemonId, level);
     const activeIndex = this.active.findIndex((m) => m && m.uid === oldUid);
     this.members[index] = newMember;
     if (activeIndex !== -1) this.active[activeIndex] = newMember;
@@ -104,6 +105,18 @@ export class TeamSystem {
     bus.emit(EVENTS.POKEMON_SWAPPED, { entering: member, leaving });
     bus.emit(EVENTS.TOAST, {
       text: `${getPokemon(member.pokemonId).name} entrou em campo!`,
+      icon: 'swap'
+    });
+    return true;
+  }
+
+  /** Liga e desliga o ataque de um Pokémon (ele continua em campo, só acompanhando). */
+  toggleAttack(memberUid) {
+    const member = this.members.find((m) => m.uid === memberUid);
+    if (!member) return false;
+    member.attack = member.attack === false;
+    bus.emit(EVENTS.TOAST, {
+      text: `${getPokemon(member.pokemonId).name} ${member.attack ? 'volta a atacar' : 'só acompanha, sem atacar'}`,
       icon: 'swap'
     });
     return true;
@@ -147,7 +160,7 @@ export class TeamSystem {
     return {
       members: this.members.map((m) => ({
         uid: m.uid, pokemonId: m.pokemonId, level: m.level, xp: Math.round(m.xp),
-        hp: Math.round(m.hp), fainted: m.fainted, pendingLevels: m.pendingLevels,
+        hp: Math.round(m.hp), fainted: m.fainted, pendingLevels: m.pendingLevels, attack: m.attack !== false,
         abilities: [...m.abilities], upgrades: { ...m.upgrades }
       })),
       active: this.active.map((m) => (m ? m.uid : null))
@@ -165,6 +178,7 @@ export class TeamSystem {
         hp: m.hp ?? 0,
         fainted: !!m.fainted,
         pendingLevels: m.pendingLevels ?? 0,
+        attack: m.attack !== false,
         abilities: [...(m.abilities ?? getPokemon(m.pokemonId).abilities)],
         upgrades: { ...(m.upgrades ?? {}) }
       };

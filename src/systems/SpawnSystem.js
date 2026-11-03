@@ -143,8 +143,10 @@ export class SpawnSystem {
     const { player, world } = this.run;
     const a = Math.random() * Math.PI * 2;
     const d = rand(130, 240);
-    const x = clamp(player.x + Math.cos(a) * d, 40, world.width - 40);
-    const y = clamp(player.y + Math.sin(a) * d, 40, world.height - 40);
+    let x = clamp(player.x + Math.cos(a) * d, 40, world.width - 40);
+    let y = clamp(player.y + Math.sin(a) * d, 40, world.height - 40);
+    // nunca dentro de uma árvore ou pedra, onde o treinador não alcança
+    ({ x, y } = this.run.terrain?.freeSpot(x, y, { oy: 0, hw: 10, hh: 10 }) ?? { x, y });
     this.run.stats.ballsDropped++;
     this.run.pickups.push(new Pickup('ball', x, y));
     bus.emit(EVENTS.TOAST, { text: 'Uma Poké Ball apareceu por perto!', icon: 'ball' });
@@ -157,7 +159,7 @@ export class SpawnSystem {
     for (const inst of enemy.abilities) {
       inst.timer -= dt;
       if (inst.timer <= 0) {
-        inst.timer = getAbility(inst.abilityId)?.base.cooldown ?? 5;
+        inst.timer = (getAbility(inst.abilityId)?.base.cooldown ?? 5) * CONFIG.enemies.boss.cooldownMult;
         this.run.abilitySystem.fireHostile(enemy, inst.abilityId);
       }
     }
@@ -198,6 +200,8 @@ export class SpawnSystem {
       scaling = { hp: ramp.hp * byLevel.hp, speed: ramp.speed, damage: ramp.damage * byLevel.damage, xp: byLevel.xp };
     }
     const enemy = new Enemy(enemyId, x, y, scaling, level);
+    // nasce fora das árvores, pedras e paredes
+    this.run.terrain?.place(enemy, enemy.box);
     this.run.enemies.push(enemy);
     return enemy;
   }

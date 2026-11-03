@@ -258,9 +258,9 @@ def extract_pokemon(source, manifest):
         }
 
 
-# Ícones de item que o jogo desenha no chão: os do Pokemon All
+# Ícones de item que o jogo desenha no chão (Poké Ball, Ímã, Poção): os do Pokemon All
 # (assets/items/default, do PokeAPI/sprites), copiados como estão.
-ITEMS = ['poke-ball', 'magnet']
+ITEMS = ['poke-ball', 'magnet', 'potion']
 
 
 def extract_items(source, manifest):
@@ -362,13 +362,20 @@ def extract_scenes(decomp, manifest):
         layout = layouts[f'{name}_Layout']
         tileset = Tileset(decomp, snake(layout['primary_tileset']), snake(layout['secondary_tileset']))
         raw = (decomp / layout['blockdata_filepath']).read_bytes()
-        grid = [struct.unpack_from('<H', raw, i * 2)[0] & 0x3FF for i in range(layout['width'] * layout['height'])]
+        cells = [struct.unpack_from('<H', raw, i * 2)[0] for i in range(layout['width'] * layout['height'])]
+        grid = [cell & 0x3FF for cell in cells]
         ids = sorted(set(grid))
+        # bloqueia quem tem colisão (bits 10-11 do map.bin) na maioria das casas do mapa
+        blocked = {mid: [0, 0] for mid in ids}
+        for cell in cells:
+            blocked[cell & 0x3FF][0] += 1 if cell & 0xC00 else 0
+            blocked[cell & 0x3FF][1] += 1
+        solid = [mid for mid in ids if blocked[mid][0] * 2 > blocked[mid][1]]
         manifest[f'scene/{key}'] = {
             'src': save(strip([tileset.metatile(mid) for mid in ids]), ASSETS / 'scenes' / f'{key}.png'),
             'frameWidth': 16, 'frameHeight': 16, 'frames': len(ids),
         }
-        scenes[key] = {'ids': ids}
+        scenes[key] = {'ids': ids, 'solid': solid}
         if keep_grid:
             scenes[key].update(width=layout['width'], height=layout['height'], grid=grid)
     write_scene_manifest(scenes)
@@ -380,13 +387,15 @@ def write_scene_manifest(scenes):
         ' * METATILES DO CENÁRIO — gerado por tools/assets/extract.py. Não edite à mão.',
         ' *',
         ' * Por tira (asset scene/<id>): `ids` diz qual metatile do FireRed está em',
-        ' * cada quadro; nos salões, `grid` é o mapa original (IDs, linha a linha).',
+        ' * cada quadro; `solid`, quais bloqueiam o caminho (a colisão do mapa); nos',
+        ' * salões, `grid` é o mapa original (IDs, linha a linha).',
         ' */',
         'export const SCENE_TILES = {',
     ]
     for key, scene in scenes.items():
         lines.append(f"  {key}: {{")
         lines.append(f"    ids: [{', '.join(f'0x{i:X}' for i in scene['ids'])}],")
+        lines.append(f"    solid: [{', '.join(f'0x{i:X}' for i in scene['solid'])}],")
         if 'grid' in scene:
             w = scene['width']
             rows = [', '.join(f'0x{i:X}' for i in scene['grid'][y * w:(y + 1) * w]) for y in range(scene['height'])]

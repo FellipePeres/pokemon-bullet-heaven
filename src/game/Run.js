@@ -1,7 +1,8 @@
 import { CONFIG } from '../core/config.js';
 import { getStage, segmentAt } from '../data/stages.js';
 import { sceneOf } from '../data/scenery.js';
-import { Player } from '../entities/Player.js';
+import { Player, FEET_BOX } from '../entities/Player.js';
+import { Terrain } from '../systems/terrain.js';
 import { Companion } from '../entities/Companion.js';
 import { SpatialGrid } from '../systems/SpatialGrid.js';
 import { SpawnSystem } from '../systems/SpawnSystem.js';
@@ -55,6 +56,10 @@ export class Run {
     this.upgrades = {};                        // mantido para compatibilidade de save
     this.segment = segmentAt(this.stage, 0);
     this.world.scene = sceneOf(this.segment, this.world);
+    // árvores, pedras e paredes do cenário bloqueiam o treinador e os inimigos
+    this.terrain = new Terrain(this.stage, this.world);
+    this.world.terrain = this.terrain;
+    this._settleTerrain();
     this.evolutionQueue = [];
     this.stats = { kills: 0, captures: 0, damageDealt: 0, faints: 0, ballsDropped: 0 };
 
@@ -238,6 +243,7 @@ export class Run {
       this.segment = segment;
       this.world.theme = segment.theme ?? this.world.theme;
       this.world.scene = sceneOf(segment, this.world);
+      this._settleTerrain();
       bus.emit(EVENTS.TOAST, { text: `Você chegou em ${segment.name}`, icon: 'stages' });
     }
 
@@ -249,6 +255,13 @@ export class Run {
     this._updateEffects(dt);
     this._cleanup();
     this._checkState();
+  }
+
+  /** Troca o terreno para o cenário do trecho e tira quem ficou dentro de um obstáculo. */
+  _settleTerrain() {
+    this.terrain.setScene(this.world.scene);
+    this.terrain.place(this.player, FEET_BOX);
+    for (const enemy of this.enemies) if (!enemy.dead) this.terrain.place(enemy, enemy.box);
   }
 
   _updateEnemies(dt) {

@@ -1,6 +1,9 @@
 import { CONFIG } from '../core/config.js';
 import { clamp } from '../core/utils.js';
 
+/** Caixa de colisão do treinador: só os pés esbarram, como no FireRed. */
+export const FEET_BOX = { oy: 10, hw: 8, hh: 5 };
+
 /**
  * O TREINADOR.
  * Ele não luta e não tem vida: apenas guia a equipe pelo mapa.
@@ -29,9 +32,11 @@ export class Player {
     this.speed = speed;
     this.vx = move.x * speed;
     this.vy = move.y * speed;
+    if (world.terrain) world.terrain.move(this, this.vx * dt, this.vy * dt, FEET_BOX);
+    else { this.x += this.vx * dt; this.y += this.vy * dt; }
     const inset = CONFIG.arena.inset;
-    this.x = clamp(this.x + this.vx * dt, inset, world.width - inset);
-    this.y = clamp(this.y + this.vy * dt, inset, world.height - inset);
+    this.x = clamp(this.x, inset, world.width - inset);
+    this.y = clamp(this.y, inset, world.height - inset);
 
     this.moving = move.x !== 0 || move.y !== 0;
     if (move.x !== 0) this.facing = move.x > 0 ? 1 : -1;

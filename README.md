@@ -37,7 +37,8 @@ uma equipe de seis, evoluída, com golpes melhorados e sinergias que você escol
 |---|---|
 | Mover o treinador | `WASD` ou setas |
 | Trocar o Pokémon em campo | `1` – `6` (ou clique no card) |
-| Escolher qual slot ativo recebe a troca | `Tab` ou clique no card |
+| Escolher quem sai na troca (o card marcado "⇄ sai") | `Tab` ou clique no card |
+| Ligar ou desligar o ataque de um Pokémon em campo | botão da espadinha no card (desligado, ele só acompanha) |
 | Gastar os níveis acumulados de um Pokémon | botão `▲` no card |
 | Pausar / fechar janela | `ESC` |
 | Controle (gamepad) | analógico ou direcional anda · LB/RB escolhem o slot · X/Y/B põem a reserva em campo · Start pausa · nas telas, direcional e A |
@@ -107,8 +108,11 @@ Perder devolve você ao início da fase com a equipe como estava ao entrar nela.
   choque e raio em corrente).
 - **Cenário do FireRed**: cada trecho da jornada é montado com as metatiles do lugar
   (a grama e as árvores da Rota 1, a mata da Floresta de Viridian, o Monte Lua) e
-  cada ginásio e sala da Liga tem o visual do mapa original. O andar continua livre.
-- **Ímã**: raro, cai de alguns Pokémon e, ao ser pego, puxa todo o XP do mapa até você.
+  cada ginásio e sala da Liga tem o visual do mapa original. O andar continua livre,
+  mas árvores, pedras, paredões e estátuas bloqueiam o caminho (seu e dos selvagens).
+- **Ímã**: raríssimo, cai de alguns Pokémon e, ao ser pego, puxa todo o XP do mapa até você.
+- **Líderes de verdade**: cada um com muito mais vida e golpes mais fortes e frequentes
+  que a horda.
 - **Pokédex de Kanto** (151) que se preenche conforme você captura e evolui.
 - **12 conquistas** com recompensa em Shards.
 - A dificuldade e a quantidade de inimigos sobem fase a fase: os selvagens ganham

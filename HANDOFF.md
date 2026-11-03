@@ -5,7 +5,7 @@
 > decisão foi tomada e o que falta fazer. O `README.md` é o manual de uso;
 > este aqui é o contexto de desenvolvimento.
 
-**Versão atual:** `0.8.0` · **Última atualização:** 2026-11-02
+**Versão atual:** `0.9.0` · **Última atualização:** 2026-11-02
 **Stack:** HTML + CSS + JavaScript puro (ES Modules). Sem backend, sem build, sem dependências.
 **Repositório:** https://github.com/FellipePeres/pokemon-bullet-heaven (público)
 **Jogo no ar:** https://fellipeperes.github.io/pokemon-bullet-heaven/
@@ -131,6 +131,7 @@ src/
     CaptureSystem.js  sorteio da captura
     SpawnSystem.js    ondas, elites, Poké Balls roteirizadas, time do líder
     SpatialGrid.js    grade espacial (evita colisão O(n²))
+    terrain.js        gera o cenário de cada trecho e diz o que bloqueia (colisão)
     stats.js          vida máxima, XP por nível, multiplicador de dano por nível
   game/
     Run.js            uma partida: estado, loop, colisões, condições de fim
@@ -140,7 +141,7 @@ src/
     assets.js         carrega as folhas do catálogo e desenha quadros em escala inteira
     trainer.js        qual quadro do treinador mostrar (passo pela distância andada)
     fx.js             desenha os sprites de golpe
-    scenery.js        monta o chão da arena com metatiles do FireRed (e o cache em canvas)
+    scenery.js        pinta o chão da arena (o grid do terreno) num canvas por cenário
     sprites.js        sprites de Pokémon (estático/animado/artwork) e insígnias
     icons.js          ícones de item por chave semântica
   ui/
@@ -190,6 +191,13 @@ confirmar com ele**.
 - Pokémon que desmaia **fica fora até o fim da fase** (item Revive virá depois).
   Um da reserva entra automaticamente no lugar. **Os 6 desmaiados = derrota.**
 - Reserva regenera vida sozinha (2,5 HP/s) — trocar é a principal sustentação.
+- **Troca** (0.9): o card marcado "⇄ sai" (`team.selectedSlot`, escolhido com
+  clique, tecla do ativo ou `Tab`) é quem sai; a reserva clicada entra no lugar.
+  Os botões do HUD agem no `pointerdown`: o HUD se refaz quando alguém sobe de
+  nível, e um clique entre apertar e soltar se perdia.
+- **Espadinha** (0.9): cada ativo tem um botão de ataque (`member.attack`, vai no
+  save). Desligado, o Pokémon continua em campo e apanha, mas não ataca, não
+  avança para o alvo e recolhe aura e orbes (`AbilitySystem._holdFire`).
 
 ### Experiência e níveis
 - O XP de cada inimigo é **dividido pela equipe**: peso 3 para ativo, 1 para
@@ -240,10 +248,13 @@ Nunca voltar bônus globais para o pool de level up — foi pedido explícito.
   **momentos garantidos** (`scriptedBalls`) — a jornada não pode depender de sorte.
 - A bola rola devagar na direção do treinador quando ele está perto: sem isso,
   builds de longo alcance matavam longe e nunca capturavam.
-- Desde a 0.8 a chance de cair é ×0,45 (`CONFIG.capture.dropChanceMultiplier`):
-  pegar Pokémon novo ficou mais raro, a pedido do Fellipe.
-- **Ímã** (0.8): cai raramente (0,15% por selvagem, 4% por elite ou Pokémon de
-  líder; um por vez no mapa). Ao pegar, todo o XP do mapa vem até o treinador
+- A chance de cair é ×0,15 (`CONFIG.capture.dropChanceMultiplier`; ×0,45 na
+  0.8): pegar Pokémon novo é raro, a pedido do Fellipe. As garantidas continuam.
+- **Quem entra chega perto da equipe** (0.9): capturado ou presente, o novato tem
+  a média de nível da equipe menos 3. Antes entrava no nível 1 e, numa equipe de
+  nível 20, desmaiava na hora (parecia que a captura não tinha funcionado).
+- **Ímã**: raríssimo (0,05% por selvagem, 1,5% por elite ou Pokémon de líder; um
+  por vez no mapa). Ao pegar, todo o XP do mapa vem até o treinador
   (`Pickup.magnetized`), acelerando até 2400 px/s.
 - Quais espécies aparecem e com qual chance está em `capturePools.js`, com as
   **9 tabelas de porcentagem definidas pelo Fellipe**. Espécies ainda não
@@ -253,9 +264,19 @@ Nunca voltar bônus globais para o pool de level up — foi pedido explícito.
 - **Uma fase = a jornada inteira até um ginásio.** Ela tem `segments` (Rota 1 →
   Rota 2 → Floresta → Ginásio) que trocam o cenário e aparecem no HUD.
 - **Cenário** (0.8): cada trecho tem um `scene` (ou usa o do tema) e o chão é
-  montado com metatiles do FireRed (`data/scenery.js`, `render/scenery.js`). É só
-  desenho: nada bloqueia, e o treinador para 96 px antes da borda
-  (`CONFIG.arena.inset`), onde ficam a mata e as paredes.
+  montado com metatiles do FireRed (`data/scenery.js`; gerador em
+  `systems/terrain.js`, pintura em `render/scenery.js`).
+- **Obstáculos** (0.9, D2): árvores, pedras, paredões, estátuas, paredes e
+  desníveis **bloqueiam o treinador e os inimigos**. O que bloqueia é a colisão do
+  mapa do FireRed (`solid` no `sceneManifest.js`, por metatile). O grid fica na
+  lógica (`run.terrain`), então o bot e os testes andam no mesmo terreno. O
+  treinador esbarra só com os pés (`FEET_BOX`); o inimigo usa uma caixa menor que
+  o raio (cabe entre duas árvores), desliza no obstáculo e, travado de frente,
+  contorna pelo lado. Os Pokémon da equipe, golpes e itens passam por cima. Ao
+  mudar de trecho, quem ficou dentro de um obstáculo novo vai para o ponto livre
+  mais perto (`Run._settleTerrain`).
+- **Líderes** (0.9): vida ×2,5, dano ×1,4 e golpes 25% mais frequentes que os
+  dados (`CONFIG.enemies.boss`), a pedido do Fellipe ("está muito fácil").
 - O chefe final é o **time do líder, enfrentado em sequência** (`bossTeam`),
   terminando no ace. Vencer dá insígnia + Shards.
 - A **jornada carrega equipe, níveis e build** de uma fase para a próxima
@@ -296,39 +317,49 @@ Valores em `src/core/config.js` (o que não estiver lá está em `/data`):
 | Invencibilidade após golpe | 0,5s |
 | Regeneração: campo / reserva | 0,6 / 2,5 HP/s |
 | Chance de poção (selvagem comum) | 4% |
-| Poké Balls por fase | até 5 a 6 (3 garantidas); 4 na Elite Four, 2 no Campeão; chance de cair ×0,45 |
-| Ímã | 0,15% por selvagem, 4% por elite ou Pokémon de líder |
-| Dano e quantidade de inimigos | dano ×1,2 e ondas ×1,2 em todas as fases (`CONFIG.enemies`), além do `scaling` de cada fase |
+| Poké Balls por fase | até 5 a 6 (3 garantidas); 4 na Elite Four, 2 no Campeão; chance de cair ×0,15 |
+| Ímã | 0,05% por selvagem, 1,5% por elite ou Pokémon de líder |
+| Dano, vida e quantidade de inimigos | dano ×1,2, vida ×1,15 e ondas ×1,2 em todas as fases (`CONFIG.enemies`), além do `scaling` de cada fase |
+| Líderes | vida ×2,5, dano ×1,4, golpes a cada 75% do tempo (`CONFIG.enemies.boss`) |
+| Nível de quem entra na equipe | média da equipe − 3 |
 | Shards por fase | 120 (+180 na 1ª vez) |
 | Duração das fases | 300s a 420s (Fases 1 a 8); 280s a 300s (Elite Four); 240s (Campeão) |
 | Selvagens por nível (Fase 3+) | vida ×1,075 e dano ×1,035 por nível acima do 5; XP +8% por nível |
 
-**Dificuldade medida** (0.8, depois da primeira partida do Fellipe; `npm run balance`
-em blocos encadeados com `--save`/`--load`, 14 a 18 jornadas por bloco, jogador
-virtual). Entre parênteses, a 0.7:
+**Dificuldade medida** (0.9: líderes ×2,5 de vida, obstáculos, Poké Ball ×0,15 e
+quem entra na equipe perto do nível dela; `npm run balance` em blocos encadeados com
+`--save`/`--load`, 14 a 18 jornadas por bloco, jogador virtual). Entre parênteses,
+a 0.8:
 
-| Etapa | Vitórias do bot | Nível no líder (ace) | Luta | Desmaios | Pico de inimigos | `scaling.damage` |
+| Etapa | Vitórias do bot | Nível no líder (ace) | Luta com o líder | Desmaios | Pico de inimigos | `scaling` (vida / dano) |
 |---|---|---|---|---|---|---|
-| Fase 1 (Brock) | 47% (71%) | 17 (14) | 21s | 3,2 (2,4) | 61 | 0,55 |
-| Fase 2 (Misty) | 60% (80%) | 24 (21) | 16s | 3,0 (2,0) | 77 | 1,3 |
-| Fase 3 (Lt. Surge) | 43% (63%) | 36 (24) | 15s | 4,2 (3,1) | 82 | 2,7 |
-| Fase 4 (Erika) | 46% (79%) | 42 (29) | 13s | 3,8 (1,7) | 87 | 4,5 |
-| Fase 5 (Koga) | 44% (71%) | 45 (43) | 24s | 4,1 (1,9) | 99 | 4,4 |
-| Fase 6 (Sabrina) | 57% (44%) | 53 (43) | 20s | 3,0 (4,3) | 120 | 3,3 |
-| Fase 7 (Blaine) | 43% (80%) | 61 (47) | 23s | 4,0 (2,0) | 107 | 3,6 |
-| Fase 8 (Giovanni) | 35% (70%) | 69 (50) | 26s | 4,4 (2,1) | 115 | 4,8 |
-| Lorelei | 59% (88%) | 68 (54) | 33s | 3,5 (1,8) | 145 | 3,3 |
-| Bruno | 48% (78%) | 72 (56) | 34s | 4,0 (1,6) | 99 | 5,0 |
-| Agatha | 60% (50%) | 78 (58) | 35s | 3,3 (3,5) | 89 | 2,5 |
-| Lance | 61% (63%) | 77 (60) | 37s | 3,3 (2,9) | 120 | 2,3 |
-| Campeão | 42% (83%) | 83 (63) | 43s | 4,2 (1,8) | 136 | 1,3 |
+| Fase 1 (Brock) | 55% (47%) | 19 (14) | 36s (21s) | 2,5 | 66 | 2,3 / 0,32 |
+| Fase 2 (Misty) | 39% (60%) | 26 (21) | 36s (16s) | 3,9 | 93 | 2,9 / 0,8 |
+| Fase 3 (Lt. Surge) | 31% (43%) | 38 (24) | 30s (15s) | 4,8 | 98 | 3,0 / 2,0 |
+| Fase 4 (Erika) | 50% (46%) | 46 (29) | 18s (13s) | 3,5 | 91 | 3,5 / 5,0 |
+| Fase 5 (Koga) | 35% (44%) | 51 (43) | 48s (24s) | 4,5 | 95 | 4,0 / 5,8 |
+| Fase 6 (Sabrina) | 68% (57%) | 57 (43) | 35s (20s) | 2,6 | 121 | 7,0 / 4,1 |
+| Fase 7 (Blaine) | 16% (43%) | 66 (47) | 37s (23s) | 5,5 | 115 | 4,5 / 4,6 * |
+| Fase 8 (Giovanni) | 27% (35%) | 68 (50) | 50s (26s) | 4,6 | 116 | 3,2 / 7,5 * |
+| Lorelei | 38% (59%) | 75 (54) | 59s (33s) | 4,3 | 179 | 4,0 / 3,3 |
+| Bruno | 79% (48%) | 76 (56) | 62s (34s) | 1,8 | 112 | 2,4 / 7,0 * |
+| Agatha | 73% (60%) | 82 (58) | 64s (35s) | 2,8 | 93 | 2,9 / 3,25 * |
+| Lance | 53% (61%) | 85 (60) | 65s (37s) | 3,5 | 124 | 2,7 / 2,0 |
+| Campeão | 27% (42%) | 86 (63) | 82s (43s) | 5,1 | 141 | 2,4 / 2,1 |
 
-Por cima do `scaling.damage` de cada fase vale o `CONFIG.enemies.damageMult` (1,2).
-Na Fase 4 a alavanca certa foi o nível: a equipe chegava 9 níveis acima do ace e
-nem dano 5,5 pegava; os selvagens de Celadon subiram 4 níveis. Entre uma medição e
-outra os números variam uns ±15 pontos (o sorteio de capturas pesa muito), então
-olhe a tendência de várias rodadas antes de mexer. O Fellipe joga melhor que o bot:
-se a sensação for de jogo fácil, a primeira alavanca é o `scaling.damage` da fase.
+Média: 45% de vitórias e 3,7 desmaios por tentativa (0.8: 53% e 3,4). As lutas
+contra os líderes dobraram de duração. \* Depois desta medição, um último ajuste
+nas fases que oscilaram: Blaine 5,0 → 4,6, Giovanni 8,0 → 7,5, Bruno 6,3 → 7,0 e
+Agatha 3,15 → 3,25.
+
+Por cima do `scaling` de cada fase valem o `CONFIG.enemies` (dano ×1,2, vida ×1,15,
+ondas ×1,2) e o reforço dos líderes. **A variação entre medições é grande**: a
+mesma fase com o mesmo número já deu 18% e 41%, porque a qualidade da equipe que
+chega (capturas, golpes, evoluções) pesa muito. Olhe a média de várias rodadas e
+mexa só no que sai do padrão em todas. Na Fase 4 a alavanca certa foi o nível: a
+equipe chegava 9 níveis acima do ace; os selvagens de Celadon subiram 4 níveis. O
+Fellipe joga melhor que o bot: se a sensação for de jogo fácil, a primeira
+alavanca é o `scaling.damage` da fase.
 
 **Como ajustar dificuldade** (na ordem de impacto):
 1. `scaling.damage` da fase — é o que mais mata. Por cima dele vale o
@@ -407,7 +438,7 @@ Procedência e como regerar: `assets/PROVENIENCIA.md`.
 | Caixa de texto do FireRed | `assets/ui/text_window.png`, usada como `border-image` (`.fr-window`) |
 | Sprites de golpe | `assets/fx/<id>.png`: 46 folhas tiradas de `graphics/battle_anims/sprites` (ver `FX` em `extract.py`) |
 | Pokémon animados | `assets/pokemon/<dex>.png`: os GIFs da Gen 5 do Pokemon All em tiras de quadros |
-| Poké Ball e Ímã no chão | `assets/items/{poke-ball,magnet}.png` |
+| Poké Ball, Ímã e Poção no chão | `assets/items/{poke-ball,magnet,potion}.png` |
 | Cenário | `assets/scenes/<id>.png`: as metatiles de cada mapa (17 cenários); `src/data/sceneManifest.js` diz qual metatile é cada quadro e guarda o mapa dos salões |
 
 - Tudo é pixel art em **escala inteira, sem suavização** (`CONFIG.render.pixelScale`,
@@ -536,6 +567,12 @@ tipo, som e o polimento de troca e captura.
   o `npm run check` monta todos os cenários e acusa o que faltar.
 - **Caminhos de areia que se cruzam:** o tileset das rotas só tem cantos de dentro
   para curvas desenhadas à mão; o gerador faz retas separadas (`Taken.free`).
+- **Clique perdido no HUD:** os cards da equipe são refeitos quando a equipe muda
+  (subir de nível, fim da recarga). Ação em `onclick` se perdia se o HUD se
+  refizesse entre apertar e soltar; use `onpointerdown`.
+- **Novato no nível 1:** quem entra na equipe tem que vir perto do nível dela
+  (`CaptureSystem.newMemberLevel`), senão parece que a captura falhou.
+- **Inimigo nascendo dentro de árvore:** todo spawn passa por `terrain.place`.
 - **Level up trava o update:** `Run.update` retorna cedo quando o estado não é
   `running`. Testes que simulam frames precisam resolver `levelup`/`capture`/
   `evolution`, senão o tempo congela.
@@ -588,6 +625,7 @@ tipo, som e o polimento de troca e captura.
 | 5 | fases que faltam com dificuldade crescente; sprites de golpe; escolher menino ou menina; tudo ambientado com sprites (movimento continua livre, só o cenário espelha o FireRed); outras regiões em breve | `PLANEJAMENTO.md`; etapas 0 e 1 (0.5): extrator do Pokemon All, vitrine e screenshots, progresso por região, tela do treinador com o Oak, Red/Leaf em jogo, retratos dos líderes; conserto da insígnia |
 | 6 | jogo leve no navegador: no máximo 4 golpes por tipo, reaproveitando; otimizar; todo o conteúdo (fases e Pokémon novos) | etapa 2 (0.6): 52 golpes em 16 tipos (Terra, Fantasma, Dragão e Gelo novos), sprites do FireRed em todos, aviso no chão antes do golpe do líder, tremor de tela, opções salvas, vitrine de golpes e de estresse; migração dos saves. Etapa 4 (0.7): as 151 espécies, as 13 etapas até o Campeão, selvagens com nível, presentes, rival pelo inicial, apresentação do líder, calibragem fase a fase com `tools/balance.mjs` |
 | 7 | (primeira partida) muito fácil, quase não toma dano: mais dano e mais inimigos; Poké Ball mais rara; TM mais rara, o golpe melhora na evolução; cenário com os sprites que temos; ícone bonito para a Poké Ball; Ímã raro que puxa todo o XP | 0.8: dano ×1,2 e ondas ×1,2 com o `scaling.damage` de cada fase recalibrado (bot vence 35% a 60%, contra 44% a 88% antes, e desmaia 3 a 4 vezes por tentativa); bola ×0,45; TM 4% e evolução que melhora o golpe; cenário de tiles do FireRed em 17 lugares (Etapa 3); sprites de item para Poké Ball e Ímã |
+| 8 | Poké Ball 3x mais rara; ícone de vida vira Poção; sugestões para o XP; Clefairy capturada "bugada"; obstáculos bloqueiam jogador e inimigos; inimigos com um pouco mais de vida; líderes bem mais fortes; Ímã menor e mais raro; troca que às vezes troca o Pokémon errado; espadinha para o Pokémon só acompanhar | 0.9: bola ×0,15; Poção no chão; captura e presentes entram com a média da equipe − 3; colisão com o cenário (`systems/terrain.js`) pela colisão dos mapas do FireRed; vida ×1,15; líderes ×2,5 de vida, ×1,4 de dano, golpes mais frequentes; Ímã em 1x, 0,05%/1,5%; HUD no `pointerdown` e selo "⇄ sai"; botão de ataque por Pokémon; 6 sugestões de XP no PLANEJAMENTO (D10) |
 
 ---
 

@@ -26,14 +26,15 @@ Regerar sobrescreve os PNG e o catálogo `src/data/assetManifest.js`.
 | `scenes/<id>.png` | as metatiles 16x16 que o mapa usa, montadas de `data/tilesets/primary/<primário>` + `secondary/<secundário>` (`tiles.png`, `metatiles.bin`); o mapa vem de `data/layouts/<Mapa>/map.bin` (ver `SCENES` no extrator: Rota 1, Floresta de Viridian, Monte Lua, os 8 ginásios e as salas da Liga) | `palettes/00-06.pal` do primário e `07-12.pal` do secundário |
 
 O catálogo das metatiles (qual ID do FireRed está em cada quadro, e o mapa dos
-salões) sai em `src/data/sceneManifest.js`.
+salões, e quais metatiles bloqueiam o caminho pela colisão do mapa) sai em
+`src/data/sceneManifest.js`.
 
 ## Copiados do Pokemon All
 
 | Saída | Origem |
 |---|---|
 | `pokemon/<dex>.png` | `assets/pokemon/battle/front/<dex>.gif` (GIFs da Gen 5), convertidos em tira de quadros com paleta reduzida |
-| `items/poke-ball.png`, `items/magnet.png` | `assets/items/default/<nome>.png` (vêm do PokeAPI/sprites), copiados como estão: a Poké Ball e o Ímã que caem no chão |
+| `items/poke-ball.png`, `items/magnet.png`, `items/potion.png` | `assets/items/default/<nome>.png` (vêm do PokeAPI/sprites), copiados como estão: a Poké Ball, o Ímã e a Poção que caem no chão |
 
 Os PNG do decomp são indexados com uma paleta provisória; as cores de verdade estão
 nos `.pal`. O índice 0 é transparente, e o recorte é sempre pelo índice, nunca pela cor.

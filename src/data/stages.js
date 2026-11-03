@@ -38,7 +38,7 @@ export const STAGES = {
     description: 'Rota 1, Rota 2 e a Floresta de Viridian — até o Ginásio de Pewter.',
     duration: 300,
     world: { width: 2800, height: 1900, theme: 'grass' },
-    scaling: { hp: 2.6, speed: 0.3, damage: 0.55 },
+    scaling: { hp: 2.3, speed: 0.3, damage: 0.32 },
 
     segments: [
       { from: 0,   name: 'Rota 1',               theme: 'grass' },
@@ -92,7 +92,7 @@ export const STAGES = {
     description: 'Monte Lua, Rota 4 e Cerulean — até o Ginásio da Misty.',
     duration: 330,
     world: { width: 3000, height: 2000, theme: 'cave' },
-    scaling: { hp: 3.2, speed: 0.34, damage: 1.3 },
+    scaling: { hp: 2.9, speed: 0.34, damage: 0.8 },
     unlockedBy: 'gym_1_pewter',
 
     segments: [
@@ -147,7 +147,7 @@ export const STAGES = {
     description: 'Rotas 5 e 6, a Caverna do Diglett e a Rota 11 — até o Ginásio do Lt. Surge.',
     duration: 345,
     world: { width: 3000, height: 2000, theme: 'grass' },
-    scaling: { hp: 3.0, speed: 0.3, damage: 2.7 },
+    scaling: { hp: 3.0, speed: 0.3, damage: 2.0 },
     unlockedBy: 'gym_2_cerulean',
 
     segments: [
@@ -208,7 +208,7 @@ export const STAGES = {
     description: 'Rota 9, o Túnel de Pedra e a Rota 8 — até o Ginásio da Erika.',
     duration: 360,
     world: { width: 3000, height: 2000, theme: 'grass' },
-    scaling: { hp: 3.5, speed: 0.3, damage: 4.5 },
+    scaling: { hp: 3.5, speed: 0.3, damage: 5.0 },
     unlockedBy: 'gym_3_vermilion',
 
     segments: [
@@ -265,7 +265,7 @@ export const STAGES = {
     description: 'A Torre Pokémon, as Rotas 12 a 15 e a Zona Safári — até o Ginásio do Koga.',
     duration: 375,
     world: { width: 3200, height: 2100, theme: 'cave' },
-    scaling: { hp: 4.0, speed: 0.3, damage: 4.4 },
+    scaling: { hp: 4.0, speed: 0.3, damage: 5.8 },
     unlockedBy: 'gym_4_celadon',
 
     segments: [
@@ -323,7 +323,7 @@ export const STAGES = {
     description: 'A Usina, a Ciclovia e a Silph Co. — até o Ginásio da Sabrina.',
     duration: 390,
     world: { width: 3200, height: 2100, theme: 'cave' },
-    scaling: { hp: 7.0, speed: 0.3, damage: 3.3 },
+    scaling: { hp: 7.0, speed: 0.3, damage: 4.1 },
     unlockedBy: 'gym_5_fuchsia',
 
     segments: [
@@ -385,7 +385,7 @@ export const STAGES = {
     description: 'As Rotas 19 e 20, as Ilhas Seafoam e a Mansão Pokémon — até o Ginásio do Blaine.',
     duration: 405,
     world: { width: 3300, height: 2200, theme: 'grass' },
-    scaling: { hp: 4.5, speed: 0.3, damage: 3.6 },
+    scaling: { hp: 4.5, speed: 0.3, damage: 4.6 },
     unlockedBy: 'gym_6_saffron',
 
     segments: [
@@ -444,7 +444,7 @@ export const STAGES = {
     description: 'A Rota 21, o Esconderijo Rocket e a Rota 22 — até o Ginásio do Giovanni.',
     duration: 420,
     world: { width: 3400, height: 2200, theme: 'grass' },
-    scaling: { hp: 3.2, speed: 0.3, damage: 4.8 },
+    scaling: { hp: 3.2, speed: 0.3, damage: 7.5 },
     unlockedBy: 'gym_7_cinnabar',
 
     segments: [
@@ -555,7 +555,7 @@ export const STAGES = {
     description: 'O corredor da Liga — até a sala do Bruno.',
     duration: 280,
     world: { width: 3000, height: 2000, theme: 'gym' },
-    scaling: { hp: 2.4, speed: 0.3, damage: 5.0 },
+    scaling: { hp: 2.4, speed: 0.3, damage: 7.0 },
     unlockedBy: 'e4_lorelei',
 
     segments: [
@@ -606,7 +606,7 @@ export const STAGES = {
     description: 'O corredor da Liga — até a sala da Agatha.',
     duration: 280,
     world: { width: 3000, height: 2000, theme: 'cave' },
-    scaling: { hp: 2.9, speed: 0.3, damage: 2.5 },
+    scaling: { hp: 2.9, speed: 0.3, damage: 3.25 },
     unlockedBy: 'e4_bruno',
 
     segments: [
@@ -656,7 +656,7 @@ export const STAGES = {
     description: 'O corredor da Liga — até a sala do Lance.',
     duration: 280,
     world: { width: 3000, height: 2000, theme: 'cave' },
-    scaling: { hp: 2.7, speed: 0.3, damage: 2.3 },
+    scaling: { hp: 2.7, speed: 0.3, damage: 2.0 },
     unlockedBy: 'e4_agatha',
 
     segments: [
@@ -706,7 +706,7 @@ export const STAGES = {
     description: 'O Platô Indigo — o desafio final da jornada.',
     duration: 240,
     world: { width: 3000, height: 2000, theme: 'gym' },
-    scaling: { hp: 2.4, speed: 0.3, damage: 1.3 },
+    scaling: { hp: 2.4, speed: 0.3, damage: 2.1 },
     unlockedBy: 'e4_lance',
 
     segments: [

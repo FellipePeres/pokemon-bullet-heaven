@@ -30,16 +30,28 @@ export class CaptureSystem {
     return weightedPickMany(pool, count).map((entry) => entry.pokemon);
   }
 
+  /**
+   * Nível de quem entra (captura ou presente): perto da equipe, um pouco atrás.
+   * Antes entrava no 1, e numa equipe de nível 20 o novato não causava dano e
+   * desmaiava na hora: parecia que não tinha entrado (o bug da Clefairy, 0.9).
+   */
+  newMemberLevel() {
+    const levels = this.run.team.members.filter((m) => !m.fainted).map((m) => m.level);
+    if (!levels.length) return 1;
+    const average = levels.reduce((sum, level) => sum + level, 0) / levels.length;
+    return Math.max(1, Math.round(average) - CONFIG.capture.levelsBehindTeam);
+  }
+
   /** Adiciona à equipe (quando ainda há espaço). */
   capture(pokemonId) {
-    const member = this.run.team.add(pokemonId);
+    const member = this.run.team.add(pokemonId, this.newMemberLevel());
     if (member) this._registerCapture(pokemonId);
     return member;
   }
 
   /** Substitui um membro existente (equipe cheia). */
   captureReplacing(oldUid, pokemonId) {
-    const member = this.run.team.replaceMember(oldUid, pokemonId);
+    const member = this.run.team.replaceMember(oldUid, pokemonId, this.newMemberLevel());
     if (member) this._registerCapture(pokemonId);
     return member;
   }

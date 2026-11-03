@@ -143,6 +143,8 @@ export class AbilitySystem {
   update(dt) {
     for (const companion of this.run.companions) {
       if (companion.dead) continue;
+      // espadinha desligada no HUD: acompanha o treinador sem atacar
+      if (companion.member.attack === false) { this._holdFire(companion); continue; }
       for (const inst of companion.abilities) {
         if (!inst.stats) this.syncInstance(companion, inst);
         const behavior = inst.ability.behavior;
@@ -156,6 +158,15 @@ export class AbilitySystem {
         // se não havia alvo, tenta de novo logo em seguida
         inst.timer = fired ? inst.stats.cooldown : 0.15;
       }
+    }
+  }
+
+  /** Recolhe auras e orbes de quem parou de atacar (voltam ao religar). */
+  _holdFire(companion) {
+    companion.target = null;
+    for (const inst of companion.abilities) {
+      if (inst.runtime.zone) { inst.runtime.zone.dead = true; inst.runtime.zone = null; }
+      if (inst.runtime.orbs?.length) { inst.runtime.orbs.forEach((orb) => { orb.dead = true; }); inst.runtime.orbs.length = 0; }
     }
   }
 
@@ -301,7 +312,8 @@ export class AbilitySystem {
       this.run.zones.push(new Zone({
         kind: 'nova', x: enemy.x, y: enemy.y,
         radius: enemy.radius, maxRadius: s.area, growSpeed: s.speed,
-        damage: s.damage * CONFIG.enemies.damageMult, knockback: s.knockback,
+        damage: s.damage * CONFIG.enemies.damageMult * (enemy.boss ? CONFIG.enemies.boss.damageMult : 1),
+        knockback: s.knockback,
         type: ability.type, color: '#ff6b6b', hostile: true, abilityId,
         delay: CONFIG.fx.bossTelegraph, visualType: enemy.types[0]
       }));

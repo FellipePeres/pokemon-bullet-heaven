@@ -96,7 +96,7 @@ export class Companion {
     // Abaixo de 35% de vida ele para de avançar e fica colado no treinador:
     // é o que dá chance de um Pokémon machucado sobreviver até a troca.
     const healthy = this.member.hp / this.maxHp(teamStats?.pokemonHpBonus ?? 0) > 0.35;
-    if (healthy && this.target && !this.target.dead) {
+    if (healthy && this.member.attack !== false && this.target && !this.target.dead) {
       const dx = this.target.x - targetX;
       const dy = this.target.y - targetY;
       const d = Math.hypot(dx, dy);

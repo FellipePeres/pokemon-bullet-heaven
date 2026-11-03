@@ -54,6 +54,7 @@ export const ASSET_MANIFEST = {
   'fx/x_sign': { src: 'assets/fx/x_sign.png', frameWidth: 64, frameHeight: 64, frames: 1 },
   'item/magnet': { src: 'assets/items/magnet.png', frameWidth: 30, frameHeight: 30, frames: 1 },
   'item/poke-ball': { src: 'assets/items/poke-ball.png', frameWidth: 30, frameHeight: 30, frames: 1 },
+  'item/potion': { src: 'assets/items/potion.png', frameWidth: 30, frameHeight: 30, frames: 1 },
   'pokemon/1': { src: 'assets/pokemon/1.png', frameWidth: 45, frameHeight: 49, frames: 21, fps: 17 },
   'pokemon/10': { src: 'assets/pokemon/10.png', frameWidth: 46, frameHeight: 45, frames: 25, fps: 17 },
   'pokemon/100': { src: 'assets/pokemon/100.png', frameWidth: 45, frameHeight: 43, frames: 30, fps: 17 },

@@ -13,7 +13,7 @@ import { ABILITIES } from '../src/data/abilities.js';
 import { POKEMON } from '../src/data/pokemon.js';
 import { SaveManager } from '../src/save/SaveManager.js';
 import { createProfile, normalizeProfile, regionProgress } from '../src/save/profile.js';
-import { Player, facingDir } from '../src/entities/Player.js';
+import { Player, facingDir, FEET_BOX } from '../src/entities/Player.js';
 import { CONFIG } from '../src/core/config.js';
 import { maxHpFor } from '../src/systems/stats.js';
 import { hpRatio } from '../src/systems/stats.js';
@@ -292,6 +292,64 @@ console.log('\n[Ímã]');
   check('o Ímã puxa todo o XP do mapa', far.every((orb) => orb.dead),
         `${far.filter((orb) => orb.dead).length}/${far.length} coletados`);
   check('o XP puxado conta para a equipe', gained >= 15, `${gained} de XP`);
+}
+
+// ---------------------------------------------- 5.8 obstáculos do cenário
+console.log('\n[obstáculos]');
+{
+  const run = new Run('gym_1_pewter', { starter: 'charmander' });
+  const terrain = run.terrain;
+  check('o treinador começa fora de obstáculo', !terrain.overlaps(run.player, FEET_BOX));
+  // anda reto para cada lado: para nas árvores e na mata da borda, sem atravessar nada
+  let crossed = false;
+  for (const move of [{ x: -1, y: 0 }, { x: 0, y: -1 }, { x: 1, y: 0 }, { x: 0, y: 1 }]) {
+    for (let i = 0; i < 60 * 12; i++) {
+      run.update(1 / 60, move);
+      if (run.state !== 'running') { run.state = 'running'; run.levelUpMember = null; run.pendingBall = false; }
+      if (terrain.overlaps(run.player, FEET_BOX)) crossed = true;
+    }
+  }
+  check('árvores e a mata da borda bloqueiam o treinador', !crossed);
+  const inside = run.enemies.filter((e) => !e.dead && terrain.overlaps(e, e.box)).length;
+  check('nenhum inimigo dentro de obstáculo', inside === 0, `${run.enemies.length} inimigos, ${inside} dentro`);
+
+  // trocar de trecho tira quem ficou dentro do obstáculo novo
+  run.world.scene = 'pewter_gym';
+  run._settleTerrain();
+  check('mudar de trecho não prende ninguém', !terrain.overlaps(run.player, FEET_BOX)
+        && run.enemies.every((e) => e.dead || !terrain.overlaps(e, e.box)));
+}
+
+// ---------------------------------------------- 5.9 captura, espadinha e troca
+console.log('\n[captura, espadinha e troca]');
+{
+  const run = new Run('gym_2_cerulean', { starter: 'charmander' });
+  run.team.members[0].level = 20;
+  const caught = run.captureSystem.capture('clefairy');
+  check('quem entra chega perto do nível da equipe', caught.level === 20 - CONFIG.capture.levelsBehindTeam,
+        `Clefairy no nível ${caught.level}`);
+  check('e vai para o campo se há vaga', run.team.active.includes(caught) && run.companions.some((c) => c.member === caught));
+
+  // espadinha desligada em todos: em campo, mas ninguém causa dano
+  for (const member of run.team.members) run.team.toggleAttack(member.uid);
+  const before = run.stats.damageDealt;
+  for (let i = 0; i < 60 * 20; i++) {
+    run.update(1 / 60, { x: Math.sin(i / 60), y: Math.cos(i / 50) });
+    if (run.state !== 'running') { run.state = 'running'; run.levelUpMember = null; run.pendingBall = false; }
+  }
+  check('com a espadinha desligada ninguém ataca', run.stats.damageDealt === before,
+        `${Math.round(run.stats.damageDealt - before)} de dano`);
+  check('a espadinha vai junto no save', run.team.serialize().members.every((m) => m.attack === false));
+
+  // a troca põe quem entra no slot escolhido
+  run.team.add('pidgey', 18);
+  run.team.add('rattata', 18);
+  run.team.selectedSlot = 1;
+  const leaving = run.team.active[1];
+  const entering = run.team.reserve.find((m) => !m.fainted);
+  run.team.swapTimer = 0;
+  run.team.swapIn(entering.uid);
+  check('a troca põe quem entra no lugar do slot escolhido', run.team.active[1] === entering && !run.team.active.includes(leaving));
 }
 
 // ------------------------------------------------------- 6. upgrades/dados

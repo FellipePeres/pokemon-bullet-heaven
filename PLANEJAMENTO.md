@@ -467,12 +467,50 @@ O Fellipe jogou a 0.7 em 2026-11-02 e pediu:
 | Ícone da Poké Ball mais bonito | O sprite do item, com brilho dourado pulsando |
 | Ímã | Raro (0,15% por selvagem, 4% por elite ou Pokémon de líder, um por vez no mapa). Ao pegar, todo o XP do mapa voa até o treinador, acelerando, com rastro |
 
+### Segundo retorno (0.9)
+
+O Fellipe jogou a 0.8 e pediu:
+
+| Pedido | O que mudou |
+|---|---|
+| Poké Ball 3x mais rara | Chance de cair ×0,15 (era ×0,45); os momentos garantidos de cada fase continuam |
+| Ícone de vida vira Poção | A cura que cai no chão é o sprite da Poção |
+| Clefairy capturada "bugada", não foi para o time | Ela entrava, mas no **nível 1**: numa equipe de nível 20 não causava dano e desmaiava logo. Quem é capturado (e os presentes) agora entra com a média da equipe menos 3 (`CONFIG.capture.levelsBehindTeam`) |
+| Rochas, árvores e obstáculos bloqueiam o jogador e os inimigos | D2 decidido. Grid de colisão por cenário (`systems/terrain.js`), com a colisão dos mapas do FireRed: árvores, mata da borda, pedras, paredões, estátuas, paredes e desníveis. Grama, areia, copa das árvores e água não bloqueiam. O treinador esbarra com os pés; o inimigo desliza no obstáculo e contorna pelo lado |
+| Inimigos com um pouco mais de vida | +15% (`CONFIG.enemies.hpMult`) |
+| Líderes com muito mais vida e bem mais difíceis | Vida ×2,5, dano ×1,4 e golpes 25% mais frequentes (`CONFIG.enemies.boss`) |
+| Ímã menor no mapa e ainda mais raro | Sprite em 1x (era 2x); 0,05% por selvagem e 1,5% por elite ou líder (era 0,15% e 4%) |
+| A troca às vezes não troca o Pokémon que eu quero | Duas causas: o HUD se refazia entre apertar e soltar o botão (o clique se perdia), e não dava para ver qual slot ia sair. Agora o clique vale no apertar, o card que sai tem o selo "⇄ sai", a reserva diz quem ela substitui e clicar durante a recarga avisa quanto falta |
+| Espadinha em cada Pokémon ativo | Botão no card: desligado, o Pokémon fica em campo só acompanhando o treinador (não ataca, não avança, sem aura nem orbes). Vai no save |
+
+Com tudo isso o bot vence 45% das tentativas em média (0.8: 53%), desmaia 3,7
+vezes por tentativa e as lutas contra os líderes duram o dobro. Para não ficar
+injusto no começo, com menos Poké Balls e selvagens mais resistentes, o dano das
+ondas das Fases 1 e 2 caiu um pouco (tabela no HANDOFF, seção 5).
+
+**XP: sugestões para refinar (D10, a decidir)**
+
+1. **Orbes por faixa de valor** (recomendada): pequeno azul, médio verde, grande
+   dourado, como os cristais dos bullet heavens, mas com cara de doce (o Doce
+   Raro está nos itens do Pokemon All; os Exp. Candy da Gen 8 não estão).
+   Orbes perto uns dos outros se juntam num maior, o que também alivia o
+   navegador com a horda grande.
+2. **Coleta com "pop"**: o orbe dá um pulinho e um brilho ao ser puxado, e um
+   número "+XP" sobe do Pokémon que recebeu.
+3. **Barra de XP do Pokémon que mais recebe** pulsando no HUD, com o nível novo
+   piscando ao subir.
+4. **Sequência (combo)**: pegar orbes em seguida aumenta o XP por alguns segundos
+   (x1,1, x1,2...), premiando quem corre atrás deles no meio da horda.
+5. **Doce Raro**: muito raro, cai de elites e sobe um nível na hora no Pokémon
+   escolhido.
+6. **Exp. Share**: uma melhoria do treinador (Shards) que dá mais XP à reserva.
+
 ## 5. Decisões em aberto (do Fellipe)
 
 | | Pergunta | Recomendação | Trava |
 |---|---|---|---|
 | D1 | Pokémon em campo: GIF animado da Gen 5, sprite do FireRed (parado, mas no estilo do cenário) ou ícone da caixa (2 quadros, estilo "mini")? | GIF animado, porque é o que dá movimento. A vitrine mostra os três lado a lado para escolher olhando. | Etapa 3 |
-| D2 | Árvores e pedras do cenário: só decoração ou obstáculo de verdade? | Aplicado como padrão na 0.8: decoração, e o treinador para antes da borda. Obstáculo muda o jogo: os inimigos precisariam desviar. | Etapa 3 |
+| D2 | Árvores e pedras do cenário: só decoração ou obstáculo de verdade? | ✅ Decidido (0.9): bloqueiam o treinador e os inimigos. Quem bloqueia é a colisão do próprio mapa do FireRed; os Pokémon da equipe, os golpes e os itens passam por cima. | Etapa 3 |
 | D3 | Selvagens com nível e curva de XP cúbica? | ✅ Feito na 0.7, com ajustes: nível acompanha a equipe; curva exponencial até o 20 e potência depois. | Etapa 4 |
 | D4 | Quem já tem save escolhe o treinador ao abrir o jogo, ou fica Menino até trocar em Opções? | ✅ Decidido: escolhe ao continuar (a tela aparece uma vez) e pode trocar em Opções. | Etapa 1 |
 | D5 | Próxima região? | Hoenn | Etapa 8 |
@@ -480,6 +518,7 @@ O Fellipe jogou a 0.7 em 2026-11-02 e pediu:
 | D7 | Onde entram as 9 espécies que não estão em tabela nenhuma? | Aplicado como padrão na 0.7 (lugares do FireRed com peso 3, e os presentes). As porcentagens são suas: é só mudar em `capturePools.js`. | Etapa 4 |
 | D8 | Celular e controle importam? | Controle feito na 0.7 (padrão); celular depois de Kanto fechado. | Etapa 6 |
 | D9 | Final e pós-jogo | Hall da Fama e créditos na 1.0; revanche dos líderes e lendários depois. | Etapa 7 |
+| D10 | Como refinar o XP? (o Fellipe pediu sugestões na 0.9) | Ver as opções em "Segundo retorno" abaixo. Recomendação: orbes por faixa de valor com o visual de doce, que se juntam no chão. | — |
 
 Enquanto uma decisão não vem, a recomendação vale como padrão. O que foi feito
 assim fica anotado como "padrão até o Fellipe decidir".

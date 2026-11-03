@@ -24,6 +24,17 @@ function sizeScale(abilityId, size) {
   return Math.min(2, Math.round((size / base) * 2) / 2);
 }
 
+/**
+ * Itens no chão: o sprite do item (pixel art em 1x), o brilho em volta e a
+ * escala. A Poké Ball vai na escala do cenário para chamar atenção; o Ímã e a
+ * Poção ficam menores.
+ */
+const ITEM_LOOKS = {
+  ball:   { sheet: 'item/poke-ball', glow: '#ffcb05', ring: 24, scale: CONFIG.render.pixelScale, wobble: true },
+  magnet: { sheet: 'item/magnet', glow: '#63b3ff', ring: 14, scale: 1 },
+  heal:   { sheet: 'item/potion', glow: '#57d18a', ring: 14, scale: 1 }
+};
+
 /** Onde ficam os pés do treinador em relação ao centro dele (o raio de colisão). */
 const TRAINER_FEET = 14;
 
@@ -282,32 +293,31 @@ export class Renderer {
     for (const p of run.pickups) {
       if (p.dead) continue;
       const bob = Math.sin(p.bob) * 2;
-      if (p.kind === 'ball' || p.kind === 'magnet') {
-        // brilho pulsando em volta: dourado na Poké Ball, azul no Ímã
-        const ball = p.kind === 'ball';
+      const item = ITEM_LOOKS[p.kind];
+      if (item) {
+        // brilho pulsando em volta e o sprite do item
         ctx.globalAlpha = 0.18 + Math.sin(p.age * 6) * 0.08;
-        ctx.fillStyle = ball ? '#ffcb05' : '#63b3ff';
+        ctx.fillStyle = item.glow;
         ctx.beginPath();
-        ctx.arc(p.x, p.y + bob, 24, 0, Math.PI * 2);
+        ctx.arc(p.x, p.y + bob, item.ring, 0, Math.PI * 2);
         ctx.fill();
         ctx.globalAlpha = 0.5 + Math.sin(p.age * 6) * 0.2;
-        ctx.strokeStyle = ball ? '#ffcb05' : '#63b3ff';
+        ctx.strokeStyle = item.glow;
         ctx.lineWidth = 2;
         ctx.stroke();
         ctx.globalAlpha = 1;
-        const sheet = getSheet(ball ? 'item/poke-ball' : 'item/magnet');
+        const sheet = getSheet(item.sheet);
         if (sheet) {
-          // na escala do cenário (o ícone do item é pixel art em 1x)
           drawFrame(ctx, sheet, 0, p.x, p.y + bob, {
-            scale: CONFIG.render.pixelScale, anchorY: 0.5, rotation: ball ? Math.sin(p.age * 2) * 0.3 : 0
+            scale: item.scale, anchorY: 0.5, rotation: item.wobble ? Math.sin(p.age * 2) * 0.3 : 0
           });
-        } else if (ball) {
+        } else if (p.kind === 'ball') {
           drawPokeball(ctx, p.x, p.y + bob, 22, Math.sin(p.age * 2) * 0.25);
+        } else if (p.kind === 'heal') {
+          ctx.fillStyle = '#57d18a';
+          ctx.fillRect(p.x - 6, p.y + bob - 2, 12, 4);
+          ctx.fillRect(p.x - 2, p.y + bob - 6, 4, 12);
         }
-      } else if (p.kind === 'heal') {
-        ctx.fillStyle = '#57d18a';
-        ctx.fillRect(p.x - 6, p.y + bob - 2, 12, 4);
-        ctx.fillRect(p.x - 2, p.y + bob - 6, 4, 12);
       } else {
         if (p.magnetized) {
           // rastro do XP voando até o treinador

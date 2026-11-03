@@ -736,6 +736,33 @@ html, body {
   border-radius: 5px; font-size: 9px; padding: 0 4px; color: var(--muted);
 }
 
+/* quem sai na próxima troca */
+.mon-card .swap-tag {
+  position: absolute; bottom: -9px; left: 50%; transform: translateX(-50%);
+  padding: 0 7px; border-radius: 999px;
+  background: var(--yellow); color: #1b2340;
+  font-size: 9.5px; font-weight: 800; letter-spacing: .5px; white-space: nowrap;
+  border: 1px solid #fff; pointer-events: none;
+}
+
+/* espadinha: o Pokémon ativo ataca (ligada) ou só acompanha (desligada) */
+.attack-btn {
+  position: absolute; bottom: -9px; left: -9px;
+  width: 24px; height: 24px; padding: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: linear-gradient(180deg, #e2463f, #a8231d);
+  border: 2px solid #fff; border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 0 8px rgba(226, 70, 63, .5);
+}
+.attack-btn.off { background: #3a4260; box-shadow: none; }
+.attack-btn.off svg { opacity: .55; }
+.attack-btn.off::after {
+  content: ''; position: absolute; width: 22px; height: 2px;
+  background: #ff6b6b; transform: rotate(-45deg); border-radius: 2px;
+}
+.mon-card.passive img { filter: saturate(.55); }
+
 /* botão de subir nível acumulado */
 .level-btn {
   position: absolute;

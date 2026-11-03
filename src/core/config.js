@@ -3,7 +3,7 @@
  * Nada de número mágico espalhado pelo gameplay: se precisar ajustar, ajuste aqui.
  */
 export const CONFIG = {
-  version: '0.8.0',
+  version: '0.9.0',
 
   canvas: { width: 1280, height: 720 },
 
@@ -110,6 +110,9 @@ export const CONFIG = {
     // todas as fases por cima da calibragem de cada uma
     damageMult: 1.2,        // dano de contato e dos golpes dos líderes (por fase: scaling.damage)
     spawnMult: 1.2,         // ondas: levas mais frequentes e mais inimigos vivos
+    hpMult: 1.15,           // selvagens e elites (0.9: "um pouco mais de vida")
+    // líderes (0.9, "muito fácil"): vida, dano e golpes mais frequentes
+    boss: { hpMult: 2.5, damageMult: 1.4, cooldownMult: 0.75 },
     referenceLevel: 5,
     hpGrowth: 1.075,
     damageGrowth: 1.035,
@@ -118,11 +121,13 @@ export const CONFIG = {
 
   capture: {
     choices: 3,
-    // Poké Ball mais rara (pedido do Fellipe na 0.8); as garantidas da fase continuam
-    dropChanceMultiplier: 0.45,
-    // Ímã: puxa todo o XP do mapa até o treinador. Bem raro; um por vez no chão.
-    magnetChance: 0.0015,
-    magnetChanceElite: 0.04,
+    levelsBehindTeam: 3,     // quem entra chega com a média da equipe menos isso
+    // Poké Ball rara (pedidos do Fellipe: ×0,45 na 0.8, mais 3x menor na 0.9);
+    // as garantidas da fase continuam
+    dropChanceMultiplier: 0.15,
+    // Ímã: puxa todo o XP do mapa até o treinador. Raríssimo; um por vez no chão.
+    magnetChance: 0.0005,
+    magnetChanceElite: 0.015,
     potionChance: 0.04       // chance de um selvagem comum deixar uma poção
   },
 

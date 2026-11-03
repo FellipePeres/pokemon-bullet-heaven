@@ -111,13 +111,37 @@ const ROTEIROS = {
       { run: `game.run.world.scene = '${scene}'` }, { wait: 1800 }, { shot: `cenario-${scene}` }
     ])
   ],
+  // capturar na Fase 2 com a equipe já crescida: quem entra aparece em campo e no HUD
+  captura: [
+    { open: 'index.html' }, { wait: 500 },
+    { run: "game.newGame(); game.chooseTrainer('leaf'); game.chooseStarter('charmander');" +
+           "game.campaign.clearedStages.push('gym_1_pewter'); game.startStage('gym_2_cerulean');" +
+           "game.run.team.members[0].level = 18; game.run.team.add('pidgey', 16); game.run.refreshStats()" },
+    { wait: 1500 }, { run: "game.run.state = 'capture'; game.captureOpen = true; game.pickCapture('clefairy')" },
+    { wait: 2500 }, { shot: 'captura' },
+    { log: "JSON.stringify(game.run.team.members.map((m) => [m.pokemonId, m.level, Math.round(m.hp), m.fainted]))" },
+    { wait: 4000 }, { shot: 'captura-depois' },
+    { log: "JSON.stringify(game.run.team.members.map((m) => [m.pokemonId, m.level, Math.round(m.hp), m.fainted]))" }
+  ],
+  // o HUD da equipe: espadinha (atacar ou só acompanhar), selo de quem sai e a troca
+  equipe: [
+    { open: 'index.html' }, { wait: 500 },
+    { run: "game.newGame(); game.chooseTrainer('red'); game.chooseStarter('squirtle');" +
+           "game.campaign.clearedStages.push('gym_1_pewter'); game.startStage('gym_2_cerulean');" +
+           "['pidgey', 'clefairy', 'rattata', 'zubat'].forEach((id) => game.run.captureSystem.capture(id));" +
+           "game.run.team.toggleAttack(game.run.team.active[2].uid); game.run.team.selectedSlot = 1; game.hud.signature = ''" },
+    { wait: 2500 }, { shot: 'equipe' },
+    { run: "game.run.team.swapIn(game.run.team.reserve[0].uid); game.hud.signature = ''" }, { wait: 600 },
+    { log: "JSON.stringify(game.run.team.active.map((m) => m && [m.pokemonId, m.level, m.attack]))" },
+    { shot: 'equipe-trocou' }
+  ],
   // Poké Ball e Ímã no chão; depois o Ímã puxando o XP do mapa
   itens: [
     { open: 'index.html' }, { wait: 500 },
     { run: START_RUN }, { wait: 1200 },
     { run: "import('./src/entities/Pickup.js').then(({ Pickup }) => { const r = game.run, p = r.player;" +
            "r.spawner.update = () => {}; r.enemies.length = 0;" +
-           "r.pickups.push(new Pickup('ball', p.x - 260, p.y - 40), new Pickup('magnet', p.x + 160, p.y + 10));" +
+           "r.pickups.push(new Pickup('ball', p.x - 260, p.y - 40), new Pickup('magnet', p.x + 160, p.y + 10), new Pickup('heal', p.x - 120, p.y + 110, 28));" +
            "for (let i = 0; i < 40; i++) r.pickups.push(new Pickup('xp', p.x + Math.cos(i) * (200 + i * 12), p.y + Math.sin(i * 1.7) * (150 + i * 8), 2)); })" },
     { wait: 700 }, { shot: 'itens-chao' },
     { run: "game.run.pickups.find((x) => x.kind === 'magnet').x = game.run.player.x" }, { wait: 260 }, { shot: 'itens-ima', raw: true }

@@ -17,10 +17,12 @@ export class Enemy {
     this.y = y;
     this.radius = data.radius;
     this.scale = data.scale ?? 1;
-    this.maxHp = data.hp * scaling.hp;
+    // os líderes têm vida absoluta nos dados (sem a escala da fase), mais o reforço deles
+    const tuning = data.boss ? CONFIG.enemies.boss : { hpMult: CONFIG.enemies.hpMult, damageMult: 1 };
+    this.maxHp = data.hp * scaling.hp * tuning.hpMult;
     this.hp = this.maxHp;
     this.speed = data.speed * scaling.speed;
-    this.damage = data.damage * scaling.damage * CONFIG.enemies.damageMult;
+    this.damage = data.damage * scaling.damage * CONFIG.enemies.damageMult * tuning.damageMult;
     this.xp = data.xp * (scaling.xp ?? 1);
     this.level = level ?? data.level ?? null;
     this.elite = !!data.elite;
@@ -40,6 +42,9 @@ export class Enemy {
     this.dashing = false;
     this.dashX = 0;
     this.dashY = 0;
+    // colisão com o cenário: o corpo, menor que o raio (cabe entre duas árvores)
+    this.box = { oy: this.radius * 0.25, hw: Math.min(12, this.radius * 0.5), hh: Math.min(9, this.radius * 0.35) };
+    this.detourSide = Math.random() < 0.5 ? 1 : -1;   // por onde contorna um obstáculo
 
     // efeitos de status ativos
     this.status = { burn: null, poison: null, slow: null };
@@ -163,8 +168,23 @@ export class Enemy {
         break;
     }
 
-    this.x += (mx + this.kvx) * dt;
-    this.y += (my + this.kvy) * dt;
+    const stepX = (mx + this.kvx) * dt;
+    const stepY = (my + this.kvy) * dt;
+    const terrain = world.terrain;
+    if (terrain) {
+      const moved = terrain.move(this, stepX, stepY, this.box);
+      // travou de frente num obstáculo: contorna pelo lado; se o lado também
+      // estiver fechado, da próxima vez tenta o outro
+      const wanted = Math.hypot(stepX, stepY);
+      if (wanted > 0.01 && Math.hypot(moved.x, moved.y) < wanted * 0.35) {
+        const side = speed * dt * this.detourSide;
+        const slid = terrain.move(this, -ny * side, nx * side, this.box);
+        if (!slid.x && !slid.y) this.detourSide = -this.detourSide;
+      }
+    } else {
+      this.x += stepX;
+      this.y += stepY;
+    }
 
     // o empurrão perde força rapidamente
     const decay = Math.pow(0.0015, dt);
