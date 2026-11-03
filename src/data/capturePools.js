@@ -20,10 +20,17 @@ export const CAPTURE_POOLS = {
     id: 'phase1',
     name: 'Rotas iniciais',
     species: {
-      rattata: 22, pidgey: 20, caterpie: 13, weedle: 13, spearow: 8,
-      nidoran_f: 5, nidoran_m: 5, metapod: 3, kakuna: 3,
-      raticate: 2, pidgeotto: 2, pikachu: 1, butterfree: 1, beedrill: 1,
-      nidorina: 0.5, nidorino: 0.5
+      // 0.11.2, a pedido do Fellipe: mais variedade, quase tudo forma básica.
+      // Rotas 1, 2, 22 e 3, a Floresta de Viridian e a pesca do começo do FireRed.
+      rattata: 11, pidgey: 11, spearow: 8, caterpie: 8, weedle: 8,
+      nidoran_f: 6, nidoran_m: 6, mankey: 5, jigglypuff: 5, ekans: 5,
+      sandshrew: 4, magikarp: 4, zubat: 3, pikachu: 2, diglett: 2,
+      // Água e Planta tiram 4x do Brock (Pedra/Terra): ficam raros, para ele seguir difícil
+      poliwag: 2, goldeen: 2, oddish: 2,
+      clefairy: 1, abra: 1,
+      // evoluídos: raros (4% somados)
+      metapod: 1, kakuna: 1, raticate: 0.5, pidgeotto: 0.5,
+      butterfree: 0.25, beedrill: 0.25, nidorina: 0.25, nidorino: 0.25
     }
   },
 

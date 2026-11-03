@@ -5,7 +5,7 @@
 > decisão foi tomada e o que falta fazer. O `README.md` é o manual de uso;
 > este aqui é o contexto de desenvolvimento.
 
-**Versão atual:** `0.11.1` · **Última atualização:** 2026-11-03
+**Versão atual:** `0.11.2` · **Última atualização:** 2026-11-03
 **Stack:** HTML + CSS + JavaScript puro (ES Modules). Sem backend, sem build, sem dependências.
 **Repositório:** https://github.com/FellipePeres/pokemon-bullet-heaven (público)
 **Jogo no ar:** https://fellipeperes.github.io/pokemon-bullet-heaven/
@@ -279,6 +279,10 @@ Nunca voltar bônus globais para o pool de level up — foi pedido explícito.
 - Quais espécies aparecem e com qual chance está em `capturePools.js`, com as
   **9 tabelas de porcentagem definidas pelo Fellipe**. Espécies ainda não
   implementadas são filtradas automaticamente.
+- A **Fase 1 foi ampliada** (0.11.2, "simples demais… mais chances de estágio 1"):
+  28 espécies, 96% do peso em formas básicas (Rotas 1, 2, 22 e 3, Floresta de
+  Viridian e a pesca do começo) e 4% nos evoluídos. Água e Planta (Poliwag,
+  Goldeen, Oddish) ficaram em 2% cada porque tiram 4x do Brock.
 
 ### Fases
 - **Uma fase = a jornada inteira até um ginásio.** Ela tem `segments` (Rota 1 →
@@ -391,7 +395,9 @@ encadeados). A meta é ~40–50% para o bot: quem joga bem vence mais.
 
 Média medida: 59% (as 4 opções por Poké Ball deixaram as equipes mais fortes).
 ¹ Charmander contra o Brock é o caminho difícil (~10%); Bulbasaur ~35%, Squirtle
-~75%. \* Depois da medição, o dano dessas subiu (e o do Campeão desceu) para
+~75%. Com a Fase 1 ampliada (0.11.2, evoluídos raros na Poké Ball), o bot
+passou de 30% → 4% com Bulbasaur, 2% → 2% com Charmander e 73% → 64% com
+Squirtle (16 jornadas cada; o bot pega sempre a primeira opção). \* Depois da medição, o dano dessas subiu (e o do Campeão desceu) para
 voltar à meta: Erika 4,6 → 5,2, Koga 6,2 → 7,2, Sabrina 4,2 → 5,2, Giovanni
 11 → 12,5, Bruno 8,6 → 10, Lance 2,3 → 2,8, Campeão 2,4 → 2,1.
 
@@ -690,6 +696,7 @@ tipo, som e o polimento de troca e captura.
 | 9 | Poké Balls ainda demais, as garantidas atrapalham; jogo levemente mais difícil; líderes muito fáceis (o bot não joga como um humano); remodelar o front copiando o UX do Pokemon All; publicar | 0.10: só a Fase 1 com garantidas, tetos menores, bola ×0,07; dano ×1,3 e vida ×1,2; líderes com vida ×4, Rajada mirando o treinador e fúria; bot que escolhe bem as melhorias e desvia; identidade visual do Pokemon All (molduras do FireRed, fontes em pixel, logo próprio, fundo com o cenário do jogo); site publicado |
 | 10 | fases de ~4 min fixas; música no lobby e em cada fase, do Pokemon All, com volume num botão sempre no canto; Opções sem ativos e sem sprites; conquistas em níveis; mais Pokémon à disposição; PC no lobby | 0.11: 3:30 até o líder em todas (linha do tempo comprimida, XP compensado); 17 músicas do FireRed renderizadas com a cópia do sintetizador do Pokemon All + o tema do lobby, Web Audio com loop do jogo, mixer em Opções e engrenagem em toda tela; 20 conquistas com 99 degraus; 4 opções por Poké Ball, tabelas acumuladas e os outros iniciais; PC (captura com equipe cheia e trocas no lobby) |
 | 11 | na derrota, duas opções: Centro Pokémon (cura e recomeça a fase) ou a jornada do zero; quais Pokémon aparecem na Fase 1 e com que chance | 0.11.1: tela de derrota com as duas saídas e confirmação para recomeçar; Centro Pokémon com a equipe curada, a música do Centro e a vinheta de cura do FireRed (`MusicPlayer.jingle`), aviso de quem se perdeu e o PC à mão; tabela da Fase 1 respondida na conversa |
+| 12 | todos os Pokémon são obtíveis?; a Fase 1 simples demais: mais espécies, poucos evoluídos, mais estágio 1 | as 151 têm caminho (141 captura, 3 iniciais, 4 presentes, 3 evolução), mas Mew (0,11% por bola, só na Liga) e companhia são impraticáveis — sugerido encontro de lendário no pós-jogo, aguardando o Fellipe; 0.11.2: Fase 1 com 28 espécies, 96% básicas |
 
 ---
 
