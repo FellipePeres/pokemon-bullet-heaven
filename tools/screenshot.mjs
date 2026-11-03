@@ -123,6 +123,13 @@ const ROTEIROS = {
     { wait: 4000 }, { shot: 'captura-depois' },
     { log: "JSON.stringify(game.run.team.members.map((m) => [m.pokemonId, m.level, Math.round(m.hp), m.fainted]))" }
   ],
+  // a tela de título: sem save, com o cursor descendo, e com uma jornada salva
+  titulo: [
+    { open: 'index.html' }, { wait: 1500 }, { shot: 'titulo' },
+    { key: 'ArrowDown' }, { key: 'ArrowDown' }, { wait: 300 }, { shot: 'titulo-cursor' },
+    { run: "game.newGame(); game.chooseTrainer('red'); game.chooseStarter('squirtle'); game.campaign.clearedStages.push('gym_1_pewter'); game.menus.show('screen-title')" },
+    { wait: 900 }, { shot: 'titulo-com-save' }
+  ],
   // todas as telas, uma por foto: para conferir o visual (use antes e depois de mexer no CSS)
   telas: [
     { open: 'index.html' }, { wait: 1200 }, { shot: 'tela-01-titulo' },
@@ -174,6 +181,9 @@ const ROTEIROS = {
     { wait: 650 }, { shot: 'chefe-onda' }
   ]
 };
+
+/** Códigos de tecla do Windows para as teclas que os roteiros apertam. */
+const KEY_CODES = { ArrowUp: 38, ArrowDown: 40, Enter: 13, Escape: 27 };
 
 /** Antes de cada foto da partida: fecha telas de melhoria, captura e evolução. */
 const SETTLE = `typeof game !== 'undefined' && game.run && (() => {
@@ -363,6 +373,11 @@ async function main() {
         await evaluate(step.run);
       } else if (step.log) {
         console.log(`${step.log} => ${await evaluate(step.log)}`);
+      } else if (step.key) {
+        // uma tecla de verdade, apertada e solta (menus que ouvem keydown)
+        for (const type of ['keyDown', 'keyUp']) {
+          await page('Input.dispatchKeyEvent', { type, key: step.key, code: step.key, windowsVirtualKeyCode: KEY_CODES[step.key] ?? 0 });
+        }
       } else if (step.hold) {
         await evaluate(`game.input.keys.clear(); ${JSON.stringify(step.hold)}.forEach((k) => game.input.keys.add(k))`);
       } else if (step.shot) {

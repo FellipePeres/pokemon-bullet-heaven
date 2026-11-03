@@ -39,10 +39,18 @@ salões, e quais metatiles bloqueiam o caminho pela colisão do mapa) sai em
 Os PNG do decomp são indexados com uma paleta provisória; as cores de verdade estão
 nos `.pal`. O índice 0 é transparente, e o recorte é sempre pelo índice, nunca pela cor.
 
+## Copiados do Pokemon All (interface)
+
+| Saída | Origem |
+|---|---|
+| `ui/window-frame.png`, `ui/window-frame-button.png` | `src/app/assets/` do Pokemon All: a `graphics/text_window/type2.png` do decomp com a paleta `stdpal_0`, já ampliada (3x e 2x) para o `border-image` sair nítido |
+| `fonts/*.woff2` | Press Start 2P e Pixelify Sans, as fontes do Pokemon All, baixadas do Google Fonts (licença SIL Open Font License 1.1, que permite redistribuir) |
+
 ## Outros
 
 | Arquivo | Origem |
 |---|---|
+| `ui/title-background.webp` | arte do Fellipe para a tela de título (2026-11-02), convertida para WebP |
 | `banner.svg` | feito para o projeto |
 | sprites de Pokémon, itens e insígnias | não ficam aqui: vêm do [PokeAPI/sprites](https://github.com/PokeAPI/sprites) pela internet (ver `CONFIG.sprites`) |
 

@@ -44,33 +44,52 @@
        MENU PRINCIPAL
        ============================================================ -->
   <section id="screen-title" class="screen title-screen">
-    <div class="poke-bg" aria-hidden="true">
-      <div class="poke-orb"></div>
-      <div class="poke-stripe"></div>
+    <!-- a arte de fundo do Fellipe: a clareira à noite, cercada pela horda -->
+    <img class="title-bg" src="assets/ui/title-background.webp" alt="" aria-hidden="true" />
+    <div class="title-scrim" aria-hidden="true"></div>
+
+    <!-- atalhos no canto, como a engrenagem do Pokemon All -->
+    <div class="title-corner">
+      <button class="corner-btn" data-modal="modal-pokedex" title="Pokédex"><img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/town-map.png" alt="" /><span class="corner-label">Pokédex</span></button>
+      <button class="corner-btn" data-modal="modal-achievements" title="Conquistas"><img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/star-piece.png" alt="" /><span class="corner-label">Conquistas</span></button>
+      <button class="corner-btn" data-modal="modal-trainer" title="Melhorias do treinador"><img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/coin-case.png" alt="" /><span class="corner-label">Treinador</span></button>
+      <button class="corner-btn gear" data-modal="modal-options" title="Opções">
+        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path fill="currentColor" d="M19.4 13a7.6 7.6 0 0 0 0-2l2.1-1.6-2-3.4-2.5 1a7.7 7.7 0 0 0-1.7-1L15 3.3h-4l-.4 2.7a7.7 7.7 0 0 0-1.7 1l-2.5-1-2 3.4L6.5 11a7.6 7.6 0 0 0 0 2l-2.1 1.6 2 3.4 2.5-1a7.7 7.7 0 0 0 1.7 1l.4 2.7h4l.4-2.7a7.7 7.7 0 0 0 1.7-1l2.5 1 2-3.4zM13 15.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z" transform="translate(-1 0)"/></svg>
+        <span class="corner-label">Opções</span>
+      </button>
     </div>
 
     <div class="title-content">
       <div class="logo-block">
         <h1 class="logo-main">POKÉMON</h1>
         <div class="logo-sub"><span>BULLET HEAVEN</span></div>
-        <p class="tagline">Monte sua equipe. Enfrente a horda. Conquiste Kanto.</p>
       </div>
 
-      <div class="menu-column">
-        <button id="btn-continue" class="menu-btn primary" disabled>
-          <span class="btn-ball"></span><span class="btn-text">Continuar</span>
+      <!-- cada entrada é uma caixa de diálogo; a Poké Ball aponta a escolhida (↑ ↓ e Enter) -->
+      <nav id="title-menu" class="title-menu" aria-label="Menu principal">
+        <button id="btn-continue" class="title-item" disabled>
+          <span class="title-pointer btn-ball"></span><span class="btn-text title-label">Continuar</span>
+          <span class="title-seal" id="continue-seal">Sem jogo salvo</span>
         </button>
-        <button id="btn-new-game" class="menu-btn">
-          <span class="btn-ball"></span><span class="btn-text">Nova Jornada</span>
+        <button id="btn-new-game" class="title-item">
+          <span class="title-pointer btn-ball"></span><span class="btn-text title-label">Nova jornada</span>
         </button>
-        <button id="btn-load-game" class="menu-btn">
-          <span class="btn-ball"></span><span class="btn-text">Carregar Jogo (.json)</span>
+        <button id="btn-load-game" class="title-item">
+          <span class="title-pointer btn-ball"></span><span class="btn-text title-label">Carregar jogo</span>
+          <span class="title-seal">.json</span>
         </button>
-      </div>
+        <button class="title-item" data-modal="modal-help">
+          <span class="title-pointer btn-ball"></span><span class="btn-text title-label">Como jogar</span>
+        </button>
+      </nav>
 
-      <div id="title-progress" class="progress-strip"></div>
+      <p class="tagline">Monte sua equipe. Enfrente a horda. Conquiste Kanto.</p>
     </div>
 
+    <div class="title-footer">
+      <div id="title-progress" class="progress-strip"></div>
+      <p class="title-hint"><kbd>↑</kbd><kbd>↓</kbd> escolher <span class="dot">·</span> <kbd>Enter</kbd> confirmar</p>
+    </div>
     <p class="version-tag" id="version-tag"></p>
   </section>
 

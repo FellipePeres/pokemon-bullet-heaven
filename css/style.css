@@ -249,9 +249,39 @@ button { font: inherit; color: inherit; }
   color: rgba(232, 237, 245, .7); text-shadow: 2px 2px 0 rgba(0, 0, 0, .6);
 }
 
-/* ========================= MENU PRINCIPAL ========================= */
-.title-screen { justify-content: center; }
-.poke-bg { display: none; }
+/* ========================= TELA DE TÍTULO =========================
+   A arte de fundo é do Fellipe (a clareira à noite, cercada pela horda de
+   olhos vermelhos): ela é o motivo da tela existir, então o véu é leve e só
+   escurece atrás do logo e do menu. O menu segue o do Pokemon All: cada
+   entrada é uma caixa de diálogo própria, com a Poké Ball de ponteiro na
+   escolhida, navegável por ↑ ↓ e Enter (ui/titleMenu.js). */
+.title-screen { justify-content: center; padding: 28px; gap: 0; }
+/* no título, a arte é o fundo: a barra lateral e o cenário dos menus saem */
+#app[data-screen="screen-title"] #side-rail,
+#app[data-screen="screen-title"] #menu-bg { display: none; }
+
+.title-bg {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 60%;
+  animation: title-breathe 24s ease-in-out infinite alternate;
+}
+/* o cenário respira devagar, como uma câmera parada na clareira */
+@keyframes title-breathe { from { transform: scale(1); } to { transform: scale(1.045); } }
+
+.title-scrim {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 40% 52% at 50% 44%, rgba(6, 8, 22, .55), transparent 78%),
+    linear-gradient(180deg, rgba(6, 8, 22, .45) 0%, transparent 22%, transparent 70%, rgba(6, 8, 22, .72) 100%);
+}
 
 .title-content {
   position: relative;
@@ -259,10 +289,17 @@ button { font: inherit; color: inherit; }
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 30px;
+  gap: 26px;
+  margin-top: -2vh;
   animation: title-in .8s var(--ease) both;
 }
 @keyframes title-in { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+
+/* saída para o jogo: clareia e afasta, como a abertura do FireRed */
+.title-screen.leaving .title-content,
+.title-screen.leaving .title-footer,
+.title-screen.leaving .title-corner { opacity: 0; transform: scale(1.04); transition: opacity .35s var(--ease), transform .35s var(--ease); }
+.title-screen.leaving .title-scrim { background: rgba(6, 8, 22, .9); transition: background .35s var(--ease); }
 
 /* O logo, em pixel: o amarelo e o azul da marca com contorno duro em degraus. */
 .logo-block {
@@ -274,7 +311,7 @@ button { font: inherit; color: inherit; }
 @keyframes title-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
 .logo-main {
   font-family: var(--font-arcade);
-  font-size: clamp(34px, 6.4vw, 78px);
+  font-size: clamp(34px, 6.2vw, 76px);
   font-weight: 400;
   letter-spacing: .04em;
   line-height: 1.15;
@@ -283,7 +320,7 @@ button { font: inherit; color: inherit; }
     -4px 0 0 var(--logo-blue), 4px 0 0 var(--logo-blue), 0 -4px 0 var(--logo-blue), 0 4px 0 var(--logo-blue),
     -4px -4px 0 var(--logo-blue), 4px -4px 0 var(--logo-blue), -4px 4px 0 var(--logo-blue), 4px 4px 0 var(--logo-blue),
     0 8px 0 var(--logo-blue-deep), 4px 8px 0 var(--logo-blue-deep), -4px 8px 0 var(--logo-blue-deep),
-    0 12px 0 rgba(0, 0, 0, .45);
+    0 14px 18px rgba(0, 0, 0, .55);
 }
 /* a placa vermelha de Poké Ball, com moldura dura em degraus */
 .logo-sub {
@@ -291,7 +328,7 @@ button { font: inherit; color: inherit; }
   padding: 10px 22px 9px;
   background: var(--poke-red);
   border: 4px solid #ffffff;
-  box-shadow: 0 0 0 4px var(--poke-red-dark), 6px 6px 0 4px rgba(0, 0, 0, .4);
+  box-shadow: 0 0 0 4px var(--poke-red-dark), 6px 6px 0 4px rgba(0, 0, 0, .45);
 }
 .logo-sub span {
   font-family: var(--font-arcade);
@@ -301,13 +338,150 @@ button { font: inherit; color: inherit; }
   text-shadow: 2px 2px 0 var(--poke-red-dark);
 }
 .tagline {
-  margin-top: 22px;
   font-family: var(--font-pixel);
   font-size: 17px;
   font-weight: 500;
   color: #eef2f8;
-  text-shadow: 2px 2px 0 rgba(0, 0, 0, .7);
+  text-shadow: 2px 2px 0 rgba(0, 0, 0, .8);
 }
+
+/* --- o menu --- */
+.title-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: min(84vw, 360px);
+}
+.title-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 4px 10px 4px 6px;
+  color: var(--gba-ink);
+  background: none;
+  border: 16px solid transparent;
+  border-image: url(../assets/ui/window-frame-button.png) 16 fill stretch;
+  font-family: var(--font-pixel);
+  font-size: 19px;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  /* sombra curta: separa da arte, não dá profundidade */
+  filter: drop-shadow(0 3px 5px rgba(0, 0, 0, .55));
+  transition: transform .14s var(--ease), filter .14s var(--ease);
+}
+.title-item .title-label { flex: 1; }
+/* a escolhida: a Poké Ball aparece e a caixa avança, como o cursor do jogo */
+.title-item .title-pointer { opacity: 0; transition: opacity .14s var(--ease), transform .14s var(--ease); }
+.title-item.on { transform: translateX(8px); filter: drop-shadow(0 5px 7px rgba(0, 0, 0, .6)); }
+.title-item.on .title-pointer { opacity: 1; transform: rotate(-12deg); }
+.title-item.on .title-label { color: var(--gba-frame); }
+.title-item:focus-visible { outline: none; }
+.title-item:active:not(:disabled) { transform: translate(10px, 2px); }
+.title-item:disabled { cursor: not-allowed; }
+.title-item:disabled .title-label { color: #9aa4b6; }
+
+/* selo com moldura no lugar de texto solto (o "em breve" do Pokemon All) */
+.title-seal {
+  flex-shrink: 0;
+  padding: 3px 6px 2px;
+  font-family: var(--font-pixel);
+  font-size: 11.5px;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  color: var(--gba-ink-soft);
+  background: var(--gba-button);
+  border: 2px solid var(--gba-button-shade);
+  border-radius: 2px;
+}
+#btn-continue:not(:disabled) .title-seal { color: var(--gba-frame); border-color: var(--gba-frame); }
+
+/* --- atalhos no canto --- */
+.title-corner {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  z-index: 3;
+  display: flex;
+  gap: 8px;
+}
+.corner-btn {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  padding: 0;
+  color: var(--gba-frame);
+  background: var(--gba-button);
+  border: 2px solid var(--gba-frame);
+  border-radius: 3px;
+  cursor: pointer;
+  /* relevo duro e sombra sólida: é o que separa o botão da arte */
+  box-shadow: var(--relief), 2px 2px 0 rgba(0, 0, 0, .55);
+  transition: background .14s var(--ease), transform .08s var(--ease);
+}
+.corner-btn img { width: 30px; height: 30px; image-rendering: pixelated; }
+.corner-btn:hover { background: var(--gba-hover); }
+.corner-btn:active { transform: translate(2px, 2px); box-shadow: var(--relief); }
+.corner-label {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  padding: 3px 8px;
+  white-space: nowrap;
+  font-family: var(--font-pixel);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--gba-ink);
+  background: var(--gba-fill);
+  border: 2px solid var(--gba-frame);
+  border-radius: 3px;
+  box-shadow: 2px 2px 0 rgba(0, 0, 0, .45);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .12s var(--ease);
+}
+.corner-btn:hover .corner-label, .corner-btn:focus-visible .corner-label { opacity: 1; }
+
+/* --- rodapé: o progresso da conta e as teclas --- */
+.title-footer {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 18px;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+.title-hint {
+  font-family: var(--font-pixel);
+  font-size: 14px;
+  color: #dfe6f2;
+  text-shadow: 2px 2px 0 rgba(0, 0, 0, .8);
+}
+.title-hint kbd {
+  display: inline-block;
+  min-width: 22px;
+  margin: 0 2px;
+  padding: 1px 5px;
+  font-family: var(--font-pixel);
+  font-size: 13px;
+  font-weight: 700;
+  text-align: center;
+  color: var(--gba-ink);
+  background: var(--gba-button);
+  border: 2px solid var(--gba-frame);
+  border-radius: 3px;
+  box-shadow: inset -1px -2px 0 var(--gba-button-shade);
+  text-shadow: none;
+}
+.title-hint .dot { margin: 0 6px; }
 
 /* progresso da conta: selos com moldura, não texto solto */
 .progress-strip { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
@@ -323,9 +497,16 @@ button { font: inherit; color: inherit; }
   background: var(--gba-button);
   border: 2px solid var(--gba-frame);
   border-radius: 3px;
-  box-shadow: var(--relief), 2px 2px 0 rgba(0, 0, 0, .4);
+  box-shadow: var(--relief), 2px 2px 0 rgba(0, 0, 0, .45);
 }
 .progress-strip .pill b { color: var(--gba-frame); font-weight: 700; }
+
+@media (max-height: 700px) {
+  .title-content { gap: 18px; }
+  .logo-main { font-size: clamp(28px, 5vw, 58px); }
+  .title-item { font-size: 17px; }
+  .tagline { display: none; }
+}
 
 /* ============================= BOTÕES ============================= */
 .menu-column { display: flex; flex-direction: column; gap: 10px; width: min(380px, 86vw); }

@@ -13,6 +13,7 @@ import { CONFIG } from '../core/config.js';
 import { iconHTML } from '../render/icons.js';
 import { formatTime } from '../core/utils.js';
 import { maxHpFor } from '../systems/stats.js';
+import { TitleMenu } from './titleMenu.js';
 
 const SCREENS = ['screen-title', 'screen-trainer', 'screen-starter', 'screen-campaign'];
 const MODALS = ['modal-pokedex', 'modal-achievements', 'modal-team', 'modal-trainer', 'modal-options', 'modal-help'];
@@ -27,11 +28,12 @@ export class Menus {
     this.game = game;
     this.openModal = null;
     this._bind();
+    this.titleMenu = new TitleMenu(this);
   }
 
   _bind() {
-    el('btn-new-game').onclick = () => this.game.newGame();
-    el('btn-continue').onclick = () => this.game.continueGame();
+    el('btn-new-game').onclick = () => this.leaveTitle(() => this.game.newGame());
+    el('btn-continue').onclick = () => this.leaveTitle(() => this.game.continueGame());
     el('btn-load-game').onclick = () => el('save-file-input').click();
     el('btn-save-campaign').onclick = () => this.game.saveToFile();
     el('btn-hall').onclick = () => this.game.showHallOfFame(this.game.profile.hallOfFame.at(-1));
@@ -66,10 +68,23 @@ export class Menus {
     hide(el('stage-wrapper'));
     show(el('side-rail'));
     if (screenId) show(el(screenId));
+    // o CSS usa a tela atual (no título, a arte de fundo substitui a barra e o cenário)
+    el('app').dataset.screen = screenId ?? '';
     if (screenId === 'screen-title') this.refreshTitle();
   }
 
+  /** Sai do título com o esmaecimento da abertura e só então segue. */
+  leaveTitle(next) {
+    const title = el('screen-title');
+    title.classList.add('leaving');
+    setTimeout(() => {
+      title.classList.remove('leaving');
+      next();
+    }, 320);
+  }
+
   showGame() {
+    el('app').dataset.screen = 'game';
     for (const id of SCREENS) hide(el(id));
     hide(el('side-rail'));
     this.closeModal();
@@ -100,11 +115,10 @@ export class Menus {
   refreshTitle() {
     const profile = this.game.profile;
     const canContinue = this.game.canContinue();
-    const btn = el('btn-continue');
-    btn.disabled = !canContinue;
-    btn.querySelector('.btn-text').textContent = canContinue
-      ? `Continuar — ${this.game.continueLabel()}`
-      : 'Continuar';
+    el('btn-continue').disabled = !canContinue;
+    // o selo diz de onde a jornada continua (ou que não há jogo salvo)
+    el('continue-seal').textContent = canContinue ? this.game.continueLabel().split(' — ')[0] : 'Sem jogo salvo';
+    this.titleMenu?.reset();
 
     const strip = clear(el('title-progress'));
     const pills = [

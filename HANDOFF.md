@@ -5,7 +5,7 @@
 > decisão foi tomada e o que falta fazer. O `README.md` é o manual de uso;
 > este aqui é o contexto de desenvolvimento.
 
-**Versão atual:** `0.10.0` · **Última atualização:** 2026-11-02
+**Versão atual:** `0.10.1` · **Última atualização:** 2026-11-02
 **Stack:** HTML + CSS + JavaScript puro (ES Modules). Sem backend, sem build, sem dependências.
 **Repositório:** https://github.com/FellipePeres/pokemon-bullet-heaven (público)
 **Jogo no ar:** https://fellipeperes.github.io/pokemon-bullet-heaven/
@@ -66,7 +66,8 @@ retratos. **Olhe os screenshots antes de entregar mudança visual.** O feel
 
 ## 2b. Publicação (GitHub Pages)
 
-O jogo está no ar em **https://fellipeperes.github.io/pokemon-bullet-heaven/**,
+O jogo está no ar em **https://fellipeperes.github.io/pokemon-bullet-heaven/**
+(a 0.10.1 desde 2026-11-03),
 servido pelo GitHub Pages direto da branch `main`, pasta raiz (`build_type: legacy`).
 
 **Para publicar uma atualização, basta `git push` na `main`** — o workflow
@@ -150,6 +151,7 @@ src/
     dom.js            helpers de DOM e toasts
     pad.js            o controle nas telas: foco nos alvos clicáveis da camada de cima
     backdrop.js       o fundo dos menus: um trecho de rota montado pelo gerador do cenário
+    titleMenu.js      o menu da tela de título: ↑ ↓ e Enter, Poké Ball de ponteiro
   save/
     SaveManager.js    arquivo .json + autosave em localStorage
     profile.js        progresso permanente + ProfileTracker (eventos → perfil)
@@ -454,6 +456,7 @@ Procedência e como regerar: `assets/PROVENIENCIA.md`.
 | Cenário | `assets/scenes/<id>.png`: as metatiles de cada mapa (17 cenários); `src/data/sceneManifest.js` diz qual metatile é cada quadro e guarda o mapa dos salões |
 | Moldura das janelas e dos botões | `assets/ui/window-frame.png` (3x, fatia 24) e `window-frame-button.png` (2x, fatia 16): a `text_window` do FireRed, copiadas do Pokemon All |
 | Fontes | `assets/fonts/`: Press Start 2P e Pixelify Sans (licença OFL), as do Pokemon All |
+| Fundo da tela de título | `assets/ui/title-background.webp`: arte do Fellipe (a clareira à noite cercada pela horda) |
 
 - Tudo é pixel art em **escala inteira, sem suavização** (`CONFIG.render.pixelScale`,
   hoje 2). `render/assets.js` carrega sob demanda e, enquanto a folha não carrega,

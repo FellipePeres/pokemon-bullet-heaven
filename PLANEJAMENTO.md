@@ -428,6 +428,14 @@ Levantamento de 2026-11-02:
   maiúscula só na inicial: a Press Start 2P achata as maiúsculas acentuadas.
 - ✅ **Publicado** (0.10): a `main` recebeu a branch `etapa-0-1-treinador` e o
   site saiu da 0.4.
+- ✅ **Tela de título** (0.10.1, com a arte que o Fellipe fez: a clareira à noite
+  cercada pela horda de olhos vermelhos): a arte com véu leve só atrás do logo e
+  do menu e um zoom lento; o menu do Pokemon All, uma caixa de diálogo por
+  entrada, com a Poké Ball de ponteiro, ↑ ↓ e Enter (pula o que está
+  desabilitado) e o mouse escolhendo ao passar; selos com moldura ("Sem jogo
+  salvo", de onde a jornada continua); atalhos no canto (Pokédex, Conquistas,
+  Treinador e a engrenagem de Opções), no lugar da barra lateral; o progresso da
+  conta e as teclas no rodapé; a saída esmaece como a abertura do jogo.
 
 ### Etapa 7 — Final da jornada
 
