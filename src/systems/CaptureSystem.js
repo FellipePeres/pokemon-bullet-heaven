@@ -78,6 +78,7 @@ export class CaptureSystem {
   _registerCapture(pokemonId, toPC = false) {
     const data = getPokemon(pokemonId);
     this.run.stats.captures++;
+    this.run.captured.push(data.name);   // o Centro Pokémon avisa quem se perde numa derrota
     bus.emit(EVENTS.POKEMON_CAPTURED, { pokemonId, dex: data.dex, name: data.name });
     bus.emit(EVENTS.TOAST, { text: toPC ? `${data.name} foi para o PC!` : `${data.name} entrou para a equipe!`, icon: 'ball' });
   }

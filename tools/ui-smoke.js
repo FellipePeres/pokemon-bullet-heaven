@@ -243,6 +243,17 @@ game.run.state = 'defeat';
 game._handleRunState();
 check('derrota mostra o resultado', !registry.get('result-overlay').classes.has('hidden'));
 check('derrota não avança a jornada', game.campaign.clearedStages.length === 0);
+check('derrota oferece o Centro Pokémon e recomeçar a jornada',
+      !registry.get('result-defeat').classes.has('hidden') && registry.get('result-victory').classes.has('hidden'));
+registry.get('btn-result-center').click();
+check('o Centro Pokémon mostra a equipe curada',
+      game.centerOpen && !registry.get('center-overlay').classes.has('hidden') &&
+      registry.get('result-overlay').classes.has('hidden') && registry.get('center-team').children.length >= 1);
+registry.get('btn-center-go').click();
+check('do Centro Pokémon a fase recomeça com a equipe curada',
+      !game.centerOpen && registry.get('center-overlay').classes.has('hidden') &&
+      game.run?.stage.id === 'gym_1_pewter' && game.run.time === 0 &&
+      game.run.team.members.every((m) => !m.fainted && m.hp > 0));
 
 game.quitToMenu();
 check('voltar ao mapa funciona', !registry.get('screen-campaign').classes.has('hidden'));
@@ -252,6 +263,8 @@ game.startStage('gym_1_pewter');
 game.run.state = 'victory';
 game._handleRunState();
 check('vitória conclui a fase', game.campaign.clearedStages.includes('gym_1_pewter'));
+check('vitória mostra Continuar jornada (e não as saídas da derrota)',
+      !registry.get('result-victory').classes.has('hidden') && registry.get('result-defeat').classes.has('hidden'));
 check('vitória registra a insígnia do líder',
       game.campaign.badges.includes('Insígnia Pedra') && game.profile.stats.badges === 1);
 check('vitória rende Shards', game.profile.shards > 0, `${game.profile.shards} Shards`);
@@ -327,6 +340,26 @@ check('save sem treinador pede a escolha ao continuar', !registry.get('screen-tr
 game.chooseTrainer('red');
 check('depois da escolha, o Continuar segue para a jornada',
       game.profile.trainer === 'red' && !registry.get('screen-campaign').classes.has('hidden'));
+
+// ---- derrota → recomeçar a jornada do zero ----
+const dexBefore = game.profile.pokedex.caught.length;
+game.startStage('gym_1_pewter');
+for (const member of game.run.team.members) member.fainted = true;
+game.run.state = 'defeat';
+game._handleRunState();
+registry.get('btn-result-restart').click();
+check('recomeçar a jornada pede confirmação antes',
+      !registry.get('result-confirm').classes.has('hidden') && registry.get('result-defeat').classes.has('hidden') &&
+      !!game.campaign.starter);
+registry.get('btn-restart-no').click();
+check('"Voltar" desiste de recomeçar',
+      registry.get('result-confirm').classes.has('hidden') && !registry.get('result-defeat').classes.has('hidden'));
+registry.get('btn-result-restart').click();
+registry.get('btn-restart-yes').click();
+check('recomeçar apaga a jornada e mantém a Pokédex e o Hall da Fama',
+      !game.run && !game.campaign.starter && !game.campaign.journey && game.campaign.badges.length === 0 &&
+      game.profile.pokedex.caught.length === dexBefore && game.profile.hallOfFame.length === 1);
+check('a jornada nova começa pela escolha de treinador', !registry.get('screen-trainer').classes.has('hidden'));
 
 console.log(`\n=== ${failures === 0 ? 'TUDO OK' : failures + ' FALHA(S)'} ===\n`);
 process.exit(failures ? 1 : 0);

@@ -1532,3 +1532,46 @@ button { font: inherit; color: inherit; }
 .pc-empty { grid-column: 1 / -1; font-size: 15px; color: var(--gba-ink-soft); padding: 10px 4px; border-top: 3px dotted var(--gba-shade); }
 /* na tela de "equipe cheia", a caixinha de mandar o novo para o PC */
 .card.to-pc { box-shadow: inset 0 0 0 3px var(--gba-frame); }
+
+
+/* ========================= DERROTA E CENTRO POKÉMON =========================
+   A derrota oferece duas saídas: o Centro Pokémon (cura e tenta de novo) ou
+   a jornada do zero, que pede confirmação. */
+.menu-btn .btn-sub {
+  display: block;
+  margin-top: 2px;
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--gba-ink-soft);
+}
+.confirm-text {
+  margin: 0 0 4px;
+  font-size: 15px;
+  line-height: 1.35;
+  color: var(--gba-ink);
+  text-align: left;
+}
+.center-title { display: flex; align-items: center; justify-content: center; gap: 8px; color: #d0506a; }
+.center-note {
+  margin: 12px auto 14px;
+  max-width: 380px;
+  font-size: 14px;
+  line-height: 1.35;
+  color: var(--gba-ink-soft);
+}
+.center-note:empty { display: none; }
+#center-overlay .team-summary .sum-mon { animation: center-heal .9s var(--ease) both; }
+#center-overlay .team-summary .sum-mon:nth-child(2) { animation-delay: .12s; }
+#center-overlay .team-summary .sum-mon:nth-child(3) { animation-delay: .24s; }
+#center-overlay .team-summary .sum-mon:nth-child(4) { animation-delay: .36s; }
+#center-overlay .team-summary .sum-mon:nth-child(5) { animation-delay: .48s; }
+#center-overlay .team-summary .sum-mon:nth-child(6) { animation-delay: .6s; }
+/* a cura: cada Pokémon pisca em rosa e volta ao normal, como a máquina do Centro */
+@keyframes center-heal {
+  0% { filter: brightness(1.8) sepia(1) hue-rotate(290deg); transform: translateY(2px); }
+  60% { filter: brightness(1.3) sepia(.4) hue-rotate(290deg); transform: translateY(-3px); }
+  100% { filter: none; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  #center-overlay .team-summary .sum-mon { animation: none; }
+}

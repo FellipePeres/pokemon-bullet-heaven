@@ -217,7 +217,7 @@ export class Menus {
     if (hall.length) show(el('btn-hall')); else hide(el('btn-hall'));
 
     el('campaign-subtitle').textContent = journey
-      ? 'Sua equipe e sua build continuam de uma fase para a outra. Uma derrota devolve você ao início da fase.'
+      ? 'Sua equipe e sua build continuam de uma fase para a outra. Numa derrota, o Centro Pokémon cura a equipe e a fase recomeça.'
       : 'Comece pela Rota 1. A partir dela sua equipe cresce e segue com você.';
 
     // o botão do PC diz quantos estão guardados

@@ -5,7 +5,7 @@
 > decisão foi tomada e o que falta fazer. O `README.md` é o manual de uso;
 > este aqui é o contexto de desenvolvimento.
 
-**Versão atual:** `0.11.0` · **Última atualização:** 2026-11-03
+**Versão atual:** `0.11.1` · **Última atualização:** 2026-11-03
 **Stack:** HTML + CSS + JavaScript puro (ES Modules). Sem backend, sem build, sem dependências.
 **Repositório:** https://github.com/FellipePeres/pokemon-bullet-heaven (público)
 **Jogo no ar:** https://fellipeperes.github.io/pokemon-bullet-heaven/
@@ -308,15 +308,21 @@ Nunca voltar bônus globais para o pool de level up — foi pedido explícito.
   comprimida; as levas ficaram ×1/√f mais densas e cada selvagem vale ×1/√f de XP
   (`stage.xpScale`), para a equipe chegar ao líder no mesmo nível de antes.
 - **Música** (0.11): cada fase tem `music` e `leaderMusic`. `Game._updateMusic`
-  escolhe a faixa a cada quadro (lobby, fase, líder, vitória, Hall da Fama) e
+  escolhe a faixa a cada quadro (lobby, fase, líder, vitória, Hall da Fama,
+  Centro Pokémon) e
   `audio/music.js` toca com loop sem emenda (Web Audio, pontos do loop do jogo em
   `data/musicTracks.js`). O volume é o `CONFIG.audio.musicVolume`, salvo nas
   opções; na pausa a música abaixa.
 - O chefe final é o **time do líder, enfrentado em sequência** (`bossTeam`),
   terminando no ace. Vencer dá insígnia + Shards.
 - A **jornada carrega equipe, níveis e build** de uma fase para a próxima
-  (`regions.kanto.journey`). Derrota devolve ao início da fase com a equipe
-  como estava no começo dela.
+  (`regions.kanto.journey`). A **derrota tem duas saídas** (0.11.1): o **Centro
+  Pokémon** (`Game.pokemonCenter`) cura a equipe da jornada — a do começo da fase;
+  quem foi capturado na tentativa perdida fica para trás, e a tela diz quem — e a
+  fase recomeça (`leaveCenter`); ali mesmo dá para abrir o PC. Ou **recomeçar a
+  jornada** do zero (`restartJourney` → `newGame`), com confirmação: perde
+  insígnias, equipe e PC da região; Pokédex, conquistas, Shards, melhorias do
+  treinador e Hall da Fama ficam.
 - **Kanto tem 13 etapas** (0.7): os 8 ginásios, a Elite Four em 4 salas (uma por
   membro, cada uma com o time de 5 do FireRed) e o Campeão. Os times são os do
   FireRed, com os níveis dele; o do rival muda pelo seu inicial
@@ -480,7 +486,7 @@ Procedência e como regerar: `assets/PROVENIENCIA.md`.
 | Moldura das janelas e dos botões | `assets/ui/window-frame.png` (3x, fatia 24) e `window-frame-button.png` (2x, fatia 16): a `text_window` do FireRed, copiadas do Pokemon All |
 | Fontes | `assets/fonts/`: Press Start 2P e Pixelify Sans (licença OFL), as do Pokemon All |
 | Fundo da tela de título | `assets/ui/title-background.webp`: arte do Fellipe (a clareira à noite cercada pela horda) |
-| Músicas | `assets/music/*.ogg`: 17 do FireRed (`tools/assets/render_music.py`) e o tema do lobby do Pokemon All; 7 MB ao todo, cada uma carregada quando toca |
+| Músicas | `assets/music/*.ogg`: 18 do FireRed, a vinheta de cura do Centro Pokémon (`tools/assets/render_music.py`) e o tema do lobby do Pokemon All; 7,5 MB ao todo, cada uma carregada quando toca |
 
 - Tudo é pixel art em **escala inteira, sem suavização** (`CONFIG.render.pixelScale`,
   hoje 2). `render/assets.js` carrega sob demanda e, enquanto a folha não carrega,
@@ -683,6 +689,7 @@ tipo, som e o polimento de troca e captura.
 | 8 | Poké Ball 3x mais rara; ícone de vida vira Poção; sugestões para o XP; Clefairy capturada "bugada"; obstáculos bloqueiam jogador e inimigos; inimigos com um pouco mais de vida; líderes bem mais fortes; Ímã menor e mais raro; troca que às vezes troca o Pokémon errado; espadinha para o Pokémon só acompanhar | 0.9: bola ×0,15; Poção no chão; captura e presentes entram com a média da equipe − 3; colisão com o cenário (`systems/terrain.js`) pela colisão dos mapas do FireRed; vida ×1,15; líderes ×2,5 de vida, ×1,4 de dano, golpes mais frequentes; Ímã em 1x, 0,05%/1,5%; HUD no `pointerdown` e selo "⇄ sai"; botão de ataque por Pokémon; 6 sugestões de XP no PLANEJAMENTO (D10) |
 | 9 | Poké Balls ainda demais, as garantidas atrapalham; jogo levemente mais difícil; líderes muito fáceis (o bot não joga como um humano); remodelar o front copiando o UX do Pokemon All; publicar | 0.10: só a Fase 1 com garantidas, tetos menores, bola ×0,07; dano ×1,3 e vida ×1,2; líderes com vida ×4, Rajada mirando o treinador e fúria; bot que escolhe bem as melhorias e desvia; identidade visual do Pokemon All (molduras do FireRed, fontes em pixel, logo próprio, fundo com o cenário do jogo); site publicado |
 | 10 | fases de ~4 min fixas; música no lobby e em cada fase, do Pokemon All, com volume num botão sempre no canto; Opções sem ativos e sem sprites; conquistas em níveis; mais Pokémon à disposição; PC no lobby | 0.11: 3:30 até o líder em todas (linha do tempo comprimida, XP compensado); 17 músicas do FireRed renderizadas com a cópia do sintetizador do Pokemon All + o tema do lobby, Web Audio com loop do jogo, mixer em Opções e engrenagem em toda tela; 20 conquistas com 99 degraus; 4 opções por Poké Ball, tabelas acumuladas e os outros iniciais; PC (captura com equipe cheia e trocas no lobby) |
+| 11 | na derrota, duas opções: Centro Pokémon (cura e recomeça a fase) ou a jornada do zero; quais Pokémon aparecem na Fase 1 e com que chance | 0.11.1: tela de derrota com as duas saídas e confirmação para recomeçar; Centro Pokémon com a equipe curada, a música do Centro e a vinheta de cura do FireRed (`MusicPlayer.jingle`), aviso de quem se perdeu e o PC à mão; tabela da Fase 1 respondida na conversa |
 
 ---
 

@@ -144,6 +144,20 @@ const ROTEIROS = {
     { run: "game.menus.closeModal(); game.startStage('gym_3_vermilion')" }, { wait: 1500 },
     { run: "game.run.state = 'capture'; game.captureOpen = true; game.pickCapture('meowth')" }, { wait: 800 }, { shot: 'pc-captura', raw: true }
   ],
+  // a derrota: as duas saídas, o aviso de recomeçar do zero e o Centro Pokémon
+  derrota: [
+    { open: 'index.html' }, { wait: 500 },
+    { run: "game.newGame(); game.chooseTrainer('red'); game.chooseStarter('charmander'); game.campaign.clearedStages.push('gym_1_pewter');" +
+           "import('./src/game/Run.js').then(({ Run }) => { const r = new Run('gym_1_pewter', { starter: 'charmander' });" +
+           "['pidgey', 'nidoran_m'].forEach((id) => r.team.add(id, 12)); r.team.members[0].level = 15;" +
+           "game.campaign.journey = { team: r.team.serialize(), pc: [] }; game.startStage('gym_2_cerulean');" +
+           "game.run.captureSystem.capture('clefairy'); game.run.team.members.forEach((m) => { m.fainted = true; m.hp = 0; }); game.run.state = 'defeat'; })" },
+    { wait: 1500 }, { shot: 'derrota-1-escolha', raw: true },
+    { run: "document.getElementById('btn-result-restart').click()" }, { wait: 400 }, { shot: 'derrota-2-confirmar', raw: true },
+    { run: "document.getElementById('btn-restart-no').click(); document.getElementById('btn-result-center').click()" },
+    { wait: 1200 }, { shot: 'derrota-3-centro', raw: true },
+    { run: "document.getElementById('btn-center-go').click()" }, { wait: 900 }, { shot: 'derrota-4-de-volta', raw: true }
+  ],
   // as conquistas em níveis, com algumas prontas para coletar e outras já subidas de degrau
   conquistas: [
     { open: 'index.html' }, { wait: 500 },

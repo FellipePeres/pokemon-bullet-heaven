@@ -53,6 +53,7 @@ export class Game {
     this.padNav = new PadNavigator();
     this.music = new MusicPlayer();
     this.hallOpen = false;
+    this.centerOpen = false;   // o Centro Pokémon, depois de uma derrota
 
     this.run = null;
     this.runEnded = false;
@@ -104,13 +105,14 @@ export class Game {
 
   /**
    * A música que deveria tocar agora: o tema do lobby nos menus, a da fase na
-   * partida, a do líder quando ele entra, a da vitória no resultado e a do Hall
-   * da Fama. A pausa só abaixa o volume.
+   * partida, a do líder quando ele entra, a da vitória no resultado, a do Hall
+   * da Fama e a do Centro Pokémon depois de uma derrota. A pausa só abaixa o volume.
    */
   _updateMusic() {
     const run = this.run;
     let track = 'lobby-theme';
     if (this.hallOpen) track = 'mus_hall_of_fame';
+    else if (this.centerOpen) track = 'mus_poke_center';
     else if (run?.state === 'victory') track = 'mus_victory_gym_leader';
     else if (run && (run.boss || run.pendingIntro)) track = run.stage.leaderMusic ?? 'mus_vs_gym_leader';
     else if (run) track = run.stage.music ?? 'lobby-theme';
@@ -283,6 +285,7 @@ export class Game {
   quitToMenu() {
     this.run = null;
     this.runEnded = false;
+    this.centerOpen = false;
     this.hud.hideAllOverlays();
     if (this.campaign.starter) this.openCampaign();
     else this.menus.show('screen-title');
@@ -524,6 +527,59 @@ export class Game {
     }
   }
 
+  /* ======================= derrota: as duas saídas ======================= */
+
+  /**
+   * Centro Pokémon: a equipe da jornada (a do começo da fase) é curada e o
+   * jogador volta para a mesma fase. O que foi capturado na tentativa perdida
+   * fica para trás, como sempre foi numa derrota.
+   */
+  pokemonCenter() {
+    const run = this.run;
+    if (!run || run.state !== 'defeat') return;
+    this.centerStage = run.stage.id;
+    this.centerLost = [...run.captured];
+    this.centerOpen = true;
+    this.music.jingle('mus_heal');
+    this.hud.hideResult();
+    this._showCenter();
+  }
+
+  _showCenter() {
+    const journey = this.campaign.journey;
+    const members = journey?.team?.members?.length
+      ? journey.team.members.map((m) => ({ ...m, fainted: false }))
+      : [{ pokemonId: this.campaign.starter, level: 1, fainted: false }];
+    this.hud.showCenter({
+      members,
+      stage: STAGES[this.centerStage],
+      lost: this.centerLost ?? [],
+      pcCount: this.pcBox.length,
+      hasJourney: !!journey?.team
+    });
+  }
+
+  /** Do Centro Pokémon de volta para a fase, do começo. */
+  leaveCenter() {
+    if (!this.centerOpen) return;
+    this.centerOpen = false;
+    this.hud.hideCenter();
+    this.startStage(this.centerStage);
+  }
+
+  /**
+   * Recomeçar a jornada do zero: a campanha da região recomeça (insígnias,
+   * equipe e PC), e a Pokédex, as conquistas, os Shards e as melhorias do
+   * treinador continuam, como na Nova jornada da tela de título.
+   */
+  restartJourney() {
+    this.run = null;
+    this.runEnded = false;
+    this.centerOpen = false;
+    this.hud.hideAllOverlays();
+    this.newGame();
+  }
+
   _nextStage() {
     const cleared = this.campaign.clearedStages;
     for (const entry of this.region.campaign) {
@@ -561,6 +617,7 @@ export class Game {
   /** No lobby: troca um da equipe por um do PC (ver systems/pc.js). */
   pcSwap(teamUid, pcUid) {
     const ok = swapWithPC(this.campaign.journey, teamUid, pcUid, CONFIG.team.maxSize);
+    if (ok && this.centerOpen) this._showCenter();   // o PC do Centro Pokémon muda quem volta para a fase
     if (ok) this.autosave();
     return ok;
   }

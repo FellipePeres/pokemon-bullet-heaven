@@ -42,6 +42,12 @@ export class HUD {
     el('btn-save-run').onclick = () => this.game.saveToFile();
     el('btn-result-save').onclick = () => this.game.saveToFile();
     el('btn-result-menu').onclick = () => this.game.quitToMenu();
+    // derrota: o Centro Pokémon, ou a jornada do zero (que pede confirmação)
+    el('btn-result-center').onclick = () => this.game.pokemonCenter();
+    el('btn-result-restart').onclick = () => this._confirmRestart(true);
+    el('btn-restart-no').onclick = () => this._confirmRestart(false);
+    el('btn-restart-yes').onclick = () => this.game.restartJourney();
+    el('btn-center-go').onclick = () => this.game.leaveCenter();
     el('capture-skip').onclick = () => this.game.resolveCapture();
   }
 
@@ -391,10 +397,11 @@ export class HUD {
 
     el('result-subtitle').textContent = victory
       ? `Você concluiu ${run.stage.name}!`
-      : 'Todos os seus Pokémon desmaiaram.';
+      : 'Todos os seus Pokémon desmaiaram. E agora?';
 
-    el('btn-result-menu').querySelector('.btn-text').textContent =
-      victory ? 'Continuar Jornada' : 'Voltar ao Mapa';
+    el('result-victory').classList.toggle('hidden', !victory);
+    el('result-defeat').classList.toggle('hidden', victory);
+    hide(el('result-confirm'));
 
     clear(el('result-team')).append(...this._teamSummary(run.team.members));
 
@@ -416,6 +423,34 @@ export class HUD {
 
   hideResult() { hide(el('result-overlay')); }
 
+  /** Recomeçar a jornada apaga o progresso da região: mostra o aviso antes. */
+  _confirmRestart(open) {
+    // o "voltar" do controle (B) também chega aqui, mesmo sem o aviso aberto
+    if (!open && el('result-confirm').classList.contains('hidden')) return;
+    el('result-defeat').classList.toggle('hidden', open);
+    el('result-confirm').classList.toggle('hidden', !open);
+  }
+
+  /**
+   * O Centro Pokémon: a equipe que volta para a fase, curada (a do começo da
+   * fase; as capturas da tentativa perdida ficam para trás).
+   */
+  showCenter({ members, stage, lost, pcCount, hasJourney }) {
+    clear(el('center-team')).append(...this._teamSummary(members));
+    const names = lost.length > 1 ? `${lost.slice(0, -1).join(', ')} e ${lost.at(-1)}` : lost[0];
+    el('center-note').textContent = lost.length
+      ? `${names}, ${lost.length > 1 ? 'capturados na tentativa perdida, não ficaram' : 'capturado na tentativa perdida, não ficou'}: a equipe volta como estava no começo da fase.`
+      : '';
+    const phase = stage.name.split(' — ')[0];
+    el('center-go-label').textContent = phase.startsWith('Fase') ? `Voltar para a ${phase}` : 'Voltar para a luta';
+    const pc = el('btn-center-pc');
+    pc.classList.toggle('hidden', !hasJourney);
+    pc.querySelector('.btn-text').textContent = pcCount ? `PC (${pcCount})` : 'PC';
+    show(el('center-overlay'));
+  }
+
+  hideCenter() { hide(el('center-overlay')); }
+
   _teamSummary(members) {
     return members.map((member) => {
       const data = getPokemon(member.pokemonId);
@@ -435,5 +470,6 @@ export class HUD {
     this.hideCapture();
     this.hidePause();
     this.hideResult();
+    this.hideCenter();
   }
 }

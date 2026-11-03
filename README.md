@@ -118,6 +118,8 @@ Perder devolve você ao início da fase com a equipe como estava ao entrar nela.
   menus montado com o próprio cenário do jogo.
 - **Música do FireRed**: uma por fase, a do líder, a da vitória e o tema do lobby,
   com volume ajustável.
+- **Derrota**: vá ao Centro Pokémon (a equipe é curada e a fase recomeça) ou
+  recomece a jornada do zero.
 - **PC**: com a equipe cheia, quem sai (ou quem chega) vai para o PC, e no mapa da
   jornada você monta a equipe da próxima fase.
 - **Conquistas em níveis**: 20 conquistas, cada uma com vários degraus — ao coletar,

@@ -262,9 +262,37 @@
         <p class="subtitle" id="result-subtitle"></p>
         <div id="result-team" class="team-summary"></div>
         <div id="result-stats" class="stat-list"></div>
-        <div class="menu-column">
+        <div class="menu-column" id="result-victory">
           <button id="btn-result-save" class="menu-btn"><span class="btn-text">Salvar Jogo (.json)</span></button>
           <button id="btn-result-menu" class="menu-btn primary"><span class="btn-text">Continuar Jornada</span></button>
+        </div>
+        <!-- derrota: o Centro Pokémon (cura e tenta de novo) ou a jornada do zero -->
+        <div class="menu-column hidden" id="result-defeat">
+          <button id="btn-result-center" class="menu-btn primary">
+            <span class="btn-text">Centro Pokémon<small class="btn-sub">Cura a equipe e recomeça esta fase</small></span>
+          </button>
+          <button id="btn-result-restart" class="menu-btn danger">
+            <span class="btn-text">Recomeçar a jornada<small class="btn-sub">Do zero, com um novo inicial</small></span>
+          </button>
+        </div>
+        <div class="menu-column hidden" id="result-confirm">
+          <p class="confirm-text">Recomeçar do zero apaga as insígnias, a equipe e o PC desta jornada. A Pokédex, as conquistas, os Shards e as melhorias do treinador continuam.</p>
+          <button id="btn-restart-yes" class="menu-btn danger"><span class="btn-text">Sim, recomeçar do zero</span></button>
+          <button id="btn-restart-no" class="menu-btn"><span class="btn-text">Voltar</span></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== CENTRO POKÉMON (depois de uma derrota) ===== -->
+    <div id="center-overlay" class="overlay hidden">
+      <div class="overlay-card narrow">
+        <h2 class="center-title"><span class="ui-icon"><img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/potion.png" alt="" /></span>Centro Pokémon</h2>
+        <p class="subtitle">Seus Pokémon foram curados e estão prontos para a revanche!</p>
+        <div id="center-team" class="team-summary"></div>
+        <p class="center-note" id="center-note"></p>
+        <div class="menu-column">
+          <button id="btn-center-go" class="menu-btn primary"><span class="btn-text" id="center-go-label">Voltar para a fase</span></button>
+          <button id="btn-center-pc" class="menu-btn" data-modal="modal-pc"><span class="btn-text">PC</span></button>
         </div>
       </div>
     </div>

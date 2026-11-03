@@ -64,6 +64,7 @@ export class Run {
     this.stats = { kills: 0, captures: 0, damageDealt: 0, faints: 0, ballsDropped: 0 };
     // Pokémon mandados para o PC nesta partida (vão para o PC da jornada se a fase for vencida)
     this.pc = [...(options.pc ?? [])];
+    this.captured = [];   // nomes dos capturados nesta tentativa
 
     // ---- sistemas ----
     this.grid = new SpatialGrid(100);

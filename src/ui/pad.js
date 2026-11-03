@@ -5,7 +5,8 @@
  * tela) e clica no escolhido.
  */
 const TARGETS = 'button:not([disabled]), .card, .starter-card, .trainer-card, .stage-card.clickable';
-const LAYERS = ['.overlay:not(.hidden)', '.modal:not(.hidden)', '.screen:not(.hidden)'];
+// as janelas do menu abrem por cima das da partida (Opções na pausa, o PC no Centro Pokémon)
+const LAYERS = ['.modal:not(.hidden)', '.overlay:not(.hidden)', '.screen:not(.hidden)'];
 
 const visible = (node) => node.offsetParent !== null && !node.closest('.hidden');
 
@@ -14,7 +15,7 @@ export class PadNavigator {
     this.current = null;
   }
 
-  /** A camada de cima: a janela aberta, ou a tela do menu. */
+  /** A camada de cima: a janela do menu, a da partida, ou a tela. */
   scope() {
     for (const selector of LAYERS) {
       const layers = [...document.querySelectorAll(selector)].filter(visible);
@@ -38,7 +39,7 @@ export class PadNavigator {
     }
     if (button === 'b') {
       // voltar: o botão de fechar ou de voltar da camada, se ela tiver
-      scope.querySelector('[data-close], [data-back], #capture-skip')?.click();
+      scope.querySelector('[data-close], [data-back], #capture-skip, #btn-restart-no')?.click();
       return;
     }
     const step = button === 'left' || button === 'up' ? -1 : 1;

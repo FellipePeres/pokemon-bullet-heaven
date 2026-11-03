@@ -23,6 +23,7 @@ export class MusicPlayer {
     this.wanted = null;      // a faixa que deveria estar tocando
     this.buffers = new Map();
     this.ducked = false;
+    this.holding = false;    // uma vinheta tocando: a faixa pedida espera ela acabar
     if (this.supported) {
       const unlock = () => this._unlock();
       window.addEventListener('pointerdown', unlock);
@@ -49,7 +50,26 @@ export class MusicPlayer {
   play(track) {
     if (track === this.wanted) return;
     this.wanted = track;
-    if (this.ctx) this._switch(track);
+    if (this.ctx && !this.holding) this._switch(track);
+  }
+
+  /**
+   * Toca uma vinheta uma vez (a cura do Centro Pokémon): a música que tocava
+   * esmaece, a vinheta toca inteira e depois entra a faixa pedida.
+   */
+  async jingle(track) {
+    if (!this.ctx) return;
+    this.holding = true;
+    this._switch(null);
+    const buffer = await this._buffer(track);
+    if (buffer) {
+      const source = this.ctx.createBufferSource();
+      source.buffer = buffer;
+      source.connect(this.master);
+      await new Promise((resolve) => { source.onended = resolve; source.start(); });
+    }
+    this.holding = false;
+    if (this.wanted && !this.current) this._switch(this.wanted);
   }
 
   _unlock() {
@@ -93,7 +113,7 @@ export class MusicPlayer {
 
     const buffer = await this._buffer(track);
     // enquanto carregava, outra faixa pode ter sido pedida
-    if (!buffer || track !== this.wanted || this.current) return;
+    if (!buffer || track !== this.wanted || this.current || this.holding) return;
 
     const source = this.ctx.createBufferSource();
     source.buffer = buffer;

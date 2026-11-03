@@ -916,6 +916,11 @@ MUSIC = {
     'mus_vs_champion': 'a luta contra o Campeão',
     'mus_victory_gym_leader': 'a vitória sobre o líder',
     'mus_hall_of_fame': 'o Hall da Fama',
+    'mus_poke_center': 'o Centro Pokémon, depois de uma derrota',
+}
+#: As vinhetas: tocam uma vez, sem loop (não entram em musicTracks.js).
+JINGLES = {
+    'mus_heal': 'a cura do Centro Pokémon',
 }
 DECOMP_COMMIT = 'c75f352304d529f6ba92d4f74b9cf8b5c3810788'
 REPO = pathlib.Path(__file__).resolve().parents[2]
@@ -969,6 +974,12 @@ def main() -> None:
         write_ogg(OUT / f'{name}.ogg', audio)
         rows[name] = (where, loop_start / OUT_RATE, loop_end / OUT_RATE)
         print(f'  music/{name}.ogg  {len(audio) / OUT_RATE:6.2f} s, loop de {loop_start / OUT_RATE:.3f} a {loop_end / OUT_RATE:.3f} s')
+    for name in JINGLES:
+        if args.only and not name.startswith(args.only):
+            continue
+        audio = Song(midi_for(name, cache), cfg.get(name, {})).render()
+        write_ogg(OUT / f'{name}.ogg', audio)
+        print(f'  music/{name}.ogg  {len(audio) / OUT_RATE:6.2f} s, vinheta')
 
     lines = [
         '/**',

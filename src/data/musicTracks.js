@@ -38,5 +38,7 @@ export const MUSIC_TRACKS = {
   /** A vitória sobre o líder. */
   mus_victory_gym_leader: { loopStart: 6.311973, loopEnd: 48.235692 },
   /** O Hall da Fama. */
-  mus_hall_of_fame: { loopStart: 1.607256, loopEnd: 28.579773 }
+  mus_hall_of_fame: { loopStart: 1.607256, loopEnd: 28.579773 },
+  /** O Centro Pokémon, depois de uma derrota. */
+  mus_poke_center: { loopStart: 0.016735, loopEnd: 33.267710 }
 };
