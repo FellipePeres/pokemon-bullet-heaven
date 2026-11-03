@@ -8,6 +8,7 @@
  *   behavior                           — 'chaser' | 'wanderer' | 'swooper' | 'tank' | 'boss'
  *   radius / scale                     — colisão e tamanho do sprite
  *   abilities                          — habilidades hostis (ver abilities.js)
+ *   cooldownMult                       — chefes: espaça (>1) ou apressa os golpes deste líder
  *   elite / boss                       — marcam inimigos especiais (barra de vida, XP extra)
  */
 export const ENEMIES = {
@@ -141,17 +142,20 @@ export const ENEMIES = {
      ============================================================== */
   brock_geodude: {
     id: 'brock_geodude', dex: 74, name: 'Geodude do Brock', types: ['rock', 'ground'],
-    hp: 1900, speed: 78, damage: 14, xp: 180, dropChance: 1,
+    hp: 1700, speed: 78, damage: 14, xp: 180, dropChance: 1,
     behavior: 'boss', radius: 30, scale: 2.4, boss: true,
     leader: 'Brock',
+    // 0.11.3: a chuva de pedras do Brock "matava tudo": golpes mais espaçados e um pouco menos de vida
+    cooldownMult: 1.6,
     abilities: ['boss_shockwave'],
     summons: { enemy: 'geodude_wild', count: 1, interval: 12 }
   },
   brock_onix: {
     id: 'brock_onix', dex: 95, name: 'Onix do Brock', types: ['rock', 'ground'],
-    hp: 3800, speed: 88, damage: 19, xp: 420, dropChance: 1,
+    hp: 3400, speed: 88, damage: 19, xp: 420, dropChance: 1,
     behavior: 'boss', radius: 40, scale: 3.4, boss: true, ace: true,
     leader: 'Brock',
+    cooldownMult: 1.6,
     abilities: ['leader_rock_barrage', 'boss_shockwave'],
     summons: { enemy: 'geodude_wild', count: 2, interval: 11 }
   },

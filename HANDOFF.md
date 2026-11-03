@@ -5,7 +5,7 @@
 > decisão foi tomada e o que falta fazer. O `README.md` é o manual de uso;
 > este aqui é o contexto de desenvolvimento.
 
-**Versão atual:** `0.11.2` · **Última atualização:** 2026-11-03
+**Versão atual:** `0.11.3` · **Última atualização:** 2026-11-03
 **Stack:** HTML + CSS + JavaScript puro (ES Modules). Sem backend, sem build, sem dependências.
 **Repositório:** https://github.com/FellipePeres/pokemon-bullet-heaven (público)
 **Jogo no ar:** https://fellipeperes.github.io/pokemon-bullet-heaven/
@@ -218,8 +218,12 @@ confirmar com ele**.
   reserva. Com equipe cheia dá exatamente **25% por ativo e 8,33% por reserva**,
   que foi o pedido original. Com menos Pokémon a proporção se redistribui —
   nada de XP se perde no começo.
-- **Subir de nível NÃO cura.** (Curava antes; deixava o jogo trivial.)
-  Cura vem de poções no chão, da regeneração da reserva e da troca.
+- **Subir de nível cura 1/4 da vida** de quem subiu (0.11.3, pedido do Fellipe;
+  `CONFIG.progression.levelUpHeal`). Quem está desmaiado não volta. Antes da 0.11.3
+  não curava (a cura total do começo deixava o jogo trivial). Medido com o bot, a
+  cura de 1/4 leva as Fases 1 a 3 a 84–100% de vitórias (sem ela, 18–92%); a de
+  10% fica em 43–100%. Fora isso, cura vem de poções no chão, da regeneração da
+  reserva e da troca.
 - A tela de melhoria aparece **a cada 3 níveis** (`upgradeEveryLevels`). Os níveis
   intermediários valem em vida e dano, sem interromper. Isso caiu de ~45 telas
   por fase para ~20, que foi a reclamação do Fellipe.
@@ -239,7 +243,8 @@ Nunca voltar bônus globais para o pool de level up — foi pedido explícito.
   Bulbasaur 16/32, Squirtle 16/36, Pidgey 18/36, Magikarp→Gyarados 20, etc.
 - Onde a evolução real depende de pedra ou troca, usamos um nível equivalente e
   marcamos `method: 'stone' | 'trade'` + `item`, para virar item de verdade depois.
-- Evoluir **mantém** as melhorias e a proporção de vida (não cura) e **melhora o
+- Evoluir **mantém** as melhorias, **cura toda a vida** (0.11.3; antes mantinha a
+  proporção) e **melhora o
   golpe** (0.8, pedido do Fellipe): se a espécie nova começa num golpe mais adiante
   na linha, o Pokémon passa para ele levando as melhorias, como uma TM.
 - Evolução registra a espécie nova na Pokédex e abre uma tela de evolução.
@@ -306,7 +311,10 @@ Nunca voltar bônus globais para o pool de level up — foi pedido explícito.
   vermelho; `Run._hostileHit` faz o Pokémon mais perto levar o dano) e a
   **fúria** abaixo da metade da vida (`enemy.enraged`: mais rápido, golpes e
   invocações mais seguidos, rajada maior; brilho vermelho e "furioso!" na barra).
-  Os líderes também invocam um Pokémon a mais, com mais frequência.
+  Os líderes também invocam um Pokémon a mais, com mais frequência. Um líder pode
+  espaçar os golpes com `cooldownMult` nos dados dele: o Brock tem 1,6 (0.11.3, a
+  chuva de pedras "matava tudo"; o Onix soltava pedra a cada ~2 s, ~1,3 s na
+  fúria) e ~10% menos vida (Geodude 1900 → 1700, Onix 3800 → 3400).
 - **Duração fixa** (0.11, "uma média de 4 min, não crescente"): todas as fases
   têm 3:30 até o líder (`duration: 210`), ~4 min com a luta. A linha do tempo foi
   comprimida; as levas ficaram ×1/√f mais densas e cada selvagem vale ×1/√f de XP
@@ -698,6 +706,7 @@ tipo, som e o polimento de troca e captura.
 | 10 | fases de ~4 min fixas; música no lobby e em cada fase, do Pokemon All, com volume num botão sempre no canto; Opções sem ativos e sem sprites; conquistas em níveis; mais Pokémon à disposição; PC no lobby | 0.11: 3:30 até o líder em todas (linha do tempo comprimida, XP compensado); 17 músicas do FireRed renderizadas com a cópia do sintetizador do Pokemon All + o tema do lobby, Web Audio com loop do jogo, mixer em Opções e engrenagem em toda tela; 20 conquistas com 99 degraus; 4 opções por Poké Ball, tabelas acumuladas e os outros iniciais; PC (captura com equipe cheia e trocas no lobby) |
 | 11 | na derrota, duas opções: Centro Pokémon (cura e recomeça a fase) ou a jornada do zero; quais Pokémon aparecem na Fase 1 e com que chance | 0.11.1: tela de derrota com as duas saídas e confirmação para recomeçar; Centro Pokémon com a equipe curada, a música do Centro e a vinheta de cura do FireRed (`MusicPlayer.jingle`), aviso de quem se perdeu e o PC à mão; tabela da Fase 1 respondida na conversa |
 | 12 | todos os Pokémon são obtíveis?; a Fase 1 simples demais: mais espécies, poucos evoluídos, mais estágio 1 | as 151 têm caminho (141 captura, 3 iniciais, 4 presentes, 3 evolução), mas Mew (0,11% por bola, só na Liga) e companhia são impraticáveis — sugerido encontro de lendário no pós-jogo, aguardando o Fellipe; 0.11.2: Fase 1 com 28 espécies, 96% básicas |
+| 13 | golpes do Brock mais espaçados (spam de pedra); subir de nível cura 1/4 e evoluir cura tudo; Brock com um pouco menos de vida; teste de vitória com os iniciais | 0.11.3: `cooldownMult` 1,6 nos Pokémon do Brock e −10% de vida; `levelUpHeal` 0,25 e evolução com vida cheia. Bot na Fase 1: Charmander 2% → 69%, Bulbasaur 4% → 100%, Squirtle 64% → 100% — a cura é quase todo o efeito (só o Brock: 28%, 22%, 68%) |
 
 ---
 

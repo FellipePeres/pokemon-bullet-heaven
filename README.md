@@ -71,7 +71,7 @@ recarga menor, efeitos de status.
 
 **Evolução fiel aos jogos.** Charmander vira Charmeleon no nível 16 e Charizard no
 36; Bulbasaur e Squirtle seguem 16/32 e 16/36; Magikarp vira Gyarados no 20. Evoluir
-mantém tudo — golpe, melhorias e proporção de vida.
+mantém golpe e melhorias e cura toda a vida. Subir de nível cura 1/4 da vida.
 
 **TMs — a linha de 3 golpes.** Cada espécie tem a própria linha de evolução de
 golpe. Charmander é `Ember → Flamethrower → Fire Blast`; Pidgey é

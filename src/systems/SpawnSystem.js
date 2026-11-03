@@ -169,7 +169,8 @@ export class SpawnSystem {
     for (const inst of enemy.abilities) {
       inst.timer -= dt;
       if (inst.timer <= 0) {
-        inst.timer = (getAbility(inst.abilityId)?.base.cooldown ?? 5) * tuning.cooldownMult * (rage?.cooldown ?? 1);
+        inst.timer = (getAbility(inst.abilityId)?.base.cooldown ?? 5) * tuning.cooldownMult
+                     * (enemy.data.cooldownMult ?? 1) * (rage?.cooldown ?? 1);
         this.run.abilitySystem.fireHostile(enemy, inst.abilityId);
       }
     }

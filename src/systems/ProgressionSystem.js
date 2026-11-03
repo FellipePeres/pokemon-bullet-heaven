@@ -62,6 +62,11 @@ export class ProgressionSystem {
     while (member.xp >= need) {
       member.xp -= need;
       member.level++;
+      // subir de nível cura 1/4 da vida de quem subiu (a evolução, logo abaixo, cura tudo)
+      if (!member.fainted) {
+        const max = maxHpFor(member, this.run.playerStats.pokemonHpBonus);
+        member.hp = Math.min(max, member.hp + max * CONFIG.progression.levelUpHeal);
+      }
 
       // a melhoria não vem a cada nível: vem a cada N (menos interrupção)
       if (member.level % CONFIG.progression.upgradeEveryLevels === 0) {
@@ -76,8 +81,8 @@ export class ProgressionSystem {
 
   /**
    * Evolução por nível, fiel aos jogos.
-   * A espécie muda (mais vida e mais dano), mas o Pokémon mantém habilidades,
-   * melhorias e vida proporcional — nada do que você construiu se perde.
+   * A espécie muda (mais vida e mais dano), mas o Pokémon mantém habilidades e
+   * melhorias — nada do que você construiu se perde. E sai com a vida cheia.
    */
   checkEvolution(member) {
     const data = getPokemon(member.pokemonId);
@@ -87,9 +92,6 @@ export class ProgressionSystem {
     const options = [evo.to, ...(evo.alternatives ?? [])];
     const next = getPokemon(options[Math.floor(Math.random() * options.length)]);
     if (!next) return null;
-
-    const beforeMax = maxHpFor(member, this.run.playerStats.pokemonHpBonus);
-    const ratio = beforeMax > 0 ? member.hp / beforeMax : 1;
 
     const from = data;
     member.pokemonId = next.id;
@@ -112,8 +114,8 @@ export class ProgressionSystem {
     if (stageMove && line.indexOf(stageMove) > line.indexOf(member.abilities[0])) {
       this.learnTM(member, stageMove);
     }
-    // mantém a proporção de vida: evoluir não cura, mas também não penaliza
-    member.hp = Math.round(maxHpFor(member, this.run.playerStats.pokemonHpBonus) * ratio);
+    // evoluir cura toda a vida (0.11.3; antes mantinha a proporção)
+    member.hp = maxHpFor(member, this.run.playerStats.pokemonHpBonus);
 
     this.run.queueEvolution({ member, from, to: next });
     bus.emit(EVENTS.POKEMON_EVOLVED, { member, from: from.id, to: next.id, dex: next.dex });

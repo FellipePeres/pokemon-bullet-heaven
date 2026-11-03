@@ -261,15 +261,31 @@ console.log('\n[evolução]');
 {
   const run = new Run('gym_1_pewter', { starter: 'charmander' });
   const member = run.team.members[0];
+  const bonus = run.playerStats.pokemonHpBonus;
+
+  // subir de nível cura 1/4 da vida de quem subiu (0.11.3)
+  member.level = 10;
+  member.hp = 10;
+  run.progression.addXpTo(member, run.progression.xpToNext(10) + 1);
+  check('subir de nível cura 1/4 da vida',
+        member.level === 11 && Math.abs(member.hp - (10 + maxHpFor(member, bonus) * 0.25)) < 0.01,
+        `${Math.round(member.hp)}/${maxHpFor(member, bonus)} HP`);
+  const fainted = run.team.createMember('pidgey', 10);
+  fainted.fainted = true;
+  fainted.hp = 0;
+  run.progression.addXpTo(fainted, run.progression.xpToNext(10) + 1);
+  check('subir de nível não reanima quem desmaiou', fainted.fainted && fainted.hp === 0);
+
   member.level = 15;
+  member.hp = 5;
   member.upgrades.ember_damage = 2;
   run.progression.addXpTo(member, run.progression.xpToNext(15) + 1);
 
   check('Charmander evolui no nível 16', member.pokemonId === 'charmeleon',
         `virou ${getPokemon(member.pokemonId).name} no nível ${member.level}`);
   check('a evolução entra na fila para a tela aparecer', run.evolutionQueue.length === 1);
-  check('evoluir não cura de graça',
-        member.hp <= maxHpFor(member, run.playerStats.pokemonHpBonus));
+  check('evoluir cura toda a vida', member.hp === maxHpFor(member, bonus),
+        `${member.hp}/${maxHpFor(member, bonus)} HP`);
   // evoluir melhora o golpe (0.8): Charmeleon chega com Flamethrower, levando as melhorias
   check('evoluir melhora o golpe e leva as melhorias',
         member.abilities[0] === 'flamethrower' && member.upgrades.flamethrower_damage === 2 && !member.upgrades.ember_damage,

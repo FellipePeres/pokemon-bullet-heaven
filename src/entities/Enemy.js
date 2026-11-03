@@ -55,7 +55,7 @@ export class Enemy {
     this.enraged = false;
     this.abilities = hostile.map((abilityId) => ({
       abilityId,
-      timer: getAbility(abilityId)?.base.cooldown ?? 3
+      timer: (getAbility(abilityId)?.base.cooldown ?? 3) * (data.cooldownMult ?? 1)
     }));
     this.summonTimer = data.summons?.interval ?? 0;
 
