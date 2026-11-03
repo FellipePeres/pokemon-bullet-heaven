@@ -349,6 +349,7 @@ export class Run {
       if (p.dead) continue;
       p.update(dt, findTarget, this.world);
       const expired = p.dead;
+      if (p.hostile) { this._hostileHit(p); continue; }
 
       for (const enemy of this.grid.query(p.x, p.y, p.size + 30)) {
         if (enemy.dead || p.hits.has(enemy)) continue;
@@ -381,6 +382,28 @@ export class Run {
         p.explode = null;
       }
     }
+  }
+
+  /**
+   * Projétil de líder: acerta o Pokémon em campo em que encostar; se chegar no
+   * treinador, o Pokémon mais perto o defende (como no contato dos inimigos).
+   */
+  _hostileHit(p) {
+    if (p.dead) return;
+    let victim = null;
+    for (const companion of this.companions) {
+      if (companion.dead || companion.member.fainted) continue;
+      const r = companion.radius + p.size;
+      if ((companion.x - p.x) ** 2 + (companion.y - p.y) ** 2 < r * r) { victim = companion; break; }
+    }
+    if (!victim) {
+      const r = this.player.radius + p.size;
+      if ((this.player.x - p.x) ** 2 + (this.player.y - p.y) ** 2 < r * r) victim = this.nearestCompanion(p.x, p.y);
+    }
+    if (!victim) return;
+    p.dead = true;
+    this.damageCompanion(victim, p.damage);
+    burst(this.particles, p.x, p.y, p.color, 6, 140, 3, 0.35);
   }
 
   _updateOrbs(dt) {

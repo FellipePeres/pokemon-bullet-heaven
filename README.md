@@ -111,8 +111,10 @@ Perder devolve você ao início da fase com a equipe como estava ao entrar nela.
   cada ginásio e sala da Liga tem o visual do mapa original. O andar continua livre,
   mas árvores, pedras, paredões e estátuas bloqueiam o caminho (seu e dos selvagens).
 - **Ímã**: raríssimo, cai de alguns Pokémon e, ao ser pego, puxa todo o XP do mapa até você.
-- **Líderes de verdade**: cada um com muito mais vida e golpes mais fortes e frequentes
-  que a horda.
+- **Líderes de verdade**: cada um com muito mais vida, rajadas de projéteis mirando
+  você e uma fase de fúria abaixo da metade da vida.
+- **Visual de GBA**: as janelas e botões do FireRed, fontes em pixel e o fundo dos
+  menus montado com o próprio cenário do jogo.
 - **Pokédex de Kanto** (151) que se preenche conforme você captura e evolui.
 - **12 conquistas** com recompensa em Shards.
 - A dificuldade e a quantidade de inimigos sobem fase a fase: os selvagens ganham

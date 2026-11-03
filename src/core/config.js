@@ -3,7 +3,7 @@
  * Nada de número mágico espalhado pelo gameplay: se precisar ajustar, ajuste aqui.
  */
 export const CONFIG = {
-  version: '0.9.0',
+  version: '0.10.0',
 
   canvas: { width: 1280, height: 720 },
 
@@ -108,11 +108,18 @@ export const CONFIG = {
   enemies: {
     // dificuldade geral (0.8, "muito fácil, quase não tomo dano"): valem para
     // todas as fases por cima da calibragem de cada uma
-    damageMult: 1.2,        // dano de contato e dos golpes dos líderes (por fase: scaling.damage)
+    damageMult: 1.3,        // dano de contato e dos golpes dos líderes (por fase: scaling.damage)
     spawnMult: 1.2,         // ondas: levas mais frequentes e mais inimigos vivos
-    hpMult: 1.15,           // selvagens e elites (0.9: "um pouco mais de vida")
-    // líderes (0.9, "muito fácil"): vida, dano e golpes mais frequentes
-    boss: { hpMult: 2.5, damageMult: 1.4, cooldownMult: 0.75 },
+    hpMult: 1.2,            // selvagens e elites (0.9 e 0.10: "um pouco mais de vida")
+    // Líderes (0.10, "o Brock foi muito fácil"): bem mais vida e dano, golpes
+    // mais frequentes, uma rajada de projéteis mirando o treinador e, abaixo da
+    // metade da vida, fúria (mais rápido, golpes e invocações mais seguidos).
+    boss: {
+      hpMult: 4, damageMult: 1.6, cooldownMult: 0.6,
+      extraAbilities: ['leader_barrage'],
+      summonBonus: 1, summonIntervalMult: 0.7,
+      enrageAt: 0.5, enrage: { speed: 1.3, cooldown: 0.65, summonInterval: 0.6, barrageExtra: 2 }
+    },
     referenceLevel: 5,
     hpGrowth: 1.075,
     damageGrowth: 1.035,
@@ -122,9 +129,9 @@ export const CONFIG = {
   capture: {
     choices: 3,
     levelsBehindTeam: 3,     // quem entra chega com a média da equipe menos isso
-    // Poké Ball rara (pedidos do Fellipe: ×0,45 na 0.8, mais 3x menor na 0.9);
-    // as garantidas da fase continuam
-    dropChanceMultiplier: 0.15,
+    // Poké Ball rara (pedidos do Fellipe: ×0,45 na 0.8, ×0,15 na 0.9, ×0,07 na
+    // 0.10, quando as garantidas também saíram: sobrou uma, na Fase 1)
+    dropChanceMultiplier: 0.07,
     // Ímã: puxa todo o XP do mapa até o treinador. Raríssimo; um por vez no chão.
     magnetChance: 0.0005,
     magnetChanceElite: 0.015,

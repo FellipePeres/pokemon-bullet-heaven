@@ -38,6 +38,10 @@ const ITEM_LOOKS = {
 /** Onde ficam os pés do treinador em relação ao centro dele (o raio de colisão). */
 const TRAINER_FEET = 14;
 
+/** As fontes da interface (css/style.css), também no canvas. */
+const PIXEL_FONT = '"Pixelify Sans", "Trebuchet MS", sans-serif';
+const ARCADE_FONT = '"Press Start 2P", monospace';
+
 /** Quanto dura a troca de cenário entre trechos da fase (segundos). */
 const SCENE_FADE = 0.8;
 
@@ -362,6 +366,15 @@ export class Renderer {
       if (actor.kind === 'enemy') {
         // inimigo
         const size = 42 * (actor.scale ?? 1);
+        if (actor.enraged) {
+          // fúria do líder: brilho vermelho pulsando embaixo dele
+          ctx.globalAlpha = 0.25 + Math.sin(run.time * 8) * 0.1;
+          ctx.fillStyle = '#ff3b30';
+          ctx.beginPath();
+          ctx.ellipse(actor.x, actor.y + size * 0.32, size * 0.8, size * 0.42, 0, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.globalAlpha = 1;
+        }
         drawPokemon(ctx, actor.data.dex, actor.x, actor.y, size, {
           facing: actor.facing, types: actor.types, flash: actor.hitFlash, time: run.time + actor.animPhase
         });
@@ -408,7 +421,7 @@ export class Renderer {
     ctx.fillStyle = ratio > 0.5 ? '#57d18a' : ratio > 0.25 ? '#f8d030' : '#e2574c';
     ctx.fillRect(x, y, w * ratio, 4);
 
-    ctx.font = 'bold 9px Trebuchet MS, sans-serif';
+    ctx.font = `8px ${ARCADE_FONT}`;
     ctx.textAlign = 'left';
     ctx.fillStyle = 'rgba(0,0,0,.65)';
     ctx.fillRect(x + w - 15, y - 11, 17, 10);
@@ -573,6 +586,7 @@ export class Renderer {
   _drawProjectiles(ctx, run) {
     for (const p of run.projectiles) {
       if (p.dead) continue;
+      if (p.hostile) { this._drawHostileShot(ctx, p); continue; }
       const fx = abilityFx(p.abilityId);
       // rastro curto na cor do tipo
       ctx.globalAlpha = fx ? 0.22 : 0.35;
@@ -600,6 +614,21 @@ export class Renderer {
     }
   }
 
+  /** Projétil de líder: um halo vermelho por baixo diz "isso machuca você". */
+  _drawHostileShot(ctx, p) {
+    ctx.globalAlpha = 0.35 + Math.sin(p.age * 18) * 0.12;
+    ctx.fillStyle = '#ff3b30';
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.size * 1.15, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.globalAlpha = 1;
+    if (p.sprite && drawFx(ctx, p.sprite, p.x, p.y, { t: p.age, angle: Math.atan2(p.vy, p.vx) })) return;
+    ctx.fillStyle = p.color;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.size * 0.7, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
   _drawEffects(ctx, run) {
     for (const fx of run.effects) {
       if (fx.dead) continue;
@@ -625,7 +654,7 @@ export class Renderer {
         }
       } else if (fx instanceof FloatingText) {
         ctx.globalAlpha = Math.min(1, t * 1.6);
-        ctx.font = `bold ${fx.size}px Trebuchet MS, sans-serif`;
+        ctx.font = `700 ${Math.round(fx.size * 1.15)}px ${PIXEL_FONT}`;
         ctx.textAlign = 'center';
         ctx.lineWidth = 3;
         ctx.strokeStyle = 'rgba(0,0,0,.75)';
@@ -704,11 +733,15 @@ export class Renderer {
     ctx.strokeStyle = typeColor(boss.types[0]);
     ctx.lineWidth = 2;
     ctx.strokeRect(x, y, w, 14);
+    // marca da fúria (metade da vida)
+    const rageX = x + w * CONFIG.enemies.boss.enrageAt;
+    ctx.fillStyle = 'rgba(255,255,255,.75)';
+    ctx.fillRect(rageX - 1, y - 2, 2, 18);
 
-    ctx.font = 'bold 13px Trebuchet MS, sans-serif';
+    ctx.font = `11px ${ARCADE_FONT}`;
     ctx.textAlign = 'center';
     ctx.fillStyle = '#fff';
-    ctx.fillText(boss.data.name.toUpperCase(), this.width / 2, y - 8);
+    ctx.fillText(boss.data.name + (boss.enraged ? ' — furioso!' : ''), this.width / 2, y - 8);
     ctx.restore();
   }
 }

@@ -49,8 +49,11 @@ export class Enemy {
     // efeitos de status ativos
     this.status = { burn: null, poison: null, slow: null };
 
-    // habilidades hostis (chefes)
-    this.abilities = (data.abilities ?? []).map((abilityId) => ({
+    // habilidades hostis (chefes): as do líder mais as que todo líder tem
+    const hostile = [...(data.abilities ?? [])];
+    if (data.boss) for (const id of CONFIG.enemies.boss.extraAbilities) if (!hostile.includes(id)) hostile.push(id);
+    this.enraged = false;
+    this.abilities = hostile.map((abilityId) => ({
       abilityId,
       timer: getAbility(abilityId)?.base.cooldown ?? 3
     }));

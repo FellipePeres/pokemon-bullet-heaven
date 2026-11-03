@@ -5,11 +5,16 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Pokémon Bullet Heaven</title>
 <link rel="preconnect" href="https://raw.githubusercontent.com" />
+<link rel="icon" type="image/png" href="assets/items/poke-ball.png" />
 <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
 
 <div id="app">
+
+  <!-- fundo dos menus: um trecho de rota do FireRed (ui/backdrop.js) -->
+  <canvas id="menu-bg" aria-hidden="true"></canvas>
+  <div id="menu-scrim" aria-hidden="true"></div>
 
   <!-- ============================================================
        BARRA LATERAL — atalhos que abrem janelas sobre o menu
@@ -88,7 +93,7 @@
        ============================================================ -->
   <section id="screen-starter" class="screen hidden">
     <header class="screen-head">
-      <h2 class="screen-title">ESCOLHA SEU POKÉMON INICIAL</h2>
+      <h2 class="screen-title">Escolha seu Pokémon inicial</h2>
       <p class="subtitle">Ele será o primeiro membro da sua equipe. Cada um joga de um jeito diferente.</p>
     </header>
     <div id="starter-choices" class="starter-grid"></div>
@@ -102,7 +107,7 @@
     <header class="screen-head campaign-head">
       <img id="campaign-trainer" class="campaign-trainer" alt="" />
       <div class="screen-head">
-        <h2 class="screen-title" id="campaign-title">JORNADA — KANTO</h2>
+        <h2 class="screen-title" id="campaign-title">Jornada — Kanto</h2>
         <p class="subtitle" id="campaign-subtitle"></p>
       </div>
     </header>
@@ -162,7 +167,7 @@
         <div class="overlay-head levelup-head">
           <img id="levelup-sprite" class="overlay-sprite" alt="" />
           <div>
-            <h2 class="glow">SUBIU DE NÍVEL!</h2>
+            <h2 class="glow">Subiu de nível!</h2>
             <p class="subtitle" id="levelup-subtitle"></p>
           </div>
         </div>
@@ -174,9 +179,9 @@
     <div id="capture-overlay" class="overlay hidden">
       <div class="overlay-card">
         <div class="overlay-head">
-          <span class="ui-icon big"><img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png" alt="" /></span>
+          <span class="ui-icon big"><img src="assets/items/poke-ball.png" alt="" /></span>
           <div>
-            <h2 class="glow">POKÉ BALL ENCONTRADA!</h2>
+            <h2 class="glow">Poké Ball encontrada!</h2>
             <p class="subtitle" id="capture-subtitle">Escolha um Pokémon para a sua equipe</p>
           </div>
         </div>
@@ -188,7 +193,7 @@
     <!-- ===== EVOLUÇÃO ===== -->
     <div id="evolution-overlay" class="overlay hidden">
       <div class="overlay-card narrow evolution-card">
-        <h2 class="glow">EVOLUÇÃO!</h2>
+        <h2 class="glow">Evolução!</h2>
         <div class="evo-stage">
           <img id="evo-from" class="evo-sprite" alt="" />
           <span class="evo-arrow">➜</span>
@@ -215,7 +220,7 @@
     <!-- ===== PAUSA ===== -->
     <div id="pause-overlay" class="overlay hidden">
       <div class="overlay-card narrow">
-        <h2>PAUSADO</h2>
+        <h2>Pausado</h2>
         <div id="pause-team-summary" class="team-summary"></div>
         <div class="menu-column">
           <button id="btn-resume" class="menu-btn primary"><span class="btn-text">Continuar</span></button>
@@ -228,7 +233,7 @@
     <!-- ===== RESULTADO ===== -->
     <div id="result-overlay" class="overlay hidden">
       <div class="overlay-card narrow">
-        <h2 id="result-title">VITÓRIA!</h2>
+        <h2 id="result-title">Vitória!</h2>
         <p class="subtitle" id="result-subtitle"></p>
         <div id="result-team" class="team-summary"></div>
         <div id="result-stats" class="stat-list"></div>
@@ -246,7 +251,7 @@
   <div id="modal-pokedex" class="modal hidden">
     <div class="modal-card wide">
       <header class="modal-head">
-        <h3>📕 POKÉDEX DE KANTO</h3>
+        <h3><span class="ui-icon"><img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/town-map.png" alt="" /></span>Pokédex de Kanto</h3>
         <span id="pokedex-progress" class="modal-sub"></span>
         <button class="icon-btn close" data-close>✕</button>
       </header>
@@ -259,7 +264,7 @@
   <div id="modal-achievements" class="modal hidden">
     <div class="modal-card">
       <header class="modal-head">
-        <h3>🏆 CONQUISTAS</h3>
+        <h3><span class="ui-icon"><img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/star-piece.png" alt="" /></span>Conquistas</h3>
         <span class="modal-sub" id="achievements-sub"></span>
         <button class="icon-btn close" data-close>✕</button>
       </header>
@@ -272,7 +277,7 @@
   <div id="modal-team" class="modal hidden">
     <div class="modal-card">
       <header class="modal-head">
-        <h3>🎒 EQUIPE DA JORNADA</h3>
+        <h3><span class="ui-icon"><img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png" alt="" /></span>Equipe da jornada</h3>
         <span class="modal-sub">Equipe e build levadas para a próxima fase.</span>
         <button class="icon-btn close" data-close>✕</button>
       </header>
@@ -285,7 +290,7 @@
   <div id="modal-trainer" class="modal hidden">
     <div class="modal-card">
       <header class="modal-head">
-        <h3>🪙 MELHORIAS DO TREINADOR</h3>
+        <h3><span class="ui-icon"><img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/coin-case.png" alt="" /></span>Melhorias do treinador</h3>
         <span class="modal-sub" id="trainer-coins">0 Shards</span>
         <button class="icon-btn close" data-close>✕</button>
       </header>
@@ -303,7 +308,7 @@
   <div id="modal-options" class="modal hidden">
     <div class="modal-card">
       <header class="modal-head">
-        <h3>⚙️ OPÇÕES</h3>
+        <h3><span class="ui-icon"><img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/escape-rope.png" alt="" /></span>Opções</h3>
         <span class="modal-sub">Valores provisórios, fáceis de ajustar.</span>
         <button class="icon-btn close" data-close>✕</button>
       </header>
@@ -316,14 +321,15 @@
   <div id="modal-help" class="modal hidden">
     <div class="modal-card">
       <header class="modal-head">
-        <h3>❔ COMO JOGAR</h3>
+        <h3><span class="ui-icon"><img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/oaks-parcel.png" alt="" /></span>Como jogar</h3>
         <button class="icon-btn close" data-close>✕</button>
       </header>
       <div class="modal-body">
         <div class="help-grid">
           <div class="help-item"><b>WASD / Setas</b><span>Mover o treinador</span></div>
           <div class="help-item"><b>1 – 6</b><span>Trocar o Pokémon em campo</span></div>
-          <div class="help-item"><b>Tab</b><span>Escolher qual slot ativo recebe a troca</span></div>
+          <div class="help-item"><b>Tab</b><span>Escolher quem sai na troca (o card marcado "⇄ sai")</span></div>
+          <div class="help-item"><b>Espadinha</b><span>Ligar ou desligar o ataque de um Pokémon em campo</span></div>
           <div class="help-item"><b>ESC</b><span>Pausar</span></div>
           <div class="help-item"><b>▲ no card</b><span>Gastar os níveis acumulados de um Pokémon</span></div>
         </div>
@@ -342,7 +348,7 @@
   <!-- ===== HALL DA FAMA (depois do Campeão, como no FireRed) ===== -->
   <div id="hall-overlay" class="overlay hidden">
     <div class="overlay-card hall-card">
-      <h2 class="glow">HALL DA FAMA</h2>
+      <h2 class="glow">Hall da Fama</h2>
       <p class="subtitle" id="hall-text"></p>
       <div class="hall-row">
         <img id="hall-trainer" class="hall-trainer" alt="" />

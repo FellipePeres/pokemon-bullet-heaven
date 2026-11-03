@@ -51,10 +51,11 @@ for (const starter of ['charmander', 'bulbasaur', 'squirtle']) {
 // ------------------------------------------- 2. jornada encadeada (campanha)
 console.log('\n[jornada — equipe e build passam de fase em fase]');
 {
-  // A fase é desafiadora de propósito: o bot vence ~50% das tentativas
-  // (tools/balance.mjs) e perder devolve ao início com a mesma equipe, então o
-  // teste também repete. Mas uma equipe ruim montada na Fase 1 perde a Fase 2
-  // todas as vezes (~1 jornada em 15): aí começa uma jornada nova, até 3.
+  // A fase é desafiadora de propósito (tools/balance.mjs) e perder devolve ao
+  // início com a mesma equipe, então o teste também repete. Mas uma equipe ruim
+  // montada na Fase 1 perde a Fase 2 todas as vezes: aí começa uma jornada nova,
+  // até 3. Vai de Squirtle: desde a 0.10 o Charmander contra o Brock é o caminho
+  // difícil (fogo contra pedra, como no FireRed), e o teste é da jornada, não dele.
   let journey = null;
   let results = [];
   for (let journeyTry = 0; journeyTry < 3; journeyTry++) {
@@ -66,7 +67,7 @@ console.log('\n[jornada — equipe e build passam de fase em fase]');
       let attempts = 0;
       do {
         attempts++;
-        result = simulate(stageId, 'charmander', { maxSeconds: stage.duration + 240, journey });
+        result = simulate(stageId, 'squirtle', { maxSeconds: stage.duration + 240, journey });
       } while (result.run.state !== 'victory' && attempts < 6);
       results.push({ stage, result, attempts });
       if (result.run.state !== 'victory') break;
@@ -80,7 +81,8 @@ console.log('\n[jornada — equipe e build passam de fase em fase]');
           `estado=${run.state} em ${attempts} tentativa(s), equipe ${run.team.members.length}, níveis ${teamLevels(run)}`);
     console.log(`         ${captures} capturas · ${ballsDropped} Poké Balls · ${run.stats.faints} desmaios · ${run.stats.kills} abates`);
   }
-  check('jornada chega ao fim com equipe formada', (journey?.team.members.length ?? 0) >= 4,
+  // com as Poké Balls raras da 0.10, duas fases rendem uma equipe de 3 ou mais
+  check('jornada chega ao fim com equipe formada', (journey?.team.members.length ?? 0) >= 3,
         `${journey?.team.members.length ?? 0} Pokémon`);
 }
 

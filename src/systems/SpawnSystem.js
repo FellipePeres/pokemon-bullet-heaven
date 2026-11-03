@@ -155,11 +155,21 @@ export class SpawnSystem {
   /** Comportamento especial de chefes: invocações e habilidades. */
   updateBoss(enemy, dt) {
     if (!enemy.boss) return;
+    const tuning = CONFIG.enemies.boss;
+
+    // fúria: abaixo da metade da vida, o líder acelera e ataca mais seguido
+    if (!enemy.enraged && enemy.hp <= enemy.maxHp * tuning.enrageAt) {
+      enemy.enraged = true;
+      enemy.speed *= tuning.enrage.speed;
+      this.run.shake(6, 0.4);
+      bus.emit(EVENTS.TOAST, { text: `${enemy.data.name} ficou furioso!`, icon: 'boss' });
+    }
+    const rage = enemy.enraged ? tuning.enrage : null;
 
     for (const inst of enemy.abilities) {
       inst.timer -= dt;
       if (inst.timer <= 0) {
-        inst.timer = (getAbility(inst.abilityId)?.base.cooldown ?? 5) * CONFIG.enemies.boss.cooldownMult;
+        inst.timer = (getAbility(inst.abilityId)?.base.cooldown ?? 5) * tuning.cooldownMult * (rage?.cooldown ?? 1);
         this.run.abilitySystem.fireHostile(enemy, inst.abilityId);
       }
     }
@@ -168,8 +178,8 @@ export class SpawnSystem {
     if (summons) {
       enemy.summonTimer -= dt;
       if (enemy.summonTimer <= 0) {
-        enemy.summonTimer = summons.interval;
-        for (let i = 0; i < summons.count; i++) {
+        enemy.summonTimer = summons.interval * tuning.summonIntervalMult * (rage?.summonInterval ?? 1);
+        for (let i = 0; i < summons.count + tuning.summonBonus; i++) {
           const a = Math.random() * Math.PI * 2;
           const d = enemy.radius + rand(30, 90);
           this.spawnAt(summons.enemy, enemy.x + Math.cos(a) * d, enemy.y + Math.sin(a) * d, this.summonLevel);

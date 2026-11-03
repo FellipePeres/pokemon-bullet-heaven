@@ -22,7 +22,8 @@
  *   capturePool    id da tabela de chances de captura (data/capturePools.js)
  *   ballChance     multiplicador da chance de drop de Poké Ball
  *   maxBalls       teto de Poké Balls da fase (controla o ritmo das capturas)
- *   scriptedBalls  segundos em que uma Poké Ball aparece garantida
+ *   scriptedBalls  segundos em que uma Poké Ball aparece garantida (0.10: só uma,
+ *                  na Fase 1, para o inicial ganhar companhia; o resto é sorte)
  *   reward         Shards ganhos ao concluir
  */
 export const STAGES = {
@@ -38,7 +39,7 @@ export const STAGES = {
     description: 'Rota 1, Rota 2 e a Floresta de Viridian — até o Ginásio de Pewter.',
     duration: 300,
     world: { width: 2800, height: 1900, theme: 'grass' },
-    scaling: { hp: 2.3, speed: 0.3, damage: 0.32 },
+    scaling: { hp: 1.8, speed: 0.3, damage: 0.18 },
 
     segments: [
       { from: 0,   name: 'Rota 1',               theme: 'grass' },
@@ -49,14 +50,14 @@ export const STAGES = {
 
     waves: [
       { from: 0,   to: 85,  interval: 1.5,  batch: 1, maxAlive: 24, enemies: [{ id: 'rattata', weight: 6 }, { id: 'caterpie', weight: 3 }] },
-      { from: 70,  to: 165, interval: 1.25, batch: 2, maxAlive: 45, enemies: [{ id: 'rattata', weight: 5 }, { id: 'spearow', weight: 4 }, { id: 'weedle', weight: 3 }] },
-      { from: 150, to: 255, interval: 0.95, batch: 3, maxAlive: 85, enemies: [{ id: 'caterpie', weight: 4 }, { id: 'weedle', weight: 4 }, { id: 'spearow', weight: 3 }, { id: 'ekans', weight: 3 }, { id: 'zubat', weight: 2 }] },
+      { from: 70,  to: 165, interval: 1.1, batch: 1, maxAlive: 34, enemies: [{ id: 'rattata', weight: 5 }, { id: 'spearow', weight: 4 }, { id: 'weedle', weight: 3 }] },
+      { from: 150, to: 255, interval: 0.95, batch: 2, maxAlive: 60, enemies: [{ id: 'caterpie', weight: 4 }, { id: 'weedle', weight: 4 }, { id: 'spearow', weight: 3 }, { id: 'ekans', weight: 3 }, { id: 'zubat', weight: 2 }] },
       { from: 240, to: 288, interval: 0.95, batch: 4, maxAlive: 78, enemies: [{ id: 'geodude_wild', weight: 5 }, { id: 'sandshrew', weight: 4 }, { id: 'zubat', weight: 3 }, { id: 'spearow', weight: 2 }] }
     ],
 
     elites: [
-      { at: 95,  id: 'raticate', count: 1 },
-      { at: 150, id: 'raticate', count: 2 },
+      { at: 125, id: 'raticate', count: 1 },   // 0.10: mais tarde (com poucas capturas, a equipe ainda é de 2)
+      { at: 165, id: 'raticate', count: 2 },
       { at: 195, id: 'primeape', count: 1 },
       { at: 265, id: 'graveler', count: 2 }
     ],
@@ -75,8 +76,8 @@ export const STAGES = {
 
     capturePool: 'phase1',
     ballChance: 1,
-    maxBalls: 5,
-    scriptedBalls: [25, 85, 175],
+    maxBalls: 3,
+    scriptedBalls: [45, 140],
     reward: { shards: 140 }
   },
 
@@ -92,7 +93,7 @@ export const STAGES = {
     description: 'Monte Lua, Rota 4 e Cerulean — até o Ginásio da Misty.',
     duration: 330,
     world: { width: 3000, height: 2000, theme: 'cave' },
-    scaling: { hp: 2.9, speed: 0.34, damage: 0.8 },
+    scaling: { hp: 2.9, speed: 0.34, damage: 1.0 },
     unlockedBy: 'gym_1_pewter',
 
     segments: [
@@ -130,8 +131,7 @@ export const STAGES = {
 
     capturePool: 'phase2',
     ballChance: 1,
-    maxBalls: 5,
-    scriptedBalls: [30, 120, 220],
+    maxBalls: 2,
     reward: { shards: 200 }
   },
 
@@ -147,7 +147,7 @@ export const STAGES = {
     description: 'Rotas 5 e 6, a Caverna do Diglett e a Rota 11 — até o Ginásio do Lt. Surge.',
     duration: 345,
     world: { width: 3000, height: 2000, theme: 'grass' },
-    scaling: { hp: 3.0, speed: 0.3, damage: 2.0 },
+    scaling: { hp: 3.0, speed: 0.3, damage: 2.3 },
     unlockedBy: 'gym_2_cerulean',
 
     segments: [
@@ -191,8 +191,7 @@ export const STAGES = {
 
     capturePool: 'phase3',
     ballChance: 1,
-    maxBalls: 6,
-    scriptedBalls: [30, 125, 230],
+    maxBalls: 2,
     reward: { shards: 260 }
   },
 
@@ -208,7 +207,7 @@ export const STAGES = {
     description: 'Rota 9, o Túnel de Pedra e a Rota 8 — até o Ginásio da Erika.',
     duration: 360,
     world: { width: 3000, height: 2000, theme: 'grass' },
-    scaling: { hp: 3.5, speed: 0.3, damage: 5.0 },
+    scaling: { hp: 3.5, speed: 0.3, damage: 4.6 },
     unlockedBy: 'gym_3_vermilion',
 
     segments: [
@@ -248,8 +247,7 @@ export const STAGES = {
 
     capturePool: 'phase4',
     ballChance: 1,
-    maxBalls: 6,
-    scriptedBalls: [30, 130, 240],
+    maxBalls: 2,
     reward: { shards: 320 }
   },
 
@@ -265,7 +263,7 @@ export const STAGES = {
     description: 'A Torre Pokémon, as Rotas 12 a 15 e a Zona Safári — até o Ginásio do Koga.',
     duration: 375,
     world: { width: 3200, height: 2100, theme: 'cave' },
-    scaling: { hp: 4.0, speed: 0.3, damage: 5.8 },
+    scaling: { hp: 4.0, speed: 0.3, damage: 7.0 },
     unlockedBy: 'gym_4_celadon',
 
     segments: [
@@ -306,8 +304,7 @@ export const STAGES = {
 
     capturePool: 'phase5',
     ballChance: 1,
-    maxBalls: 6,
-    scriptedBalls: [30, 135, 245],
+    maxBalls: 2,
     reward: { shards: 380 }
   },
 
@@ -323,7 +320,7 @@ export const STAGES = {
     description: 'A Usina, a Ciclovia e a Silph Co. — até o Ginásio da Sabrina.',
     duration: 390,
     world: { width: 3200, height: 2100, theme: 'cave' },
-    scaling: { hp: 7.0, speed: 0.3, damage: 4.1 },
+    scaling: { hp: 7.0, speed: 0.3, damage: 4.8 },
     unlockedBy: 'gym_5_fuchsia',
 
     segments: [
@@ -368,8 +365,7 @@ export const STAGES = {
 
     capturePool: 'phase6',
     ballChance: 1,
-    maxBalls: 6,
-    scriptedBalls: [30, 140, 250],
+    maxBalls: 2,
     reward: { shards: 440 }
   },
 
@@ -385,7 +381,7 @@ export const STAGES = {
     description: 'As Rotas 19 e 20, as Ilhas Seafoam e a Mansão Pokémon — até o Ginásio do Blaine.',
     duration: 405,
     world: { width: 3300, height: 2200, theme: 'grass' },
-    scaling: { hp: 4.5, speed: 0.3, damage: 4.6 },
+    scaling: { hp: 4.5, speed: 0.3, damage: 6.0 },
     unlockedBy: 'gym_6_saffron',
 
     segments: [
@@ -427,8 +423,7 @@ export const STAGES = {
 
     capturePool: 'phase7',
     ballChance: 1,
-    maxBalls: 6,
-    scriptedBalls: [30, 145, 260],
+    maxBalls: 2,
     reward: { shards: 500 }
   },
 
@@ -444,7 +439,7 @@ export const STAGES = {
     description: 'A Rota 21, o Esconderijo Rocket e a Rota 22 — até o Ginásio do Giovanni.',
     duration: 420,
     world: { width: 3400, height: 2200, theme: 'grass' },
-    scaling: { hp: 3.2, speed: 0.3, damage: 7.5 },
+    scaling: { hp: 3.2, speed: 0.3, damage: 9.8 },
     unlockedBy: 'gym_7_cinnabar',
 
     segments: [
@@ -485,8 +480,7 @@ export const STAGES = {
 
     capturePool: 'phase8',
     ballChance: 1,
-    maxBalls: 6,
-    scriptedBalls: [30, 150, 270],
+    maxBalls: 2,
     reward: { shards: 560 }
   },
 
@@ -502,7 +496,7 @@ export const STAGES = {
     description: 'A Rota 23 e a Victory Road — até a sala da Lorelei.',
     duration: 300,
     world: { width: 3000, height: 2000, theme: 'cave' },
-    scaling: { hp: 4.0, speed: 0.3, damage: 3.3 },
+    scaling: { hp: 4.0, speed: 0.3, damage: 3.8 },
     unlockedBy: 'gym_8_viridian',
 
     segments: [
@@ -538,8 +532,7 @@ export const STAGES = {
 
     capturePool: 'phase9',
     ballChance: 1,
-    maxBalls: 4,
-    scriptedBalls: [40, 160],
+    maxBalls: 1,
     reward: { shards: 300 }
   },
 
@@ -555,7 +548,7 @@ export const STAGES = {
     description: 'O corredor da Liga — até a sala do Bruno.',
     duration: 280,
     world: { width: 3000, height: 2000, theme: 'gym' },
-    scaling: { hp: 2.4, speed: 0.3, damage: 7.0 },
+    scaling: { hp: 2.4, speed: 0.3, damage: 7.8 },
     unlockedBy: 'e4_lorelei',
 
     segments: [
@@ -589,8 +582,7 @@ export const STAGES = {
 
     capturePool: 'phase9',
     ballChance: 1,
-    maxBalls: 4,
-    scriptedBalls: [40, 150],
+    maxBalls: 1,
     reward: { shards: 320 }
   },
 
@@ -639,8 +631,7 @@ export const STAGES = {
 
     capturePool: 'phase9',
     ballChance: 1,
-    maxBalls: 4,
-    scriptedBalls: [40, 150],
+    maxBalls: 1,
     reward: { shards: 340 }
   },
 
@@ -656,7 +647,7 @@ export const STAGES = {
     description: 'O corredor da Liga — até a sala do Lance.',
     duration: 280,
     world: { width: 3000, height: 2000, theme: 'cave' },
-    scaling: { hp: 2.7, speed: 0.3, damage: 2.0 },
+    scaling: { hp: 2.7, speed: 0.3, damage: 2.3 },
     unlockedBy: 'e4_agatha',
 
     segments: [
@@ -689,8 +680,7 @@ export const STAGES = {
 
     capturePool: 'phase9',
     ballChance: 1,
-    maxBalls: 4,
-    scriptedBalls: [40, 150],
+    maxBalls: 1,
     reward: { shards: 360 }
   },
 
@@ -706,7 +696,7 @@ export const STAGES = {
     description: 'O Platô Indigo — o desafio final da jornada.',
     duration: 240,
     world: { width: 3000, height: 2000, theme: 'gym' },
-    scaling: { hp: 2.4, speed: 0.3, damage: 2.1 },
+    scaling: { hp: 2.4, speed: 0.3, damage: 2.4 },
     unlockedBy: 'e4_lance',
 
     segments: [
@@ -745,8 +735,7 @@ export const STAGES = {
 
     capturePool: 'phase9',
     ballChance: 1,
-    maxBalls: 2,
-    scriptedBalls: [60],
+    maxBalls: 0,
     reward: { shards: 800 }
   }
 };

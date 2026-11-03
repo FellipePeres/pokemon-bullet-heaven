@@ -123,6 +123,24 @@ const ROTEIROS = {
     { wait: 4000 }, { shot: 'captura-depois' },
     { log: "JSON.stringify(game.run.team.members.map((m) => [m.pokemonId, m.level, Math.round(m.hp), m.fainted]))" }
   ],
+  // todas as telas, uma por foto: para conferir o visual (use antes e depois de mexer no CSS)
+  telas: [
+    { open: 'index.html' }, { wait: 1200 }, { shot: 'tela-01-titulo' },
+    { run: 'game.newGame()' }, { wait: 900 }, { shot: 'tela-02-treinador' },
+    { run: "game.chooseTrainer('leaf')" }, { wait: 900 }, { shot: 'tela-03-inicial' },
+    { run: "game.chooseStarter('bulbasaur'); ['gym_1_pewter', 'gym_2_cerulean'].forEach((s) => game.campaign.clearedStages.push(s)); game.openCampaign()" },
+    { wait: 1200 }, { shot: 'tela-04-jornada' },
+    { run: "game.menus.showModal('modal-options')" }, { wait: 500 }, { shot: 'tela-05-opcoes' },
+    { run: "game.menus.closeModal(); game.menus.showModal('modal-pokedex')" }, { wait: 800 }, { shot: 'tela-06-pokedex' },
+    { run: "game.menus.closeModal(); game.menus.showModal('modal-trainer')" }, { wait: 500 }, { shot: 'tela-07-treinador-loja' },
+    { run: "game.menus.closeModal(); game.menus.showModal('modal-achievements')" }, { wait: 500 }, { shot: 'tela-07b-conquistas' },
+    { run: "game.menus.closeModal(); game.menus.showModal('modal-help')" }, { wait: 500 }, { shot: 'tela-07c-ajuda' },
+    { run: "game.menus.closeModal(); game.startStage('gym_3_vermilion')" }, { wait: 1500 }, { shot: 'tela-08-partida', raw: true },
+    { run: "const m = game.run.team.members[0]; m.pendingLevels = 1; game.openLevelUpFor(m)" }, { wait: 600 }, { shot: 'tela-09-nivel', raw: true },
+    { run: "game.pickUpgrade(game.run.progression.rollChoices(game.run.levelUpMember)[0].id); game.run.state = 'capture'; game.captureOpen = true; game.hud.showCapture(game.run.captureSystem.rollChoices(), (id) => game.pickCapture(id))" },
+    { wait: 700 }, { shot: 'tela-10-captura', raw: true },
+    { run: 'game.resolveCapture(); game.togglePause()' }, { wait: 500 }, { shot: 'tela-11-pausa', raw: true }
+  ],
   // o HUD da equipe: espadinha (atacar ou só acompanhar), selo de quem sai e a troca
   equipe: [
     { open: 'index.html' }, { wait: 500 },

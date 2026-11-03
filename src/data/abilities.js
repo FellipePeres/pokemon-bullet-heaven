@@ -571,6 +571,15 @@ export const ABILITIES = {
     base: { damage: 26, cooldown: 4, area: 230, speed: 380, knockback: 300, size: 20 },
     hostile: true
   },
+  leader_barrage: {
+    id: 'leader_barrage',
+    name: 'Rajada',
+    type: 'normal',
+    behavior: 'projectile',
+    description: 'Leque de projéteis na direção do treinador (o visual é do tipo do líder).',
+    base: { damage: 12, cooldown: 3.4, count: 5, spread: 0.24, speed: 250, size: 14, duration: 3.4 },
+    hostile: true
+  },
   boss_shockwave: {
     id: 'boss_shockwave',
     name: 'Investida',

@@ -94,7 +94,7 @@ quando o Fellipe mandar**, porque o push publica o jogo.
 | 3 | Pokémon animados e cenário de tiles | 0.7 → 0.8 | ✅ feita (2026-11-02): Pokémon animados na 0.7, cenário de tiles na 0.8 |
 | 4 | Fases 3 a 8, Elite Four e Campeão | 0.7 | ✅ feita (2026-11-02); falta só os lendários como encontros especiais |
 | 5 | Som | 1.0 | ⏳ |
-| 6 | Acabamento: opções salvas, controle, celular, desempenho, assets locais | 0.6 → 1.0 | 🔶 opções, desempenho e controle feitos; faltam celular e assets locais |
+| 6 | Acabamento: opções salvas, controle, celular, desempenho, assets locais, identidade visual | 0.6 → 1.0 | 🔶 opções, desempenho, controle e identidade visual (0.10) feitos; faltam celular e assets locais |
 | 7 | Final da jornada: Hall da Fama e créditos | 0.7 | ✅ feita (2026-11-02); o pós-jogo (D9) fica para depois |
 | 8 | Outras regiões | 1.x | ⏳ |
 
@@ -415,8 +415,19 @@ Levantamento de 2026-11-02:
 - **Assets locais.** Os sprites de Pokémon, itens e insígnias ainda vêm do
   raw.githubusercontent.com a cada partida. Com a Etapa 3 o canvas fica local;
   falta a interface (HUD, menus, Pokédex).
-- **Publicar.** A 0.5 está numa branch local; o site roda a 0.4. Publicar é
-  merge na `main` + push, quando o Fellipe mandar.
+- ✅ **Identidade visual** (0.10, pedido do Fellipe: "remodelar todo o front,
+  copiando o UX do Pokemon All"): o padrão do DEC-002 de lá. A caixa de diálogo
+  do FireRed de verdade como moldura (`assets/ui/window-frame*.png`, as mesmas do
+  Pokemon All), botões em relevo duro, Poké Ball de ponteiro, divisórias
+  pontilhadas, Press Start 2P nos títulos e Pixelify Sans no texto (servidas de
+  `assets/fonts`, licença OFL), as cores do `theme.css` de lá. A identidade
+  própria fica no logo em pixel (o amarelo e o azul com contorno duro, a placa
+  vermelha "BULLET HEAVEN") e no fundo dos menus, montado pelo gerador de cenário
+  do próprio jogo (`ui/backdrop.js`). O HUD da partida usa as caixas "noite" do
+  jogo e as barras de vida em degraus nas cores do FireRed. Títulos com
+  maiúscula só na inicial: a Press Start 2P achata as maiúsculas acentuadas.
+- ✅ **Publicado** (0.10): a `main` recebeu a branch `etapa-0-1-treinador` e o
+  site saiu da 0.4.
 
 ### Etapa 7 — Final da jornada
 
@@ -504,6 +515,20 @@ ondas das Fases 1 e 2 caiu um pouco (tabela no HANDOFF, seção 5).
 5. **Doce Raro**: muito raro, cai de elites e sobe um nível na hora no Pokémon
    escolhido.
 6. **Exp. Share**: uma melhoria do treinador (Shards) que dá mais XP à reserva.
+
+### Terceiro retorno (0.10)
+
+| Pedido | O que mudou |
+|---|---|
+| Ainda muitas Poké Balls; as garantidas atrapalham | Sem Poké Ball garantida da Fase 2 em diante (a Fase 1 ficou com duas, para o inicial ganhar companhia); teto de 2 por fase (3 na Fase 1, 1 em cada sala da Liga, nenhuma no Campeão) e a chance de cair ×0,07 (era ×0,15) |
+| O jogo ainda está fácil; quer "levemente mais dificultoso" | Dano dos inimigos ×1,3 (era 1,2) e vida ×1,2 (era 1,15) |
+| Líderes muito fáceis ("derrotei o Brock de maneira muito simples") | Vida ×4 (era 2,5), dano ×1,6, golpes 40% mais frequentes, uma **Rajada** de projéteis mirando o treinador (com halo vermelho) e **fúria** abaixo da metade da vida: mais rápido, golpes e invocações mais seguidos, rajada maior. A barra do líder marca a metade |
+| "O teste do bot é diferente de um humano; eu upo corretamente nos níveis" | O bot passou a jogar como quem conhece o jogo: escolhe a melhoria que mais dá dano (TM primeiro), desvia do que encosta, dos avisos no chão e dos projéteis, e vai atrás da Poké Ball. A calibragem passou a ser com ele |
+| Remodelar o front copiando o UX do Pokemon All, e publicar | Etapa 6, acima, e o site publicado |
+
+Com menos Poké Balls, a equipe da Fase 1 fica com 2 ou 3 Pokémon e as ondas
+dela foram aliviadas (os elites também chegam mais tarde): a dificuldade passou
+a estar nos líderes. Com o bot novo, metade das derrotas da Fase 1 é no Brock.
 
 ## 5. Decisões em aberto (do Fellipe)
 

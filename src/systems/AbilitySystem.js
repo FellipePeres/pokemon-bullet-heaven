@@ -1,7 +1,7 @@
 import { CONFIG } from '../core/config.js';
 import { getAbility } from '../data/abilities.js';
 import { getUpgrade } from '../data/upgrades.js';
-import { abilityFx } from '../data/fx.js';
+import { abilityFx, BOSS_WAVE_FX } from '../data/fx.js';
 import { applyModifiers, deepClone, clamp } from '../core/utils.js';
 import { typeColor } from '../data/types.js';
 import { Projectile, Orb } from '../entities/projectiles.js';
@@ -307,12 +307,28 @@ export class AbilitySystem {
     const ability = getAbility(abilityId);
     if (!ability) return;
     const s = ability.base;
+    const damageMult = CONFIG.enemies.damageMult * (enemy.boss ? CONFIG.enemies.boss.damageMult : 1);
+    if (ability.behavior === 'projectile') {
+      // leque mirando o treinador; o visual e o tipo são os do líder
+      const type = enemy.types[0] ?? 'normal';
+      const count = s.count + (enemy.enraged ? CONFIG.enemies.boss.enrage.barrageExtra : 0);
+      const aim = Math.atan2(this.run.player.y - enemy.y, this.run.player.x - enemy.x);
+      for (let i = 0; i < count; i++) {
+        const a = aim + s.spread * (i - (count - 1) / 2);
+        this.run.projectiles.push(new Projectile({
+          x: enemy.x, y: enemy.y, vx: Math.cos(a) * s.speed, vy: Math.sin(a) * s.speed,
+          damage: s.damage * damageMult, size: s.size, life: s.duration,
+          type, color: typeColor(type), hostile: true, sprite: BOSS_WAVE_FX[type]?.ring ?? null
+        }));
+      }
+      return;
+    }
     if (ability.behavior === 'nova') {
       // a onda sai depois de um aviso no chão, para dar tempo de reagir
       this.run.zones.push(new Zone({
         kind: 'nova', x: enemy.x, y: enemy.y,
         radius: enemy.radius, maxRadius: s.area, growSpeed: s.speed,
-        damage: s.damage * CONFIG.enemies.damageMult * (enemy.boss ? CONFIG.enemies.boss.damageMult : 1),
+        damage: s.damage * damageMult,
         knockback: s.knockback,
         type: ability.type, color: '#ff6b6b', hostile: true, abilityId,
         delay: CONFIG.fx.bossTelegraph, visualType: enemy.types[0]

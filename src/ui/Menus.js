@@ -196,7 +196,7 @@ export class Menus {
     const trainer = getTrainerLook(this.game.profile.trainer);
     el('campaign-trainer').src = assetUrl(trainer.portrait);
     el('campaign-trainer').alt = trainer.name;
-    el('campaign-title').textContent = `JORNADA — ${this.game.region.name.toUpperCase()}`;
+    el('campaign-title').textContent = `Jornada — ${this.game.region.name}`;
     const hall = this.game.profile.hallOfFame.filter((h) => h.region === this.game.profile.region);
     if (hall.length) show(el('btn-hall')); else hide(el('btn-hall'));
 

@@ -141,19 +141,19 @@ export const ENEMIES = {
      ============================================================== */
   brock_geodude: {
     id: 'brock_geodude', dex: 74, name: 'Geodude do Brock', types: ['rock', 'ground'],
-    hp: 2600, speed: 78, damage: 17, xp: 180, dropChance: 1,
+    hp: 1900, speed: 78, damage: 14, xp: 180, dropChance: 1,
     behavior: 'boss', radius: 30, scale: 2.4, boss: true,
     leader: 'Brock',
     abilities: ['boss_shockwave'],
-    summons: { enemy: 'geodude_wild', count: 2, interval: 11 }
+    summons: { enemy: 'geodude_wild', count: 1, interval: 12 }
   },
   brock_onix: {
     id: 'brock_onix', dex: 95, name: 'Onix do Brock', types: ['rock', 'ground'],
-    hp: 5000, speed: 88, damage: 23, xp: 420, dropChance: 1,
+    hp: 3800, speed: 88, damage: 19, xp: 420, dropChance: 1,
     behavior: 'boss', radius: 40, scale: 3.4, boss: true, ace: true,
     leader: 'Brock',
     abilities: ['leader_rock_barrage', 'boss_shockwave'],
-    summons: { enemy: 'geodude_wild', count: 3, interval: 10 }
+    summons: { enemy: 'geodude_wild', count: 2, interval: 11 }
   },
 
   misty_staryu: {

@@ -375,7 +375,7 @@ export class HUD {
 
   showResult({ victory, run }) {
     const title = el('result-title');
-    title.textContent = victory ? 'VITÓRIA!' : 'DERROTA';
+    title.textContent = victory ? 'Vitória!' : 'Derrota';
     title.className = victory ? 'victory' : 'defeat';
 
     el('result-subtitle').textContent = victory
