@@ -83,6 +83,8 @@ export const CONFIG = {
     upgradeEveryLevels: 3,
     /** Subir de nível cura essa fração da vida máxima de quem subiu (0.11.3); evoluir cura tudo. */
     levelUpHeal: 0.25,
+    /** ...só a partir deste nível: no começo a cura deixava as fases fáceis demais. */
+    levelUpHealFrom: 11,
     /** Chance de uma das opções do nível ser uma TM (troca da habilidade base). */
     // O golpe melhora sobretudo na evolução; a TM no level up é um bônus raro
     // (pedido do Fellipe na 0.8: antes era 12%).

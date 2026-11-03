@@ -263,7 +263,12 @@ console.log('\n[evolução]');
   const member = run.team.members[0];
   const bonus = run.playerStats.pokemonHpBonus;
 
-  // subir de nível cura 1/4 da vida de quem subiu (0.11.3)
+  // subir de nível cura 1/4 da vida de quem subiu (0.11.3), do nível 11 em diante
+  member.level = 5;
+  member.hp = 10;
+  run.progression.addXpTo(member, run.progression.xpToNext(5) + 1);
+  check('antes do nível 11, subir de nível não cura', member.level === 6 && member.hp === 10,
+        `${Math.round(member.hp)} HP no nível ${member.level}`);
   member.level = 10;
   member.hp = 10;
   run.progression.addXpTo(member, run.progression.xpToNext(10) + 1);
