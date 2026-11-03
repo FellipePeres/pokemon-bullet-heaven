@@ -5,7 +5,7 @@
 > decisão foi tomada e o que falta fazer. O `README.md` é o manual de uso;
 > este aqui é o contexto de desenvolvimento.
 
-**Versão atual:** `0.11.3` · **Última atualização:** 2026-11-03
+**Versão atual:** `0.11.4` · **Última atualização:** 2026-11-03
 **Stack:** HTML + CSS + JavaScript puro (ES Modules). Sem backend, sem build, sem dependências.
 **Repositório:** https://github.com/FellipePeres/pokemon-bullet-heaven (público)
 **Jogo no ar:** https://fellipeperes.github.io/pokemon-bullet-heaven/
@@ -218,12 +218,17 @@ confirmar com ele**.
   reserva. Com equipe cheia dá exatamente **25% por ativo e 8,33% por reserva**,
   que foi o pedido original. Com menos Pokémon a proporção se redistribui —
   nada de XP se perde no começo.
-- **Subir de nível cura 1/4 da vida** de quem subiu, **do nível 11 em diante**
-  (0.11.3, pedido do Fellipe; `CONFIG.progression.levelUpHeal` e `levelUpHealFrom`).
-  Quem está desmaiado não volta. Antes da 0.11.3 não curava (a cura total do começo
-  deixava o jogo trivial). Medido com o bot nas Fases 1 a 3: sem cura, 18–92% de
-  vitórias; 1/4 desde o nível 1, 84–100%; 1/4 do nível 11 em diante, Fase 1 com
-  48–94% e Fases 2 e 3 com 84–100% (fáceis: pedem mais dano dos inimigos). Fora isso, cura vem de poções no chão, da regeneração da
+- **Subir de nível cura 1/10 da vida máxima** de quem subiu, **do nível 11 em
+  diante** (`CONFIG.progression.levelUpHeal` e `levelUpHealFrom`). Quem está
+  desmaiado não volta. Antes da 0.11.3 não curava (a cura total do começo deixava o
+  jogo trivial); a 0.11.3 curava 1/4, fácil demais; a 0.11.4 baixou para 1/10, a
+  pedido do Fellipe. Bot nas Fases 1 a 3 (Charmander / Bulbasaur / Squirtle):
+
+  | Cura ao subir de nível | Fase 1 | Fase 2 | Fase 3 | Desmaios |
+  |---|---|---|---|---|
+  | nenhuma | 24 / 20 / 76% | 18 / 26 / 41% | 50 / 27 / 92% | 1,2–4,3 |
+  | 1/4 do nível 11 (0.11.3) | 48 / 63 / 94% | 100 / 100 / 84% | 100% | 0–1,7 |
+  | 1/10 do nível 11 (0.11.4) | 43 / 56 / 100% | 59 / 81 / 57% | 100 / 92 / 87% | 0–3,4 | Fora isso, cura vem de poções no chão, da regeneração da
   reserva e da troca.
 - A tela de melhoria aparece **a cada 3 níveis** (`upgradeEveryLevels`). Os níveis
   intermediários valem em vida e dano, sem interromper. Isso caiu de ~45 telas
@@ -708,6 +713,7 @@ tipo, som e o polimento de troca e captura.
 | 11 | na derrota, duas opções: Centro Pokémon (cura e recomeça a fase) ou a jornada do zero; quais Pokémon aparecem na Fase 1 e com que chance | 0.11.1: tela de derrota com as duas saídas e confirmação para recomeçar; Centro Pokémon com a equipe curada, a música do Centro e a vinheta de cura do FireRed (`MusicPlayer.jingle`), aviso de quem se perdeu e o PC à mão; tabela da Fase 1 respondida na conversa |
 | 12 | todos os Pokémon são obtíveis?; a Fase 1 simples demais: mais espécies, poucos evoluídos, mais estágio 1 | as 151 têm caminho (141 captura, 3 iniciais, 4 presentes, 3 evolução), mas Mew (0,11% por bola, só na Liga) e companhia são impraticáveis — sugerido encontro de lendário no pós-jogo, aguardando o Fellipe; 0.11.2: Fase 1 com 28 espécies, 96% básicas |
 | 13 | golpes do Brock mais espaçados (spam de pedra); subir de nível cura 1/4 e evoluir cura tudo; Brock com um pouco menos de vida; teste de vitória com os iniciais | 0.11.3: `cooldownMult` 1,6 nos Pokémon do Brock e −10% de vida; `levelUpHeal` 0,25 e evolução com vida cheia. Bot na Fase 1: Charmander 2% → 69%, Bulbasaur 4% → 100%, Squirtle 64% → 100% — a cura é quase todo o efeito (só o Brock: 28%, 22%, 68%). Depois, "no começo é muito fácil": a cura só do nível 11 em diante (Fase 1: 48%, 63%, 94%); publicado |
+| 14 | ainda fácil com a cura: uma sugestão de cura por nível sem quebrar; o Fellipe escolheu 1/10 da vida máxima | 0.11.4: `levelUpHeal` 0,1 (do nível 11); Fases 1 a 3 com 43–100% e de 0 a 3,4 desmaios por tentativa (24 jornadas por inicial) |
 
 ---
 

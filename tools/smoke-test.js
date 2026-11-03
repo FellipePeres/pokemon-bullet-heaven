@@ -263,7 +263,7 @@ console.log('\n[evolução]');
   const member = run.team.members[0];
   const bonus = run.playerStats.pokemonHpBonus;
 
-  // subir de nível cura 1/4 da vida de quem subiu (0.11.3), do nível 11 em diante
+  // subir de nível cura parte da vida de quem subiu (levelUpHeal), do nível 11 em diante
   member.level = 5;
   member.hp = 10;
   run.progression.addXpTo(member, run.progression.xpToNext(5) + 1);
@@ -272,8 +272,9 @@ console.log('\n[evolução]');
   member.level = 10;
   member.hp = 10;
   run.progression.addXpTo(member, run.progression.xpToNext(10) + 1);
-  check('subir de nível cura 1/4 da vida',
-        member.level === 11 && Math.abs(member.hp - (10 + maxHpFor(member, bonus) * 0.25)) < 0.01,
+  check('subir de nível cura 1/10 da vida',
+        CONFIG.progression.levelUpHeal === 0.1 &&
+        member.level === 11 && Math.abs(member.hp - (10 + maxHpFor(member, bonus) * 0.1)) < 0.01,
         `${Math.round(member.hp)}/${maxHpFor(member, bonus)} HP`);
   const fainted = run.team.createMember('pidgey', 10);
   fainted.fainted = true;

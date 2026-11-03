@@ -3,7 +3,7 @@
  * Nada de número mágico espalhado pelo gameplay: se precisar ajustar, ajuste aqui.
  */
 export const CONFIG = {
-  version: '0.11.3',
+  version: '0.11.4',
 
   canvas: { width: 1280, height: 720 },
 
@@ -81,8 +81,9 @@ export const CONFIG = {
      * continuam valendo (vida e dano sobem), só não interrompem a partida.
      */
     upgradeEveryLevels: 3,
-    /** Subir de nível cura essa fração da vida máxima de quem subiu (0.11.3); evoluir cura tudo. */
-    levelUpHeal: 0.25,
+    /** Subir de nível cura essa fração da vida máxima de quem subiu; evoluir cura tudo. */
+    // 0.11.4: 1/10 (era 1/4 na 0.11.3, que deixava as fases fáceis demais)
+    levelUpHeal: 0.1,
     /** ...só a partir deste nível: no começo a cura deixava as fases fáceis demais. */
     levelUpHealFrom: 11,
     /** Chance de uma das opções do nível ser uma TM (troca da habilidade base). */

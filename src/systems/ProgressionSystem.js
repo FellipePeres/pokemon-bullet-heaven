@@ -62,7 +62,7 @@ export class ProgressionSystem {
     while (member.xp >= need) {
       member.xp -= need;
       member.level++;
-      // subir de nível cura 1/4 da vida de quem subiu, do nível 11 em diante
+      // subir de nível cura 1/10 da vida de quem subiu, do nível 11 em diante
       // (a evolução, logo abaixo, cura tudo)
       if (!member.fainted && member.level >= CONFIG.progression.levelUpHealFrom) {
         const max = maxHpFor(member, this.run.playerStats.pokemonHpBonus);
