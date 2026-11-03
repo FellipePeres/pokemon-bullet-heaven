@@ -48,6 +48,7 @@ export class HUD {
     el('btn-restart-no').onclick = () => this._confirmRestart(false);
     el('btn-restart-yes').onclick = () => this.game.restartJourney();
     el('btn-center-go').onclick = () => this.game.leaveCenter();
+    el('btn-center-map').onclick = () => this.game.quitToMenu();
     el('capture-skip').onclick = () => this.game.resolveCapture();
   }
 

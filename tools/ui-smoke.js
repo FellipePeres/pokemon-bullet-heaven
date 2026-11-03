@@ -341,6 +341,17 @@ game.chooseTrainer('red');
 check('depois da escolha, o Continuar segue para a jornada',
       game.profile.trainer === 'red' && !registry.get('screen-campaign').classes.has('hidden'));
 
+// ---- derrota → Centro Pokémon → mapa da jornada ----
+game.startStage('gym_1_pewter');
+for (const member of game.run.team.members) member.fainted = true;
+game.run.state = 'defeat';
+game._handleRunState();
+registry.get('btn-result-center').click();
+registry.get('btn-center-map').click();
+check('do Centro Pokémon dá para ir ao mapa da jornada',
+      !game.centerOpen && !game.run && registry.get('center-overlay').classes.has('hidden') &&
+      !registry.get('screen-campaign').classes.has('hidden'));
+
 // ---- derrota → recomeçar a jornada do zero ----
 const dexBefore = game.profile.pokedex.caught.length;
 game.startStage('gym_1_pewter');

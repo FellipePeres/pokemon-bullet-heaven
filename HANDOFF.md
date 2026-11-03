@@ -323,7 +323,8 @@ Nunca voltar bônus globais para o pool de level up — foi pedido explícito.
   (`regions.kanto.journey`). A **derrota tem duas saídas** (0.11.1): o **Centro
   Pokémon** (`Game.pokemonCenter`) cura a equipe da jornada — a do começo da fase;
   quem foi capturado na tentativa perdida fica para trás, e a tela diz quem — e a
-  fase recomeça (`leaveCenter`); ali mesmo dá para abrir o PC. Ou **recomeçar a
+  fase recomeça (`leaveCenter`); ali mesmo dá para abrir o PC ou ir ao mapa da
+  jornada. Ou **recomeçar a
   jornada** do zero (`restartJourney` → `newGame`), com confirmação: perde
   insígnias, equipe e PC da região; Pokédex, conquistas, Shards, melhorias do
   treinador e Hall da Fama ficam.

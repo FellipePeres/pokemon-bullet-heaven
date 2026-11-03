@@ -559,7 +559,7 @@ export class Game {
     });
   }
 
-  /** Do Centro Pokémon de volta para a fase, do começo. */
+  /** Do Centro Pokémon de volta para a fase, do começo (ou para o mapa: `quitToMenu`). */
   leaveCenter() {
     if (!this.centerOpen) return;
     this.centerOpen = false;
