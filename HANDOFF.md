@@ -5,7 +5,7 @@
 > decisão foi tomada e o que falta fazer. O `README.md` é o manual de uso;
 > este aqui é o contexto de desenvolvimento.
 
-**Versão atual:** `0.14.0` · **Última atualização:** 2026-11-03
+**Versão atual:** `0.15.0` · **Última atualização:** 2026-11-03
 **Stack:** HTML + CSS + JavaScript puro (ES Modules). Sem backend, sem build, sem dependências.
 **Repositório:** https://github.com/FellipePeres/pokemon-bullet-heaven (público)
 **Jogo no ar:** https://fellipeperes.github.io/pokemon-bullet-heaven/
@@ -416,10 +416,14 @@ Nunca voltar bônus globais para o pool de level up — foi pedido explícito.
   espaçar os golpes com `cooldownMult` nos dados dele: o Brock tem 1,6 (0.11.3, a
   chuva de pedras "matava tudo"; o Onix soltava pedra a cada ~2 s, ~1,3 s na
   fúria) e ~10% menos vida (Geodude 1900 → 1700, Onix 3800 → 3400).
-- **Duração fixa** (0.11, "uma média de 4 min, não crescente"): todas as fases
-  têm 3:30 até o líder (`duration: 210`), ~4 min com a luta. A linha do tempo foi
+- **Duração fixa** (0.11, "uma média de 4 min, não crescente"; 0.15, "levemente
+  mais rápido": de 3:30 para 2:45): todas as fases têm 2:45 até o líder
+  (`duration: 165`), ~3:15 com a luta. Nas duas vezes a linha do tempo foi
   comprimida; as levas ficaram ×1/√f mais densas e cada selvagem vale ×1/√f de XP
   (`stage.xpScale`), para a equipe chegar ao líder no mesmo nível de antes.
+  Medido na 0.15 (16 jornadas por inicial): Brock 20,6–21,5, Misty 26,8–28,9,
+  Surge 37,9–39,2, Erika ~46,6, Koga 49,9–54,8, Sabrina 57–63,5 — o mesmo da
+  `stage.leaderLevel` do líder que acompanha a equipe.
 - **Música** (0.11): cada fase tem `music` e `leaderMusic`. `Game._updateMusic`
   escolhe a faixa a cada quadro (lobby, fase, líder, vitória, Hall da Fama,
   Centro Pokémon) e
@@ -504,7 +508,7 @@ Valores em `src/core/config.js` (o que não estiver lá está em `/data`):
 | Líderes | vida ×4, dano ×1,6, golpes a cada 60% do tempo, Rajada, fúria abaixo de 50% (`CONFIG.enemies.boss`) |
 | Nível de quem entra na equipe | média da equipe − 3 |
 | Shards por fase | 120 (+180 na 1ª vez) |
-| Duração das fases | 3:30 até o líder em todas (~4 min com a luta), desde a 0.11 |
+| Duração das fases | 2:45 até o líder em todas (~3:15 com a luta), desde a 0.15 (3:30 na 0.11) |
 | Opções por Poké Ball | 4 (tabelas acumuladas; os outros iniciais raros da Fase 3 em diante) |
 | Selvagens por nível (Fase 3+) | vida ×1,075 e dano ×1,035 por nível acima do 5; XP +8% por nível |
 
@@ -840,6 +844,7 @@ tipo, som e o polimento de troca e captura.
 | 17 | a Poção do nível máximo (50%) forte demais: 20%; ideia do bônus de ataque raro no nível máximo (planejamento); tem shiny?; líderes das últimas fases fracos demais | 0.12.1: `maxedHeal` 0,2; D11 no PLANEJAMENTO; shiny não existe (respondido). 0.12.2: `stage.bossTuning`, rampa do Erika ao Campeão |
 | 18 | lobby mais bonito e único (planejado junto: o Town Map, o estojo com as métricas, tudo na barra do topo); o 2º golpe no lugar do bônus de ataque; shiny só na captura e do jogador; publicar o lobby | 0.13: `ui/lobby.js`, `ui/badgeCase.js`, `systems/stageStats.js`, `data/regionMap.js`, mapa e cartão por script; D11 reescrita (publicada com a Poção e os líderes). 0.13.1: shiny (1% por opção da Poké Ball), com sprites shiny no campo, nos cards e no PC, ✦ na Pokédex e a conquista Brilho Raro |
 | 19 | o inicial também shiny (1%) e publicar; refinar os 3 2º golpes por tipo (aprovados com ajustes: Whirlpool longe, curas com teto, 2%/1% pelos tipos, nome oficial, 60% do dano); tremor só nos golpes dos líderes; o nível passando de 100 (o número saía do selo) e os líderes fáceis demais | 0.13.2: inicial shiny. 0.14: `data/bonusMoves.js` (51 golpes) e o motor deles; o líder acompanha a equipe (`leaderLevel`, `bossLift`); tremor só dos líderes; selo do nível que cresce com o número |
+| 20 | fases levemente mais rápidas: de 3:30 para 2:45 | 0.15: a linha do tempo das 13 fases comprimida (×165/210; levas ×√f mais densas, XP ×1/√f); a equipe chega ao líder no mesmo nível (medido) |
 
 ---
 

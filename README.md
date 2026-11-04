@@ -134,7 +134,7 @@ Perder devolve você ao início da fase com a equipe como estava ao entrar nela.
   a mão como cursor, pegar e soltar para montar a equipe da próxima fase.
 - **Conquistas em níveis**: 20 conquistas, cada uma com vários degraus — ao coletar,
   ela volta com um objetivo maior e mais Shards.
-- Fases de cerca de 4 minutos.
+- Fases curtas: 2:45 até o líder, cerca de 3 minutos com a luta.
 - **Pokédex de Kanto** (151) que se preenche conforme você captura e evolui.
 - **12 conquistas** com recompensa em Shards.
 - A dificuldade e a quantidade de inimigos sobem fase a fase: os selvagens ganham
