@@ -480,6 +480,81 @@ região, da Etapa 0, serve para as duas respostas.
 
 ---
 
+### Etapa 9 — Lobby: o Mapa de Kanto e o Estojo de Insígnias (0.13, em planejamento)
+
+**O pedido (0.12):** "no lobby, onde tem as fases e tudo mais, eu gostaria de uma
+UX mais bonita… o PC, o Salvar e o Menu estão lá embaixo, talvez uma top bar…
+algo mais bonito e único". Das três direções apresentadas (Mapa de Kanto, Cartão
++ próxima fase, Estojo de insígnias), o Fellipe escolheu **o mapa**, com **o
+estojo em algum lugar, com as métricas de cada fase**, e **todos os botões na
+barra do topo**.
+
+Hoje o mapa da jornada é uma lista de 13 cards com rolagem, a lateral de ícones
+à esquerda e PC, Hall da Fama, Salvar e Menu no fim da página.
+
+**1. A barra do topo** (uma só, no estilo das janelas do FireRed):
+
+| Esquerda | Meio | Direita |
+|---|---|---|
+| o treinador (sprite pequeno do Red/Leaf), o estojo em miniatura (as 8 insígnias, apagadas as que faltam; abre o estojo) | Shards e Pokédex x/151 | ícones com rótulo ao passar o mouse: Pokédex, Conquistas (com o selo de "para coletar"), Equipe, Treinador, **PC**, Hall da Fama (depois do Campeão), **Salvar**, Opções, Ajuda, **Menu** |
+
+A lateral de ícones some do lobby. PC, Salvar e Menu ganham destaque (texto, não só
+ícone), porque são os que o Fellipe procurou embaixo.
+
+**2. O mapa** (o centro da tela):
+
+- O **Town Map do FireRed**, montado a partir do decomp (`graphics/region_map`:
+  `kanto.bin`, 30x20 casas, sobre `region_map.png`), em pixels inteiros como o PC.
+- Cada fase é um ponto na cidade do ginásio: Pewter, Cerulean, Vermilion,
+  Celadon, Fuchsia, Saffron, Cinnabar, Viridian; a Elite Four e o Campeão no
+  Indigo Plateau, um ponto só com as 5 salas no painel.
+- Estados: concluída (a insígnia sobre a cidade), próxima (o cursor do Town Map
+  piscando), bloqueada (apagada). A rota entre as cidades acende conforme a
+  jornada avança.
+- O **ícone do Red/Leaf** (`player_icon_red/leaf.png`) fica na cidade da última
+  vitória; ao voltar de uma vitória, ele anda até a próxima.
+- Escolher um ponto abre o **painel da fase** (ao lado do mapa, sem rolagem): nome,
+  os trechos (Rota 1 → … → Ginásio), retrato e time do líder, tipo, tempo, a
+  insígnia, as métricas da fase (abaixo) e **Jogar**. A próxima fase vem
+  selecionada ao abrir.
+- Embaixo do mapa, **a equipe** com os ícones de caixa do FireRed (os do PC) e o
+  nível; clicar abre o PC.
+
+**3. O Estojo de Insígnias** (a ideia que o Fellipe gostou):
+
+- Abre pela miniatura na barra do topo (e por um botão no painel da fase). É o
+  estojo do FireRed, com as 8 insígnias nos lugares delas; embaixo, uma fileira
+  para a Liga (4 salas) e o Campeão.
+- Escolher uma insígnia mostra **as métricas daquela fase**. Proposta:
+
+  | Métrica | De onde vem |
+  |---|---|
+  | vitórias / tentativas | contadas no fim de cada partida |
+  | melhor tempo (até vencer o líder) | `run.time` das vitórias |
+  | menos desmaios numa vitória | `run.stats.faints` |
+  | maior nível levado | o melhor Pokémon da equipe na vitória |
+  | capturas na fase (total) | `run.stats.captures` |
+  | dano total na fase | `run.stats.damageDealt` |
+  | primeira vitória | a data, e a equipe que venceu (os ícones) |
+
+- Os dados ficam em `regions.kanto.stageStats[stageId]`, gravados em
+  `applyRunResult`. Saves de antes começam vazios: o estojo mostra "—" até a
+  próxima partida daquela fase.
+
+**4. Arte e código:**
+
+- `tools/assets/extract_region_map.py`: monta o mapa e recorta cursor, ícones do
+  Red/Leaf e moldura, lendo o decomp do Pokemon All (só leitura). As insígnias já
+  existem (`badgeUrl`); o estojo pode usar a arte do Cartão de Treinador do
+  Pokemon All (`trainer-card/badges.png`) ou ser desenhado com as janelas do jogo.
+- `ui/lobby.js` (o mapa, o painel e a barra) e `ui/badgeCase.js`, tirando o mapa
+  da jornada do `Menus.js`; `systems/stageStats.js` com as métricas, puro e testado.
+- Celular: o painel da fase desce para baixo do mapa.
+
+**Em aberto (padrão até o Fellipe decidir):** a lista de métricas acima; se o
+estojo é uma janela (padrão) ou fica sempre à vista ao lado do mapa; a arte do
+estojo (padrão: a do Cartão de Treinador do Pokemon All).
+
 ### Retorno da primeira partida (0.8)
 
 O Fellipe jogou a 0.7 em 2026-11-02 e pediu:
