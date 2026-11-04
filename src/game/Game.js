@@ -496,6 +496,7 @@ export class Game {
       teamSize: run.team.members.length,
       stats: run.stats,
       time: run.time,
+      team: run.team.members,
       // vitória leva a equipe, a build e o PC para a próxima fase
       journey: {
         team: run.team.serialize(), upgrades: { ...run.upgrades }, level: bestLevel,

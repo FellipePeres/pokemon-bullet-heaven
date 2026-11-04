@@ -17,6 +17,8 @@ const ITEM = {
   achievements: { item: 'star-piece',   emoji: '🏆' },
   team:         { item: 'poke-ball',    emoji: '🎒' },
   pc:           { item: 'pokemon-box-link', emoji: '🖥️' },
+  save:         { item: 'vs-recorder',  emoji: '💾' },
+  menu:         { item: 'escape-rope',  emoji: '🚪' },
   trainer:      { item: 'coin-case',    emoji: '🪙' },
   options:      { item: 'escape-rope',  emoji: '⚙️' },
   help:         { item: 'oaks-parcel',  emoji: '❔' },

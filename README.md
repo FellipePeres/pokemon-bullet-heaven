@@ -119,6 +119,9 @@ Perder devolve você ao início da fase com a equipe como estava ao entrar nela.
   menus montado com o próprio cenário do jogo.
 - **Música do FireRed**: uma por fase, a do líder, a da vitória e o tema do lobby,
   com volume ajustável.
+- **Lobby no Town Map de Kanto**: cada fase na cidade do ginásio, o treinador
+  andando pelo mapa, a fase escolhida ao lado e o **Estojo de Insígnias** (o Cartão
+  de Treinador do FireRed) com as métricas de cada fase.
 - **Derrota**: vá ao Centro Pokémon (a equipe é curada; dali você volta para a
   fase, mexe no PC ou vai ao mapa) ou recomece a jornada do zero.
 - **PC do FireRed**: com a equipe cheia, nada se perde — quem sai (ou quem chega)

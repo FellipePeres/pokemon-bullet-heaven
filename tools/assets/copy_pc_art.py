@@ -1,5 +1,5 @@
 """
-A arte do PC do FireRed, trazida do Pokemon All (só leitura).
+A arte do PC e do Cartão de Treinador do FireRed, trazida do Pokemon All (só leitura).
 
     python tools/assets/copy_pc_art.py [--fonte "../Pokemon All"]
 
@@ -54,6 +54,11 @@ def main() -> None:
         down4(sprites / 'icons' / f'{dex}.png', REPO / 'assets' / 'pokemon' / 'gen3' / 'icons' / f'{dex}.png')
         down4(sprites / 'front' / f'{dex}.png', REPO / 'assets' / 'pokemon' / 'gen3' / 'front' / f'{dex}.png')
     print(f'  assets/pokemon/gen3: ícones e sprites frontais de {len(KANTO)} espécies')
+
+    # o Cartão de Treinador do FireRed (o azul), que vira o Estojo de Insígnias do lobby
+    down4(args.fonte / 'src' / 'app' / 'assets' / 'trainer-card' / 'card-front-0.png',
+          REPO / 'assets' / 'ui' / 'trainer-card.png')
+    print('  assets/ui/trainer-card.png: o cartão azul, com as 8 casas das insígnias')
 
 
 if __name__ == '__main__':

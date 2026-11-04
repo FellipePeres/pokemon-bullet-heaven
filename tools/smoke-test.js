@@ -22,6 +22,7 @@ import { getPokemon } from '../src/data/pokemon.js';
 import { Pickup } from '../src/entities/Pickup.js';
 import { swapWithPC, normalizePC, monAt, previewMove, moveMon, boxCount } from '../src/systems/pc.js';
 import { TILE } from '../src/systems/terrain.js';
+import { recordStageResult } from '../src/systems/stageStats.js';
 
 let failures = 0;
 
@@ -504,6 +505,21 @@ console.log('\n[ajuste por inicial]');
   check('nas últimas fases o líder tem mais vida e golpes mais fortes',
         Math.abs(strong.maxHp / plain.maxHp - keep.hp) < 1e-9 && strong.attackMult === keep.damage && plain.attackMult === 1,
         `vida ×${keep.hp}, dano ×${keep.damage}`);
+}
+
+// ---------------------------------------------- 5.12 métricas da fase (o Estojo de Insígnias)
+console.log('\n[métricas da fase]');
+{
+  let s = recordStageResult(undefined, { victory: false, time: 200, faints: 6, level: 15, captures: 2, damage: 1000.6, team: [], date: 'a' });
+  check('derrota conta a tentativa, as capturas e o dano, mas não vitória',
+        s.attempts === 1 && s.wins === 0 && s.captures === 2 && s.damage === 1001 && s.bestTime === null);
+  s = recordStageResult(s, { victory: true, time: 250.4, faints: 3, level: 18, captures: 1, damage: 500,
+    team: [{ uid: 'x', pokemonId: 'charmander', level: 18 }], date: 'b' });
+  s = recordStageResult(s, { victory: true, time: 240, faints: 1, level: 20, captures: 0, damage: 0, team: [], date: 'c' });
+  check('vitórias guardam o melhor tempo, os menos desmaios e o maior nível',
+        s.attempts === 3 && s.wins === 2 && s.bestTime === 240 && s.fewestFaints === 1 && s.bestLevel === 20);
+  check('a primeira vitória fica com a data e a equipe dela (só espécie e nível)',
+        s.firstWin.date === 'b' && s.firstWin.team.length === 1 && !('uid' in s.firstWin.team[0]));
 }
 
 // ------------------------------------------------------- 6. upgrades/dados

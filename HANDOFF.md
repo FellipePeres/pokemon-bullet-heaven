@@ -5,7 +5,7 @@
 > decisão foi tomada e o que falta fazer. O `README.md` é o manual de uso;
 > este aqui é o contexto de desenvolvimento.
 
-**Versão atual:** `0.12.2` · **Última atualização:** 2026-11-03
+**Versão atual:** `0.13.0` · **Última atualização:** 2026-11-03
 **Stack:** HTML + CSS + JavaScript puro (ES Modules). Sem backend, sem build, sem dependências.
 **Repositório:** https://github.com/FellipePeres/pokemon-bullet-heaven (público)
 **Jogo no ar:** https://fellipeperes.github.io/pokemon-bullet-heaven/
@@ -134,7 +134,8 @@ src/
     SpawnSystem.js    ondas, elites, Poké Balls roteirizadas, time do líder
     SpatialGrid.js    grade espacial (evita colisão O(n²))
     terrain.js        gera o cenário de cada trecho e diz o que bloqueia (colisão)
-    pc.js             o PC da jornada: trocar, retirar e depositar
+    pc.js             o PC da jornada: as casas de cada Pokémon, pegar e soltar
+    stageStats.js     as métricas de cada fase (o Estojo de Insígnias)
     stats.js          vida máxima, XP por nível, multiplicador de dano por nível
   game/
     Run.js            uma partida: estado, loop, colisões, condições de fim
@@ -151,6 +152,8 @@ src/
     HUD.js            HUD da partida e overlays (nível, captura, evolução, pausa)
     Menus.js          menu, mapa, modais (Pokédex, conquistas, equipe, loja, opções)
     pcScreen.js       a tela do PC (a do FireRed, portada do Pokemon All): caixas, equipe, pegar e soltar
+    lobby.js          o lobby: o Town Map de Kanto, a fase escolhida, a equipe e a barra do topo
+    badgeCase.js      o Estojo de Insígnias: o Cartão de Treinador e as métricas de cada fase
     dom.js            helpers de DOM e toasts
     pad.js            o controle nas telas: foco nos alvos clicáveis da camada de cima
   audio/
@@ -169,6 +172,8 @@ tools/
   screenshot.mjs      screenshots no Chrome sem janela (DevTools Protocol, sem dependências)
   assets/extract.py   gera assets/ a partir do decomp do FireRed no Pokemon All
   assets/render_music.py  renderiza as músicas do FireRed (cópia do sintetizador do Pokemon All)
+  assets/copy_pc_art.py   traz do Pokemon All a arte do PC, os sprites do FireRed e o Cartão de Treinador
+  assets/extract_region_map.py  monta o Town Map de Kanto do decomp (o mapa do lobby)
 ```
 
 **Regra do projeto: `/data` é conteúdo, `/systems` é comportamento.**
@@ -316,6 +321,29 @@ Nunca voltar bônus globais para o pool de level up — foi pedido explícito.
   28 espécies, 96% do peso em formas básicas (Rotas 1, 2, 22 e 3, Floresta de
   Viridian e a pesca do começo) e 4% nos evoluídos. Água e Planta (Poliwag,
   Goldeen, Oddish) ficaram em 2% cada porque tiram 4x do Brock.
+
+### O lobby (0.13)
+- **O mapa da jornada é o Town Map de Kanto do FireRed** (`ui/lobby.js`, Etapa 9
+  do PLANEJAMENTO), no lugar da lista de 13 cards: o mapa do decomp
+  (`extract_region_map.py`, 192x144) em pixels inteiros; cada fase na cidade do
+  ginásio e a Liga e o Campeão no Indigo Plateau (`data/regionMap.js`, as casas
+  da grade 22x15 do jogo). Concluída mostra a insígnia; a próxima, o cursor do
+  Town Map; bloqueada fica apagada; o número da fase embaixo. O ícone do Red/Leaf
+  fica na cidade da última vitória e anda até a nova ao voltar. Ao entrar, a
+  próxima fase já vem escolhida.
+- **Ao lado, a fase escolhida**: o líder, a insígnia, os trechos, as métricas e
+  Jogar (na Liga, as cinco salas para escolher). **Embaixo, a equipe** com os
+  ícones do PC (a bolinha marca os 3 em campo); clicar abre o PC.
+- **Barra do topo** com tudo: o treinador, o estojo em miniatura, Shards e
+  Pokédex, os ícones (Pokédex, Conquistas com o aviso de "para coletar", Equipe,
+  Treinador, Opções, Ajuda) e PC, Hall, Salvar e Menu escritos. A lateral de
+  ícones e a engrenagem do canto saem desta tela.
+- **Estojo de Insígnias** (`ui/badgeCase.js`): o Cartão de Treinador azul do
+  FireRed (do Pokemon All) com as 8 insígnias nas casas dele, a Liga embaixo e,
+  ao lado, as métricas da fase (`systems/stageStats.js`, gravadas em
+  `applyRunResult`): vitórias de tentativas, melhor tempo, menos desmaios numa
+  vitória, maior nível, capturas, dano e a primeira vitória (data e equipe).
+  Abandonar no meio não conta. Saves de antes começam com "—".
 
 ### Fases
 - **Uma fase = a jornada inteira até um ginásio.** Ela tem `segments` (Rota 1 →
@@ -599,7 +627,8 @@ botão Continuar). Estrutura:
     "regions": {
       "kanto": {
         "starter": "charmander", "clearedStages": ["gym_1_pewter"], "badges": ["Insígnia Pedra"],
-        "journey": { "team": { "members": [], "active": [] }, "level": 18, "pc": [] }  // pc: 0.11
+        "journey": { "team": { "members": [], "active": [] }, "level": 18, "pc": [] },  // pc: 0.11
+        "stageStats": { "gym_1_pewter": { "attempts": 2, "wins": 1, "bestTime": 241, "...": 0 } }  // 0.13
       }
     }
   },
@@ -762,6 +791,7 @@ tipo, som e o polimento de troca e captura.
 | 15 | investigar o inimigo preso (sugestão: teleporte aleatório quando travar); Squirtle fácil demais: inimigos um pouco mais fortes com ele | 0.11.5: a causa era o empurrão entre inimigos, que ignorava o cenário; rede de segurança com teleporte; `starterTuning` do Squirtle nas Fases 1, 6 e 7 |
 | 16 | usar o PC do Pokemon All (a Global Box: ícones, arrastar, equipe); sinalizar melhor na captura que nada se perde | 0.12: `ui/pcScreen.js` + `systems/pc.js` com casas; arte e sprites do FireRed por `tools/assets/copy_pc_art.py`; aviso na Poké Ball e tela de equipe cheia reescrita |
 | 17 | a Poção do nível máximo (50%) forte demais: 20%; ideia do bônus de ataque raro no nível máximo (planejamento); tem shiny?; líderes das últimas fases fracos demais | 0.12.1: `maxedHeal` 0,2; D11 no PLANEJAMENTO; shiny não existe (respondido). 0.12.2: `stage.bossTuning`, rampa do Erika ao Campeão |
+| 18 | lobby mais bonito e único (planejado junto: o Town Map, o estojo com as métricas, tudo na barra do topo); o 2º golpe no lugar do bônus de ataque; shiny só na captura e do jogador; publicar o lobby | 0.13: `ui/lobby.js`, `ui/badgeCase.js`, `systems/stageStats.js`, `data/regionMap.js`, mapa e cartão por script; D11 reescrita; shiny a seguir |
 
 ---
 

@@ -2,6 +2,7 @@ import { CONFIG } from '../core/config.js';
 import { ACHIEVEMENTS } from '../data/achievements.js';
 import { KANTO_TOTAL } from '../data/kanto.js';
 import { REGIONS, DEFAULT_REGION } from '../data/regions.js';
+import { recordStageResult } from '../systems/stageStats.js';
 import { STAGES } from '../data/stages.js';
 import { bus, EVENTS } from '../core/events.js';
 
@@ -75,7 +76,9 @@ export function createRegionProgress() {
     lastStage: null,
     // "jornada": equipe, build e nível levados de uma fase para a seguinte.
     // É atualizada a cada fase concluída e serve de checkpoint em caso de derrota.
-    journey: null
+    journey: null,
+    // métricas de cada fase, para o Estojo de Insígnias (0.13; systems/stageStats.js)
+    stageStats: {}
   };
 }
 
@@ -253,9 +256,14 @@ export class ProfileTracker {
   }
 
   /** Aplica o resultado de uma partida ao perfil. */
-  applyRunResult({ stage, victory, level, teamSize, stats, time, journey = null }) {
+  applyRunResult({ stage, victory, level, teamSize, stats, time, journey = null, team = [] }) {
     const p = this.profile;
     const campaign = regionProgress(p);
+    campaign.stageStats ??= {};
+    campaign.stageStats[stage.id] = recordStageResult(campaign.stageStats[stage.id], {
+      victory, time, faints: stats?.faints, level, captures: stats?.captures, damage: stats?.damageDealt,
+      team, date: new Date().toISOString()
+    });
     p.stats.runsPlayed++;
     p.stats.playTime += Math.round(time ?? 0);
     p.stats.maxRunLevel = Math.max(p.stats.maxRunLevel, level ?? 0);

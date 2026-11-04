@@ -147,6 +147,23 @@ const ROTEIROS = {
     { run: "game.menus.closeModal(); game.startStage('gym_3_vermilion')" }, { wait: 1500 },
     { run: "game.run.state = 'capture'; game.captureOpen = true; game.pickCapture('meowth')" }, { wait: 800 }, { shot: 'pc-captura', raw: true }
   ],
+  // o lobby (0.13): o Town Map de Kanto, a fase escolhida, a equipe e o Estojo de Insígnias
+  lobby: [
+    { open: 'index.html' }, { wait: 500 },
+    { run: "game.newGame(); game.chooseTrainer('leaf'); game.chooseStarter('squirtle');" +
+           "Promise.all([import('./src/game/Run.js'), import('./src/data/stages.js')]).then(([{ Run }, { STAGES }]) => {" +
+           "const r = new Run('gym_4_celadon', { starter: 'squirtle' });" +
+           "['pidgeotto', 'pikachu', 'oddish', 'machop'].forEach((id) => r.team.add(id, 30)); r.team.members[0].level = 33;" +
+           "['gym_1_pewter', 'gym_2_cerulean', 'gym_3_vermilion'].forEach((id, i) => { for (let k = 0; k < 2 + i; k++) " +
+           "game.tracker.applyRunResult({ stage: STAGES[id], victory: k > 0, level: 18 + i * 9, teamSize: 4," +
+           " stats: { faints: k > 1 ? 1 : 2, captures: 2, damageDealt: 18000 + i * 9000 }, time: 250 - k * 9," +
+           " team: r.team.members, journey: { team: r.team.serialize(), pc: [] } }); });" +
+           "game.profile.shards = 1240; game.openCampaign(); })" },
+    { wait: 1500 }, { run: "document.getElementById('toast-container').innerHTML = ''" }, { shot: 'lobby-1-mapa' },
+    { run: "game.menus.lobby.selected = 'gym_3_vermilion'; game.menus.lobby.render()" }, { wait: 500 }, { shot: 'lobby-2-vencida' },
+    { run: "game.menus.lobby.selected = 'e4_lorelei'; game.menus.lobby.render()" }, { wait: 500 }, { shot: 'lobby-3-liga' },
+    { run: "game.menus.showModal('modal-badges', { stageId: 'gym_2_cerulean' })" }, { wait: 900 }, { shot: 'lobby-4-estojo' }
+  ],
   // a Poké Ball com a equipe cheia (0.12): o aviso de que nada se perde e o "onde ele fica"
   'captura-cheia': [
     { open: 'index.html' }, { wait: 500 },

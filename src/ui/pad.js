@@ -4,7 +4,7 @@
  * clicáveis da camada que está por cima (janela da partida, janela do menu ou
  * tela) e clica no escolhido.
  */
-const TARGETS = 'button:not([disabled]), .card, .starter-card, .trainer-card, .stage-card.clickable';
+const TARGETS = 'button:not([disabled]), .card, .starter-card, .trainer-card';
 // as janelas do menu abrem por cima das da partida (Opções na pausa, o PC no Centro Pokémon)
 const LAYERS = ['.modal:not(.hidden)', '.overlay:not(.hidden)', '.screen:not(.hidden)'];
 

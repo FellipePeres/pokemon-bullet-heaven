@@ -126,24 +126,41 @@
   <!-- ============================================================
        MAPA DA JORNADA
        ============================================================ -->
-  <section id="screen-campaign" class="screen hidden">
-    <header class="screen-head campaign-head">
-      <img id="campaign-trainer" class="campaign-trainer" alt="" />
-      <div class="screen-head">
-        <h2 class="screen-title" id="campaign-title">Jornada — Kanto</h2>
-        <p class="subtitle" id="campaign-subtitle"></p>
+  <!-- O lobby (0.13): o Town Map de Kanto, a fase escolhida ao lado, a equipe
+       embaixo e tudo o mais na barra do topo (ui/lobby.js) -->
+  <section id="screen-campaign" class="screen hidden lobby">
+    <header class="lobby-bar">
+      <div class="lobby-who">
+        <img id="campaign-trainer" class="lobby-avatar" alt="" />
+        <div class="lobby-who-text">
+          <b id="campaign-title">Kanto</b>
+          <button id="lobby-case" class="lobby-case" data-modal="modal-badges" title="Estojo de Insígnias"></button>
+        </div>
       </div>
+      <div id="lobby-stats" class="lobby-stats"></div>
+      <nav class="lobby-actions">
+        <button class="bar-btn" data-modal="modal-pokedex" title="Pokédex"><span class="bar-icon" data-icon="pokedex"></span><span class="bar-label">Pokédex</span></button>
+        <button class="bar-btn" id="bar-achievements" data-modal="modal-achievements" title="Conquistas"><span class="bar-icon" data-icon="achievements"></span><span class="bar-label">Conquistas</span></button>
+        <button class="bar-btn" data-modal="modal-team" title="Equipe"><span class="bar-icon" data-icon="team"></span><span class="bar-label">Equipe</span></button>
+        <button class="bar-btn" data-modal="modal-trainer" title="Treinador"><span class="bar-icon" data-icon="trainer"></span><span class="bar-label">Treinador</span></button>
+        <button class="bar-btn" data-modal="modal-options" title="Opções e volume"><span class="bar-icon" data-icon="options"></span><span class="bar-label">Opções</span></button>
+        <button class="bar-btn" data-modal="modal-help" title="Como jogar"><span class="bar-icon" data-icon="help"></span><span class="bar-label">Ajuda</span></button>
+        <span class="bar-sep" aria-hidden="true"></span>
+        <button id="btn-pc" class="bar-btn strong" data-modal="modal-pc" title="PC"><span class="bar-icon" data-icon="pc"></span><span class="bar-text">PC</span></button>
+        <button id="btn-hall" class="bar-btn strong hidden" title="Hall da Fama"><span class="bar-icon" data-icon="badge"></span><span class="bar-text">Hall</span></button>
+        <button id="btn-save-campaign" class="bar-btn strong" title="Salvar o jogo num arquivo (.json)"><span class="bar-icon" data-icon="save"></span><span class="bar-text">Salvar</span></button>
+        <button class="bar-btn strong" data-back="screen-title" title="Menu principal"><span class="bar-icon" data-icon="menu"></span><span class="bar-text">Menu</span></button>
+      </nav>
     </header>
 
-    <div id="campaign-team" class="journey-team"></div>
-    <div id="campaign-list" class="stage-list"></div>
-
-    <div class="row-buttons">
-      <button id="btn-pc" class="menu-btn ghost" data-modal="modal-pc">PC</button>
-      <button id="btn-hall" class="menu-btn ghost hidden">Hall da Fama</button>
-      <button id="btn-save-campaign" class="menu-btn ghost">Salvar Jogo (.json)</button>
-      <button class="menu-btn ghost back" data-back="screen-title">Menu Principal</button>
+    <div class="lobby-main">
+      <div class="lobby-map-frame">
+        <div id="lobby-map" class="lobby-map"></div>
+      </div>
+      <aside id="lobby-panel" class="lobby-panel"></aside>
     </div>
+
+    <footer id="campaign-team" class="lobby-team"></footer>
   </section>
 
   <!-- ============================================================
@@ -367,6 +384,24 @@
     <div class="pc-stage">
       <div id="pc-screen" class="pc-screen"></div>
       <p id="pc-hint" class="pc-hint"></p>
+    </div>
+  </div>
+
+  <!-- O Estojo de Insígnias: o Cartão de Treinador do FireRed e as métricas de cada fase (ui/badgeCase.js) -->
+  <div id="modal-badges" class="modal hidden">
+    <div class="modal-card wide">
+      <header class="modal-head">
+        <h3>Estojo de Insígnias</h3>
+        <span class="modal-sub" id="badges-sub"></span>
+        <button class="icon-btn close" data-close>✕</button>
+      </header>
+      <div class="modal-body badge-case">
+        <div class="badge-left">
+          <div id="trainer-card" class="badge-card"></div>
+          <div id="league-row" class="league-row"></div>
+        </div>
+        <div id="badge-stats" class="badge-stats"></div>
+      </div>
     </div>
   </div>
 

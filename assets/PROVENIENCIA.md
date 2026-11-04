@@ -64,6 +64,14 @@ nos `.pal`. O índice 0 é transparente, e o recorte é sempre pelo índice, nun
 | `pc/wallpapers/*.png` | os 16 papéis de parede do jogo e as faixas deles, do mesmo lugar |
 | `pokemon/gen3/icons/<dex>.png`, `pokemon/gen3/front/<dex>.png` | ícone de caixa (32x64, dois quadros) e sprite frontal (64x64) do FireRed, do decomp pret/pokefirered via `assets/pokemon/gen3/` do Pokemon All, reduzidos de 4x para 1x |
 
+## Lobby (0.13)
+
+| Saída | Origem |
+|---|---|
+| `ui/region-map/kanto.png` | o Town Map de Kanto, montado por `tools/assets/extract_region_map.py` do decomp do Pokemon All (`graphics/region_map`: `kanto.bin` sobre `region_map.png` com `region_map.pal`), recortado à moldura do mapa; o botão das Ilhas Sevii coberto com o mar de cima. As casas das cidades vêm de `region_map_layout_kanto.h` do pret/pokefirered (commit `c75f352`) |
+| `ui/region-map/cursor.png`, `ui/region-map/player-{red,leaf}.png` | o cursor do Town Map e os ícones do Red e da Leaf, com as paletas deles, do mesmo lugar |
+| `ui/trainer-card.png` | o Cartão de Treinador azul do FireRed (`src/app/assets/trainer-card/card-front-0.png` do Pokemon All), reduzido de 4x para 1x por `copy_pc_art.py` |
+
 ## Outros
 
 | Arquivo | Origem |

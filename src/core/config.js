@@ -3,7 +3,7 @@
  * Nada de número mágico espalhado pelo gameplay: se precisar ajustar, ajuste aqui.
  */
 export const CONFIG = {
-  version: '0.12.2',
+  version: '0.13.0',
 
   canvas: { width: 1280, height: 720 },
 

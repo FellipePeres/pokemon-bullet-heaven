@@ -1,24 +1,24 @@
 import { el, create, clear, show, hide, toast } from './dom.js';
 import { getPokemon } from '../data/pokemon.js';
 import { getAbility } from '../data/abilities.js';
-import { STAGES, isStageUnlocked } from '../data/stages.js';
 import { ACHIEVEMENTS, TOTAL_ACHIEVEMENT_TIERS } from '../data/achievements.js';
 import { roman } from '../save/profile.js';
 import { moveLineOf } from '../data/tms.js';
 import { getTrainerLook } from '../data/trainers.js';
-import { spriteUrl, artworkUrl, pokemonImg, badgeUrl } from '../render/sprites.js';
+import { spriteUrl, artworkUrl, pokemonImg } from '../render/sprites.js';
 import { assetUrl } from '../render/assets.js';
 import { saveOptions } from '../save/options.js';
 import { typeColor, typeName } from '../data/types.js';
 import { CONFIG } from '../core/config.js';
 import { iconHTML, itemUrl } from '../render/icons.js';
-import { formatTime } from '../core/utils.js';
 import { maxHpFor } from '../systems/stats.js';
 import { TitleMenu } from './titleMenu.js';
 import { PCScreen } from './pcScreen.js';
+import { Lobby } from './lobby.js';
+import { BadgeCase } from './badgeCase.js';
 
 const SCREENS = ['screen-title', 'screen-trainer', 'screen-starter', 'screen-campaign'];
-const MODALS = ['modal-pokedex', 'modal-achievements', 'modal-team', 'modal-trainer', 'modal-options', 'modal-help', 'modal-pc'];
+const MODALS = ['modal-pokedex', 'modal-achievements', 'modal-team', 'modal-trainer', 'modal-options', 'modal-help', 'modal-pc', 'modal-badges'];
 
 /**
  * Telas fora da partida.
@@ -30,6 +30,8 @@ export class Menus {
     this.game = game;
     this.openModal = null;
     this.pcScreen = new PCScreen(game);
+    this.lobby = new Lobby(game);
+    this.badgeCase = new BadgeCase(game);
     this._bind();
     this.titleMenu = new TitleMenu(this);
   }
@@ -74,6 +76,11 @@ export class Menus {
     // o CSS usa a tela atual (no título, a arte de fundo substitui a barra e o cenário)
     el('app').dataset.screen = screenId ?? '';
     if (screenId === 'screen-title') this.refreshTitle();
+    if (screenId === 'screen-campaign') {
+      // ao entrar no lobby, a próxima fase já vem escolhida; o mapa mede o espaço depois de aparecer
+      this.lobby.selected = null;
+      this.lobby.render();
+    }
   }
 
   /** Sai do título com o esmaecimento da abertura e só então segue. */
@@ -94,7 +101,7 @@ export class Menus {
     show(el('stage-wrapper'));
   }
 
-  showModal(id) {
+  showModal(id, options = {}) {
     this.closeModal();
     const builders = {
       'modal-pokedex': () => this.buildPokedex(),
@@ -102,7 +109,8 @@ export class Menus {
       'modal-team': () => this.buildTeamDetail(),
       'modal-trainer': () => this.buildTrainer(),
       'modal-options': () => this.buildOptions(),
-      'modal-pc': () => this.pcScreen.open()
+      'modal-pc': () => this.pcScreen.open(),
+      'modal-badges': () => this.badgeCase.open(options)
     };
     builders[id]?.();
     show(el(id));
@@ -113,6 +121,8 @@ export class Menus {
     if (this.openModal === 'modal-pc' || !el('modal-pc').classList.contains('hidden')) this.pcScreen.close();
     for (const id of MODALS) hide(el(id));
     this.openModal = null;
+    // o que a janela mudou (Shards, PC, conquistas) aparece na barra do lobby
+    if (!el('screen-campaign').classList.contains('hidden')) this.lobby.render();
   }
 
   /* ============================ menu principal ============================ */
@@ -207,113 +217,9 @@ export class Menus {
 
   /* ============================ mapa da jornada ============================ */
 
+  /** O mapa da jornada: o lobby, com o Town Map de Kanto (ui/lobby.js). */
   buildCampaign() {
-    const campaign = this.game.campaign;
-    const cleared = campaign.clearedStages;
-    const journey = campaign.journey;
-
-    const trainer = getTrainerLook(this.game.profile.trainer);
-    el('campaign-trainer').src = assetUrl(trainer.portrait);
-    el('campaign-trainer').alt = trainer.name;
-    el('campaign-title').textContent = `Jornada — ${this.game.region.name}`;
-    const hall = this.game.profile.hallOfFame.filter((h) => h.region === this.game.profile.region);
-    if (hall.length) show(el('btn-hall')); else hide(el('btn-hall'));
-
-    el('campaign-subtitle').textContent = journey
-      ? 'Sua equipe e sua build continuam de uma fase para a outra. Numa derrota, o Centro Pokémon cura a equipe e a fase recomeça.'
-      : 'Comece pela Rota 1. A partir dela sua equipe cresce e segue com você.';
-
-    // o botão do PC diz quantos estão guardados
-    el('btn-pc').textContent = this.game.pcBox.length ? `PC (${this.game.pcBox.length})` : 'PC';
-
-    // faixa com a equipe atual
-    const teamStrip = clear(el('campaign-team'));
-    if (journey?.team?.members?.length) {
-      for (const member of journey.team.members) {
-        const data = getPokemon(member.pokemonId);
-        const chip = create('div', 'jt-mon');
-        chip.appendChild(pokemonImg(data.dex, { alt: data.name }));
-        chip.appendChild(create('span', '', data.name));
-        chip.appendChild(create('span', 'jt-lv', `Nv.${member.level}`));
-        teamStrip.appendChild(chip);
-      }
-    } else {
-      teamStrip.appendChild(create('span', 'empty',
-        campaign.starter
-          ? `Equipe: ${getPokemon(campaign.starter).name} — capture mais Pokémon durante a fase!`
-          : 'Nenhuma equipe ainda.'));
-    }
-
-    // fases
-    const list = clear(el('campaign-list'));
-    for (const entry of this.game.region.campaign) {
-      if (entry.comingSoon) {
-        const node = create('div', 'stage-card locked');
-        // o líder que vem pela frente aparece só como silhueta
-        const portrait = entry.portrait
-          ? `<div class="stage-boss"><img class="leader-portrait silhouette" src="${assetUrl(entry.portrait)}" alt="" /><span>???</span></div>`
-          : '';
-        node.innerHTML = `
-          <div class="stage-icon">${iconHTML(entry.icon, 34)}</div>
-          <div class="stage-body"><h4>${entry.name}</h4><p>${entry.description}</p></div>
-          ${portrait}
-          <div class="stage-state">Em breve</div>
-        `;
-        list.appendChild(node);
-        continue;
-      }
-
-      const stage = STAGES[entry.stage];
-      const unlocked = isStageUnlocked(stage.id, cleared);
-      const done = cleared.includes(stage.id);
-      const leader = stage.leader;
-
-      const node = create('div', `stage-card ${unlocked ? 'clickable' : 'locked'}${done ? ' done' : ''}`);
-      node.style.borderLeftColor = done ? '' : unlocked ? 'var(--yellow)' : '';
-
-      node.appendChild(create('div', 'stage-icon', iconHTML(stage.icon, 34)));
-
-      const body = create('div', 'stage-body');
-      const trail = (stage.segments ?? []).map((seg) => seg.name).join(' → ');
-      body.innerHTML = `
-        <h4>${stage.name}</h4>
-        <p>${stage.description}</p>
-        <div class="stage-meta">
-          ⏱ ${formatTime(stage.duration)} de travessia · ${trail}
-          ${leader?.badge ? ` · 🥇 ${leader.badge}` : ''}
-        </div>
-      `;
-      node.appendChild(body);
-
-      if (leader) {
-        const box = create('div', 'stage-boss');
-        if (leader.badgeIndex) {
-          const badge = create('img', 'badge-img');
-          badge.src = badgeUrl(leader.badgeIndex);
-          badge.alt = leader.badge;
-          badge.title = leader.badge;
-          if (!done) badge.style.filter = 'grayscale(1) brightness(.5)';
-          box.appendChild(badge);
-        }
-        // retrato do líder no FireRed; sem retrato, o sprite do ace dele
-        const portrait = assetUrl(leader.portrait);
-        const img = create('img', portrait ? 'leader-portrait' : '');
-        img.src = portrait ?? spriteUrl(leader.dex);
-        img.alt = leader.name;
-        if (!unlocked) img.classList.add('silhouette');
-        box.appendChild(img);
-        box.appendChild(create('span', '', unlocked ? leader.name : '???'));
-        const team = (stage.bossTeam ?? []).length;
-        if (unlocked && team) box.appendChild(create('span', '', `${team} Pokémon`));
-        node.appendChild(box);
-      }
-
-      node.appendChild(create('div', `stage-state ${done ? 'done' : unlocked ? 'play' : ''}`,
-        done ? '✔ Concluída' : unlocked ? '▶ Jogar' : '🔒 Bloqueada'));
-
-      if (unlocked) node.onclick = () => this.game.startStage(stage.id);
-      list.appendChild(node);
-    }
+    this.lobby.render();
   }
 
   /* ============================== Pokédex ============================== */

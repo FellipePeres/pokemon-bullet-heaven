@@ -160,8 +160,11 @@ check('tela de iniciais montada com 3 opções', registry.get('starter-choices')
 game.chooseStarter('charmander');
 check('mapa da jornada aparece após escolher o inicial',
       !registry.get('screen-campaign').classes.has('hidden'));
-check('mapa lista as fases', registry.get('campaign-list').children.length >= 3,
-      `${registry.get('campaign-list').children.length} entradas`);
+const mapNodes = () => registry.get('lobby-map').children.filter((c) => c.classes.has('map-node'));
+check('o lobby mostra o Town Map com uma marca por cidade (8 ginásios e a Liga)', mapNodes().length === 9,
+      `${mapNodes().length} marcas`);
+check('ao entrar, a próxima fase já vem escolhida no painel',
+      game.menus.lobby.selected === 'gym_1_pewter' && mapNodes().filter((c) => c.classes.has('next')).length === 1);
 check('Pokédex registra o inicial escolhido', game.profile.pokedex.caught.includes(4));
 
 // ---- partida ----
@@ -350,9 +353,18 @@ game.menus.closeModal();
 check('fechar o PC desliga o teclado dele', !pcs.isOpen && registry.get('modal-pc').classes.has('hidden'));
 
 game.quitToMenu();
-game.menus.buildCampaign();
 check('Fase 2 desbloqueia após a Fase 1',
-      registry.get('campaign-list').children.length >= 3);
+      mapNodes().filter((c) => c.classes.has('done')).length === 1 && game.menus.lobby.selected === 'gym_2_cerulean');
+const pewterStats = game.campaign.stageStats.gym_1_pewter;
+check('a fase guarda as métricas do estojo (tentativas, vitórias, primeira vitória)',
+      pewterStats?.wins === 1 && pewterStats.attempts >= 2 && !!pewterStats.firstWin?.team?.length,
+      JSON.stringify({ wins: pewterStats?.wins, attempts: pewterStats?.attempts }));
+game.menus.showModal('modal-badges', { stageId: 'gym_1_pewter' });
+check('o Estojo de Insígnias abre com o cartão, as 8 casas e a Liga',
+      !registry.get('modal-badges').classes.has('hidden')
+      && registry.get('trainer-card').children.filter((c) => c.classes.has('card-slot')).length === 8
+      && registry.get('league-row').children.filter((c) => c.classes.has('league-chip')).length === 5);
+game.menus.closeModal();
 
 // ---- Campeão e Hall da Fama ----
 game.region.campaign.slice(0, -1).forEach((e) => {
