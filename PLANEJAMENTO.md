@@ -657,6 +657,45 @@ a estar nos líderes. Com o bot novo, metade das derrotas da Fase 1 é no Brock.
 Enquanto uma decisão não vem, a recomendação vale como padrão. O que foi feito
 assim fica anotado como "padrão até o Fellipe decidir".
 
+### O 2º golpe — 3 por tipo (proposta da D11, para o Fellipe aprovar ou mudar)
+
+A regra (aprovada na 0.13): quando o Pokémon já tem todas as melhorias, cada
+nível tem uma chance baixa (~2%) de dar o **2º golpe**: ele mantém o golpe dele
+e passa a usar outro junto. Cada tipo tem 3 opções e o Pokémon recebe **uma, ao
+acaso**. Os 3 de cada tipo têm mecânicas diferentes entre si e dos golpes que o
+tipo já tem; todos usam um efeito do FireRed que o jogo já tem (`fx/...`).
+
+| Tipo | Opção 1 | Opção 2 | Opção 3 |
+|---|---|---|---|
+| Fogo | **Anel de Fogo** (Flame Wheel): um anel de chamas gira colado no Pokémon o tempo todo e queima quem encosta · `spinning_fire` | **Onda de Calor** (Heat Wave): de tempos em tempos, um círculo de fogo se abre em volta e deixa os atingidos queimando · `fire` | **Rastro em Chamas** (Flame Charge): por onde o Pokémon passa, fica um rastro de brasas que queima quem pisa · `small_ember` |
+| Água | **Redemoinho** (Whirlpool): uma área gira no chão, puxa os inimigos para o centro e fere · `blue_ring` | **Anel d'Água** (Aqua Ring): bolhas giram em volta, ferem quem encosta e cada acerto cura um pouco o Pokémon · `bubble` | **Surfe** (Surf): uma onda larga varre a área à frente e empurra a horda para longe · `water_impact` |
+| Planta | **Dança das Pétalas** (Petal Dance): folhas saem em espiral para todos os lados · `razor_leaf` | **Semente Sanguessuga** (Leech Seed): planta sementes nos inimigos perto; elas drenam vida e curam o Pokémon · `green_sparkle` | **Campo de Grama** (Grassy Terrain): o chão em volta vira grama que fere os inimigos e cura a equipe aos poucos · `leaf` |
+| Elétrico | **Descarga** (Discharge): pulso elétrico em toda a volta que deixa os atingidos lentos (paralisados) · `shock` | **Raio do Céu** (Thunder): raios caem em inimigos ao acaso na tela · `lightning` | **Esferas Elétricas** (Spark): três esferas giram em volta e soltam faíscas em quem chega perto · `spark` |
+| Gelo | **Granizo** (Hail): pedras de gelo caem em pontos ao acaso perto do Pokémon · `hail` | **Caco de Gelo** (Ice Shard): cristais em leque que congelam (deixam bem lentos) · `ice_crystal` | **Névoa Gélida** (Mist): uma aura fria em volta desacelera muito quem entra · `ice_chunk` |
+| Lutador | **Soco Relâmpago** (Mach Punch): um soco muito rápido no inimigo mais perto, a cada segundo, com empurrão forte · `hands` | **Esfera de Foco** (Focus Blast): carrega e solta uma esfera grande que explode em área · `orbs` + `explosion` | **Contra-ataque** (Counter): quando o Pokémon leva dano, ele revida com uma onda de impacto · `cross_impact` |
+| Venenoso | **Espinhos Tóxicos** (Toxic Spikes): espalha armadilhas no chão que envenenam quem pisa · `needle` | **Nuvem Tóxica** (Smog): uma nuvem segue o Pokémon e envenena tudo em volta · `toxic_bubble` | **Chuva Ácida** (Acid Spray): gotas de ácido caem nos inimigos e eles passam a levar mais dano · `poison_bubble` |
+| Terrestre | **Túmulo de Areia** (Sand Tomb): prende os inimigos num redemoinho de areia (lentos e feridos) · `mud_sand` | **Tremor** (Bulldoze): de tempos em tempos o chão treme e fere todos na tela, um pouco · `flying_dirt` | **Cavar** (Dig): o Pokémon some no chão e sai embaixo do inimigo mais forte, com um impacto em área · `impact` |
+| Voador | **Lâmina de Ar** (Air Slash): lâminas de vento em linha que atravessam a horda · `gust` | **Vento a Favor** (Tailwind): uma rajada empurra os inimigos para longe e acelera a equipe por alguns segundos · `gust` | **Mergulho** (Sky Attack): o Pokémon sobe e mergulha numa linha, acertando tudo no caminho · `impact` |
+| Psíquico | **Esferas Psíquicas** (Psyshock): orbes que perseguem os inimigos sozinhos · `pink_orb` | **Barreira** (Reflect): um escudo em volta da equipe que reduz o dano e desfaz os projéteis dos líderes · `purple_ring` | **Premonição** (Future Sight): marca um ponto; segundos depois, uma explosão psíquica grande acontece ali · `gold_ring` |
+| Inseto | **Enxame** (Bug Buzz): insetinhos voam em volta e atacam quem chega perto · `blue_star` | **Teia** (Sticky Web): teias no chão que prendem os inimigos (bem lentos) · `spider_web` | **Míssil de Agulhas** (Pin Missile): rajada de agulhas para todos os lados · `needle` |
+| Pedra | **Pedras Flutuantes** (Stealth Rock): pedras pontudas giram em volta e acertam quem encosta · `rocks` | **Avalanche** (Rock Tomb): pedras caem do céu numa área perto da horda · `rocks` | **Tempestade de Areia** (Sandstorm): uma tempestade em volta fere tudo devagar · `mud_sand` |
+| Fantasma | **Maldição** (Hex): marca inimigos; quando um marcado morre, explode em fogo-fátuo nos vizinhos · `purple_flame` | **Sombra Furtiva** (Shadow Sneak): uma sombra sai do Pokémon e persegue o inimigo mais perto · `ghostly_spirit` | **Força Fantasma** (Phantom Force): o Pokémon fica intangível por um instante e fere quem ele atravessa · `shadow_ball` |
+| Dragão | **Fúria do Dragão** (Dragon Rage): uma rajada em cone à frente que acerta todos com o mesmo dano · `purple_flame` | **Dança do Dragão** (Dragon Dance): por alguns segundos, os golpes do Pokémon ficam mais fortes e mais rápidos · `orbs` | **Meteoro Dracônico** (Draco Meteor): meteoros caem em pontos ao acaso, com dano alto · `explosion` |
+| Fada | **Luz da Lua** (Moonblast): um orbe de luz que explode em área e deixa os inimigos lentos (encantados) · `pink_orb` | **Campo Nebuloso** (Misty Terrain): uma névoa rosa em volta que cura a equipe aos poucos · `magenta_heart` | **Beijo Drenante** (Draining Kiss): corações perseguem inimigos e devolvem vida ao Pokémon · `magenta_heart` |
+| Normal | **Estrelas** (Swift): estrelas que perseguem os inimigos e nunca erram · `blue_star` | **Giro Rápido** (Rapid Spin): o Pokémon gira e acerta tudo em volta, empurrando · `impact` | **Eco** (Echoed Voice): uma onda sonora que fica mais forte a cada vez seguida · `metal_sound` |
+| Metálico | **Canhão de Luz** (Flash Cannon): um raio de luz em linha reta que atravessa tudo · `orbs` | **Engrenagens** (Gyro Ball): engrenagens giram em volta e ficam mais fortes quanto mais rápido o treinador anda · `metal_sound` | **Bomba Magnética** (Magnet Bomb): bombas que grudam nos inimigos e explodem depois · `explosion` |
+
+Sombrio não entra: nenhuma das 151 é desse tipo. Metálico só aparece como o
+2º tipo do Magnemite e do Magneton.
+
+**Ainda para decidir:**
+- **Pokémon de dois tipos:** sorteia só entre os 3 do 1º tipo (padrão: o Charizard
+  sempre ganha um de Fogo) ou entre os 6 dos dois tipos.
+- **Nome no jogo:** o nome oficial em inglês, como os outros golpes (Flame Wheel),
+  com a descrição em português ao passar o mouse; ou o nome em português.
+- **Força:** padrão de ~60% do dano de um golpe-base do mesmo estágio, e sem
+  melhorias próprias.
+
 ## 6. Depois de Kanto
 
 Vieram da lista antiga do HANDOFF e continuam valendo:
