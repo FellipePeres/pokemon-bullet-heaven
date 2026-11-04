@@ -490,8 +490,20 @@ console.log('\n[ajuste por inicial]');
   check('com o inicial ajustado, os selvagens têm mais vida e dano',
         Math.abs(tuned.maxHp / base.maxHp - 1.2) < 1e-9 && Math.abs(tuned.damage / base.damage - 1.2) < 1e-9);
   const boss = foe('charmander', 'brock_onix'), tunedBoss = foe('squirtle', 'brock_onix');
-  check('o líder também', Math.abs(tunedBoss.maxHp / boss.maxHp - 1.2) < 1e-9 && tunedBoss.tilt === 1.2 && boss.tilt === 1);
+  check('o líder também', Math.abs(tunedBoss.maxHp / boss.maxHp - 1.2) < 1e-9 && tunedBoss.attackMult === 1.2 && boss.attackMult === 1);
   stage.starterTuning = saved;
+
+  // o líder das últimas fases (0.12.2): vida e dano do time dele multiplicados pela fase
+  const late = STAGES.gym_6_saffron;
+  const keep = late.bossTuning;
+  const ace = () => new Run('gym_6_saffron', { starter: 'charmander' }).spawner.spawnAt('sabrina_alakazam', 0, 0);
+  const strong = ace();
+  late.bossTuning = undefined;
+  const plain = ace();
+  late.bossTuning = keep;
+  check('nas últimas fases o líder tem mais vida e golpes mais fortes',
+        Math.abs(strong.maxHp / plain.maxHp - keep.hp) < 1e-9 && strong.attackMult === keep.damage && plain.attackMult === 1,
+        `vida ×${keep.hp}, dano ×${keep.damage}`);
 }
 
 // ------------------------------------------------------- 6. upgrades/dados

@@ -5,7 +5,7 @@
 > decisão foi tomada e o que falta fazer. O `README.md` é o manual de uso;
 > este aqui é o contexto de desenvolvimento.
 
-**Versão atual:** `0.12.1` · **Última atualização:** 2026-11-03
+**Versão atual:** `0.12.2` · **Última atualização:** 2026-11-03
 **Stack:** HTML + CSS + JavaScript puro (ES Modules). Sem backend, sem build, sem dependências.
 **Repositório:** https://github.com/FellipePeres/pokemon-bullet-heaven (público)
 **Jogo no ar:** https://fellipeperes.github.io/pokemon-bullet-heaven/
@@ -376,6 +376,16 @@ Nunca voltar bônus globais para o pool de level up — foi pedido explícito.
   membro, cada uma com o time de 5 do FireRed) e o Campeão. Os times são os do
   FireRed, com os níveis dele; o do rival muda pelo seu inicial
   (`bossTeamByStarter`), como no jogo.
+- **Líderes das últimas fases** (0.12.2, "no começo tá equilibrado, no final tá
+  muito fácil"): `stage.bossTuning: { hp, damage }` multiplica a vida e o dano
+  (golpes inclusive, por `enemy.attackMult`) do time do líder. Rampa, padrão até o
+  Fellipe decidir: Erika ×1,25/×1,1 · Koga ×1,35/×1,15 · Sabrina ×1,5/×1,2 ·
+  Blaine ×1,6/×1,2 · Giovanni e Elite Four ×1,7/×1,25 · Lance ×1,75/×1,25 ·
+  Campeão ×1,8/×1,3. Brock, Misty e Surge ficaram como estavam. Com as mesmas
+  equipes salvas, a luta com o líder ficou mais longa (Erika 17–35 s → 23–53 s,
+  Giovanni 29 → 49 s, Lorelei 49 → 98 s, Agatha 61 → 87 s). O bot quase não chega
+  ao fim (morre nas ondas das Fases 4 a 6 mesmo sem a rampa), então a medida
+  final é o Fellipe jogando.
 - **Ajuste por inicial** (0.11.5, `stage.starterTuning`): onde um inicial sobra,
   vida e dano dos inimigos e do líder sobem um pouco quando ele é o da jornada
   (`SpawnSystem.spawnAt`, e `enemy.tilt` nos golpes do líder). Hoje só o Squirtle,
@@ -751,6 +761,7 @@ tipo, som e o polimento de troca e captura.
 | 14 | ainda fácil com a cura: uma sugestão de cura por nível sem quebrar; o Fellipe escolheu 1/10 da vida máxima | 0.11.4: `levelUpHeal` 0,1 (do nível 11); Fases 1 a 3 com 43–100% e de 0 a 3,4 desmaios por tentativa (24 jornadas por inicial) |
 | 15 | investigar o inimigo preso (sugestão: teleporte aleatório quando travar); Squirtle fácil demais: inimigos um pouco mais fortes com ele | 0.11.5: a causa era o empurrão entre inimigos, que ignorava o cenário; rede de segurança com teleporte; `starterTuning` do Squirtle nas Fases 1, 6 e 7 |
 | 16 | usar o PC do Pokemon All (a Global Box: ícones, arrastar, equipe); sinalizar melhor na captura que nada se perde | 0.12: `ui/pcScreen.js` + `systems/pc.js` com casas; arte e sprites do FireRed por `tools/assets/copy_pc_art.py`; aviso na Poké Ball e tela de equipe cheia reescrita |
+| 17 | a Poção do nível máximo (50%) forte demais: 20%; ideia do bônus de ataque raro no nível máximo (planejamento); tem shiny?; líderes das últimas fases fracos demais | 0.12.1: `maxedHeal` 0,2; D11 no PLANEJAMENTO; shiny não existe (respondido). 0.12.2: `stage.bossTuning`, rampa do Erika ao Campeão |
 
 ---
 

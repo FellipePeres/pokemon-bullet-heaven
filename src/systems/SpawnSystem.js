@@ -207,7 +207,9 @@ export class SpawnSystem {
     // ajuste por inicial (0.11.5): na fase em que um inicial sobra, os inimigos
     // (o líder também) ficam um pouco mais fortes quando ele é o da jornada
     const tilt = this.stage.starterTuning?.[this.run.campaignStarter] ?? 1;
-    let scaling = { hp: tilt, speed: 1, damage: tilt };
+    // o líder da fase (0.12.2): das últimas fases, mais vida e mais dano
+    const lead = isBoss ? { hp: 1, damage: 1, ...this.stage.bossTuning } : { hp: 1, damage: 1 };
+    let scaling = { hp: tilt * lead.hp, speed: 1, damage: tilt * lead.damage };
     if (!isBoss) {
       const ramp = this.scaling;
       const byLevel = levelScaling(level);
@@ -217,7 +219,7 @@ export class SpawnSystem {
       };
     }
     const enemy = new Enemy(enemyId, x, y, scaling, level);
-    enemy.tilt = tilt;   // os golpes do líder também
+    enemy.attackMult = tilt * lead.damage;   // os golpes do líder também
     // nasce fora das árvores, pedras e paredes
     this.run.terrain?.place(enemy, enemy.box);
     this.run.enemies.push(enemy);

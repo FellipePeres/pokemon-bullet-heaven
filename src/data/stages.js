@@ -25,6 +25,8 @@
  *                  até o líder, ~4 min com a luta; menos inimigos, cada um vale mais)
  *   music          a música da fase (assets/music, data/musicTracks.js); leaderMusic
  *                  toca quando o líder entra
+ *   bossTuning     { hp, damage } — multiplica a vida e o dano (golpes inclusive) do time
+ *                  do líder; as últimas fases ficavam fáceis para quem joga bem (0.12.2)
  *   starterTuning  { inicial: fator } — vida e dano dos inimigos (e do líder) multiplicados
  *                  quando esse é o inicial da jornada; para a fase em que um inicial sobra
  *   maxBalls       teto de Poké Balls da fase (controla o ritmo das capturas)
@@ -259,6 +261,8 @@ export const STAGES = {
       portrait: 'portrait/erika',
       quote: 'Ah... que dia lindo. Minhas flores não vão pegar leve, viu?'
     },
+    // líder mais forte nas últimas fases (0.12.2: "no final tá muito fácil")
+    bossTuning: { hp: 1.25, damage: 1.1 },
     bossTeam: ['erika_victreebel', 'erika_tangela', 'erika_vileplume'],
 
     capturePool: 'phase4',
@@ -318,6 +322,8 @@ export const STAGES = {
       portrait: 'portrait/koga',
       quote: 'Fwahahaha! Veneno e sombras: a arte ninja!'
     },
+    // líder mais forte nas últimas fases (0.12.2: "no final tá muito fácil")
+    bossTuning: { hp: 1.35, damage: 1.15 },
     bossTeam: ['koga_koffing', 'koga_muk', 'koga_koffing', 'koga_weezing'],
 
     capturePool: 'phase5',
@@ -376,6 +382,8 @@ export const STAGES = {
       portrait: 'portrait/sabrina',
       quote: 'Eu já sabia que você viria. E também sei como isso termina.'
     },
+    // líder mais forte nas últimas fases (0.12.2: "no final tá muito fácil")
+    bossTuning: { hp: 1.5, damage: 1.2 },
     bossTeam: ['sabrina_kadabra', 'sabrina_mr_mime', 'sabrina_venomoth', 'sabrina_alakazam'],
     // presentes (como as trocas e o Dojo do FireRed): oferecidos uma vez, na hora marcada
     gifts: [
@@ -443,6 +451,8 @@ export const STAGES = {
       portrait: 'portrait/blaine',
       quote: 'Hah! Espero que você tenha trazido Anti-Queimadura!'
     },
+    // líder mais forte nas últimas fases (0.12.2: "no final tá muito fácil")
+    bossTuning: { hp: 1.6, damage: 1.2 },
     bossTeam: ['blaine_growlithe', 'blaine_ponyta', 'blaine_rapidash', 'blaine_arcanine'],
 
     // o Squirtle sobrava aqui (0.11.5: 100%: Água contra o Blaine)
@@ -504,6 +514,8 @@ export const STAGES = {
       portrait: 'portrait/giovanni',
       quote: 'Fwahaha! Faz tempo que ninguém me desafia de verdade.'
     },
+    // líder mais forte nas últimas fases (0.12.2: "no final tá muito fácil")
+    bossTuning: { hp: 1.7, damage: 1.25 },
     bossTeam: ['giovanni_rhyhorn', 'giovanni_dugtrio', 'giovanni_nidoqueen', 'giovanni_nidoking', 'giovanni_rhyhorn_ace'],
 
     capturePool: 'phase8',
@@ -558,6 +570,8 @@ export const STAGES = {
       portrait: 'portrait/lorelei',
       quote: 'Ninguém entende de gelo como eu. Prepare-se para congelar!'
     },
+    // líder mais forte nas últimas fases (0.12.2: "no final tá muito fácil")
+    bossTuning: { hp: 1.7, damage: 1.25 },
     bossTeam: ['lorelei_dewgong', 'lorelei_cloyster', 'lorelei_slowbro', 'lorelei_jynx', 'lorelei_lapras'],
 
     capturePool: 'phase9',
@@ -610,6 +624,8 @@ export const STAGES = {
       portrait: 'portrait/bruno',
       quote: 'Treinamos os músculos até o limite. Hoo hah!'
     },
+    // líder mais forte nas últimas fases (0.12.2: "no final tá muito fácil")
+    bossTuning: { hp: 1.7, damage: 1.25 },
     bossTeam: ['bruno_onix', 'bruno_hitmonchan', 'bruno_hitmonlee', 'bruno_onix', 'bruno_machamp'],
 
     capturePool: 'phase9',
@@ -661,6 +677,8 @@ export const STAGES = {
       portrait: 'portrait/agatha',
       quote: 'Pokémon são para lutar! Vou te mostrar como se faz.'
     },
+    // líder mais forte nas últimas fases (0.12.2: "no final tá muito fácil")
+    bossTuning: { hp: 1.7, damage: 1.25 },
     bossTeam: ['agatha_gengar', 'agatha_golbat', 'agatha_haunter', 'agatha_arbok', 'agatha_gengar_ace'],
 
     capturePool: 'phase9',
@@ -712,6 +730,8 @@ export const STAGES = {
       portrait: 'portrait/lance',
       quote: 'Dragões são criaturas místicas... e quase invencíveis.'
     },
+    // líder mais forte nas últimas fases (0.12.2: "no final tá muito fácil")
+    bossTuning: { hp: 1.75, damage: 1.25 },
     bossTeam: ['lance_gyarados', 'lance_dragonair', 'lance_dragonair', 'lance_aerodactyl', 'lance_dragonite'],
 
     capturePool: 'phase9',
@@ -764,6 +784,8 @@ export const STAGES = {
       quote: 'Até que enfim! Eu sou o melhor treinador do mundo!'
     },
     // como no FireRed, o rival escolheu o inicial com vantagem sobre o seu
+    // líder mais forte nas últimas fases (0.12.2: "no final tá muito fácil")
+    bossTuning: { hp: 1.8, damage: 1.3 },
     bossTeam: ['rival_pidgeot', 'rival_alakazam', 'rival_rhydon', 'rival_arcanine', 'rival_exeggutor', 'rival_blastoise'],
     bossTeamByStarter: {
       charmander: ['rival_pidgeot', 'rival_alakazam', 'rival_rhydon', 'rival_arcanine', 'rival_exeggutor', 'rival_blastoise'],
