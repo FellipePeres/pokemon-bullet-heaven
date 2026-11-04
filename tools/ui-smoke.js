@@ -30,7 +30,10 @@ class StubElement {
     this.id = id;
     this.children = [];
     this.classes = new Set();
-    this.style = new Proxy({}, { get: (t, k) => t[k] ?? '', set: (t, k, v) => { t[k] = v; return true; } });
+    this.style = new Proxy({}, {
+      get: (t, k) => (k === 'setProperty' ? (name, value) => { t[name] = String(value); } : t[k] ?? ''),
+      set: (t, k, v) => { t[k] = v; return true; }
+    });
     this.dataset = {};
     this.attributes = {};
     this._text = '';
@@ -55,12 +58,14 @@ class StubElement {
   set innerHTML(v) { this._html = String(v); this.children = []; }
   appendChild(child) { this.children.push(child); return child; }
   append(...nodes) { nodes.forEach((n) => this.appendChild(n)); }
+  prepend(...nodes) { this.children.unshift(...nodes); }
   removeChild(child) { this.children = this.children.filter((c) => c !== child); return child; }
   remove() {}
   replaceWith() {}
   querySelector() { return new StubElement('span'); }
   querySelectorAll() { return []; }
   addEventListener(type, fn) { (this.listeners[type] ??= []).push(fn); }
+  setAttribute(name, value) { this.attributes[name] = String(value); }
   click() { this.onclick?.({ stopPropagation() {} }); }
   getContext() { return stubCtx(); }
 }
@@ -102,7 +107,10 @@ global.document = {
   body: new StubElement('body'),
   addEventListener: () => {}
 };
-global.window = { addEventListener: () => {}, location: { href: '' } };
+global.window = {
+  addEventListener: () => {}, removeEventListener: () => {}, location: { href: '' },
+  innerWidth: 1280, innerHeight: 720, devicePixelRatio: 1
+};
 global.requestAnimationFrame = () => 0;
 global.Image = class { set src(v) { this._src = v; } get src() { return this._src; } };
 global.localStorage = {
@@ -204,12 +212,21 @@ check('pausa fecha', registry.get('pause-overlay').classes.has('hidden') && game
 
 // tela de captura com a equipe cheia (fluxo de substituição)
 while (!game.run.team.isFull) game.run.team.add('pidgey') ?? game.run.team.add('poliwag');
+game.run.pendingBall = true;
+game.run.state = 'capture';
+game.openCapture();
+check('com a equipe cheia, a Poké Ball avisa que nada se perde (o PC guarda)',
+      registry.get('capture-note').classes.has('strong') && !registry.get('capture-note').classes.has('hidden')
+      && registry.get('capture-note').innerHTML.includes('Nenhum Pokémon se perde'));
 const options = game.run.captureSystem.rollChoices();
-game.captureOpen = true;
 game.pickCapture(options[0]?.id ?? 'pikachu');
-check('equipe cheia pede para escolher quem sai',
-      registry.get('capture-subtitle').textContent.includes('vai para o PC'),
+check('equipe cheia: escolher onde o novo fica, sem perder ninguém',
+      registry.get('capture-subtitle').textContent.includes('ninguém se perde')
+      && registry.get('capture-skip').textContent === 'Desistir da captura',
       registry.get('capture-subtitle').textContent);
+const replaceCards = registry.get('capture-choices').children;
+check('o primeiro card guarda o novo no PC; os outros dizem que vão para o PC',
+      replaceCards[0]?.classes.has('to-pc') && replaceCards.length === CONFIG.team.maxSize + 1);
 game.resolveCapture();
 
 // níveis acumulados do banco (botão ▲)
@@ -306,6 +323,31 @@ if (affordable) {
 }
 game.menus.closeModal();
 check('vitória guarda a equipe da jornada', !!game.campaign.journey?.team?.members?.length);
+
+// ---- o PC (0.12): a tela do FireRed, pegar e soltar ----
+const pcJourney = game.campaign.journey;
+pcJourney.pc = [{ ...pcJourney.team.members[0], uid: 'pc-test-1', pokemonId: 'psyduck', level: 9, slot: 0 }];
+game.menus.showModal('modal-pc');
+const pcs = game.menus.pcScreen;
+const pcSlots = () => registry.get('pc-screen').children.filter((c) => c.classes.has('pc-slot'));
+check('o PC abre com as 30 casas da caixa e as 6 vagas da equipe',
+      pcs.isOpen && !registry.get('modal-pc').classes.has('hidden') && pcSlots().length === 36, `${pcSlots().length} lugares`);
+const teamSize = pcJourney.team.members.length;
+pcs.act({ area: 'box', slot: 0 });
+check('clicar num Pokémon do PC pega ele', pcs.held?.area === 'box' && pcs.held.slot === 0);
+pcs.act({ area: 'team', index: teamSize });
+check('soltar na vaga vazia da equipe leva ele para o fim da equipe',
+      !pcs.held && pcJourney.team.members.at(-1).uid === 'pc-test-1' && pcJourney.pc.length === 0);
+pcs.act({ area: 'team', index: teamSize });
+pcs.act({ area: 'box', slot: 7 });
+check('e de volta para uma casa do PC', pcJourney.pc[0]?.uid === 'pc-test-1' && pcJourney.pc[0].slot === 7
+      && pcJourney.team.members.length === teamSize);
+pcs.act({ area: 'team', index: 0 });
+pcs.act({ area: 'box', slot: 8 });
+check('o último da equipe não vai para o PC', teamSize > 1 || (pcJourney.team.members.length === 1 && !!pcs.message));
+pcs.held = null;
+game.menus.closeModal();
+check('fechar o PC desliga o teclado dele', !pcs.isOpen && registry.get('modal-pc').classes.has('hidden'));
 
 game.quitToMenu();
 game.menus.buildCampaign();

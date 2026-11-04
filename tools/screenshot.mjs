@@ -140,9 +140,22 @@ const ROTEIROS = {
            "game.campaign.journey = { team: r.team.serialize(), pc: r.pc }; game.openCampaign(); })" },
     { wait: 1200 }, { shot: 'pc-lobby' },
     { run: "game.menus.showModal('modal-pc')" }, { wait: 700 }, { shot: 'pc-modal' },
-    { run: "game.menus.pcSelected = game.campaign.journey.team.members[2].uid; game.menus.buildPC()" }, { wait: 400 }, { shot: 'pc-selecionado' },
+    { run: "{ const pc = game.menus.pcScreen; pc.aim = { area: 'box', slot: 1 }; pc.render() }" }, { wait: 400 }, { shot: 'pc-apontando' },
+    { run: "{ const pc = game.menus.pcScreen; pc.act({ area: 'box', slot: 1 }); pc.aim = { area: 'team', index: 2 }; pc.render() }" }, { wait: 400 }, { shot: 'pc-trocando' },
+    { run: "{ const pc = game.menus.pcScreen; pc.aim = { area: 'box', slot: 7 }; pc.render() }" }, { wait: 400 }, { shot: 'pc-soltando' },
+    { run: "{ const pc = game.menus.pcScreen; pc.act({ area: 'team', index: 2 }); pc.flip(1) }" }, { wait: 400 }, { shot: 'pc-caixa-2' },
     { run: "game.menus.closeModal(); game.startStage('gym_3_vermilion')" }, { wait: 1500 },
     { run: "game.run.state = 'capture'; game.captureOpen = true; game.pickCapture('meowth')" }, { wait: 800 }, { shot: 'pc-captura', raw: true }
+  ],
+  // a Poké Ball com a equipe cheia (0.12): o aviso de que nada se perde e o "onde ele fica"
+  'captura-cheia': [
+    { open: 'index.html' }, { wait: 500 },
+    { run: START_RUN }, { wait: 1500 },
+    { run: "['pidgey', 'rattata', 'caterpie', 'weedle', 'spearow'].forEach((id) => game.run.team.add(id, 8)); game.run.pendingBall = true; game.run.state = 'capture'; game.openCapture()" },
+    { wait: 900 }, { shot: 'captura-cheia-1-opcoes', raw: true },
+    { run: "game.pickCapture(game.run.captureSystem.rollChoices()[0].id)" }, { wait: 900 }, { shot: 'captura-cheia-2-onde-fica', raw: true },
+    { run: "game.resolveCapture(); game.run.team.members.splice(3); game.run.pendingBall = true; game.run.state = 'capture'; game.openCapture()" },
+    { wait: 900 }, { shot: 'captura-cheia-3-com-vaga', raw: true }
   ],
   // a derrota: as duas saídas, o aviso de recomeçar do zero e o Centro Pokémon
   derrota: [

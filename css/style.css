@@ -1496,40 +1496,242 @@ button { font: inherit; color: inherit; }
 
 
 /* ================================ PC ================================
-   A equipe em cima e o PC embaixo, cada Pokémon numa caixinha do jogo. */
-.pc-title {
-  margin: 4px 0 8px;
-  font-family: var(--font-arcade);
-  font-size: 11px;
-  font-weight: 400;
-  color: var(--gba-frame);
-  text-shadow: 2px 2px 0 var(--gba-shade);
+   A tela de armazenamento do FireRed, trazida do Pokemon All (DEC-004 de lá;
+   0.12 aqui). É composta em pixels do GBA, 288x160; `--px` é quanto vale um
+   pixel do GBA na tela (ui/pcScreen.js: o maior inteiro que cabe) e `--ipx`,
+   o pixel do ícone do Pokémon, um degrau abaixo. A arte vem ampliada 4x no
+   arquivo; cada peça é desenhada com o tamanho dela em pixels do GBA. */
+.modal.pc-modal {
+  padding: 16px;
+  background:
+    linear-gradient(180deg, rgba(6, 10, 18, .8), rgba(6, 10, 18, .9)),
+    url(../assets/ui/title-background.webp) center 58% / cover no-repeat;
 }
-.pc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); gap: 8px; margin-bottom: 14px; }
-.pc-mon {
+.pc-stage { display: flex; flex-direction: column; align-items: center; gap: 14px; }
+.pc-screen {
+  --px: 2px;
+  --ipx: 1px;
+  position: relative;
+  width: calc(var(--px) * 288);
+  height: calc(var(--px) * 160);
+  overflow: hidden;
+  background: url(../assets/pc/background-tile.png) 0 0 / calc(var(--px) * 32) calc(var(--px) * 32) repeat;
+  image-rendering: pixelated;
+  font-family: var(--font-pixel);
+  font-size: calc(var(--px) * 8);
+  color: var(--gba-ink);
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  cursor: none;
+  /* a moldura do "monitor": contorno duro, sem blur */
+  box-shadow:
+    0 0 0 calc(var(--px) * 2) var(--gba-night-edge),
+    0 0 0 calc(var(--px) * 4) var(--gba-frame),
+    8px 10px 0 calc(var(--px) * 4) rgba(0, 0, 0, .45);
+  animation: pop-in .3s var(--ease) both;
+}
+.pc-hint {
+  margin: 0;
+  max-width: 92vw;
+  font-family: var(--font-pixel);
+  font-size: 15px;
+  color: #dfe8f5;
+  text-align: center;
+  text-shadow: 2px 2px 0 rgba(0, 0, 0, .6);
+}
+.pc-hint--warn { color: var(--gba-gold); }
+
+/* toda peça é posicionada em pixels do GBA */
+.gba {
+  position: absolute;
+  left: calc(var(--px) * var(--x));
+  top: calc(var(--px) * var(--y));
+  width: calc(var(--px) * var(--w));
+  height: calc(var(--px) * var(--h));
+}
+:where(.pc-screen button) { padding: 0; border: 0; background-color: transparent; color: inherit; cursor: none; }
+.pc-screen button:focus-visible { outline: calc(var(--px) * 1) solid var(--gba-gold); outline-offset: calc(var(--px) * 1); }
+
+/* --- DADOS (o PKMN DATA do jogo) --- */
+.pc-data {
+  background: url(../assets/pc/data-panel-wave.png) 0 0 / 400% 100% no-repeat;
+  image-rendering: pixelated;
+  animation: pc-wave 1.2s steps(4) infinite;
+}
+@keyframes pc-wave { to { background-position: 133.333% 0; } }
+.pc-data__label {
+  position: absolute;
+  left: calc(var(--px) * 14);
+  top: calc(var(--px) * 2);
+  width: calc(var(--px) * 53);
+  height: calc(var(--px) * 10);
+  display: grid;
+  place-items: center;
+  font-size: calc(var(--px) * 8);
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: .03em;
+  text-transform: uppercase;
+  color: #f8d88f;
+  text-shadow:
+    calc(var(--px) * 1) 0 0 #4f4f57, calc(var(--px) * -1) 0 0 #4f4f57,
+    0 calc(var(--px) * 1) 0 #4f4f57, 0 calc(var(--px) * -1) 0 #4f4f57;
+}
+.pc-data__sprite {
+  position: absolute;
+  left: calc(var(--px) * 8);
+  top: calc(var(--px) * 15);
+  width: calc(var(--px) * 64);
+  height: calc(var(--px) * 64);
+  image-rendering: pixelated;
+}
+.pc-data__info {
+  position: absolute;
+  left: calc(var(--px) * 6);
+  top: calc(var(--px) * 83);
+  width: calc(var(--px) * 68);
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 2px;
-  padding: 6px 4px;
-  font-family: var(--font-pixel);
-  color: var(--gba-ink);
-  background: var(--gba-button);
-  border: 2px solid var(--gba-shade);
-  border-radius: 3px;
-  box-shadow: var(--relief);
-  cursor: pointer;
-  transition: transform .1s var(--ease);
+  gap: calc(var(--px) * 3);
+  line-height: 1;
+  color: #fff;
+  text-shadow: calc(var(--px) * 1) calc(var(--px) * 1) 0 #4f4f57;
 }
-.pc-mon:hover { transform: translateY(-2px); border-color: var(--gba-frame); }
-.pc-mon img { width: 56px; height: 56px; object-fit: contain; image-rendering: pixelated; }
-.pc-mon b { font-size: 14px; }
-.pc-mon span { font-family: var(--font-arcade); font-size: 8px; color: var(--gba-frame); }
-.pc-mon.selected { border-color: var(--poke-red); box-shadow: inset 0 0 0 2px var(--poke-red); transform: translateY(-3px); }
-.pc-mon.disabled { opacity: .55; cursor: not-allowed; }
-.pc-actions { display: flex; justify-content: center; min-height: 0; margin: -4px 0 12px; }
-.pc-actions:empty { display: none; }
-.pc-empty { grid-column: 1 / -1; font-size: 15px; color: var(--gba-ink-soft); padding: 10px 4px; border-top: 3px dotted var(--gba-shade); }
+.pc-data__info p { margin: 0; }
+.pc-data__name { font-size: calc(var(--px) * 8); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pc-data__level { font-family: var(--font-arcade); font-size: calc(var(--px) * 6); }
+.pc-data__line { font-size: calc(var(--px) * 7); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pc-data__where { color: #f8d88f; }
+.pc-types { display: flex; flex-wrap: wrap; gap: calc(var(--px) * 2); }
+.pc-type {
+  padding: calc(var(--px) * 1) calc(var(--px) * 3);
+  border-radius: calc(var(--px) * 2);
+  font-size: calc(var(--px) * 6);
+  color: #fff;
+  text-shadow: calc(var(--px) * .5) calc(var(--px) * .5) 0 rgba(0, 0, 0, .45);
+}
+
+/* --- a caixa --- */
+.pc-banner {
+  display: grid;
+  place-items: center;
+  background: center / 100% 100% no-repeat;
+  image-rendering: pixelated;
+  font-family: var(--font-arcade);
+  font-size: calc(var(--px) * 8);
+  line-height: 1;
+  color: var(--gba-ink);
+  text-shadow: calc(var(--px) * 1) calc(var(--px) * 1) 0 rgba(255, 255, 255, .65);
+}
+.pc-arrow { background: center / 100% 100% no-repeat; image-rendering: pixelated; }
+.pc-arrow--left { background-image: url(../assets/pc/arrow-left.png); animation: pc-nudge-left .8s steps(1) infinite; }
+.pc-arrow--right { background-image: url(../assets/pc/arrow-right.png); animation: pc-nudge-right .8s steps(1) infinite; }
+@keyframes pc-nudge-left { 50% { transform: translateX(calc(var(--px) * -1)); } }
+@keyframes pc-nudge-right { 50% { transform: translateX(calc(var(--px) * 1)); } }
+.pc-wall { background: 0 0 / 100% 100% no-repeat; image-rendering: pixelated; }
+
+/* --- as casas e os ícones --- */
+.pc-slot { --lift: 0; }
+.pc-slot--team { --lift: 2; }
+.pc-mon { position: absolute; inset: 0; pointer-events: none; }
+/* centrado na casa, com o pé no fundo dela; dois quadros empilhados, o de cima é o parado */
+.pc-icon {
+  position: absolute;
+  left: calc((var(--w) * var(--px) - 32 * var(--ipx)) / 2);
+  bottom: calc(var(--lift) * var(--px));
+  width: calc(32 * var(--ipx));
+  height: calc(32 * var(--ipx));
+  background: 0 0 / 100% 200% no-repeat;
+  image-rendering: pixelated;
+}
+.pc-icon--active { animation: pc-icon .5s steps(1) infinite; }
+@keyframes pc-icon { 50% { background-position: 0 100%; } }
+.pc-mon--ghost { opacity: .55; }
+/* a bolinha dos 3 em campo, no canto da vaga da equipe */
+.pc-slot--field::before {
+  content: '';
+  position: absolute;
+  left: calc(var(--px) * 1);
+  top: calc(var(--px) * 1);
+  width: calc(var(--px) * 5);
+  height: calc(var(--px) * 5);
+  border-radius: 50%;
+  background: linear-gradient(180deg, var(--poke-red) 45%, #2d3442 45% 55%, #f8f8f8 55%);
+  box-shadow: 0 0 0 calc(var(--px) * .5) #2d3442;
+  z-index: 1;
+}
+
+/* --- a mira: o lugar sob a mão ganha moldura; com um Pokémon na mão, a cor diz
+   o que acontece ao soltar: dourada vai, laranja troca, vermelha não pode --- */
+.pc-slot::after, .pc-banner::after { content: ''; position: absolute; inset: 0; pointer-events: none; }
+.pc-slot--point::after, .pc-banner--aim::after {
+  box-shadow: inset 0 0 0 var(--px) var(--gba-ink), inset 0 0 0 calc(var(--px) * 2) #f8f8f8;
+}
+.pc-slot--drop::after { --aim: #f8d030; }
+.pc-slot--swap::after { --aim: #f08030; }
+.pc-slot--blocked::after { --aim: #e04038; }
+.pc-slot--drop::after, .pc-slot--swap::after, .pc-slot--blocked::after {
+  background: color-mix(in srgb, var(--aim) 22%, transparent);
+  box-shadow: inset 0 0 0 var(--px) var(--gba-ink), inset 0 0 0 calc(var(--px) * 2) var(--aim);
+  animation: pc-aim .5s steps(1) infinite;
+}
+@keyframes pc-aim {
+  50% { box-shadow: inset 0 0 0 var(--px) var(--gba-ink), inset 0 0 0 calc(var(--px) * 2) #f8f8f8; }
+}
+.pc-arrow--aim {
+  filter: drop-shadow(var(--px) 0 0 #f8f8f8) drop-shadow(calc(var(--px) * -1) 0 0 #f8f8f8)
+    drop-shadow(0 var(--px) 0 #f8f8f8) drop-shadow(0 calc(var(--px) * -1) 0 #f8f8f8);
+}
+.pc-arrow--carry {
+  filter: drop-shadow(var(--px) 0 0 #f8d030) drop-shadow(calc(var(--px) * -1) 0 0 #f8d030)
+    drop-shadow(0 var(--px) 0 #f8d030) drop-shadow(0 calc(var(--px) * -1) 0 #f8d030);
+  animation-duration: .3s;
+}
+
+/* --- a equipe, o botão e a mão --- */
+.pc-team { background: url(../assets/pc/team-panel.png) 0 0 / 100% 100% no-repeat; image-rendering: pixelated; }
+.pc-button {
+  display: grid;
+  place-items: center;
+  background: url(../assets/pc/button.png) center / 100% 100% no-repeat;
+  image-rendering: pixelated;
+  font-size: calc(var(--px) * 8);
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: .03em;
+  text-transform: uppercase;
+  color: #fff;
+  text-shadow: calc(var(--px) * 1) calc(var(--px) * 1) 0 #70b860;
+}
+.pc-button--on { background-image: url(../assets/pc/button-on.png); text-shadow: calc(var(--px) * 1) calc(var(--px) * 1) 0 #6088b8; }
+.pc-hand {
+  position: absolute;
+  z-index: 8;
+  left: calc(var(--px) * var(--x));
+  top: calc(var(--px) * var(--y));
+  width: calc(var(--px) * 18);
+  height: calc(var(--px) * 20);
+  pointer-events: none;
+  transition: left .06s linear, top .06s linear;
+  animation: pc-bob .9s steps(1) infinite;
+}
+.pc-hand[hidden] { display: none; }
+/* seguindo o mouse, ela é o cursor: sem balanço e sem atraso */
+.pc-hand--free { left: calc(var(--px) * var(--mx)); top: calc(var(--px) * var(--my)); transition: none; animation: none; }
+.pc-hand--free[hidden] { display: block; }
+.pc-hand__sprite { position: absolute; inset: 0; background: url(../assets/pc/hand.png) 0 0 / 100% 100% no-repeat; image-rendering: pixelated; }
+/* o Pokémon pego vai na ponta do dedo, por baixo da mão */
+.pc-hand__mon {
+  position: absolute;
+  left: calc(var(--px) * var(--tip-x) - 16 * var(--ipx));
+  top: calc(var(--px) * var(--tip-y) - 16 * var(--ipx));
+  width: calc(32 * var(--ipx));
+  height: calc(32 * var(--ipx));
+}
+.pc-hand__mon .pc-icon { left: 0; bottom: 0; }
+@keyframes pc-bob { 50% { transform: translateY(calc(var(--px) * 2)); } }
+
 /* na tela de "equipe cheia", a caixinha de mandar o novo para o PC */
 .card.to-pc { box-shadow: inset 0 0 0 3px var(--gba-frame); }
 
@@ -1575,3 +1777,57 @@ button { font: inherit; color: inherit; }
 @media (prefers-reduced-motion: reduce) {
   #center-overlay .team-summary .sum-mon { animation: none; }
 }
+
+
+/* ======================== CAPTURA: NADA SE PERDE ========================
+   0.12: os testes mostraram jogadores deixando de capturar por achar que um
+   Pokémon da equipe seria descartado. O aviso diz que o PC guarda; com a
+   equipe cheia, em destaque. */
+.capture-note {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: 760px;
+  margin: 2px auto 12px;
+  padding: 8px 12px;
+  font-size: 15px;
+  line-height: 1.35;
+  color: var(--gba-ink-soft);
+  text-align: left;
+  border-top: 3px dotted var(--gba-shade);
+  border-bottom: 3px dotted var(--gba-shade);
+}
+.capture-note .ui-icon { flex: none; }
+.capture-note.strong {
+  color: var(--gba-ink);
+  background: #e6f0fb;
+  border: 2px solid var(--gba-frame);
+  border-radius: 3px;
+  box-shadow: var(--relief);
+}
+.capture-note b { color: var(--gba-frame); }
+.card { position: relative; }
+.card-badge {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 6px;
+  font-family: var(--font-arcade);
+  font-size: 8px;
+  white-space: nowrap;
+  color: #fff;
+  background: var(--gba-frame);
+  border-radius: 3px;
+  box-shadow: 2px 2px 0 rgba(45, 52, 66, .35);
+}
+.card-badge.swap { background: #f08030; }
+/* equipe cheia: 7 cards sem a descrição, para caber na tela */
+/* com 7 cards, todos numa fileira: a de baixo empurrava o "Desistir" para fora da tela */
+.card-row.compact { gap: 8px; flex-wrap: nowrap; }
+.card-row.compact .card { width: 146px; flex: 0 1 146px; padding-top: 24px; }
+.card-row.compact .card p { display: none; }
+.card-row.compact .card img.card-sprite { width: 64px; height: 64px; }
+.card-row.compact .card .stack-info { font-size: 13px; }

@@ -15,6 +15,7 @@ import { iconHTML, itemUrl } from '../render/icons.js';
 import { formatTime } from '../core/utils.js';
 import { maxHpFor } from '../systems/stats.js';
 import { TitleMenu } from './titleMenu.js';
+import { PCScreen } from './pcScreen.js';
 
 const SCREENS = ['screen-title', 'screen-trainer', 'screen-starter', 'screen-campaign'];
 const MODALS = ['modal-pokedex', 'modal-achievements', 'modal-team', 'modal-trainer', 'modal-options', 'modal-help', 'modal-pc'];
@@ -28,6 +29,7 @@ export class Menus {
   constructor(game) {
     this.game = game;
     this.openModal = null;
+    this.pcScreen = new PCScreen(game);
     this._bind();
     this.titleMenu = new TitleMenu(this);
   }
@@ -100,7 +102,7 @@ export class Menus {
       'modal-team': () => this.buildTeamDetail(),
       'modal-trainer': () => this.buildTrainer(),
       'modal-options': () => this.buildOptions(),
-      'modal-pc': () => { this.pcSelected = null; this.buildPC(); }
+      'modal-pc': () => this.pcScreen.open()
     };
     builders[id]?.();
     show(el(id));
@@ -108,6 +110,7 @@ export class Menus {
   }
 
   closeModal() {
+    if (this.openModal === 'modal-pc' || !el('modal-pc').classList.contains('hidden')) this.pcScreen.close();
     for (const id of MODALS) hide(el(id));
     this.openModal = null;
   }
@@ -387,71 +390,6 @@ export class Menus {
         node.appendChild(create('div', 'node-state', `${iconHTML('shards', 14)} ${state.next.shards}`));
       }
       list.appendChild(node);
-    }
-  }
-
-  /* ================================== PC ================================== */
-
-  /**
-   * O PC do lobby: a equipe em cima, o PC embaixo. Toque um da equipe para
-   * escolher quem sai; toque um do PC para trocar com ele (ou só retirar, se a
-   * equipe tiver vaga). A equipe da jornada é a que entra na próxima fase.
-   */
-  buildPC() {
-    const game = this.game;
-    const team = game.campaign.journey?.team?.members ?? [];
-    const box = game.pcBox;
-    const selected = team.find((m) => m.uid === this.pcSelected) ?? null;
-    const max = CONFIG.team.maxSize;
-
-    el('pc-team-title').textContent = `Equipe (${team.length}/${max})`;
-    el('pc-box-title').textContent = `PC (${box.length})`;
-    el('pc-sub').textContent = !team.length
-      ? 'Vença a primeira fase para a sua equipe passar a ser guardada na jornada.'
-      : selected
-        ? `${getPokemon(selected.pokemonId).name} vai sair: escolha quem entra do PC, ou deposite.`
-        : 'Escolha um da equipe para sair, ou um do PC para entrar. Vale para a próxima fase.';
-
-    const card = (member, onClick, extra = '') => {
-      const data = getPokemon(member.pokemonId);
-      const node = create('button', `pc-mon${extra}`);
-      node.type = 'button';
-      node.appendChild(pokemonImg(data.dex, { alt: data.name }));
-      node.appendChild(create('b', '', data.name));
-      node.appendChild(create('span', '', `Nv.${member.level}`));
-      node.onclick = onClick;
-      return node;
-    };
-
-    const teamRow = clear(el('pc-team'));
-    for (const member of team) {
-      teamRow.appendChild(card(member, () => {
-        this.pcSelected = this.pcSelected === member.uid ? null : member.uid;
-        this.buildPC();
-      }, member.uid === this.pcSelected ? ' selected' : ''));
-    }
-
-    const actions = clear(el('pc-actions'));
-    if (selected && team.length > 1) {
-      const deposit = create('button', 'icon-btn', `Depositar ${getPokemon(selected.pokemonId).name}`);
-      deposit.onclick = () => { game.pcSwap(selected.uid, null); this.pcSelected = null; this.buildPC(); this.buildCampaign(); };
-      actions.appendChild(deposit);
-    }
-
-    const boxRow = clear(el('pc-box'));
-    if (!box.length) {
-      boxRow.appendChild(create('p', 'pc-empty',
-        'O PC está vazio. Com a equipe cheia, quem você capturar (ou quem sair dela) vem para cá.'));
-    }
-    for (const member of box) {
-      const canTake = selected || team.length < max;
-      boxRow.appendChild(card(member, () => {
-        if (!canTake) { toast('Equipe cheia: escolha antes quem sai.', 'team'); return; }
-        game.pcSwap(selected?.uid ?? null, member.uid);
-        this.pcSelected = null;
-        this.buildPC();
-        this.buildCampaign();
-      }, canTake ? '' : ' disabled'));
     }
   }
 

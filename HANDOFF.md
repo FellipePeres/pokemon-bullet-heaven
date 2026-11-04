@@ -5,7 +5,7 @@
 > decisão foi tomada e o que falta fazer. O `README.md` é o manual de uso;
 > este aqui é o contexto de desenvolvimento.
 
-**Versão atual:** `0.11.5` · **Última atualização:** 2026-11-03
+**Versão atual:** `0.12.0` · **Última atualização:** 2026-11-03
 **Stack:** HTML + CSS + JavaScript puro (ES Modules). Sem backend, sem build, sem dependências.
 **Repositório:** https://github.com/FellipePeres/pokemon-bullet-heaven (público)
 **Jogo no ar:** https://fellipeperes.github.io/pokemon-bullet-heaven/
@@ -150,6 +150,7 @@ src/
   ui/
     HUD.js            HUD da partida e overlays (nível, captura, evolução, pausa)
     Menus.js          menu, mapa, modais (Pokédex, conquistas, equipe, loja, opções)
+    pcScreen.js       a tela do PC (a do FireRed, portada do Pokemon All): caixas, equipe, pegar e soltar
     dom.js            helpers de DOM e toasts
     pad.js            o controle nas telas: foco nos alvos clicáveis da camada de cima
   audio/
@@ -200,8 +201,27 @@ confirmar com ele**.
 - **PC** (0.11): com a equipe cheia, a captura pergunta se o novo entra (e quem
   vai para o PC) ou se ele vai direto para o PC. Os depósitos da partida
   (`run.pc`, no autosave) entram no PC da jornada (`journey.pc`) quando a fase é
-  vencida, como a equipe. No lobby, `swapWithPC` (`systems/pc.js`) troca,
-  retira e deposita; a equipe nunca fica vazia.
+  vencida, como a equipe. A equipe nunca fica vazia.
+- **Tela do PC** (0.12, pedido do Fellipe: "o modelo de PC do Pokemon All"): a
+  Global Box do Pokemon All (DEC-004 de lá) portada para JS puro em
+  `ui/pcScreen.js`. É o PC do FireRed em pixels do GBA (288x160) ampliado pelo
+  maior inteiro que cabe: DADOS do Pokémon à esquerda (sprite frontal do
+  FireRed, tipos, nível, golpe, onde está), a caixa 6x5 com os 16 papéis de
+  parede do jogo e as setas, a equipe fixa à direita (a bolinha marca os 3 em
+  campo), a mão como cursor. Um clique pega, outro solta; em cima de outro, os
+  dois trocam; a moldura diz antes o que acontece (dourada vai, laranja troca,
+  vermelha não pode) e o fantasma mostra onde cada um para. Teclado: setas, Enter,
+  Q/E (caixas), Esc. As regras ficam em `systems/pc.js` (`moveMon`,
+  `previewMove`, funções puras): cada Pokémon do PC tem uma casa (`slot`; caixa
+  = `slot / 30`), quem chega sem casa vai para a primeira vazia
+  (`normalizePC`), são no mínimo 8 caixas e sempre uma com folga. Do Pokemon All
+  ficaram de fora o SUMÁRIO, o ORDENAR/Tipos, o PULAR e a lixeira (soltar na
+  natureza) — padrão até o Fellipe decidir.
+- **Captura sem medo** (0.12, "os testes deixam de capturar achando que um
+  Pokémon é descartado"): a tela da Poké Ball avisa — em destaque com a equipe
+  cheia — que nada se perde; a de equipe cheia pergunta "onde fica o X?", com
+  "Guardar no PC" primeiro e "Trocar" nos da equipe ("vai para o PC"), e o
+  cancelar virou "Desistir da captura".
 - Pokémon que desmaia **fica fora até o fim da fase** (item Revive virá depois).
   Um da reserva entra automaticamente no lugar. **Os 6 desmaiados = derrota.**
 - Reserva regenera vida sozinha (2,5 HP/s) — trocar é a principal sustentação.
@@ -728,6 +748,7 @@ tipo, som e o polimento de troca e captura.
 | 13 | golpes do Brock mais espaçados (spam de pedra); subir de nível cura 1/4 e evoluir cura tudo; Brock com um pouco menos de vida; teste de vitória com os iniciais | 0.11.3: `cooldownMult` 1,6 nos Pokémon do Brock e −10% de vida; `levelUpHeal` 0,25 e evolução com vida cheia. Bot na Fase 1: Charmander 2% → 69%, Bulbasaur 4% → 100%, Squirtle 64% → 100% — a cura é quase todo o efeito (só o Brock: 28%, 22%, 68%). Depois, "no começo é muito fácil": a cura só do nível 11 em diante (Fase 1: 48%, 63%, 94%); publicado |
 | 14 | ainda fácil com a cura: uma sugestão de cura por nível sem quebrar; o Fellipe escolheu 1/10 da vida máxima | 0.11.4: `levelUpHeal` 0,1 (do nível 11); Fases 1 a 3 com 43–100% e de 0 a 3,4 desmaios por tentativa (24 jornadas por inicial) |
 | 15 | investigar o inimigo preso (sugestão: teleporte aleatório quando travar); Squirtle fácil demais: inimigos um pouco mais fortes com ele | 0.11.5: a causa era o empurrão entre inimigos, que ignorava o cenário; rede de segurança com teleporte; `starterTuning` do Squirtle nas Fases 1, 6 e 7 |
+| 16 | usar o PC do Pokemon All (a Global Box: ícones, arrastar, equipe); sinalizar melhor na captura que nada se perde | 0.12: `ui/pcScreen.js` + `systems/pc.js` com casas; arte e sprites do FireRed por `tools/assets/copy_pc_art.py`; aviso na Poké Ball e tela de equipe cheia reescrita |
 
 ---
 

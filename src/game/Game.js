@@ -27,7 +27,7 @@ import { POKEMON, getPokemon } from '../data/pokemon.js';
 import { ENEMIES } from '../data/enemies.js';
 import { TRAINER_UPGRADES, getTrainerUpgrade, nextCost } from '../data/trainerUpgrades.js';
 import { MusicPlayer } from '../audio/music.js';
-import { swapWithPC } from '../systems/pc.js';
+import { swapWithPC, moveMon, normalizePC } from '../systems/pc.js';
 
 /**
  * GAME — junta tudo: perfil, telas, partida e loop principal.
@@ -448,7 +448,8 @@ export class Game {
       this.resolveCapture();
       return;
     }
-    this.hud.showCapture(choices, (pokemonId) => this.pickCapture(pokemonId), this.run.pendingGift?.title);
+    this.hud.showCapture(choices, (pokemonId) => this.pickCapture(pokemonId), this.run.pendingGift?.title,
+      { teamSize: this.run.team.members.length, maxSize: CONFIG.team.maxSize });
   }
 
   pickCapture(pokemonId) {
@@ -609,9 +610,19 @@ export class Game {
 
   /* ================================= PC ================================= */
 
-  /** O PC da jornada (Pokémon guardados fora da equipe). */
+  /** O PC da jornada (Pokémon guardados fora da equipe), cada um na sua casa. */
   get pcBox() {
-    return this.campaign.journey?.pc ?? [];
+    return normalizePC(this.campaign.journey);
+  }
+
+  /** Na tela do PC: solta o Pokémon de um lugar em outro (ver systems/pc.js). */
+  pcMove(from, to) {
+    const ok = moveMon(this.campaign.journey, from, to, CONFIG.team.maxSize);
+    if (!ok) return false;
+    if (this.centerOpen) this._showCenter();   // o PC do Centro Pokémon muda quem volta para a fase
+    this.menus.buildCampaign();
+    this.autosave();
+    return true;
   }
 
   /** No lobby: troca um da equipe por um do PC (ver systems/pc.js). */

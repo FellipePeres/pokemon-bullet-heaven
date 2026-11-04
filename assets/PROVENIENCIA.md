@@ -56,6 +56,14 @@ nos `.pal`. O índice 0 é transparente, e o recorte é sempre pelo índice, nun
 | `ui/window-frame.png`, `ui/window-frame-button.png` | `src/app/assets/` do Pokemon All: a `graphics/text_window/type2.png` do decomp com a paleta `stdpal_0`, já ampliada (3x e 2x) para o `border-image` sair nítido |
 | `fonts/*.woff2` | Press Start 2P e Pixelify Sans, as fontes do Pokemon All, baixadas do Google Fonts (licença SIL Open Font License 1.1, que permite redistribuir) |
 
+## PC do FireRed (`tools/assets/copy_pc_art.py`, do Pokemon All)
+
+| Saída | Origem |
+|---|---|
+| `pc/*.png` (fundo, painéis, botão, mão, setas) | `src/app/assets/pc/` do Pokemon All: peças da folha da interface do PC do FireRed (The Spriters Resource), recortadas lá por `extract_pc_interface.py`, ampliadas 4x |
+| `pc/wallpapers/*.png` | os 16 papéis de parede do jogo e as faixas deles, do mesmo lugar |
+| `pokemon/gen3/icons/<dex>.png`, `pokemon/gen3/front/<dex>.png` | ícone de caixa (32x64, dois quadros) e sprite frontal (64x64) do FireRed, do decomp pret/pokefirered via `assets/pokemon/gen3/` do Pokemon All, reduzidos de 4x para 1x |
+
 ## Outros
 
 | Arquivo | Origem |

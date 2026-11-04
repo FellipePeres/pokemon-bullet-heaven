@@ -121,8 +121,9 @@ Perder devolve você ao início da fase com a equipe como estava ao entrar nela.
   com volume ajustável.
 - **Derrota**: vá ao Centro Pokémon (a equipe é curada; dali você volta para a
   fase, mexe no PC ou vai ao mapa) ou recomece a jornada do zero.
-- **PC**: com a equipe cheia, quem sai (ou quem chega) vai para o PC, e no mapa da
-  jornada você monta a equipe da próxima fase.
+- **PC do FireRed**: com a equipe cheia, nada se perde — quem sai (ou quem chega)
+  vai para o PC. No mapa da jornada, o PC é o do jogo: caixas com papel de parede,
+  a mão como cursor, pegar e soltar para montar a equipe da próxima fase.
 - **Conquistas em níveis**: 20 conquistas, cada uma com vários degraus — ao coletar,
   ela volta com um objetivo maior e mais Shards.
 - Fases de cerca de 4 minutos.

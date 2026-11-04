@@ -210,6 +210,8 @@
             <p class="subtitle" id="capture-subtitle">Escolha um Pokémon para a sua equipe</p>
           </div>
         </div>
+        <!-- 0.12: os testes mostraram jogadores deixando de capturar com medo de perder alguém -->
+        <p id="capture-note" class="capture-note hidden"></p>
         <div id="capture-choices" class="card-row"></div>
         <button id="capture-skip" class="menu-btn ghost slim">Ignorar</button>
       </div>
@@ -360,20 +362,11 @@
   </div>
 
   <!-- O PC do lobby: troque Pokémon entre a equipe e o PC entre uma fase e outra -->
-  <div id="modal-pc" class="modal hidden">
-    <div class="modal-card wide">
-      <header class="modal-head">
-        <h3><span class="ui-icon"><img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/pokemon-box-link.png" alt="" /></span>PC</h3>
-        <span class="modal-sub" id="pc-sub">Escolha um da equipe e um do PC para trocar.</span>
-        <button class="icon-btn close" data-close>✕</button>
-      </header>
-      <div class="modal-body">
-        <h4 class="pc-title" id="pc-team-title">Equipe</h4>
-        <div id="pc-team" class="pc-grid"></div>
-        <div class="pc-actions" id="pc-actions"></div>
-        <h4 class="pc-title" id="pc-box-title">PC</h4>
-        <div id="pc-box" class="pc-grid"></div>
-      </div>
+  <!-- O PC: a tela de armazenamento do FireRed, trazida do Pokemon All (ui/pcScreen.js) -->
+  <div id="modal-pc" class="modal pc-modal hidden">
+    <div class="pc-stage">
+      <div id="pc-screen" class="pc-screen"></div>
+      <p id="pc-hint" class="pc-hint"></p>
     </div>
   </div>
 

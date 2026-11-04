@@ -20,7 +20,7 @@ import { hpRatio } from '../src/systems/stats.js';
 import { nextMoveFor, moveLineOf } from '../src/data/tms.js';
 import { getPokemon } from '../src/data/pokemon.js';
 import { Pickup } from '../src/entities/Pickup.js';
-import { swapWithPC } from '../src/systems/pc.js';
+import { swapWithPC, normalizePC, monAt, previewMove, moveMon, boxCount } from '../src/systems/pc.js';
 import { TILE } from '../src/systems/terrain.js';
 
 let failures = 0;
@@ -442,6 +442,35 @@ console.log('\n[PC e capturas]');
         && swapWithPC(journey, null, journey.pc[0].uid, 6));
   const solo = { team: { members: [journey.team.members[0]], active: [journey.team.members[0].uid] }, pc: [] };
   check('a equipe nunca fica vazia', !swapWithPC(solo, solo.team.members[0].uid, null, 6));
+
+  // as caixas (0.12): cada um tem casa; pegar e soltar move, troca ou deposita
+  const box = (slot) => ({ area: 'box', slot });
+  const team = (index) => ({ area: 'team', index });
+  const j = { team: run.team.serialize(), pc: run.pc.map((m) => ({ ...m, slot: undefined })) };
+  normalizePC(j);
+  check('quem chega ao PC ganha a primeira casa vazia, sem repetir',
+        new Set(j.pc.map((m) => m.slot)).size === j.pc.length && j.pc.every((m) => m.slot < j.pc.length));
+  const first = monAt(j, box(0));
+  check('soltar numa casa vazia leva para lá', previewMove(j, box(0), box(40), 6) === 'drop'
+        && moveMon(j, box(0), box(40), 6) && monAt(j, box(40)) === first && !monAt(j, box(0)));
+  const second = monAt(j, box(1));
+  check('soltar em cima de outro troca os dois', previewMove(j, box(40), box(1), 6) === 'swap'
+        && moveMon(j, box(40), box(1), 6) && monAt(j, box(1)) === first && monAt(j, box(40)) === second);
+  check('com a equipe cheia, a vaga vazia dela não aceita ninguém do PC',
+        j.team.members.length === 6 && previewMove(j, box(1), team(6), 6) === 'blocked');
+  const outgoing = j.team.members[0];
+  const wasActive = j.team.active.indexOf(outgoing.uid);
+  check('do PC para cima de alguém da equipe: trocam, e o novo assume o lugar dele em campo',
+        moveMon(j, box(1), team(0), 6) && j.team.members[0] === first && monAt(j, box(1)) === outgoing
+        && (wasActive === -1 || j.team.active[wasActive] === first.uid) && first.slot === undefined);
+  const a = j.team.members[1], b = j.team.members[4];
+  check('dentro da equipe, soltar em cima troca a ordem', moveMon(j, team(1), team(4), 6)
+        && j.team.members[1] === b && j.team.members[4] === a);
+  const out2 = j.team.members[2];
+  check('da equipe para uma casa vazia: deposita, e a vaga em campo é completada',
+        moveMon(j, team(2), box(70), 6) && monAt(j, box(70)) === out2 && j.team.members.length === 5
+        && !j.team.active.includes(out2.uid) && j.team.active.every((uid) => j.team.members.some((m) => m.uid === uid)));
+  check('o PC abre caixas conforme enche (8 no mínimo)', boxCount(j) === 8 && boxCount({ pc: [{ slot: 245 }] }) === 10);
 }
 
 // ---------------------------------------------- 5.11 ajuste por inicial

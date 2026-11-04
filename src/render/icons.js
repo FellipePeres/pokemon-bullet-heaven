@@ -16,6 +16,7 @@ const ITEM = {
   pokedex:      { item: 'town-map',     emoji: '📕' },
   achievements: { item: 'star-piece',   emoji: '🏆' },
   team:         { item: 'poke-ball',    emoji: '🎒' },
+  pc:           { item: 'pokemon-box-link', emoji: '🖥️' },
   trainer:      { item: 'coin-case',    emoji: '🪙' },
   options:      { item: 'escape-rope',  emoji: '⚙️' },
   help:         { item: 'oaks-parcel',  emoji: '❔' },

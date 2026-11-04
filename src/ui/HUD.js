@@ -329,10 +329,17 @@ export class HUD {
 
   /* ============================== CAPTURA ============================== */
 
-  showCapture(choices, onPick, subtitle = 'Escolha um Pokémon para a sua equipe') {
+  showCapture(choices, onPick, subtitle = 'Escolha um Pokémon para a sua equipe', { teamSize = 0, maxSize = 6 } = {}) {
     const row = clear(el('capture-choices'));
+    row.classList.remove('compact');
     el('capture-subtitle').textContent = subtitle;
     el('capture-skip').textContent = 'Ignorar';
+    // nada se perde: com a equipe cheia, o PC guarda (0.12, os testes mostraram
+    // jogadores deixando de capturar por achar que alguém seria descartado)
+    this._captureNote(teamSize >= maxSize
+      ? '<b>Equipe cheia? Pode capturar!</b> Nenhum Pokémon se perde: o novo vai para o PC, ou entra na equipe e quem sair vai para o PC.'
+      : `Entra direto na equipe (${teamSize + 1}/${maxSize}). Quando ela encher, o PC guarda os próximos.`,
+      teamSize >= maxSize);
 
     choices.forEach((pokemon) => {
       row.appendChild(this._pokemonCard(pokemon, () => onPick(pokemon.id)));
@@ -343,21 +350,34 @@ export class HUD {
   /** Segunda etapa: equipe cheia, escolher quem sai. */
   showReplace(pokemon, members, onPick, onSendToPC = null) {
     const row = clear(el('capture-choices'));
-    el('capture-subtitle').textContent = `Equipe cheia. Quem vai para o PC para ${pokemon.name} entrar?`;
-    el('capture-skip').textContent = 'Cancelar';
+    row.classList.add('compact');   // 7 cards: sem a descrição, para caber na tela
+    el('capture-subtitle').textContent = `Equipe cheia — ninguém se perde. Onde fica o ${pokemon.name}?`;
+    el('capture-skip').textContent = 'Desistir da captura';
+    this._captureNote('Quem sair da equipe vai para o PC e volta quando você quiser, pelo PC do mapa da jornada ou do Centro Pokémon.', true);
     if (onSendToPC) {
       // o novo vai direto para o PC: a equipe fica como está e ele espera no lobby
-      const pc = this._pokemonCard(pokemon, onSendToPC, `Mandar ${pokemon.name} para o PC`);
+      const pc = this._pokemonCard(pokemon, onSendToPC, 'Fica no PC; a equipe não muda');
       pc.classList.add('to-pc');
+      pc.prepend(create('span', 'card-badge', 'Guardar no PC'));
       row.appendChild(pc);
     }
 
     members.forEach((member) => {
       const data = getPokemon(member.pokemonId);
-      row.appendChild(this._pokemonCard(data, () => onPick(member.uid),
-        `Nv.${member.level}${member.fainted ? ' · desmaiado' : ''}`));
+      const card = this._pokemonCard(data, () => onPick(member.uid),
+        `Nv.${member.level}${member.fainted ? ' · desmaiado' : ''} · vai para o PC`);
+      card.prepend(create('span', 'card-badge swap', 'Trocar'));
+      row.appendChild(card);
     });
     show(el('capture-overlay'));
+  }
+
+  /** O aviso da Poké Ball: com a equipe cheia, em destaque. */
+  _captureNote(html, strong) {
+    const note = el('capture-note');
+    note.innerHTML = `${iconHTML('pc', 22)}<span>${html}</span>`;
+    note.classList.toggle('strong', strong);
+    show(note);
   }
 
   hideCapture() { hide(el('capture-overlay')); }
