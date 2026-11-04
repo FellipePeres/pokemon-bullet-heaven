@@ -31,7 +31,7 @@ export class TeamSystem {
   has(pokemonId) { return this.members.some((m) => m.pokemonId === pokemonId); }
 
   /** Cria a entrada de equipe de um Pokémon: o estado dele nesta jornada. */
-  createMember(pokemonId, level = 1) {
+  createMember(pokemonId, level = 1, { shiny = false } = {}) {
     const data = getPokemon(pokemonId);
     const member = {
       uid: uid('mon'),
@@ -42,6 +42,7 @@ export class TeamSystem {
       fainted: false,
       pendingLevels: 0,
       attack: true,           // a espadinha do HUD: desligado, ele só acompanha
+      shiny,                  // as cores raras (0.13.1): só de captura
       abilities: [...data.abilities],
       upgrades: {}            // upgrades de habilidade são por Pokémon
     };
@@ -50,9 +51,9 @@ export class TeamSystem {
   }
 
   /** Adiciona um Pokémon à equipe. Entra em campo se houver slot ativo livre. */
-  add(pokemonId, level = 1) {
+  add(pokemonId, level = 1, options = {}) {
     if (this.isFull) return null;
-    const member = this.createMember(pokemonId, level);
+    const member = this.createMember(pokemonId, level, options);
     this.members.push(member);
 
     const freeSlot = this.active.indexOf(null);
@@ -64,10 +65,10 @@ export class TeamSystem {
   }
 
   /** Substitui um membro da equipe (usado quando a equipe está cheia). */
-  replaceMember(oldUid, pokemonId, level = 1) {
+  replaceMember(oldUid, pokemonId, level = 1, options = {}) {
     const index = this.members.findIndex((m) => m.uid === oldUid);
     if (index === -1) return null;
-    const newMember = this.createMember(pokemonId, level);
+    const newMember = this.createMember(pokemonId, level, options);
     const activeIndex = this.active.findIndex((m) => m && m.uid === oldUid);
     this.members[index] = newMember;
     if (activeIndex !== -1) this.active[activeIndex] = newMember;
@@ -160,7 +161,7 @@ export class TeamSystem {
     return {
       uid: m.uid, pokemonId: m.pokemonId, level: m.level, xp: Math.round(m.xp),
       hp: Math.round(m.hp), fainted: m.fainted, pendingLevels: m.pendingLevels, attack: m.attack !== false,
-      abilities: [...m.abilities], upgrades: { ...m.upgrades }
+      shiny: !!m.shiny, abilities: [...m.abilities], upgrades: { ...m.upgrades }
     };
   }
 
@@ -184,6 +185,7 @@ export class TeamSystem {
         fainted: !!m.fainted,
         pendingLevels: m.pendingLevels ?? 0,
         attack: m.attack !== false,
+        shiny: !!m.shiny,
         abilities: [...(m.abilities ?? getPokemon(m.pokemonId).abilities)],
         upgrades: { ...(m.upgrades ?? {}) }
       };

@@ -278,7 +278,8 @@ export class Game {
     ];
     const dexes = new Set(enemyIds.map((id) => ENEMIES[id]?.dex).filter(Boolean));
     for (const member of this.run.team.members) dexes.add(getPokemon(member.pokemonId).dex);
-    preloadAssets([...dexes].map((dex) => `pokemon/${dex}`));
+    const shiny = this.run.team.members.filter((m) => m.shiny).map((m) => `pokemon/shiny/${getPokemon(m.pokemonId).dex}`);
+    preloadAssets([...[...dexes].map((dex) => `pokemon/${dex}`), ...shiny]);
     SceneryCache.preload(stageScenes(stage));
   }
 
@@ -448,26 +449,26 @@ export class Game {
       this.resolveCapture();
       return;
     }
-    this.hud.showCapture(choices, (pokemonId) => this.pickCapture(pokemonId), this.run.pendingGift?.title,
+    this.hud.showCapture(choices, (pokemonId, shiny) => this.pickCapture(pokemonId, shiny), this.run.pendingGift?.title,
       { teamSize: this.run.team.members.length, maxSize: CONFIG.team.maxSize });
   }
 
-  pickCapture(pokemonId) {
+  pickCapture(pokemonId, shiny = false) {
     const run = this.run;
     if (run.team.isFull) {
       // equipe cheia: quem sai vai para o PC — ou o novo vai direto para lá
-      this.hud.showReplace(getPokemon(pokemonId), run.team.members, (memberUid) => {
-        run.captureSystem.captureReplacing(memberUid, pokemonId);
+      this.hud.showReplace({ ...getPokemon(pokemonId), shiny }, run.team.members, (memberUid) => {
+        run.captureSystem.captureReplacing(memberUid, pokemonId, { shiny });
         this.tracker.registerCaught(getPokemon(pokemonId).dex);
         this.resolveCapture();
       }, () => {
-        run.captureSystem.captureToPC(pokemonId);
+        run.captureSystem.captureToPC(pokemonId, { shiny });
         this.tracker.registerCaught(getPokemon(pokemonId).dex);
         this.resolveCapture();
       });
       return;
     }
-    run.captureSystem.capture(pokemonId);
+    run.captureSystem.capture(pokemonId, { shiny });
     this.tracker.registerCaught(getPokemon(pokemonId).dex);
     this.resolveCapture();
   }
@@ -511,7 +512,7 @@ export class Game {
         date: new Date().toISOString(),
         trainer: this.profile.trainer,
         region: this.profile.region,
-        team: run.team.members.map((m) => ({ pokemonId: m.pokemonId, level: m.level }))
+        team: run.team.members.map((m) => ({ pokemonId: m.pokemonId, level: m.level, shiny: !!m.shiny }))
       });
     }
     this.autosave();

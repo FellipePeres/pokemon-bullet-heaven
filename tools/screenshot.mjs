@@ -164,6 +164,20 @@ const ROTEIROS = {
     { run: "game.menus.lobby.selected = 'e4_lorelei'; game.menus.lobby.render()" }, { wait: 500 }, { shot: 'lobby-3-liga' },
     { run: "game.menus.showModal('modal-badges', { stageId: 'gym_2_cerulean' })" }, { wait: 900 }, { shot: 'lobby-4-estojo' }
   ],
+  // shiny (0.13.1): as opções da Poké Ball, o Pokémon no campo (com o brilho) e no PC
+  shiny: [
+    { open: 'index.html' }, { wait: 500 },
+    { run: START_RUN }, { wait: 1200 },
+    { run: "game.run.spawner.update = () => {}; game.run.enemies.length = 0; " +
+           "import('./src/core/config.js').then(({ CONFIG }) => { CONFIG.capture.shinyChance = 1;" +
+           "game.run.pendingBall = true; game.run.state = 'capture'; game.openCapture(); })" },
+    { wait: 1200 }, { shot: 'shiny-1-pokebola', raw: true },
+    { run: "const c = game.run.captureSystem.rollChoices()[0]; game.pickCapture(c.id, true); game.resolveCapture()" },
+    { wait: 1400 }, { shot: 'shiny-2-campo', raw: true }, { wait: 1300 }, { shot: 'shiny-3-campo', raw: true },
+    { run: "game.campaign.journey = { team: game.run.team.serialize(), pc: [] }; game.quitToMenu(); game.menus.showModal('modal-pc');" +
+           "game.menus.pcScreen.aim = { area: 'team', index: 1 }; game.menus.pcScreen.render()" },
+    { wait: 900 }, { shot: 'shiny-4-pc' }
+  ],
   // a Poké Ball com a equipe cheia (0.12): o aviso de que nada se perde e o "onde ele fica"
   'captura-cheia': [
     { open: 'index.html' }, { wait: 500 },

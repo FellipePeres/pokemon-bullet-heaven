@@ -507,7 +507,33 @@ console.log('\n[ajuste por inicial]');
         `vida ×${keep.hp}, dano ×${keep.damage}`);
 }
 
-// ---------------------------------------------- 5.12 métricas da fase (o Estojo de Insígnias)
+// ---------------------------------------------- 5.12 shiny (só na captura e do jogador)
+console.log('\n[shiny]');
+{
+  const run = new Run('gym_1_pewter', { starter: 'charmander' });
+  const chance = CONFIG.capture.shinyChance;
+  check('a chance de shiny é rara (1% por opção, padrão)', chance > 0 && chance <= 0.02);
+  CONFIG.capture.shinyChance = 1;
+  const all = run.captureSystem.rollChoices();
+  CONFIG.capture.shinyChance = 0;
+  const none = run.captureSystem.rollChoices();
+  CONFIG.capture.shinyChance = chance;
+  check('cada opção da Poké Ball sorteia o shiny', all.every((p) => p.shiny) && none.every((p) => !p.shiny));
+  check('a equipe inicial e os selvagens não são shiny',
+        !run.team.members[0].shiny && !run.spawner.spawnAt('rattata', 0, 0, 5).shiny);
+  const member = run.captureSystem.capture('pikachu', { shiny: true });
+  check('quem é capturado shiny entra shiny e o save guarda', member.shiny && run.team.serialize().members.at(-1).shiny === true);
+  const restored = new Run('gym_1_pewter', { team: run.team.serialize() });
+  check('carregar o save mantém o shiny', restored.team.members.find((m) => m.pokemonId === 'pikachu')?.shiny === true);
+  member.level = 29;
+  run.progression.addXpTo(member, run.progression.xpToNext(29) + 1);
+  check('evoluir mantém o shiny', member.pokemonId === 'raichu' && member.shiny,
+        `${member.pokemonId}, shiny: ${member.shiny}`);
+  run.captureSystem.captureToPC('pidgey', { shiny: true });
+  check('mandado direto para o PC, continua shiny', run.pc.at(-1).shiny === true);
+}
+
+// ---------------------------------------------- 5.13 métricas da fase (o Estojo de Insígnias)
 console.log('\n[métricas da fase]');
 {
   let s = recordStageResult(undefined, { victory: false, time: 200, faints: 6, level: 15, captures: 2, damage: 1000.6, team: [], date: 'a' });

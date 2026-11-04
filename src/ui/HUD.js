@@ -135,7 +135,7 @@ export class HUD {
     card.appendChild(create('span', 'key-hint', String(index + 1)));
     card.appendChild(this._attackButton(run, member));
     if (member.attack === false) card.classList.add('passive');
-    card.appendChild(pokemonImg(data.dex, { alt: data.name }));
+    card.appendChild(pokemonImg(data.dex, { alt: data.name, shiny: member.shiny }));
 
     const info = create('div', 'mon-info');
     const top = create('div', 'mon-top');
@@ -169,7 +169,7 @@ export class HUD {
     const index = run.team.members.indexOf(member);
 
     node.appendChild(create('span', 'key-hint', String(index + 1)));
-    node.appendChild(pokemonImg(data.dex, { alt: data.name }));
+    node.appendChild(pokemonImg(data.dex, { alt: data.name, shiny: member.shiny }));
     node.appendChild(create('div', 'bench-lv', `Nv.${member.level}`));
 
     const hpBar = create('div', 'bar hp tiny');
@@ -243,8 +243,8 @@ export class HUD {
 
   showLevelUp(member, choices, onPick) {
     const data = getPokemon(member.pokemonId);
-    el('levelup-sprite').src = animatedUrl(data.dex);
-    el('levelup-sprite').onerror = (e) => { e.target.src = spriteUrl(data.dex); };
+    el('levelup-sprite').src = animatedUrl(data.dex, member.shiny);
+    el('levelup-sprite').onerror = (e) => { e.target.src = spriteUrl(data.dex, member.shiny); };
     el('levelup-subtitle').textContent =
       `${data.name} chegou ao nível ${member.level}` +
       (member.pendingLevels > 1 ? ` · ${member.pendingLevels} melhorias pendentes` : '');
@@ -275,10 +275,10 @@ export class HUD {
   showEvolution({ member, from, to }, onContinue) {
     const fromImg = el('evo-from');
     const toImg = el('evo-to');
-    fromImg.src = animatedUrl(from.dex);
-    fromImg.onerror = () => { fromImg.src = spriteUrl(from.dex); };
-    toImg.src = animatedUrl(to.dex);
-    toImg.onerror = () => { toImg.src = spriteUrl(to.dex); };
+    fromImg.src = animatedUrl(from.dex, member.shiny);
+    fromImg.onerror = () => { fromImg.src = spriteUrl(from.dex, member.shiny); };
+    toImg.src = animatedUrl(to.dex, member.shiny);
+    toImg.onerror = () => { toImg.src = spriteUrl(to.dex, member.shiny); };
 
     el('evolution-text').textContent =
       `${from.name} evoluiu para ${to.name}! (nível ${member.level}) ` +
@@ -317,8 +317,8 @@ export class HUD {
       const data = getPokemon(mon.pokemonId);
       const card = create('div', 'hall-mon');
       card.style.animationDelay = `${0.35 + i * 0.45}s`;
-      card.appendChild(pokemonImg(data.dex, { alt: data.name }));
-      card.append(create('b', '', data.name), create('span', '', `Nv. ${mon.level}`));
+      card.appendChild(pokemonImg(data.dex, { alt: data.name, shiny: mon.shiny }));
+      card.append(create('b', '', `${mon.shiny ? '✦ ' : ''}${data.name}`), create('span', '', `Nv. ${mon.level}`));
       row.appendChild(card);
     });
     el('hall-close').onclick = onClose;
@@ -342,7 +342,7 @@ export class HUD {
       teamSize >= maxSize);
 
     choices.forEach((pokemon) => {
-      row.appendChild(this._pokemonCard(pokemon, () => onPick(pokemon.id)));
+      row.appendChild(this._pokemonCard(pokemon, () => onPick(pokemon.id, pokemon.shiny)));
     });
     show(el('capture-overlay'));
   }
@@ -364,7 +364,7 @@ export class HUD {
 
     members.forEach((member) => {
       const data = getPokemon(member.pokemonId);
-      const card = this._pokemonCard(data, () => onPick(member.uid),
+      const card = this._pokemonCard({ ...data, shiny: member.shiny }, () => onPick(member.uid),
         `Nv.${member.level}${member.fainted ? ' · desmaiado' : ''} · vai para o PC`);
       card.prepend(create('span', 'card-badge swap', 'Trocar'));
       row.appendChild(card);
@@ -388,8 +388,13 @@ export class HUD {
       (t) => `<span class="type-tag" style="background:${typeColor(t)}">${typeName(t)}</span>`
     ).join('');
 
-    const img = pokemonImg(pokemon.dex, { className: 'card-sprite', alt: pokemon.name });
+    const img = pokemonImg(pokemon.dex, { className: 'card-sprite', alt: pokemon.name, shiny: pokemon.shiny });
     card.appendChild(img);
+    if (pokemon.shiny) {
+      // raro: o card brilha e diz
+      card.classList.add('shiny');
+      card.appendChild(create('span', 'card-badge shiny', '✦ Shiny'));
+    }
     const body = create('div');
     body.innerHTML = `
       <h3>${pokemon.name}</h3>
@@ -476,7 +481,7 @@ export class HUD {
     return members.map((member) => {
       const data = getPokemon(member.pokemonId);
       const node = create('div', `sum-mon${member.fainted ? ' fainted' : ''}`);
-      node.appendChild(pokemonImg(data.dex, { alt: data.name }));
+      node.appendChild(pokemonImg(data.dex, { alt: data.name, shiny: member.shiny }));
       node.appendChild(create('b', '', `Nv.${member.level}`));
       node.appendChild(create('span', '', data.name));
       node.title = member.fainted ? `${data.name} — desmaiado` : data.name;

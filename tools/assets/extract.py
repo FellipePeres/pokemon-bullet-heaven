@@ -233,8 +233,10 @@ POKEDEX_RANGE = range(1, 152)   # Kanto; regiões novas estendem a faixa
 MAX_FRAMES = 36                 # animações mais longas são amostradas (mais leve)
 
 
-def extract_pokemon(source, manifest):
-    gifs = source / 'assets' / 'pokemon' / 'battle' / 'front'
+def extract_pokemon(source, manifest, shiny=False):
+    # as cores shiny (0.13) são outros GIFs da mesma coleção, com o mesmo corte
+    gifs = source / 'assets' / 'pokemon' / 'battle' / ('front-shiny' if shiny else 'front')
+    key, folder = ('pokemon/shiny', ASSETS / 'pokemon' / 'shiny') if shiny else ('pokemon', ASSETS / 'pokemon')
     for dex in POKEDEX_RANGE:
         gif = Image.open(gifs / f'{dex}.gif')
         frames, durations = [], []
@@ -252,8 +254,8 @@ def extract_pokemon(source, manifest):
         # com paleta (8 bits) a folha fica com menos da metade do tamanho; cada GIF
         # já usa no máximo 256 cores, então quase sempre não se perde nada
         sheet = strip(cells).quantize(colors=256, method=Image.Quantize.FASTOCTREE)
-        manifest[f'pokemon/{dex}'] = {
-            'src': save(sheet, ASSETS / 'pokemon' / f'{dex}.png'),
+        manifest[f'{key}/{dex}'] = {
+            'src': save(sheet, folder / f'{dex}.png'),
             'frameWidth': cells[0].width, 'frameHeight': cells[0].height, 'frames': len(cells), 'fps': fps,
         }
 
@@ -458,6 +460,7 @@ def main():
     extract_portraits(decomp, manifest)
     extract_fx(decomp, manifest)
     extract_pokemon(args.fonte, manifest)
+    extract_pokemon(args.fonte, manifest, shiny=True)
     extract_items(args.fonte, manifest)
     extract_ui(decomp, manifest)
     extract_scenes(decomp, manifest)

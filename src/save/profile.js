@@ -21,7 +21,8 @@ export function createProfile() {
     trainer: null,
     // Pokédex: só registra o que foi CAPTURADO. O que não foi aparece como silhueta.
     pokedex: {
-      caught: []
+      caught: [],
+      shiny: []       // espécies que você já teve shiny (0.13.1)
     },
     achievements: {
       // degraus coletados de cada conquista (data/achievements.js): { catcher: 2, ... }
@@ -57,7 +58,8 @@ export function createProfile() {
       flawlessClears: 0,
       shardsEarned: 0,
       champions: 0,
-      trainerUpgradesBought: 0
+      trainerUpgradesBought: 0,
+      shinyCaught: 0
     },
     // equipes campeãs (Hall da Fama): { date, trainer, region, team: [{ pokemonId, level }] }
     hallOfFame: [],
@@ -165,9 +167,14 @@ export class ProfileTracker {
       if (enemy?.boss) stats().leaderPokemonDefeated++;
       else if (enemy?.elite) stats().elitesDefeated++;
     });
-    bus.on(EVENTS.POKEMON_CAPTURED, ({ dex }) => {
+    bus.on(EVENTS.POKEMON_CAPTURED, ({ dex, shiny }) => {
       stats().totalCaptures++;
       this.registerCaught(dex);
+      if (shiny) {
+        stats().shinyCaught = (stats().shinyCaught ?? 0) + 1;
+        const seen = (this.profile.pokedex.shiny ??= []);
+        if (!seen.includes(dex)) seen.push(dex);
+      }
       this.checkAchievements();
     });
     bus.on(EVENTS.POKEMON_EVOLVED, () => { stats().evolutions++; });

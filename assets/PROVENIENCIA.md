@@ -34,6 +34,7 @@ salões, e quais metatiles bloqueiam o caminho pela colisão do mapa) sai em
 | Saída | Origem |
 |---|---|
 | `pokemon/<dex>.png` | `assets/pokemon/battle/front/<dex>.gif` (GIFs da Gen 5), convertidos em tira de quadros com paleta reduzida |
+| `pokemon/shiny/<dex>.png` | o mesmo, de `assets/pokemon/battle/front-shiny/<dex>.gif`: as cores shiny (0.13.1) |
 | `items/poke-ball.png`, `items/magnet.png`, `items/potion.png` | `assets/items/default/<nome>.png` (vêm do PokeAPI/sprites), copiados como estão: a Poké Ball, o Ímã e a Poção que caem no chão |
 
 Os PNG do decomp são indexados com uma paleta provisória; as cores de verdade estão
@@ -62,7 +63,7 @@ nos `.pal`. O índice 0 é transparente, e o recorte é sempre pelo índice, nun
 |---|---|
 | `pc/*.png` (fundo, painéis, botão, mão, setas) | `src/app/assets/pc/` do Pokemon All: peças da folha da interface do PC do FireRed (The Spriters Resource), recortadas lá por `extract_pc_interface.py`, ampliadas 4x |
 | `pc/wallpapers/*.png` | os 16 papéis de parede do jogo e as faixas deles, do mesmo lugar |
-| `pokemon/gen3/icons/<dex>.png`, `pokemon/gen3/front/<dex>.png` | ícone de caixa (32x64, dois quadros) e sprite frontal (64x64) do FireRed, do decomp pret/pokefirered via `assets/pokemon/gen3/` do Pokemon All, reduzidos de 4x para 1x |
+| `pokemon/gen3/icons/<dex>.png`, `pokemon/gen3/front/<dex>.png`, `pokemon/gen3/front-shiny/<dex>.png` | ícone de caixa (32x64, dois quadros) e sprite frontal (64x64) do FireRed, do decomp pret/pokefirered via `assets/pokemon/gen3/` do Pokemon All, reduzidos de 4x para 1x |
 
 ## Lobby (0.13)
 

@@ -173,6 +173,7 @@ export class PCScreen {
     node.type = 'button';
     if (isTeam && mon && journey?.team?.active?.includes(mon.uid)) node.classList.add('pc-slot--field');
     if (mon) node.appendChild(this._icon(mon, !!kind));
+    if (mon?.shiny) node.appendChild(create('span', 'pc-shiny', '✦'));
     const ghost = !mon && this._ghost(spot);
     if (ghost) node.appendChild(this._icon(ghost, false, true));
     const data = mon && getPokemon(mon.pokemonId);
@@ -228,11 +229,11 @@ export class PCScreen {
     if (!mon) return panel;
     const data = getPokemon(mon.pokemonId);
     const sprite = create('img', 'pc-data__sprite');
-    sprite.src = `assets/pokemon/gen3/front/${data.dex}.png`;
+    sprite.src = `assets/pokemon/gen3/${mon.shiny ? 'front-shiny' : 'front'}/${data.dex}.png`;
     sprite.alt = '';
     panel.appendChild(sprite);
     const info = create('div', 'pc-data__info');
-    info.appendChild(create('p', 'pc-data__name', data.name));
+    info.appendChild(create('p', `pc-data__name${mon.shiny ? ' shiny' : ''}`, `${mon.shiny ? '✦ ' : ''}${data.name}`));
     const types = create('p', 'pc-types');
     for (const type of data.types) {
       const tag = create('span', 'pc-type', typeName(type));

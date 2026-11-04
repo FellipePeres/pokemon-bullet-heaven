@@ -5,7 +5,7 @@
 > decisão foi tomada e o que falta fazer. O `README.md` é o manual de uso;
 > este aqui é o contexto de desenvolvimento.
 
-**Versão atual:** `0.13.0` · **Última atualização:** 2026-11-03
+**Versão atual:** `0.13.1` · **Última atualização:** 2026-11-03
 **Stack:** HTML + CSS + JavaScript puro (ES Modules). Sem backend, sem build, sem dependências.
 **Repositório:** https://github.com/FellipePeres/pokemon-bullet-heaven (público)
 **Jogo no ar:** https://fellipeperes.github.io/pokemon-bullet-heaven/
@@ -222,6 +222,16 @@ confirmar com ele**.
   (`normalizePC`), são no mínimo 8 caixas e sempre uma com folga. Do Pokemon All
   ficaram de fora o SUMÁRIO, o ORDENAR/Tipos, o PULAR e a lixeira (soltar na
   natureza) — padrão até o Fellipe decidir.
+- **Shiny** (0.13.1, "não aparece shiny nos inimigos, apenas na captura e para o
+  jogador"): cada opção da Poké Ball (ou do presente) tem `CONFIG.capture.shinyChance`
+  de vir shiny (1%, padrão até o Fellipe decidir). O card brilha em dourado com
+  "✦ Shiny"; quem entra guarda `member.shiny` (no save, na evolução e no PC). No
+  campo, a tira animada shiny (`pokemon/shiny/<dex>`, os GIFs `front-shiny` do
+  Pokemon All) e três estrelinhas piscando de tempos em tempos (`drawShinySparkles`);
+  nos cards, os GIFs shiny do PokeAPI; no PC, o sprite shiny do FireRed (o ícone de
+  caixa não muda, como no jogo) e o ✦. A Pokédex marca com ✦ quem você já teve
+  shiny (`pokedex.shiny`), e a conquista **Brilho Raro** conta `shinyCaught`
+  (1, 3, 5, 10). Selvagens e o inicial nunca são shiny.
 - **Captura sem medo** (0.12, "os testes deixam de capturar achando que um
   Pokémon é descartado"): a tela da Poké Ball avisa — em destaque com a equipe
   cheia — que nada se perde; a de equipe cheia pergunta "onde fica o X?", com
@@ -791,7 +801,7 @@ tipo, som e o polimento de troca e captura.
 | 15 | investigar o inimigo preso (sugestão: teleporte aleatório quando travar); Squirtle fácil demais: inimigos um pouco mais fortes com ele | 0.11.5: a causa era o empurrão entre inimigos, que ignorava o cenário; rede de segurança com teleporte; `starterTuning` do Squirtle nas Fases 1, 6 e 7 |
 | 16 | usar o PC do Pokemon All (a Global Box: ícones, arrastar, equipe); sinalizar melhor na captura que nada se perde | 0.12: `ui/pcScreen.js` + `systems/pc.js` com casas; arte e sprites do FireRed por `tools/assets/copy_pc_art.py`; aviso na Poké Ball e tela de equipe cheia reescrita |
 | 17 | a Poção do nível máximo (50%) forte demais: 20%; ideia do bônus de ataque raro no nível máximo (planejamento); tem shiny?; líderes das últimas fases fracos demais | 0.12.1: `maxedHeal` 0,2; D11 no PLANEJAMENTO; shiny não existe (respondido). 0.12.2: `stage.bossTuning`, rampa do Erika ao Campeão |
-| 18 | lobby mais bonito e único (planejado junto: o Town Map, o estojo com as métricas, tudo na barra do topo); o 2º golpe no lugar do bônus de ataque; shiny só na captura e do jogador; publicar o lobby | 0.13: `ui/lobby.js`, `ui/badgeCase.js`, `systems/stageStats.js`, `data/regionMap.js`, mapa e cartão por script; D11 reescrita; shiny a seguir |
+| 18 | lobby mais bonito e único (planejado junto: o Town Map, o estojo com as métricas, tudo na barra do topo); o 2º golpe no lugar do bônus de ataque; shiny só na captura e do jogador; publicar o lobby | 0.13: `ui/lobby.js`, `ui/badgeCase.js`, `systems/stageStats.js`, `data/regionMap.js`, mapa e cartão por script; D11 reescrita (publicada com a Poção e os líderes). 0.13.1: shiny (1% por opção da Poké Ball), com sprites shiny no campo, nos cards e no PC, ✦ na Pokédex e a conquista Brilho Raro |
 
 ---
 

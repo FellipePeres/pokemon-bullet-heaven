@@ -277,7 +277,8 @@ export class Lobby {
         slot.appendChild(icon);
         slot.appendChild(create('span', 'team-lv', `Nv.${member.level}`));
         if (journey?.team?.active?.includes(member.uid)) slot.classList.add('field');
-        slot.title = `${data.name}, Nv. ${member.level}`;
+        if (member.shiny) slot.appendChild(create('span', 'team-shiny', '✦'));
+        slot.title = `${member.shiny ? '✦ ' : ''}${data.name}, Nv. ${member.level}`;
       }
       slot.onclick = () => this.game.menus.showModal('modal-pc');
       strip.appendChild(slot);

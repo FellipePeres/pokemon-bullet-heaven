@@ -53,6 +53,8 @@ def main() -> None:
     for dex in KANTO:
         down4(sprites / 'icons' / f'{dex}.png', REPO / 'assets' / 'pokemon' / 'gen3' / 'icons' / f'{dex}.png')
         down4(sprites / 'front' / f'{dex}.png', REPO / 'assets' / 'pokemon' / 'gen3' / 'front' / f'{dex}.png')
+        # o sprite shiny do FireRed, para os DADOS do PC (0.13; o ícone de caixa não muda no jogo)
+        down4(sprites / 'front-shiny' / f'{dex}.png', REPO / 'assets' / 'pokemon' / 'gen3' / 'front-shiny' / f'{dex}.png')
     print(f'  assets/pokemon/gen3: ícones e sprites frontais de {len(KANTO)} espécies')
 
     # o Cartão de Treinador do FireRed (o azul), que vira o Estojo de Insígnias do lobby

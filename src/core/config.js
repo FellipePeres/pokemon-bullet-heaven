@@ -3,7 +3,7 @@
  * Nada de número mágico espalhado pelo gameplay: se precisar ajustar, ajuste aqui.
  */
 export const CONFIG = {
-  version: '0.13.0',
+  version: '0.13.1',
 
   canvas: { width: 1280, height: 720 },
 
@@ -142,6 +142,9 @@ export const CONFIG = {
 
   capture: {
     choices: 4,              // opções por Poké Ball (0.11: eram 3)
+    // chance de cada opção da Poké Ball (ou do presente) vir shiny (0.13.1; padrão
+    // até o Fellipe decidir). Selvagens nunca são shiny: só quem entra para a equipe
+    shinyChance: 0.01,
     levelsBehindTeam: 3,     // quem entra chega com a média da equipe menos isso
     // Poké Ball rara (pedidos do Fellipe: ×0,45 na 0.8, ×0,15 na 0.9, ×0,07 na
     // 0.10, quando as garantidas também saíram: sobrou uma, na Fase 1)

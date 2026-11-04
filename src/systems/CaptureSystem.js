@@ -22,7 +22,9 @@ export class CaptureSystem {
   rollChoices(count = CONFIG.capture.choices) {
     // presente da fase: as opções são fixas (uma troca, o prêmio do Dojo)
     const gift = this.run.pendingGift;
-    if (gift) return gift.choices.map(getPokemon).filter((p) => p && !this.run.team.has(p.id));
+    // cada opção pode vir shiny (rara): o card mostra, e ela entra assim na equipe
+    const roll = (pokemon) => ({ ...pokemon, shiny: Math.random() < CONFIG.capture.shinyChance });
+    if (gift) return gift.choices.map(getPokemon).filter((p) => p && !this.run.team.has(p.id)).map(roll);
 
     // o inicial do próprio jogador não volta como captura (os outros dois sim, raros)
     const own = this.run.campaignStarter;
@@ -30,7 +32,7 @@ export class CaptureSystem {
       .filter((entry) => entry.pokemon.id !== own && !this.run.team.has(entry.pokemon.id));
 
     if (!pool.length) return [];
-    return weightedPickMany(pool, count).map((entry) => entry.pokemon);
+    return weightedPickMany(pool, count).map((entry) => roll(entry.pokemon));
   }
 
   /**
@@ -46,27 +48,27 @@ export class CaptureSystem {
   }
 
   /** Adiciona à equipe (quando ainda há espaço). */
-  capture(pokemonId) {
-    const member = this.run.team.add(pokemonId, this.newMemberLevel());
-    if (member) this._registerCapture(pokemonId);
+  capture(pokemonId, { shiny = false } = {}) {
+    const member = this.run.team.add(pokemonId, this.newMemberLevel(), { shiny });
+    if (member) this._registerCapture(pokemonId, false, shiny);
     return member;
   }
 
   /** Equipe cheia: o novo entra e quem sai vai para o PC (0.11; antes ele se perdia). */
-  captureReplacing(oldUid, pokemonId) {
+  captureReplacing(oldUid, pokemonId, { shiny = false } = {}) {
     const leaving = this.run.team.members.find((m) => m.uid === oldUid);
-    const member = this.run.team.replaceMember(oldUid, pokemonId, this.newMemberLevel());
+    const member = this.run.team.replaceMember(oldUid, pokemonId, this.newMemberLevel(), { shiny });
     if (!member) return null;
     if (leaving) this._deposit(leaving);
-    this._registerCapture(pokemonId);
+    this._registerCapture(pokemonId, false, shiny);
     return member;
   }
 
   /** Equipe cheia: o novo vai direto para o PC, e a equipe fica como está. */
-  captureToPC(pokemonId) {
-    const member = this.run.team.createMember(pokemonId, this.newMemberLevel());
+  captureToPC(pokemonId, { shiny = false } = {}) {
+    const member = this.run.team.createMember(pokemonId, this.newMemberLevel(), { shiny });
     this._deposit(member);
-    this._registerCapture(pokemonId, true);
+    this._registerCapture(pokemonId, true, shiny);
     return member;
   }
 
@@ -75,11 +77,12 @@ export class CaptureSystem {
     this.run.pc.push(TeamSystem.serializeMember({ ...member, fainted: false }));
   }
 
-  _registerCapture(pokemonId, toPC = false) {
+  _registerCapture(pokemonId, toPC = false, shiny = false) {
     const data = getPokemon(pokemonId);
     this.run.stats.captures++;
     this.run.captured.push(data.name);   // o Centro Pokémon avisa quem se perde numa derrota
-    bus.emit(EVENTS.POKEMON_CAPTURED, { pokemonId, dex: data.dex, name: data.name });
-    bus.emit(EVENTS.TOAST, { text: toPC ? `${data.name} foi para o PC!` : `${data.name} entrou para a equipe!`, icon: 'ball' });
+    bus.emit(EVENTS.POKEMON_CAPTURED, { pokemonId, dex: data.dex, name: data.name, shiny });
+    const name = shiny ? `✦ ${data.name} shiny` : data.name;
+    bus.emit(EVENTS.TOAST, { text: toPC ? `${name} foi para o PC!` : `${name} entrou para a equipe!`, icon: 'ball' });
   }
 }

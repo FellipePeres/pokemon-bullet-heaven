@@ -232,6 +232,24 @@ check('o primeiro card guarda o novo no PC; os outros dizem que vão para o PC',
       replaceCards[0]?.classes.has('to-pc') && replaceCards.length === CONFIG.team.maxSize + 1);
 game.resolveCapture();
 
+// shiny (0.13.1): raro, só na captura; o card brilha e ele entra assim
+const shinyChance = CONFIG.capture.shinyChance;
+CONFIG.capture.shinyChance = 1;
+game.run.pendingBall = true;
+game.run.state = 'capture';
+game.openCapture();
+const shinyCards = registry.get('capture-choices').children;
+check('opção shiny: o card brilha e diz "Shiny"', shinyCards.length > 0 && shinyCards.every((c) => c.classes.has('shiny')));
+const shinyCaughtBefore = game.profile.stats.shinyCaught ?? 0;
+const shinyPick = game.run.captureSystem.rollChoices()[0];
+game.pickCapture(shinyPick.id, true);
+registry.get('capture-choices').children[0].onclick?.();   // equipe cheia: guarda o novo no PC
+check('a captura shiny conta para a conquista e marca a Pokédex',
+      game.profile.stats.shinyCaught === shinyCaughtBefore + 1 && game.profile.pokedex.shiny.includes(shinyPick.dex)
+      && game.run.pc.at(-1)?.shiny === true);
+CONFIG.capture.shinyChance = shinyChance;
+game.resolveCapture();
+
 // níveis acumulados do banco (botão ▲)
 const benched = game.run.team.reserve[0];
 if (benched) {

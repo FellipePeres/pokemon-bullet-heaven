@@ -50,10 +50,10 @@ export function getSprite(dex) {
 }
 
 /** URL do sprite estático (usado no canvas e como fallback na interface). */
-export function spriteUrl(dex) {
+export function spriteUrl(dex, shiny = false) {
   return CONFIG.sprites.useLocal
     ? `${CONFIG.sprites.localBase}${dex}.png`
-    : `${CONFIG.sprites.remoteBase}${dex}.png`;
+    : `${CONFIG.sprites.remoteBase}${shiny ? 'shiny/' : ''}${dex}.png`;
 }
 
 /**
@@ -61,9 +61,9 @@ export function spriteUrl(dex) {
  * O canvas não anima GIF, então isso só é usado em <img> do HTML.
  * Existe para os Pokémon até a Gen V; acima disso cai no estático.
  */
-export function animatedUrl(dex) {
-  if (!CONFIG.sprites.useAnimatedUI || CONFIG.sprites.useLocal || dex > 649) return spriteUrl(dex);
-  return `${CONFIG.sprites.animatedBase}${dex}.gif`;
+export function animatedUrl(dex, shiny = false) {
+  if (!CONFIG.sprites.useAnimatedUI || CONFIG.sprites.useLocal || dex > 649) return spriteUrl(dex, shiny);
+  return `${CONFIG.sprites.animatedBase}${shiny ? 'shiny/' : ''}${dex}.gif`;
 }
 
 /** Arte oficial em alta resolução (telas grandes, como a escolha do inicial). */
@@ -86,13 +86,13 @@ export function itemUrl(name) {
  * <img> pronta para a interface: tenta o animado e cai no estático
  * automaticamente se o arquivo não existir ou o jogador estiver offline.
  */
-export function pokemonImg(dex, { animated = true, className = '', alt = '' } = {}) {
+export function pokemonImg(dex, { animated = true, className = '', alt = '', shiny = false } = {}) {
   const img = document.createElement('img');
   img.alt = alt;
   if (className) img.className = className;
   img.loading = 'lazy';
-  img.dataset.fallback = spriteUrl(dex);
-  img.src = animated ? animatedUrl(dex) : spriteUrl(dex);
+  img.dataset.fallback = spriteUrl(dex, shiny);
+  img.src = animated ? animatedUrl(dex, shiny) : spriteUrl(dex, shiny);
   img.onerror = () => {
     if (img.src !== img.dataset.fallback) img.src = img.dataset.fallback;
     else img.style.visibility = 'hidden';
@@ -110,7 +110,7 @@ export function preload(dexNumbers) {
  * opts: { facing, types, size, flash, alpha, shadow }
  */
 export function drawPokemon(ctx, dex, x, y, size, opts = {}) {
-  const { facing = 1, types = ['normal'], flash = 0, alpha = 1, shadow = true, time = 0 } = opts;
+  const { facing = 1, types = ['normal'], flash = 0, alpha = 1, shadow = true, time = 0, shiny = false } = opts;
   const feet = y + size * 0.42;
   // os sprites olham para a esquerda: olhar para a direita é espelhar
   const flipX = facing > 0;
@@ -126,7 +126,8 @@ export function drawPokemon(ctx, dex, x, y, size, opts = {}) {
   }
 
   let centerY = y;
-  const anim = getSheet(`pokemon/${dex}`);
+  // shiny: a tira com as cores raras; enquanto ela carrega, a normal
+  const anim = (shiny && getSheet(`pokemon/shiny/${dex}`)) || getSheet(`pokemon/${dex}`);
   if (anim) {
     // o GIF da Gen 5 animado; a altura acompanha o tamanho do Pokémon, presa entre
     // limites para o Onix não cobrir a tela e o Caterpie não sumir na horda
@@ -148,6 +149,8 @@ export function drawPokemon(ctx, dex, x, y, size, opts = {}) {
       drawProceduralPokemon(ctx, x, y, size, typeColor(types[0]), facing);
     }
   }
+
+  if (shiny) drawShinySparkles(ctx, x, centerY, size, time);
 
   // flash branco ao levar dano
   if (flash > 0) {
@@ -218,5 +221,35 @@ export function drawPokeball(ctx, x, y, size, angle = 0) {
   ctx.fillStyle = '#f6f6f6';
   ctx.fill();
   ctx.stroke();
+  ctx.restore();
+}
+
+/**
+ * O brilho do shiny: de tempos em tempos, três estrelinhas piscam em volta do
+ * Pokémon, como quando ele aparece no jogo.
+ */
+function drawShinySparkles(ctx, x, y, size, time) {
+  const phase = time % 2.6;
+  if (phase > 0.6) return;
+  const k = Math.sin((phase / 0.6) * Math.PI);
+  ctx.save();
+  ctx.globalAlpha = k;
+  ctx.fillStyle = '#fff6b0';
+  for (const [dx, dy, s] of [[-0.42, -0.38, 1], [0.38, -0.18, 0.8], [0.05, 0.36, 0.7]]) {
+    const r = size * 0.12 * s * k;
+    const cx = x + dx * size;
+    const cy = y + dy * size;
+    ctx.beginPath();
+    ctx.moveTo(cx, cy - r);
+    ctx.lineTo(cx + r * 0.25, cy - r * 0.25);
+    ctx.lineTo(cx + r, cy);
+    ctx.lineTo(cx + r * 0.25, cy + r * 0.25);
+    ctx.lineTo(cx, cy + r);
+    ctx.lineTo(cx - r * 0.25, cy + r * 0.25);
+    ctx.lineTo(cx - r, cy);
+    ctx.lineTo(cx - r * 0.25, cy - r * 0.25);
+    ctx.closePath();
+    ctx.fill();
+  }
   ctx.restore();
 }

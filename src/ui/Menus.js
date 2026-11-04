@@ -227,6 +227,7 @@ export class Menus {
   buildPokedex() {
     const grid = clear(el('pokedex-grid'));
     const caught = this.game.profile.pokedex.caught;
+    const shinyDex = this.game.profile.pokedex.shiny ?? [];   // ✦ nas espécies que você já teve shiny
 
     const dexNames = this.game.region.dex;
     el('pokedex-progress').textContent =
@@ -235,7 +236,7 @@ export class Menus {
     dexNames.forEach((name, i) => {
       const dex = i + 1;
       const isCaught = caught.includes(dex);
-      const cell = create('div', `dex-cell ${isCaught ? 'caught' : 'unknown'}`);
+      const cell = create('div', `dex-cell ${isCaught ? 'caught' : 'unknown'}${shinyDex.includes(dex) ? ' shiny' : ''}`);
       cell.innerHTML = `
         <div class="dex-num">#${String(dex).padStart(3, '0')}</div>
         <img src="${spriteUrl(dex)}" alt="${isCaught ? name : '???'}" loading="lazy" />
