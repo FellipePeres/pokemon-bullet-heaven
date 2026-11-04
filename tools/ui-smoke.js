@@ -444,5 +444,18 @@ check('recomeçar apaga a jornada e mantém a Pokédex e o Hall da Fama',
       game.profile.pokedex.caught.length === dexBefore && game.profile.hallOfFame.length === 1);
 check('a jornada nova começa pela escolha de treinador', !registry.get('screen-trainer').classes.has('hidden'));
 
+// ---- o inicial também pode vir shiny (0.13.2): sorteado na escolha e guardado na jornada ----
+const starterChance = CONFIG.capture.shinyChance;
+CONFIG.capture.shinyChance = 1;
+game.chooseTrainer('red');
+game.chooseStarter('bulbasaur');
+CONFIG.capture.shinyChance = starterChance;
+check('o inicial sorteado shiny fica marcado na jornada, na Pokédex e na equipe do lobby',
+      game.campaign.starterShiny === true && game.profile.pokedex.shiny.includes(1)
+      && registry.get('campaign-team').children.some((c) => c.children?.some((k) => k.classes?.has('team-shiny'))));
+game.startStage('gym_1_pewter');
+check('e entra shiny na primeira fase', game.run.team.members[0].shiny === true);
+game.quitToMenu();
+
 console.log(`\n=== ${failures === 0 ? 'TUDO OK' : failures + ' FALHA(S)'} ===\n`);
 process.exit(failures ? 1 : 0);

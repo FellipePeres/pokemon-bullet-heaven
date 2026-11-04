@@ -73,6 +73,7 @@ export function createProfile() {
 export function createRegionProgress() {
   return {
     starter: null,
+    starterShiny: false,   // o inicial veio shiny (0.13.2)
     clearedStages: [],
     badges: [],
     lastStage: null,
@@ -172,8 +173,7 @@ export class ProfileTracker {
       this.registerCaught(dex);
       if (shiny) {
         stats().shinyCaught = (stats().shinyCaught ?? 0) + 1;
-        const seen = (this.profile.pokedex.shiny ??= []);
-        if (!seen.includes(dex)) seen.push(dex);
+        this.registerShiny(dex);
       }
       this.checkAchievements();
     });
@@ -186,6 +186,12 @@ export class ProfileTracker {
   }
 
   /** Capturar (ou escolher como inicial) registra na Pokédex. */
+  /** A espécie que você já teve shiny ganha a estrelinha na Pokédex. */
+  registerShiny(dex) {
+    const seen = (this.profile.pokedex.shiny ??= []);
+    if (dex && !seen.includes(dex)) seen.push(dex);
+  }
+
   registerCaught(dex) {
     if (!dex) return;
     const caught = this.profile.pokedex.caught;

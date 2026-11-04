@@ -264,7 +264,7 @@ export class Lobby {
     const journey = this.campaign.journey;
     const members = journey?.team?.members?.length
       ? journey.team.members
-      : this.campaign.starter ? [{ pokemonId: this.campaign.starter, level: 1 }] : [];
+      : this.campaign.starter ? [{ pokemonId: this.campaign.starter, level: 1, shiny: !!this.campaign.starterShiny }] : [];
     strip.appendChild(create('span', 'team-label', 'Equipe'));
     for (let i = 0; i < 6; i++) {
       const member = members[i];

@@ -183,12 +183,19 @@ export class Game {
   }
 
   chooseStarter(pokemonId) {
+    const data = getPokemon(pokemonId);
     this.campaign.starter = pokemonId;
+    // o inicial também pode vir shiny (0.13.2): sorteado aqui e guardado na jornada,
+    // para não mudar a cada tentativa antes da primeira vitória
+    this.campaign.starterShiny = Math.random() < CONFIG.capture.shinyChance;
     this.campaign.journey = null;
-    this.tracker.registerCaught(getPokemon(pokemonId).dex);
+    this.tracker.registerCaught(data.dex);
+    if (this.campaign.starterShiny) this.tracker.registerShiny(data.dex);
     this.tracker.checkAchievements();
     this.autosave();
-    toast(`${getPokemon(pokemonId).name} escolhido! Sua jornada começa agora.`, '🎒');
+    toast(this.campaign.starterShiny
+      ? `✦ ${data.name} shiny! Que sorte — sua jornada começa agora.`
+      : `${data.name} escolhido! Sua jornada começa agora.`, this.campaign.starterShiny ? 'ball' : '🎒');
     this.openCampaign();
   }
 
@@ -242,7 +249,7 @@ export class Game {
     } else if (journey) {
       options = { team: journey.team };
     } else {
-      options = { starter: this.campaign.starter };
+      options = { starter: this.campaign.starter, starterShiny: this.campaign.starterShiny };
     }
     // melhorias compradas com moedas valem em todas as fases
     options.trainerUpgrades = { ...this.profile.trainerUpgrades };
@@ -552,7 +559,7 @@ export class Game {
     const journey = this.campaign.journey;
     const members = journey?.team?.members?.length
       ? journey.team.members.map((m) => ({ ...m, fainted: false }))
-      : [{ pokemonId: this.campaign.starter, level: 1, fainted: false }];
+      : [{ pokemonId: this.campaign.starter, level: 1, fainted: false, shiny: !!this.campaign.starterShiny }];
     this.hud.showCenter({
       members,
       stage: STAGES[this.centerStage],

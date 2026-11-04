@@ -76,7 +76,7 @@ export class Run {
 
     // ---- equipe inicial ----
     if (options.team) this.team.restore(options.team, { healAll: options.healTeam !== false });
-    else if (options.starter) this.team.add(options.starter);
+    else if (options.starter) this.team.add(options.starter, 1, { shiny: !!options.starterShiny });
     this.syncCompanions();
 
     this.spawner = new SpawnSystem(this);

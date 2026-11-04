@@ -519,8 +519,9 @@ console.log('\n[shiny]');
   const none = run.captureSystem.rollChoices();
   CONFIG.capture.shinyChance = chance;
   check('cada opção da Poké Ball sorteia o shiny', all.every((p) => p.shiny) && none.every((p) => !p.shiny));
-  check('a equipe inicial e os selvagens não são shiny',
-        !run.team.members[0].shiny && !run.spawner.spawnAt('rattata', 0, 0, 5).shiny);
+  check('os selvagens nunca são shiny; o inicial só se a jornada sorteou',
+        !run.team.members[0].shiny && !run.spawner.spawnAt('rattata', 0, 0, 5).shiny
+        && new Run('gym_1_pewter', { starter: 'charmander', starterShiny: true }).team.members[0].shiny === true);
   const member = run.captureSystem.capture('pikachu', { shiny: true });
   check('quem é capturado shiny entra shiny e o save guarda', member.shiny && run.team.serialize().members.at(-1).shiny === true);
   const restored = new Run('gym_1_pewter', { team: run.team.serialize() });

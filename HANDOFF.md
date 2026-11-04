@@ -5,7 +5,7 @@
 > decisão foi tomada e o que falta fazer. O `README.md` é o manual de uso;
 > este aqui é o contexto de desenvolvimento.
 
-**Versão atual:** `0.13.1` · **Última atualização:** 2026-11-03
+**Versão atual:** `0.13.2` · **Última atualização:** 2026-11-03
 **Stack:** HTML + CSS + JavaScript puro (ES Modules). Sem backend, sem build, sem dependências.
 **Repositório:** https://github.com/FellipePeres/pokemon-bullet-heaven (público)
 **Jogo no ar:** https://fellipeperes.github.io/pokemon-bullet-heaven/
@@ -231,7 +231,9 @@ confirmar com ele**.
   nos cards, os GIFs shiny do PokeAPI; no PC, o sprite shiny do FireRed (o ícone de
   caixa não muda, como no jogo) e o ✦. A Pokédex marca com ✦ quem você já teve
   shiny (`pokedex.shiny`), e a conquista **Brilho Raro** conta `shinyCaught`
-  (1, 3, 5, 10). Selvagens e o inicial nunca são shiny.
+  (1, 3, 5, 10). Selvagens nunca são shiny. O inicial pode ser (0.13.2, "inicial
+  pode ser shiny sim, 1%"): sorteado na escolha e guardado em
+  `regions.<id>.starterShiny`, para não mudar a cada tentativa da Fase 1.
 - **Captura sem medo** (0.12, "os testes deixam de capturar achando que um
   Pokémon é descartado"): a tela da Poké Ball avisa — em destaque com a equipe
   cheia — que nada se perde; a de equipe cheia pergunta "onde fica o X?", com
