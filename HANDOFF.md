@@ -5,7 +5,7 @@
 > decisão foi tomada e o que falta fazer. O `README.md` é o manual de uso;
 > este aqui é o contexto de desenvolvimento.
 
-**Versão atual:** `0.12.0` · **Última atualização:** 2026-11-03
+**Versão atual:** `0.12.1` · **Última atualização:** 2026-11-03
 **Stack:** HTML + CSS + JavaScript puro (ES Modules). Sem backend, sem build, sem dependências.
 **Repositório:** https://github.com/FellipePeres/pokemon-bullet-heaven (público)
 **Jogo no ar:** https://fellipeperes.github.io/pokemon-bullet-heaven/
@@ -240,7 +240,9 @@ confirmar com ele**.
   nada de XP se perde no começo.
 - **Subir de nível cura 1/10 da vida máxima** de quem subiu, **do nível 11 em
   diante** (`CONFIG.progression.levelUpHeal` e `levelUpHealFrom`). Quem está
-  desmaiado não volta. Antes da 0.11.3 não curava (a cura total do começo deixava o
+  desmaiado não volta. Quem já tem todas as melhorias recebe a **Poção** no lugar
+  delas (`CONFIG.progression.maxedHeal`: 20% da vida; era 50% até a 0.12.1, forte
+  demais no nível máximo). Antes da 0.11.3 subir de nível não curava (a cura total do começo deixava o
   jogo trivial); a 0.11.3 curava 1/4, fácil demais; a 0.11.4 baixou para 1/10, a
   pedido do Fellipe. Bot nas Fases 1 a 3 (Charmander / Bulbasaur / Squirtle):
 

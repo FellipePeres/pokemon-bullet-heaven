@@ -282,6 +282,12 @@ console.log('\n[evolução]');
   fainted.hp = 0;
   run.progression.addXpTo(fainted, run.progression.xpToNext(10) + 1);
   check('subir de nível não reanima quem desmaiou', fainted.fainted && fainted.hp === 0);
+  // a Poção de quem já tem todas as melhorias cura 20% (0.12.1; era 50%)
+  member.hp = 10;
+  run.progression.applyUpgrade('__heal', member);
+  check('a Poção do Pokémon com todas as melhorias cura 20% da vida',
+        Math.abs(member.hp - (10 + maxHpFor(member, bonus) * 0.2)) < 0.01,
+        `${Math.round(member.hp)}/${maxHpFor(member, bonus)} HP`);
 
   member.level = 15;
   member.hp = 5;

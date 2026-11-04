@@ -570,6 +570,7 @@ a estar nos líderes. Com o bot novo, metade das derrotas da Fase 1 é no Brock.
 | D8 | Celular e controle importam? | Controle feito na 0.7 (padrão); celular depois de Kanto fechado. | Etapa 6 |
 | D9 | Final e pós-jogo | Hall da Fama e créditos na 1.0; revanche dos líderes e lendários depois. | Etapa 7 |
 | D10 | Como refinar o XP? (o Fellipe pediu sugestões na 0.9) | Ver as opções em "Segundo retorno" abaixo. Recomendação: orbes por faixa de valor com o visual de doce, que se juntam no chão. | — |
+| D11 | **Ideia do Fellipe (0.12), para o planejamento:** quando um Pokémon chega ao máximo de melhorias, cada nível que ele sobe tem uma chance bem baixa de dar uma melhoria de ataque extra — o mesmo golpe de hoje, com um mega bônus | Recomendação: vale quando não há mais melhoria para sortear (é quando hoje aparece a Poção de 20% no lugar). Em cada nível, ~2% de chance de uma das opções virar o **Golpe Supremo**: o mesmo golpe com +40% de dano e um brilho dourado no Pokémon, até 3 vezes por Pokémon. Raro de propósito: um prêmio para quem leva o mesmo Pokémon longe. A conferir: a %, o tamanho do bônus e se acumula. | — |
 
 Enquanto uma decisão não vem, a recomendação vale como padrão. O que foi feito
 assim fica anotado como "padrão até o Fellipe decidir".

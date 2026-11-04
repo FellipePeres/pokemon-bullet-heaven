@@ -14,7 +14,7 @@ import { transferUpgrades } from './moves.js';
 const HEAL_FALLBACK = {
   id: '__heal',
   name: 'Poção',
-  description: 'Restaura 50% da vida deste Pokémon.',
+  description: `Restaura ${Math.round(CONFIG.progression.maxedHeal * 100)}% da vida deste Pokémon.`,
   icon: 'potion',
   scope: 'special'
 };
@@ -25,7 +25,8 @@ const HEAL_FALLBACK = {
  * - Cada Pokémon tem nível e XP próprios. O XP do inimigo é dividido entre a
  *   equipe com pesos (CONFIG.progression.xpWeight): com a equipe cheia dá
  *   exatamente 25% por ativo e 8,33% por reserva.
- * - Subir de nível aumenta vida máxima e dano, mas NÃO cura.
+ * - Subir de nível aumenta vida máxima e dano e, do nível 11 em diante, cura
+ *   1/10 da vida (CONFIG.progression.levelUpHeal); evoluir cura tudo.
  * - A tela de melhoria aparece a cada `upgradeEveryLevels` níveis.
  * - Ao atingir o nível de evolução, o Pokémon evolui (níveis fiéis aos jogos).
  * - As melhorias de partida são só do Pokémon. Bônus globais vêm das moedas
@@ -241,7 +242,7 @@ export class ProgressionSystem {
 
     if (upgradeId === HEAL_FALLBACK.id) {
       const max = maxHpFor(member, run.playerStats.pokemonHpBonus);
-      member.hp = Math.min(max, member.hp + max * 0.5);
+      member.hp = Math.min(max, member.hp + max * CONFIG.progression.maxedHeal);
       return;
     }
 

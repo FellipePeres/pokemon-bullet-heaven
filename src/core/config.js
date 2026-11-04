@@ -3,7 +3,7 @@
  * Nada de número mágico espalhado pelo gameplay: se precisar ajustar, ajuste aqui.
  */
 export const CONFIG = {
-  version: '0.12.0',
+  version: '0.12.1',
 
   canvas: { width: 1280, height: 720 },
 
@@ -86,6 +86,8 @@ export const CONFIG = {
     levelUpHeal: 0.1,
     /** ...só a partir deste nível: no começo a cura deixava as fases fáceis demais. */
     levelUpHealFrom: 11,
+    /** A "Poção" que aparece quando o Pokémon já tem todas as melhorias (0.12.1: era 50%, forte demais). */
+    maxedHeal: 0.2,
     /** Chance de uma das opções do nível ser uma TM (troca da habilidade base). */
     // O golpe melhora sobretudo na evolução; a TM no level up é um bônus raro
     // (pedido do Fellipe na 0.8: antes era 12%).
