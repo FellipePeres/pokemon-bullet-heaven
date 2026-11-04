@@ -1,3 +1,5 @@
+import { BONUS_MOVES } from './bonusMoves.js';
+
 /**
  * HABILIDADES
  *
@@ -591,7 +593,8 @@ export const ABILITIES = {
   }
 };
 
-export const getAbility = (id) => ABILITIES[id];
+// os 2º golpes (data/bonusMoves.js) ficam num registro à parte: não têm melhorias
+export const getAbility = (id) => ABILITIES[id] ?? BONUS_MOVES[id];
 
 /**
  * GOLPES QUE SAÍRAM na 0.6 (no máximo 4 por tipo). Saves antigos ainda podem

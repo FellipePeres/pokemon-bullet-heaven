@@ -7,6 +7,7 @@
  */
 import { POKEMON } from '../src/data/pokemon.js';
 import { ABILITIES } from '../src/data/abilities.js';
+import { BONUS_MOVES } from '../src/data/bonusMoves.js';
 import { ENEMIES } from '../src/data/enemies.js';
 import { STAGES } from '../src/data/stages.js';
 import { nextMoveFor } from '../src/data/tms.js';
@@ -117,7 +118,7 @@ for (const region of Object.values(REGIONS)) {
 const fxSheetOk = (fxId) => FX[fxId] && ASSET_MANIFEST[FX[fxId].sheet ?? `fx/${fxId}`];
 const playable = Object.values(ABILITIES).filter((a) => !a.hostile);
 const noFx = playable.filter((a) => !ABILITY_FX[a.id]);
-const staleFx = Object.keys(ABILITY_FX).filter((id) => !ABILITIES[id]);
+const staleFx = Object.keys(ABILITY_FX).filter((id) => !ABILITIES[id] && !BONUS_MOVES[id]);   // os 2º golpes também
 const fxRefs = [
   ...Object.entries(ABILITY_FX),
   ...Object.entries(BOSS_WAVE_FX).map(([type, vfx]) => [`líder ${type}`, vfx]),

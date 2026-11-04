@@ -25,6 +25,8 @@
  *                  até o líder, ~4 min com a luta; menos inimigos, cada um vale mais)
  *   music          a música da fase (assets/music, data/musicTracks.js); leaderMusic
  *                  toca quando o líder entra
+ *   leaderLevel    a média de nível com que a equipe costuma chegar ao líder (medida com o
+ *                  bot); acima dela, o líder cresce junto (SpawnSystem.bossLift, 0.14)
  *   bossTuning     { hp, damage } — multiplica a vida e o dano (golpes inclusive) do time
  *                  do líder; as últimas fases ficavam fáceis para quem joga bem (0.12.2)
  *   starterTuning  { inicial: fator } — vida e dano dos inimigos (e do líder) multiplicados
@@ -82,6 +84,7 @@ export const STAGES = {
       portrait: 'portrait/brock',
       quote: 'Minha defesa de rocha é intransponível!'
     },
+    leaderLevel: 21,
     bossTeam: ['brock_geodude', 'brock_onix'],
 
     // o Squirtle sobrava aqui (0.11.5: 100% de vitórias quase sem desmaio, contra 43–67% dos outros)
@@ -141,6 +144,7 @@ export const STAGES = {
       portrait: 'portrait/misty',
       quote: 'Você vai afundar na minha onda!'
     },
+    leaderLevel: 28,
     bossTeam: ['misty_staryu', 'misty_starmie'],
 
     capturePool: 'phase2',
@@ -199,6 +203,7 @@ export const STAGES = {
       portrait: 'portrait/lt_surge',
       quote: 'Ei, garoto! Eletricidade de verdade não perdoa amador!'
     },
+    leaderLevel: 39,
     bossTeam: ['lt_surge_voltorb', 'lt_surge_pikachu', 'lt_surge_raichu'],
     // presentes (como as trocas e o Dojo do FireRed): oferecidos uma vez, na hora marcada
     gifts: [
@@ -263,6 +268,7 @@ export const STAGES = {
     },
     // líder mais forte nas últimas fases (0.12.2: "no final tá muito fácil")
     bossTuning: { hp: 1.25, damage: 1.1 },
+    leaderLevel: 48,
     bossTeam: ['erika_victreebel', 'erika_tangela', 'erika_vileplume'],
 
     capturePool: 'phase4',
@@ -324,6 +330,7 @@ export const STAGES = {
     },
     // líder mais forte nas últimas fases (0.12.2: "no final tá muito fácil")
     bossTuning: { hp: 1.35, damage: 1.15 },
+    leaderLevel: 52,
     bossTeam: ['koga_koffing', 'koga_muk', 'koga_koffing', 'koga_weezing'],
 
     capturePool: 'phase5',
@@ -384,6 +391,7 @@ export const STAGES = {
     },
     // líder mais forte nas últimas fases (0.12.2: "no final tá muito fácil")
     bossTuning: { hp: 1.5, damage: 1.2 },
+    leaderLevel: 62,
     bossTeam: ['sabrina_kadabra', 'sabrina_mr_mime', 'sabrina_venomoth', 'sabrina_alakazam'],
     // presentes (como as trocas e o Dojo do FireRed): oferecidos uma vez, na hora marcada
     gifts: [
@@ -453,6 +461,7 @@ export const STAGES = {
     },
     // líder mais forte nas últimas fases (0.12.2: "no final tá muito fácil")
     bossTuning: { hp: 1.6, damage: 1.2 },
+    leaderLevel: 68,
     bossTeam: ['blaine_growlithe', 'blaine_ponyta', 'blaine_rapidash', 'blaine_arcanine'],
 
     // o Squirtle sobrava aqui (0.11.5: 100%: Água contra o Blaine)
@@ -516,6 +525,7 @@ export const STAGES = {
     },
     // líder mais forte nas últimas fases (0.12.2: "no final tá muito fácil")
     bossTuning: { hp: 1.7, damage: 1.25 },
+    leaderLevel: 75,
     bossTeam: ['giovanni_rhyhorn', 'giovanni_dugtrio', 'giovanni_nidoqueen', 'giovanni_nidoking', 'giovanni_rhyhorn_ace'],
 
     capturePool: 'phase8',
@@ -572,6 +582,7 @@ export const STAGES = {
     },
     // líder mais forte nas últimas fases (0.12.2: "no final tá muito fácil")
     bossTuning: { hp: 1.7, damage: 1.25 },
+    leaderLevel: 81,
     bossTeam: ['lorelei_dewgong', 'lorelei_cloyster', 'lorelei_slowbro', 'lorelei_jynx', 'lorelei_lapras'],
 
     capturePool: 'phase9',
@@ -626,6 +637,7 @@ export const STAGES = {
     },
     // líder mais forte nas últimas fases (0.12.2: "no final tá muito fácil")
     bossTuning: { hp: 1.7, damage: 1.25 },
+    leaderLevel: 85,
     bossTeam: ['bruno_onix', 'bruno_hitmonchan', 'bruno_hitmonlee', 'bruno_onix', 'bruno_machamp'],
 
     capturePool: 'phase9',
@@ -679,6 +691,7 @@ export const STAGES = {
     },
     // líder mais forte nas últimas fases (0.12.2: "no final tá muito fácil")
     bossTuning: { hp: 1.7, damage: 1.25 },
+    leaderLevel: 88,
     bossTeam: ['agatha_gengar', 'agatha_golbat', 'agatha_haunter', 'agatha_arbok', 'agatha_gengar_ace'],
 
     capturePool: 'phase9',
@@ -732,6 +745,7 @@ export const STAGES = {
     },
     // líder mais forte nas últimas fases (0.12.2: "no final tá muito fácil")
     bossTuning: { hp: 1.75, damage: 1.25 },
+    leaderLevel: 93,
     bossTeam: ['lance_gyarados', 'lance_dragonair', 'lance_dragonair', 'lance_aerodactyl', 'lance_dragonite'],
 
     capturePool: 'phase9',
@@ -786,6 +800,7 @@ export const STAGES = {
     // como no FireRed, o rival escolheu o inicial com vantagem sobre o seu
     // líder mais forte nas últimas fases (0.12.2: "no final tá muito fácil")
     bossTuning: { hp: 1.8, damage: 1.3 },
+    leaderLevel: 97,
     bossTeam: ['rival_pidgeot', 'rival_alakazam', 'rival_rhydon', 'rival_arcanine', 'rival_exeggutor', 'rival_blastoise'],
     bossTeamByStarter: {
       charmander: ['rival_pidgeot', 'rival_alakazam', 'rival_rhydon', 'rival_arcanine', 'rival_exeggutor', 'rival_blastoise'],

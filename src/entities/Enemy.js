@@ -47,7 +47,7 @@ export class Enemy {
     this.detourSide = Math.random() < 0.5 ? 1 : -1;   // por onde contorna um obstáculo
 
     // efeitos de status ativos
-    this.status = { burn: null, poison: null, slow: null };
+    this.status = { burn: null, poison: null, slow: null, weak: null, curse: null };
 
     // habilidades hostis (chefes): as do líder mais as que todo líder tem
     const hostile = [...(data.abilities ?? [])];
@@ -68,6 +68,11 @@ export class Enemy {
   /** Aplica um efeito de status (o mais forte/mais longo prevalece). */
   applyStatus(kind, payload) {
     const current = this.status[kind];
+    // do 2º golpe: enfraquecido (leva mais dano) e amaldiçoado (explode ao morrer)
+    if (kind === 'weak' || kind === 'curse') {
+      this.status[kind] = { ...payload, t: Math.max(payload.duration, current?.t ?? 0) };
+      return;
+    }
     if (kind === 'slow') {
       const factor = payload.factor ?? 1;
       if (!current || factor <= current.factor) this.status.slow = { factor, t: payload.duration };
@@ -115,9 +120,11 @@ export class Enemy {
         if (st.t <= 0) this.status[kind] = null;
       }
     }
-    if (this.status.slow) {
-      this.status.slow.t -= dt;
-      if (this.status.slow.t <= 0) this.status.slow = null;
+    for (const kind of ['slow', 'weak', 'curse']) {
+      const st = this.status[kind];
+      if (!st) continue;
+      st.t -= dt;
+      if (st.t <= 0) this.status[kind] = null;
     }
 
     // ---- movimento ----

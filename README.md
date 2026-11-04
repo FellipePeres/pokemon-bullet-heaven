@@ -122,6 +122,9 @@ Perder devolve você ao início da fase com a equipe como estava ao entrar nela.
 - **Lobby no Town Map de Kanto**: cada fase na cidade do ginásio, o treinador
   andando pelo mapa, a fase escolhida ao lado e o **Estojo de Insígnias** (o Cartão
   de Treinador do FireRed) com as métricas de cada fase.
+- **2º golpe**: com todas as melhorias, cada nível tem uma chance pequena de
+  ensinar um golpe a mais do tipo do Pokémon (51 ao todo: Flame Wheel, Whirlpool,
+  Draco Meteor...), que ele usa junto do dele.
 - **Shiny**: raro (1%), na captura e no inicial — o card da Poké Ball brilha, e o
   Pokémon fica com as cores raras no campo, no PC e na Pokédex.
 - **Derrota**: vá ao Centro Pokémon (a equipe é curada; dali você volta para a

@@ -94,7 +94,8 @@ export const FX = {
  *   nova         ring (na frente da onda) e count (quantos)
  *   chain        node (em cada alvo) e strike (cai do céu no primeiro alvo)
  *   melee_arc    slash (no alvo)
- *   shake        tremor de tela, em pixels (Earthquake, golpes de chefe)
+ *   shake        tremor de tela, em pixels — só nos golpes dos líderes (0.14, pedido
+ *                do Fellipe: "tremor da tela agora só vai existir em golpe de Boss de Gym")
  */
 export const ABILITY_FX = {
   // ---- projéteis ----
@@ -131,7 +132,7 @@ export const ABILITY_FX = {
 
   // ---- ondas ----
   gust:          { ring: 'gust', count: 6 },
-  earthquake:    { ring: 'flying_dirt', count: 12, shake: 5 },
+  earthquake:    { ring: 'flying_dirt', count: 12 },
   water_pulse:   { ring: 'blue_ring', count: 12 },
   disarming_voice: { ring: 'magenta_heart', count: 10 },
   hurricane:     { ring: 'gust', count: 10 },
@@ -164,6 +165,59 @@ export const ABILITY_FX = {
   outrage:       { slash: 'slam_hit' },
   powder_snow:   { ring: 'hail', count: 12 },
   blizzard:      { ring: 'ice_chunk', count: 16 },
+
+  // ---- os 2º golpes (0.14, data/bonusMoves.js); `strike` cai no fim do aviso ----
+  flame_ring:    { body: 'fire_swirl' },
+  heat_wave:      { ring: 'flame', count: 14 },
+  flame_charge:   { scatter: 'ember' },
+  whirlpool_zone: { center: 'blue_ring', scatter: 'bubble' },
+  aqua_ring:      { body: 'bubble' },
+  surf:           { body: 'water_impact', hit: 'bubble_pop' },
+  petal_spiral:   { body: 'leaf', hit: 'razor_leaf' },
+  leech_seed:     { ring: 'green_sparkle', count: 10 },
+  grassy_terrain: { ring: 'leaf' },
+  discharge:      { ring: 'shock', count: 12 },
+  bolt_strike:    { ring: 'spark', count: 6, strike: 'lightning' },
+  spark:          { body: 'spark' },
+  hail:           { ring: 'hail', count: 5, strike: 'ice_chunk' },
+  ice_shard:      { body: 'ice_crystal', hit: 'ice_crystal' },
+  mist:           { ring: 'ice_chunk' },
+  mach_punch:     { slash: 'hand' },
+  focus_blast:    { body: 'big_orb', hit: 'explosion' },
+  counter:        { ring: 'cross_impact', count: 8 },
+  toxic_spikes:   { center: 'poison_drop' },
+  smog:           { ring: 'toxic_bubble' },
+  acid_spray:     { ring: 'poison_splat', count: 5, strike: 'poison_drop' },
+  sand_tomb:      { scatter: 'mud_sand' },
+  bulldoze:       { ring: 'flying_dirt', count: 24 },
+  dig:            { ring: 'flying_dirt', count: 10, strike: 'rock_bits' },
+  air_slash:      { body: 'cut', hit: 'cut' },
+  tailwind:       { ring: 'gust', count: 10 },
+  sky_attack:     { body: 'gust', hit: 'impact' },
+  psyshock:       { body: 'pink_orb', hit: 'blue_star' },
+  reflect:        { ring: 'purple_ring' },
+  future_sight:   { ring: 'gold_ring', count: 12, strike: 'big_orb' },
+  bug_buzz:       { body: 'blue_star' },
+  sticky_web:     { center: 'spider_web' },
+  pin_missile:    { body: 'needle', hit: 'impact' },
+  stealth_rock:   { body: 'rock' },
+  rock_tomb:      { ring: 'rock_bits', count: 6, strike: 'boulder' },
+  sandstorm:      { ring: 'mud_sand' },
+  hex:            { ring: 'purple_flame', count: 10 },
+  shadow_sneak:   { body: 'ghostly_spirit', hit: 'shadow_ball' },
+  phantom_force:  { ring: 'shadow_ball' },
+  dragon_rage:    { slash: 'purple_flame' },
+  dragon_dance:   { ring: 'orb', count: 8 },
+  draco_meteor:   { ring: 'flame', count: 8, strike: 'explosion' },
+  moonblast:      { body: 'pink_orb', hit: 'magenta_heart' },
+  misty_terrain:  { ring: 'magenta_heart' },
+  draining_kiss:  { body: 'magenta_heart', hit: 'magenta_heart' },
+  swift:          { body: 'blue_star', hit: 'blue_star' },
+  rapid_spin:     { ring: 'impact', count: 6 },
+  echoed_voice:   { ring: 'metal_sound', count: 10 },
+  flash_cannon:   { body: 'orb', hit: 'blue_star' },
+  gyro_ball:      { body: 'metal_sound' },
+  magnet_bomb:    { body: 'orb', hit: 'explosion' },
 
   // ---- golpes dos líderes (chegam com aviso no chão) ----
   leader_rock_barrage: { ring: 'boulder', count: 10, shake: 6 },

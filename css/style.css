@@ -2171,3 +2171,7 @@ button { font: inherit; color: inherit; }
 .team-shiny { position: absolute; right: 4px; top: 1px; font-size: 13px; color: #e8b830; text-shadow: 1px 1px 0 #6b4a00; }
 .dex-cell.shiny { position: relative; }
 .dex-cell.shiny::after { content: '✦'; position: absolute; top: 4px; right: 6px; color: #e8b830; text-shadow: 1px 1px 0 #6b4a00; }
+
+/* o 2º golpe (0.14): no PC e na janela da equipe */
+.pc-data__bonus { color: #f8d888; }
+.node-meta.bonus-move { color: #b07a00; font-weight: 600; }

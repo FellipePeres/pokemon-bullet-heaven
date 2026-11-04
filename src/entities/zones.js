@@ -24,6 +24,9 @@ export class Zone {
       hostile: false,
       delay: 0,            // aviso no chão antes de a onda sair (golpes de líder)
       visualType: null,    // tipo de quem usou (o golpe genérico do líder muda de cara)
+      lifesteal: 0,        // 2º golpe: parte do dano volta como vida para o dono
+      healTeam: 0,         // 2º golpe: cura a equipe dentro da área (fração da vida máxima)
+      pull: 0,             // 2º golpe: puxa os inimigos para o centro (Whirlpool)
       dead: false
     }, opts);
     this.tick = 0;

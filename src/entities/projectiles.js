@@ -14,6 +14,9 @@ export class Projectile {
       effects: null,
       homing: 0,
       explode: null,       // { area, damageRatio }
+      delayedBlast: null,  // { area, ratio, delay }: gruda no inimigo e explode depois (Magnet Bomb)
+      owner: null,         // o Pokémon que lançou (para a cura do 2º golpe)
+      lifesteal: 0,
       abilityId: null,
       hostile: false,
       dead: false
@@ -54,6 +57,7 @@ export class Orb {
   constructor(opts) {
     Object.assign(this, {
       owner: null,
+      lifesteal: 0,
       angle: 0,
       distance: 70,
       angularSpeed: 2.4,

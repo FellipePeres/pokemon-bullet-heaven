@@ -3,6 +3,7 @@ import { getStage, segmentAt } from '../data/stages.js';
 import { sceneOf } from '../data/scenery.js';
 import { Player, FEET_BOX } from '../entities/Player.js';
 import { Terrain } from '../systems/terrain.js';
+import { Zone } from '../entities/zones.js';
 import { Companion } from '../entities/Companion.js';
 import { SpatialGrid } from '../systems/SpatialGrid.js';
 import { SpawnSystem } from '../systems/SpawnSystem.js';
@@ -10,7 +11,7 @@ import { AbilitySystem } from '../systems/AbilitySystem.js';
 import { ProgressionSystem } from '../systems/ProgressionSystem.js';
 import { TeamSystem } from '../systems/TeamSystem.js';
 import { CaptureSystem } from '../systems/CaptureSystem.js';
-import { damageEnemy, damageArea } from '../systems/combat.js';
+import { damageEnemy, damageArea, bonusHeal } from '../systems/combat.js';
 import { burst, FloatingText, SpriteFx } from '../entities/effects.js';
 import { abilityFx, zoneFx } from '../data/fx.js';
 import { bus, EVENTS } from '../core/events.js';
@@ -65,6 +66,8 @@ export class Run {
     // Pokémon mandados para o PC nesta partida (vão para o PC da jornada se a fase for vencida)
     this.pc = [...(options.pc ?? [])];
     this.captured = [];   // nomes dos capturados nesta tentativa
+    // buffs dos 2º golpes na equipe: Tailwind (treinador mais rápido) e Reflect (menos dano)
+    this.buffs = { tailwind: 0, reflect: 0 };
 
     // ---- sistemas ----
     this.grid = new SpatialGrid(100);
@@ -207,6 +210,7 @@ export class Run {
   /** Aplica dano a um Pokémon e trata o desmaio. */
   damageCompanion(companion, amount) {
     if (!companion) return;
+    if (this.buffs?.reflect > 0) amount *= 0.6;   // a barreira do Reflect
     const result = companion.takeDamage(amount);
     if (!result) return;
 
@@ -230,7 +234,8 @@ export class Run {
     if (this.shakeTime > 0) this.shakeTime = Math.max(0, this.shakeTime - dt);
     this.grid.rebuild(this.enemies);
 
-    this.player.update(dt, move, this.playerStats, this.world);
+    const stats = this.buffs.tailwind > 0 ? { ...this.playerStats, speed: this.playerStats.speed * 1.25 } : this.playerStats;
+    this.player.update(dt, move, stats, this.world);
     this.team.update(dt);
 
     for (const companion of this.companions) {
@@ -416,8 +421,18 @@ export class Run {
         p.hits.add(enemy);
         damageEnemy(this, enemy, p.damage, {
           type: p.type, effects: p.effects, knockback: p.knockback,
-          from: { x: p.x - p.vx * 0.01, y: p.y - p.vy * 0.01 }
+          from: { x: p.x - p.vx * 0.01, y: p.y - p.vy * 0.01 },
+          owner: p.owner, lifesteal: p.lifesteal
         });
+        // Magnet Bomb: gruda no inimigo e explode logo depois
+        if (p.delayedBlast) {
+          const { area, ratio, delay } = p.delayedBlast;
+          this.zones.push(new Zone({
+            kind: 'nova', x: enemy.x, y: enemy.y, radius: 8, maxRadius: area, growSpeed: area * 6,
+            damage: p.damage * ratio, delay, delayTotal: delay, type: p.type, color: p.color, abilityId: p.abilityId,
+            knockback: 120, strike: 'explosion'
+          }));
+        }
         // o acerto do golpe (sprite do FireRed); sem espaço, umas faíscas
         if (!this.spawnFx(p.x, p.y, abilityFx(p.abilityId)?.hit, { life: 0.28, scale: 0.75 })) {
           burst(this.particles, p.x, p.y, p.color, 3, 90, 2, 0.25);
@@ -434,7 +449,6 @@ export class Run {
         });
         this.spawnFx(p.x, p.y, 'explosion', { life: 0.35, scale: 1.5 });
         burst(this.particles, p.x, p.y, p.color, 10, 220, 4, 0.5);
-        this.shake(2, 0.15);
         p.explode = null;
       }
     }
@@ -477,7 +491,7 @@ export class Run {
         orb.cooldowns.set(enemy, orb.tickRate);
         damageEnemy(this, enemy, orb.damage, {
           type: orb.type, effects: orb.effects, knockback: orb.knockback,
-          from: { x: orb.owner.x, y: orb.owner.y }
+          from: { x: orb.owner.x, y: orb.owner.y }, owner: orb.owner, lifesteal: orb.lifesteal
         });
       }
     }
@@ -505,6 +519,12 @@ export class Run {
           }
           continue;
         }
+        // o golpe que cai do céu (2º golpe) aparece quando o aviso acaba
+        if (!zone.started) {
+          zone.started = true;
+          if (zone.strike) this.spawnFx(zone.x, zone.y, zone.strike, { life: 0.4, scale: 1.3 });
+        }
+        if (zone.damage <= 0) continue;   // só o visual (Dragon Dance)
         for (const enemy of this.grid.query(zone.x, zone.y, zone.radius)) {
           if (enemy.dead || zone.hits.has(enemy)) continue;
           const d = Math.hypot(enemy.x - zone.x, enemy.y - zone.y);
@@ -512,21 +532,41 @@ export class Run {
           zone.hits.add(enemy);
           damageEnemy(this, enemy, zone.damage, {
             type: zone.type, effects: zone.effects,
-            knockback: zone.knockback, from: { x: zone.x, y: zone.y }
+            knockback: zone.knockback, from: { x: zone.x, y: zone.y },
+            owner: zone.owner, lifesteal: zone.lifesteal
           });
         }
         continue;
       }
 
       // auras e zonas de chão causam dano em intervalos
+      // Whirlpool: puxa quem está dentro para o centro, todo quadro
+      if (zone.pull) {
+        for (const enemy of this.grid.query(zone.x, zone.y, zone.radius)) {
+          if (enemy.dead || enemy.boss) continue;
+          const dx = zone.x - enemy.x, dy = zone.y - enemy.y;
+          const d = Math.hypot(dx, dy);
+          if (d > zone.radius || d < 6) continue;
+          enemy.knockback(dx / d, dy / d, zone.pull * dt * 8);
+        }
+      }
       if (!zone.readyToTick(dt)) continue;
+      // campos que curam a equipe (Grassy e Misty Terrain), com o teto do 2º golpe
+      if (zone.healTeam) {
+        for (const companion of this.companions) {
+          if (companion.dead || Math.hypot(companion.x - zone.x, companion.y - zone.y) > zone.radius) continue;
+          bonusHeal(this, companion, companion.maxHp(this.playerStats.pokemonHpBonus) * zone.healTeam);
+        }
+      }
+      if (zone.damage <= 0) continue;   // só o visual (a barreira do Reflect)
       for (const enemy of this.grid.query(zone.x, zone.y, zone.radius)) {
         if (enemy.dead) continue;
         const dx = enemy.x - zone.x, dy = enemy.y - zone.y;
         if (dx * dx + dy * dy > zone.radius * zone.radius) continue;
         damageEnemy(this, enemy, zone.damage, {
           type: zone.type, effects: zone.effects, silent: Math.random() > 0.35,
-          knockback: zone.knockback, from: { x: zone.x, y: zone.y }
+          knockback: zone.knockback, from: { x: zone.x, y: zone.y },
+          owner: zone.owner, lifesteal: zone.lifesteal
         });
       }
     }
@@ -553,7 +593,6 @@ export class Run {
         for (const orb of this.pickups) {
           if (orb.kind === 'xp' && !orb.dead) { orb.magnetized = true; orb.age = 0; }
         }
-        this.shake(3, 0.25);
         bus.emit(EVENTS.MAGNET_PICKED, {});
         burst(this.particles, this.player.x, this.player.y, '#63b3ff', 18, 260, 3, 0.6);
         bus.emit(EVENTS.TOAST, { text: 'Ímã! Toda a experiência do mapa vem até você.', icon: 'magnet' });

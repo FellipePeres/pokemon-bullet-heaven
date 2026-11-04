@@ -1,6 +1,7 @@
 import { ABILITIES, RETIRED_ABILITIES } from '../data/abilities.js';
 import { UPGRADES, RENAMED_UPGRADES } from '../data/upgrades.js';
 import { getPokemon } from '../data/pokemon.js';
+import { isBonusMove } from '../data/bonusMoves.js';
 
 /**
  * Leva as melhorias de um golpe para outro. Cada upgrade do antigo vira o
@@ -48,7 +49,7 @@ export function migrateMember(member) {
   const line = getPokemon(member.pokemonId)?.moveLine ?? [];
   member.abilities = member.abilities
     .map((id, i) => {
-      if (ABILITIES[id]) return id;
+      if (ABILITIES[id] || (isBonusMove(id) && !RETIRED_ABILITIES[id])) return id;   // o 2º golpe fica como está
       const retired = RETIRED_ABILITIES[id];
       const replacement = (i > 0 && retired?.extra) || line[retired?.tier ?? 0] || line[0];
       member.upgrades = transferUpgrades(member.upgrades, id, replacement);

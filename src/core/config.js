@@ -3,7 +3,7 @@
  * Nada de número mágico espalhado pelo gameplay: se precisar ajustar, ajuste aqui.
  */
 export const CONFIG = {
-  version: '0.13.2',
+  version: '0.14.0',
 
   canvas: { width: 1280, height: 720 },
 
@@ -139,6 +139,14 @@ export const CONFIG = {
     damageGrowth: 1.035,
     xpPerLevel: 0.08
   },
+
+  /**
+   * O 2º golpe (0.14, data/bonusMoves.js): com todas as melhorias, cada nível tem
+   * essa chance de ensinar um golpe do tipo principal; senão, a do secundário.
+   * O dano por acerto é `damageRatio` do golpe principal; as curas dele param em
+   * `healPerSecond` da vida máxima do Pokémon por segundo.
+   */
+  bonusMove: { chancePrimary: 0.02, chanceSecondary: 0.01, damageRatio: 0.6, healPerSecond: 0.02 },
 
   capture: {
     choices: 4,              // opções por Poké Ball (0.11: eram 3)

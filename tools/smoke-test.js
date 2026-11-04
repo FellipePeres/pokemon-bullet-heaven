@@ -23,6 +23,10 @@ import { Pickup } from '../src/entities/Pickup.js';
 import { swapWithPC, normalizePC, monAt, previewMove, moveMon, boxCount } from '../src/systems/pc.js';
 import { TILE } from '../src/systems/terrain.js';
 import { recordStageResult } from '../src/systems/stageStats.js';
+import { BONUS_MOVES, BONUS_BY_TYPE, isBonusMove } from '../src/data/bonusMoves.js';
+import { RETIRED_ABILITIES } from '../src/data/abilities.js';
+import { abilityFx } from '../src/data/fx.js';
+import { damageEnemy, bonusHeal } from '../src/systems/combat.js';
 
 let failures = 0;
 
@@ -502,6 +506,17 @@ console.log('\n[ajuste por inicial]');
   late.bossTuning = undefined;
   const plain = ace();
   late.bossTuning = keep;
+  // o líder acompanha a equipe (0.14): acima do nível de sempre, cresce junto
+  const liftRun = new Run('gym_6_saffron', { starter: 'charmander' });
+  const at = (level) => {
+    liftRun.team.members.forEach((m) => { m.level = level; });
+    return liftRun.spawner.spawnAt('sabrina_alakazam', 0, 0);
+  };
+  const usual = at(late.leaderLevel), below = at(30), above = at(120);
+  check('o líder acompanha a equipe acima do nível de sempre (e só acima)',
+        Math.abs(below.maxHp - usual.maxHp) < 1e-6 && above.maxHp > usual.maxHp * 1.5
+        && Math.abs(above.attackMult / usual.attackMult - above.maxHp / usual.maxHp) < 1e-9,
+        `vida ×${(above.maxHp / usual.maxHp).toFixed(2)} com a equipe no 120`);
   check('nas últimas fases o líder tem mais vida e golpes mais fortes',
         Math.abs(strong.maxHp / plain.maxHp - keep.hp) < 1e-9 && strong.attackMult === keep.damage && plain.attackMult === 1,
         `vida ×${keep.hp}, dano ×${keep.damage}`);
@@ -534,7 +549,137 @@ console.log('\n[shiny]');
   check('mandado direto para o PC, continua shiny', run.pc.at(-1).shiny === true);
 }
 
-// ---------------------------------------------- 5.13 métricas da fase (o Estojo de Insígnias)
+// ---------------------------------------------- 5.13 o 2º golpe (data/bonusMoves.js)
+console.log('\n[2º golpe]');
+{
+  const types151 = new Set(Object.values(POKEMON).flatMap((p) => p.types));
+  check('3 golpes por tipo, para todos os tipos das 151', [...types151].every((t) => BONUS_BY_TYPE[t]?.length === 3)
+        && Object.keys(BONUS_MOVES).length === 3 * Object.keys(BONUS_BY_TYPE).length,
+        `${Object.keys(BONUS_MOVES).length} golpes em ${Object.keys(BONUS_BY_TYPE).length} tipos`);
+  const clash = Object.keys(BONUS_MOVES).filter((id) => ABILITIES[id] || RETIRED_ABILITIES[id] || !abilityFx(id));
+  check('cada um com visual e sem repetir o id de um golpe (atual ou que saiu)', clash.length === 0, clash.join(', '));
+
+  // aprender: só com todas as melhorias; 2% do principal, 1% do secundário; um só
+  const run = new Run('gym_1_pewter', { starter: 'charmander' });
+  run.spawner.update = () => {};
+  const member = run.team.members[0];
+  member.pokemonId = 'charizard';
+  member.level = 50;
+  const maxOut = () => {
+    for (let pass = 0; pass < 6; pass++) {
+      for (const up of Object.values(UPGRADES)) if (up.abilityId === member.abilities[0]) member.upgrades[up.id] = up.maxStacks;
+    }
+  };
+  const saved = { ...CONFIG.bonusMove };
+  CONFIG.bonusMove.chancePrimary = 1;
+  run.progression.addXpTo(member, run.progression.xpToNext(member.level) + 1);
+  check('sem todas as melhorias, o 2º golpe não vem', !member.abilities.some(isBonusMove));
+  maxOut();
+  run.progression.addXpTo(member, run.progression.xpToNext(member.level) + 1);
+  const learned = member.abilities.find(isBonusMove);
+  check('com todas as melhorias, aprende um 2º golpe do tipo principal', BONUS_MOVES[learned]?.type === 'fire', learned);
+  run.progression.addXpTo(member, run.progression.xpToNext(member.level) + 1);
+  check('um só por Pokémon', member.abilities.filter(isBonusMove).length === 1);
+  member.abilities = member.abilities.filter((id) => !isBonusMove(id));
+  CONFIG.bonusMove.chancePrimary = 0;
+  CONFIG.bonusMove.chanceSecondary = 1;
+  run.progression.addXpTo(member, run.progression.xpToNext(member.level) + 1);
+  check('o tipo secundário também ensina (com a chance dele)',
+        BONUS_MOVES[member.abilities.find(isBonusMove)]?.type === 'flying', member.abilities.join(', '));
+  Object.assign(CONFIG.bonusMove, saved);
+
+  // o dano por acerto: 60% do golpe principal (vezes o ajuste da frequência)
+  const companion = run.companions.find((c) => c.member === member);
+  run.abilitySystem.refresh();
+  const [mainInst, bonusInst] = [companion.abilities[0], companion.abilities.find((i) => isBonusMove(i.abilityId))];
+  check('o 2º golpe bate 60% do principal', Math.abs(bonusInst.stats.damage
+        - mainInst.stats.damage * 0.6 * (BONUS_MOVES[bonusInst.abilityId].base.hitScale ?? 1)) < 1e-6);
+
+  // cada um dos 51 dispara de verdade numa partida curta
+  const silent = [];
+  for (const id of Object.keys(BONUS_MOVES)) {
+    const r = new Run('gym_1_pewter', { starter: 'charmander' });
+    r.spawner.update = () => {};
+    const m = r.team.members[0];
+    m.level = 30;
+    m.abilities.push(id);
+    r.rebuildCompanionAbilities();
+    for (let i = 0; i < 16; i++) {
+      const a = (i / 16) * Math.PI * 2, d = 90 + (i % 4) * 70;
+      r.spawner.spawnAt('rattata', r.player.x + Math.cos(a) * d, r.player.y + Math.sin(a) * d, 12);
+    }
+    let seen = false;
+    for (let f = 0; f < 60 * 7 && !seen; f++) {
+      r.update(1 / 60, { x: Math.cos(f / 40), y: Math.sin(f / 40) });
+      if (r.state !== 'running') { r.state = 'running'; r.levelUpMember = null; r.pendingBall = false; r.pendingGift = null; }
+      const c = r.companions[0];
+      seen = [...r.projectiles, ...r.zones, ...r.orbs, ...r.effects].some((o) => o.abilityId === id && !o.dead)
+        || r.buffs.reflect > 0 || c?.dance?.t > 0;
+    }
+    if (!seen) silent.push(id);
+  }
+  check('os 51 golpes disparam numa partida curta', silent.length === 0, silent.join(', '));
+
+  // Whirlpool longe do próprio Pokémon; cura dentro do teto; Hex; Acid Spray; Reflect
+  {
+    const r = new Run('gym_1_pewter', { starter: 'squirtle' });
+    r.spawner.update = () => {};
+    const c = r.companions[0];
+    c.member.abilities.push('whirlpool_zone');
+    r.rebuildCompanionAbilities();
+    r.spawner.spawnAt('rattata', c.x + 60, c.y, 5);
+    const far = r.spawner.spawnAt('rattata', c.x + 300, c.y + 40, 5);
+    r.update(1 / 60, { x: 0, y: 0 });   // a grade dos inimigos é refeita a cada quadro
+    r.abilitySystem.fire(c, c.abilities.find((i) => i.abilityId === 'whirlpool_zone'));
+    const pool = r.zones.filter((z) => z.abilityId === 'whirlpool_zone').at(-1);
+    check('o Whirlpool nasce longe do próprio Pokémon (na horda de longe)',
+          !!pool && Math.hypot(pool.x - c.x, pool.y - c.y) >= 200 && Math.hypot(pool.x - far.x, pool.y - far.y) < 40);
+
+    c.member.hp = 10;
+    const cap = CONFIG.bonusMove.healPerSecond * c.maxHp(r.playerStats.pokemonHpBonus);
+    c.healBudget = 0;
+    for (let f = 0; f < 60; f++) { r.abilitySystem._tickCompanion(c, 1 / 60); bonusHeal(r, c, 999); }
+    check('a cura do 2º golpe para no teto por segundo', c.member.hp - 10 <= cap * 1.05, `${(c.member.hp - 10).toFixed(1)} de ${cap.toFixed(1)}`);
+
+    const a = r.spawner.spawnAt('rattata', 900, 900, 5), b = r.spawner.spawnAt('rattata', 930, 900, 5);
+    r.update(1 / 60, { x: 0, y: 0 });
+    const before = b.hp;
+    damageEnemy(r, a, 1, { effects: { curse: { area: 90, ratio: 50, duration: 5 } } });
+    damageEnemy(r, a, 9999, {});
+    check('Hex: o amaldiçoado explode nos vizinhos ao morrer', b.hp < before);
+    const w = r.spawner.spawnAt('rattata', 600, 600, 5);
+    const hp0 = w.hp;
+    damageEnemy(r, w, 10, { effects: { weak: { amount: 0.25, duration: 4 } } });
+    const hp1 = w.hp;
+    damageEnemy(r, w, 10, {});
+    check('Acid Spray: o enfraquecido leva 25% a mais', Math.abs((hp1 - w.hp) - 1.25 * (hp0 - hp1)) < 1e-6);
+    r.buffs.reflect = 2;
+    c.member.hp = 100;
+    c.invulnTimer = 0;
+    r.damageCompanion(c, 20);
+    check('Reflect: a equipe leva 40% menos dano', Math.abs(c.member.hp - 88) < 1e-6, `${c.member.hp}`);
+  }
+
+  // o tremor de tela só existe nos golpes dos líderes (0.14)
+  {
+    const r = new Run('gym_1_pewter', { starter: 'charmander' });
+    r.spawner.update = () => {};
+    let shakes = 0;
+    r.shake = () => { shakes++; };
+    const c = r.companions[0];
+    c.member.abilities = ['earthquake'];
+    r.rebuildCompanionAbilities();
+    r.spawner.spawnAt('rattata', c.x + 40, c.y, 5);
+    for (let f = 0; f < 120; f++) r.update(1 / 60, { x: 0, y: 0 });
+    const mine = shakes;
+    const boss = r.spawner.spawnAt('brock_onix', c.x + 200, c.y, 12);
+    r.abilitySystem.fireHostile(boss, 'boss_shockwave');
+    for (let f = 0; f < 120; f++) r.update(1 / 60, { x: 0, y: 0 });
+    check('tremor de tela só nos golpes dos líderes', mine === 0 && shakes > 0, `${mine} do jogador, ${shakes - mine} do líder`);
+  }
+}
+
+// ---------------------------------------------- 5.14 métricas da fase (o Estojo de Insígnias)
 console.log('\n[métricas da fase]');
 {
   let s = recordStageResult(undefined, { victory: false, time: 200, faints: 6, level: 15, captures: 2, damage: 1000.6, team: [], date: 'a' });

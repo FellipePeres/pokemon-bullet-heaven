@@ -4,6 +4,7 @@ import { getAbility } from '../data/abilities.js';
 import { typeColor, typeName } from '../data/types.js';
 import { CONFIG } from '../core/config.js';
 import { BOX_SIZE, boxCount, monAt, normalizePC, previewMove } from '../systems/pc.js';
+import { isBonusMove } from '../data/bonusMoves.js';
 
 /**
  * O PC — o "Pokémon Storage System" do FireRed, trazido do Pokemon All
@@ -244,6 +245,8 @@ export class PCScreen {
     info.appendChild(create('p', 'pc-data__level', `Nv. ${mon.level}`));
     const move = getAbility(mon.abilities?.[0]);
     if (move) info.appendChild(create('p', 'pc-data__line', move.name));
+    const second = mon.abilities?.find(isBonusMove);   // o 2º golpe (raro)
+    if (second) info.appendChild(create('p', 'pc-data__line pc-data__bonus', `+ ${getAbility(second).name}`));
     const team = this.journey?.team;
     const where = mon.slot !== undefined ? 'No PC'
       : team?.active?.includes(mon.uid) ? 'Em campo' : 'Na reserva';

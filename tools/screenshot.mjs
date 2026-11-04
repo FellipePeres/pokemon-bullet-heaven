@@ -164,6 +164,18 @@ const ROTEIROS = {
     { run: "game.menus.lobby.selected = 'e4_lorelei'; game.menus.lobby.render()" }, { wait: 500 }, { shot: 'lobby-3-liga' },
     { run: "game.menus.showModal('modal-badges', { stageId: 'gym_2_cerulean' })" }, { wait: 900 }, { shot: 'lobby-4-estojo' }
   ],
+  // o 2º golpe (0.14): Flame Wheel, Bolt Strike e Rock Tomb junto dos golpes de sempre
+  golpes2: [
+    { open: 'index.html' }, { wait: 500 },
+    { run: START_RUN }, { wait: 1200 },
+    { run: "const r = game.run; r.spawner.update = () => {};" +
+           "r.team.members[0].abilities.push('flame_ring'); r.team.add('pikachu', 20).abilities.push('bolt_strike');" +
+           "r.team.add('geodude', 20).abilities.push('rock_tomb'); r.team.members.forEach((m) => { m.level = 25; }); r.rebuildCompanionAbilities();" +
+           "for (let i = 0; i < 26; i++) { const a = i / 26 * Math.PI * 2, d = 150 + (i % 5) * 45; r.spawner.spawnAt('rattata', r.player.x + Math.cos(a) * d, r.player.y + Math.sin(a) * d, 14); }" },
+    { wait: 1500 }, { shot: 'golpes2-1', raw: true }, { wait: 700 }, { shot: 'golpes2-2', raw: true }, { wait: 900 }, { shot: 'golpes2-3', raw: true },
+    // o nível não tem teto: o selo em cima do Pokémon cresce com o número
+    { run: "game.run.team.members.forEach((m, i) => { m.level = [9, 100, 137][i] ?? 50; })" }, { wait: 400 }, { shot: 'golpes2-nivel', raw: true }
+  ],
   // shiny (0.13.1): as opções da Poké Ball, o Pokémon no campo (com o brilho) e no PC
   shiny: [
     { open: 'index.html' }, { wait: 500 },

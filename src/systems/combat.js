@@ -46,6 +46,21 @@ export function applyEffects(enemy, effects) {
   if (effects.burn) enemy.applyStatus('burn', effects.burn);
   if (effects.poison) enemy.applyStatus('poison', effects.poison);
   if (effects.slow) enemy.applyStatus('slow', effects.slow);
+  if (effects.weak) enemy.applyStatus('weak', effects.weak);
+}
+
+/**
+ * Cura dos 2º golpes (sanguessuga, campos): cada Pokémon tem um teto por
+ * segundo (`CONFIG.bonusMove.healPerSecond`), recarregado pelo AbilitySystem —
+ * a cura não pode sobrar (pedido do Fellipe).
+ */
+export function bonusHeal(run, companion, amount) {
+  if (!companion || companion.dead || companion.member?.fainted || amount <= 0) return 0;
+  const healed = Math.min(amount, companion.healBudget ?? 0);
+  if (healed <= 0) return 0;
+  companion.healBudget -= healed;
+  companion.heal(healed, run.playerStats.pokemonHpBonus);
+  return healed;
 }
 
 /**
@@ -56,12 +71,19 @@ export function damageEnemy(run, enemy, amount, opts = {}) {
   if (enemy.dead) return 0;
 
   const mult = opts.type ? typeMultiplier(opts.type, enemy.types) : 1;
-  const dealt = amount * mult;
+  const weak = enemy.status?.weak ? 1 + enemy.status.weak.amount : 1;   // Acid Spray
+  const dealt = amount * mult * weak;
   enemy.hp -= dealt;
   enemy.hitFlash = 0.08;
   run.stats.damageDealt += dealt;
 
   if (opts.effects) applyEffects(enemy, opts.effects);
+  // Hex: o amaldiçoado guarda o dano para explodir nos vizinhos quando morrer
+  if (opts.effects?.curse) {
+    const { area, ratio, duration } = opts.effects.curse;
+    enemy.applyStatus('curse', { area, damage: amount * ratio, duration, type: opts.type });
+  }
+  if (opts.lifesteal && opts.owner) bonusHeal(run, opts.owner, dealt * opts.lifesteal);
 
   if (opts.knockback && opts.from) {
     const dx = enemy.x - opts.from.x;
@@ -86,6 +108,14 @@ export function killEnemy(run, enemy, opts = {}) {
   if (enemy.dead) return;
   enemy.dead = true;
   run.stats.kills++;
+
+  // amaldiçoado pelo Hex: explode em fogo-fátuo nos vizinhos
+  const curse = enemy.status?.curse;
+  if (curse) {
+    enemy.status.curse = null;
+    run.spawnFx?.(enemy.x, enemy.y, 'purple_flame', { life: 0.4, scale: 1.4 });
+    damageArea(run, enemy.x, enemy.y, curse.area, curse.damage, { type: curse.type });
+  }
 
   const color = typeColor(enemy.types[0]);
   burst(run.particles, enemy.x, enemy.y, color, enemy.boss ? 40 : enemy.elite ? 18 : 7,
@@ -122,7 +152,6 @@ export function killEnemy(run, enemy, opts = {}) {
     run.pickups.push(new Pickup('heal', enemy.x - 6, enemy.y, 18));
   }
 
-  if (enemy.boss) run.shake?.(7, 0.45);   // o Pokémon do líder caiu
   bus.emit(EVENTS.ENEMY_KILLED, { enemy, run });
 }
 

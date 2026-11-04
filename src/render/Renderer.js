@@ -272,7 +272,24 @@ export class Renderer {
    * um anel que cresce até a hora do golpe e o "X" do Rock Tomb no centro.
    */
   _drawTelegraph(ctx, zone) {
-    const progress = 1 - zone.delay / CONFIG.fx.bossTelegraph;
+    const progress = 1 - zone.delay / (zone.delayTotal ?? CONFIG.fx.bossTelegraph);
+    if (!zone.hostile) {
+      // do jogador (2º golpe): o círculo na cor do tipo se fechando, sem o X
+      ctx.save();
+      ctx.strokeStyle = zone.color;
+      ctx.globalAlpha = 0.35 + progress * 0.4;
+      ctx.lineWidth = 2;
+      ctx.setLineDash([6, 6]);
+      ctx.beginPath();
+      ctx.arc(zone.x, zone.y, zone.maxRadius, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.beginPath();
+      ctx.arc(zone.x, zone.y, Math.max(1, zone.maxRadius * (1 - progress)), 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.restore();
+      return;
+    }
     ctx.save();
     ctx.fillStyle = '#ff3b30';
     ctx.globalAlpha = 0.1 + progress * 0.18;
@@ -422,12 +439,15 @@ export class Renderer {
     ctx.fillStyle = ratio > 0.5 ? '#57d18a' : ratio > 0.25 ? '#f8d030' : '#e2574c';
     ctx.fillRect(x, y, w * ratio, 4);
 
+    // o selo do nível cresce com o número (o nível não tem teto: 100, 150...)
+    const label = `${companion.member.level}`;
     ctx.font = `8px ${ARCADE_FONT}`;
     ctx.textAlign = 'left';
+    const bw = Math.max(17, ctx.measureText(label).width + 6);
     ctx.fillStyle = 'rgba(0,0,0,.65)';
-    ctx.fillRect(x + w - 15, y - 11, 17, 10);
+    ctx.fillRect(x + w + 2 - bw, y - 11, bw, 10);
     ctx.fillStyle = '#ffcb05';
-    ctx.fillText(`${companion.member.level}`, x + w - 12, y - 3);
+    ctx.fillText(label, x + w + 5 - bw, y - 3);
   }
 
   /** Status em cima do inimigo: queimadura, veneno e lentidão (sprite, ou bolinha). */

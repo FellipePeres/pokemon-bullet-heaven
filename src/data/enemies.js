@@ -141,7 +141,7 @@ export const ENEMIES = {
      ao derrotar um, o próximo entra. O último é o ace do líder.
      ============================================================== */
   brock_geodude: {
-    id: 'brock_geodude', dex: 74, name: 'Geodude do Brock', types: ['rock', 'ground'],
+    id: 'brock_geodude', dex: 74, name: 'Geodude do Brock', types: ['rock', 'ground'], level: 12,
     hp: 1700, speed: 78, damage: 14, xp: 180, dropChance: 1,
     behavior: 'boss', radius: 30, scale: 2.4, boss: true,
     leader: 'Brock',
@@ -151,7 +151,7 @@ export const ENEMIES = {
     summons: { enemy: 'geodude_wild', count: 1, interval: 12 }
   },
   brock_onix: {
-    id: 'brock_onix', dex: 95, name: 'Onix do Brock', types: ['rock', 'ground'],
+    id: 'brock_onix', dex: 95, name: 'Onix do Brock', types: ['rock', 'ground'], level: 14,
     hp: 3400, speed: 88, damage: 19, xp: 420, dropChance: 1,
     behavior: 'boss', radius: 40, scale: 3.4, boss: true, ace: true,
     leader: 'Brock',
@@ -161,7 +161,7 @@ export const ENEMIES = {
   },
 
   misty_staryu: {
-    id: 'misty_staryu', dex: 120, name: 'Staryu da Misty', types: ['water'],
+    id: 'misty_staryu', dex: 120, name: 'Staryu da Misty', types: ['water'], level: 18,
     hp: 5000, speed: 106, damage: 21, xp: 260, dropChance: 1,
     behavior: 'boss', radius: 30, scale: 2.4, boss: true,
     leader: 'Misty',
@@ -169,7 +169,7 @@ export const ENEMIES = {
     summons: { enemy: 'horsea', count: 3, interval: 10 }
   },
   misty_starmie: {
-    id: 'misty_starmie', dex: 121, name: 'Starmie da Misty', types: ['water', 'psychic'],
+    id: 'misty_starmie', dex: 121, name: 'Starmie da Misty', types: ['water', 'psychic'], level: 21,
     hp: 9000, speed: 118, damage: 27, xp: 620, dropChance: 1,
     behavior: 'boss', radius: 38, scale: 3.2, boss: true, ace: true,
     leader: 'Misty',

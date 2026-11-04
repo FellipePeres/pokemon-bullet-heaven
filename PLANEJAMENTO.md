@@ -651,13 +651,21 @@ a estar nos líderes. Com o bot novo, metade das derrotas da Fase 1 é no Brock.
 | D8 | Celular e controle importam? | Controle feito na 0.7 (padrão); celular depois de Kanto fechado. | Etapa 6 |
 | D9 | Final e pós-jogo | Hall da Fama e créditos na 1.0; revanche dos líderes e lendários depois. | Etapa 7 |
 | D10 | Como refinar o XP? (o Fellipe pediu sugestões na 0.9) | Ver as opções em "Segundo retorno" abaixo. Recomendação: orbes por faixa de valor com o visual de doce, que se juntam no chão. | — |
-| D11 | **Ideia do Fellipe (0.12), para o planejamento:** quando um Pokémon chega ao máximo de melhorias, cada nível que ele sobe tem uma chance bem baixa de ganhar um **2º golpe**: ele mantém o golpe de hoje e passa a usar outro junto — o Charizard ganha um anel de fogo, por exemplo. Para todos. (O "mesmo golpe com um mega bônus" foi recusado.) | Recomendação: vale quando não há mais melhoria para sortear (é quando aparece a Poção de 20%). Em cada nível, ~2% de chance de uma das opções virar o **2º golpe** da espécie: um golpe de área do tipo dela que gira em volta do Pokémon (o anel), com o sprite de golpe do FireRed que o tipo já tem (Fogo: o anel de fogo do Fire Spin; Água: o redemoinho; Planta: as folhas; Elétrico: as faíscas...). Um por Pokémon, para sempre, e ele começa sem melhorias. A conferir: a %, se é por tipo ou por espécie, e se o 2º golpe também recebe melhorias depois. | — |
+| D11 | ✅ Feito na 0.14 (ver "O 2º golpe — 3 por tipo"). **Ideia do Fellipe (0.12):** quando um Pokémon chega ao máximo de melhorias, cada nível que ele sobe tem uma chance bem baixa de ganhar um **2º golpe**: ele mantém o golpe de hoje e passa a usar outro junto — o Charizard ganha um anel de fogo, por exemplo. Para todos. (O "mesmo golpe com um mega bônus" foi recusado.) | Recomendação: vale quando não há mais melhoria para sortear (é quando aparece a Poção de 20%). Em cada nível, ~2% de chance de uma das opções virar o **2º golpe** da espécie: um golpe de área do tipo dela que gira em volta do Pokémon (o anel), com o sprite de golpe do FireRed que o tipo já tem (Fogo: o anel de fogo do Fire Spin; Água: o redemoinho; Planta: as folhas; Elétrico: as faíscas...). Um por Pokémon, para sempre, e ele começa sem melhorias. A conferir: a %, se é por tipo ou por espécie, e se o 2º golpe também recebe melhorias depois. | — |
 | D12 | Shiny: "vamos implementar, não aparece shiny nos inimigos, apenas na captura e para o jogador" | ✅ Feito na 0.13.1; o inicial também (0.13.2, 1% na escolha). Em aberto: a chance (padrão 1% por opção da Poké Ball) e se o shiny ganha algum bônus além das cores (hoje, não) | — |
 
 Enquanto uma decisão não vem, a recomendação vale como padrão. O que foi feito
 assim fica anotado como "padrão até o Fellipe decidir".
 
-### O 2º golpe — 3 por tipo (proposta da D11, para o Fellipe aprovar ou mudar)
+### O 2º golpe — 3 por tipo (D11; feito na 0.14)
+
+**Aprovado pelo Fellipe e feito na 0.14**, com os ajustes dele: o Redemoinho nasce
+longe do próprio Pokémon (puxar a horda para perto dele seria uma faca de dois
+gumes); as curas da Planta (e todas as outras) param num teto por segundo; nos
+Pokémon de dois tipos, 2% para um dos 3 do principal e 1% para um dos 3 do
+secundário, e ele fica com o primeiro que sair; o nome oficial; 60% do dano do
+golpe atual. O Air Slash ficou "para ver como fica". Raio do Céu virou **Bolt
+Strike** (Thunder já é um golpe do jogo).
 
 A regra (aprovada na 0.13): quando o Pokémon já tem todas as melhorias, cada
 nível tem uma chance baixa (~2%) de dar o **2º golpe**: ele mantém o golpe dele
@@ -670,7 +678,7 @@ tipo já tem; todos usam um efeito do FireRed que o jogo já tem (`fx/...`).
 | Fogo | **Anel de Fogo** (Flame Wheel): um anel de chamas gira colado no Pokémon o tempo todo e queima quem encosta · `spinning_fire` | **Onda de Calor** (Heat Wave): de tempos em tempos, um círculo de fogo se abre em volta e deixa os atingidos queimando · `fire` | **Rastro em Chamas** (Flame Charge): por onde o Pokémon passa, fica um rastro de brasas que queima quem pisa · `small_ember` |
 | Água | **Redemoinho** (Whirlpool): uma área gira no chão, puxa os inimigos para o centro e fere · `blue_ring` | **Anel d'Água** (Aqua Ring): bolhas giram em volta, ferem quem encosta e cada acerto cura um pouco o Pokémon · `bubble` | **Surfe** (Surf): uma onda larga varre a área à frente e empurra a horda para longe · `water_impact` |
 | Planta | **Dança das Pétalas** (Petal Dance): folhas saem em espiral para todos os lados · `razor_leaf` | **Semente Sanguessuga** (Leech Seed): planta sementes nos inimigos perto; elas drenam vida e curam o Pokémon · `green_sparkle` | **Campo de Grama** (Grassy Terrain): o chão em volta vira grama que fere os inimigos e cura a equipe aos poucos · `leaf` |
-| Elétrico | **Descarga** (Discharge): pulso elétrico em toda a volta que deixa os atingidos lentos (paralisados) · `shock` | **Raio do Céu** (Thunder): raios caem em inimigos ao acaso na tela · `lightning` | **Esferas Elétricas** (Spark): três esferas giram em volta e soltam faíscas em quem chega perto · `spark` |
+| Elétrico | **Descarga** (Discharge): pulso elétrico em toda a volta que deixa os atingidos lentos (paralisados) · `shock` | **Raio do Céu** (Bolt Strike): raios caem em inimigos ao acaso na tela · `lightning` | **Esferas Elétricas** (Spark): três esferas giram em volta e soltam faíscas em quem chega perto · `spark` |
 | Gelo | **Granizo** (Hail): pedras de gelo caem em pontos ao acaso perto do Pokémon · `hail` | **Caco de Gelo** (Ice Shard): cristais em leque que congelam (deixam bem lentos) · `ice_crystal` | **Névoa Gélida** (Mist): uma aura fria em volta desacelera muito quem entra · `ice_chunk` |
 | Lutador | **Soco Relâmpago** (Mach Punch): um soco muito rápido no inimigo mais perto, a cada segundo, com empurrão forte · `hands` | **Esfera de Foco** (Focus Blast): carrega e solta uma esfera grande que explode em área · `orbs` + `explosion` | **Contra-ataque** (Counter): quando o Pokémon leva dano, ele revida com uma onda de impacto · `cross_impact` |
 | Venenoso | **Espinhos Tóxicos** (Toxic Spikes): espalha armadilhas no chão que envenenam quem pisa · `needle` | **Nuvem Tóxica** (Smog): uma nuvem segue o Pokémon e envenena tudo em volta · `toxic_bubble` | **Chuva Ácida** (Acid Spray): gotas de ácido caem nos inimigos e eles passam a levar mais dano · `poison_bubble` |

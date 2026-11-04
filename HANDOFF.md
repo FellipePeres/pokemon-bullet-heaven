@@ -5,7 +5,7 @@
 > decisão foi tomada e o que falta fazer. O `README.md` é o manual de uso;
 > este aqui é o contexto de desenvolvimento.
 
-**Versão atual:** `0.13.2` · **Última atualização:** 2026-11-03
+**Versão atual:** `0.14.0` · **Última atualização:** 2026-11-03
 **Stack:** HTML + CSS + JavaScript puro (ES Modules). Sem backend, sem build, sem dependências.
 **Repositório:** https://github.com/FellipePeres/pokemon-bullet-heaven (público)
 **Jogo no ar:** https://fellipeperes.github.io/pokemon-bullet-heaven/
@@ -283,6 +283,31 @@ confirmar com ele**.
 
 Nunca voltar bônus globais para o pool de level up — foi pedido explícito.
 
+### O 2º golpe (0.14)
+- **Com todas as melhorias, cada nível pode ensinar um 2º golpe** (`data/bonusMoves.js`,
+  a D11 do PLANEJAMENTO, aprovada golpe a golpe pelo Fellipe): 2% de um dos 3 do
+  tipo principal; se não sair, 1% de um dos 3 do secundário
+  (`CONFIG.bonusMove`). Um por Pokémon, para sempre; ele mantém o golpe dele e
+  usa os dois. O 2º golpe entra em `member.abilities` (o mesmo lugar do golpe
+  extra dos iniciais), então o save, o PC e a troca já o levam.
+- 51 golpes (3 por tipo, 17 tipos — Sombrio não tem Pokémon nas 151), com o nome
+  oficial e a descrição em português. **Dano por acerto: 60% do golpe principal
+  atual** (com as melhorias dele) × `hitScale`, que diminui o de quem acerta
+  muito (auras, órbitas) e aumenta o raro (meteoros). Sem melhorias próprias.
+- Comportamentos novos no `AbilitySystem`: `rain` (o aviso no chão, na cor do
+  tipo, e o impacto: na horda mais perto, em inimigos ao acaso ou no de mais
+  vida), `trail` (Flame Charge), `buff` (Dragon Dance, Reflect, Phantom Force) e
+  `reactive` (Counter, quando o Pokémon leva dano). E: o Whirlpool nasce longe
+  do próprio Pokémon e do treinador e puxa a horda (`placement: 'far'`, `pull`);
+  as curas (Aqua Ring, Leech Seed, Draining Kiss, Grassy e Misty Terrain) param
+  num teto de 2% da vida por segundo por Pokémon (`bonusHeal`); Hex amaldiçoa
+  (explode ao morrer); Acid Spray enfraquece (+25% de dano); Magnet Bomb gruda e
+  explode; Echoed Voice cresce a cada uso; Gyro Ball cresce com o treinador
+  correndo; Tailwind acelera o treinador; Reflect tira 40% do dano da equipe.
+- Os ids não repetem os golpes que saíram (`RETIRED_ABILITIES`): Flame Wheel,
+  Whirlpool e Petal Dance têm ids próprios (`flame_ring`, `whirlpool_zone`,
+  `petal_spiral`), porque saves antigos ainda trazem os velhos.
+
 ### Evolução
 - **Por nível, fiel aos jogos**: Charmander→Charmeleon 16→Charizard 36,
   Bulbasaur 16/32, Squirtle 16/36, Pidgey 18/36, Magikarp→Gyarados 20, etc.
@@ -416,6 +441,16 @@ Nunca voltar bônus globais para o pool de level up — foi pedido explícito.
   membro, cada uma com o time de 5 do FireRed) e o Campeão. Os times são os do
   FireRed, com os níveis dele; o do rival muda pelo seu inicial
   (`bossTeamByStarter`), como no jogo.
+- **O líder acompanha a equipe** (0.14, "fiz um agora que achei MUITO fácil",
+  com a equipe acima do nível 100): o nível não tem teto, e os líderes tinham vida
+  e dano fixos. Agora cada fase sabe a média de nível com que a equipe costuma
+  chegar ao líder (`stage.leaderLevel`, do bot: 21 no Brock ... 97 no Campeão);
+  com a média da equipe acima disso, a vida e o dano do líder crescem no mesmo
+  passo do dano dela (`SpawnSystem.bossLift`: a razão de
+  `levelDamageMultiplier`). Chegando no nível de sempre, nada muda.
+- **Tremor de tela só nos golpes dos líderes** (0.14, pedido do Fellipe): saiu o
+  dos golpes do jogador (Earthquake, explosões), do Ímã, da fúria e da queda do
+  líder.
 - **Líderes das últimas fases** (0.12.2, "no começo tá equilibrado, no final tá
   muito fácil"): `stage.bossTuning: { hp, damage }` multiplica a vida e o dano
   (golpes inclusive, por `enemy.attackMult`) do time do líder. Rampa, padrão até o
@@ -804,6 +839,7 @@ tipo, som e o polimento de troca e captura.
 | 16 | usar o PC do Pokemon All (a Global Box: ícones, arrastar, equipe); sinalizar melhor na captura que nada se perde | 0.12: `ui/pcScreen.js` + `systems/pc.js` com casas; arte e sprites do FireRed por `tools/assets/copy_pc_art.py`; aviso na Poké Ball e tela de equipe cheia reescrita |
 | 17 | a Poção do nível máximo (50%) forte demais: 20%; ideia do bônus de ataque raro no nível máximo (planejamento); tem shiny?; líderes das últimas fases fracos demais | 0.12.1: `maxedHeal` 0,2; D11 no PLANEJAMENTO; shiny não existe (respondido). 0.12.2: `stage.bossTuning`, rampa do Erika ao Campeão |
 | 18 | lobby mais bonito e único (planejado junto: o Town Map, o estojo com as métricas, tudo na barra do topo); o 2º golpe no lugar do bônus de ataque; shiny só na captura e do jogador; publicar o lobby | 0.13: `ui/lobby.js`, `ui/badgeCase.js`, `systems/stageStats.js`, `data/regionMap.js`, mapa e cartão por script; D11 reescrita (publicada com a Poção e os líderes). 0.13.1: shiny (1% por opção da Poké Ball), com sprites shiny no campo, nos cards e no PC, ✦ na Pokédex e a conquista Brilho Raro |
+| 19 | o inicial também shiny (1%) e publicar; refinar os 3 2º golpes por tipo (aprovados com ajustes: Whirlpool longe, curas com teto, 2%/1% pelos tipos, nome oficial, 60% do dano); tremor só nos golpes dos líderes; o nível passando de 100 (o número saía do selo) e os líderes fáceis demais | 0.13.2: inicial shiny. 0.14: `data/bonusMoves.js` (51 golpes) e o motor deles; o líder acompanha a equipe (`leaderLevel`, `bossLift`); tremor só dos líderes; selo do nível que cresce com o número |
 
 ---
 

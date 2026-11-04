@@ -9,6 +9,7 @@ import { applyModifiers, weightedPickMany } from '../core/utils.js';
 import { bus, EVENTS } from '../core/events.js';
 import { maxHpFor, xpToNextLevel } from './stats.js';
 import { transferUpgrades } from './moves.js';
+import { BONUS_BY_TYPE, isBonusMove } from '../data/bonusMoves.js';
 
 /** Opção usada quando não há mais upgrades disponíveis para aquele Pokémon. */
 const HEAL_FALLBACK = {
@@ -25,6 +26,7 @@ const HEAL_FALLBACK = {
  * - Cada Pokémon tem nível e XP próprios. O XP do inimigo é dividido entre a
  *   equipe com pesos (CONFIG.progression.xpWeight): com a equipe cheia dá
  *   exatamente 25% por ativo e 8,33% por reserva.
+ * - Com todas as melhorias, subir de nível pode ensinar o 2º golpe (raro).
  * - Subir de nível aumenta vida máxima e dano e, do nível 11 em diante, cura
  *   1/10 da vida (CONFIG.progression.levelUpHeal); evoluir cura tudo.
  * - A tela de melhoria aparece a cada `upgradeEveryLevels` níveis.
@@ -76,6 +78,7 @@ export class ProgressionSystem {
       }
 
       this.checkEvolution(member);
+      this.maybeLearnBonusMove(member);
       need = this.xpToNext(member.level);
       bus.emit(EVENTS.POKEMON_LEVELED, { member, level: member.level });
     }
@@ -122,6 +125,31 @@ export class ProgressionSystem {
     this.run.queueEvolution({ member, from, to: next });
     bus.emit(EVENTS.POKEMON_EVOLVED, { member, from: from.id, to: next.id, dex: next.dex });
     return next;
+  }
+
+  /**
+   * O 2º golpe (0.14, data/bonusMoves.js): com todas as melhorias, cada nível tem
+   * uma chance baixa de ensinar um golpe a mais — 2% de um dos 3 do tipo
+   * principal; se não sair, 1% de um dos 3 do secundário. Um por Pokémon, para
+   * sempre; ele mantém o golpe de antes e usa os dois.
+   */
+  maybeLearnBonusMove(member) {
+    if (member.abilities.some(isBonusMove)) return null;
+    if (Object.values(UPGRADES).some((up) => this.isAvailable(up, member))) return null;
+    const [primary, secondary] = getPokemon(member.pokemonId).types;
+    const { chancePrimary, chanceSecondary } = CONFIG.bonusMove;
+    const type = Math.random() < chancePrimary ? primary
+      : secondary && Math.random() < chanceSecondary ? secondary : null;
+    const options = BONUS_BY_TYPE[type];
+    if (!options?.length) return null;
+    const moveId = options[Math.floor(Math.random() * options.length)];
+    member.abilities.push(moveId);
+    this.run.rebuildCompanionAbilities();
+    bus.emit(EVENTS.TOAST, {
+      text: `✦ ${getPokemon(member.pokemonId).name} aprendeu ${getAbility(moveId).name}, um 2º golpe!`,
+      icon: tmIconForType(getAbility(moveId).type)
+    });
+    return moveId;
   }
 
   /** Stats da equipe = base do CONFIG + melhorias do treinador (moedas). */
