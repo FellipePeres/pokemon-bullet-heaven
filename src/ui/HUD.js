@@ -5,7 +5,9 @@ import { pokemonImg, spriteUrl, animatedUrl } from '../render/sprites.js';
 import { typeColor, typeName } from '../data/types.js';
 import { maxHpFor, xpRatio } from '../systems/stats.js';
 import { CONFIG } from '../core/config.js';
-import { iconHTML } from '../render/icons.js';
+import { iconHTML, tmIconForType } from '../render/icons.js';
+import { getAbility } from '../data/abilities.js';
+import { BONUS_MOVE_LABEL } from '../data/bonusMoves.js';
 import { assetUrl } from '../render/assets.js';
 import { bus, EVENTS } from '../core/events.js';
 
@@ -245,6 +247,8 @@ export class HUD {
     const data = getPokemon(member.pokemonId);
     el('levelup-sprite').src = animatedUrl(data.dex, member.shiny);
     el('levelup-sprite').onerror = (e) => { e.target.src = spriteUrl(data.dex, member.shiny); };
+    el('levelup-title').textContent = 'Subiu de nível!';
+    el('levelup-overlay').classList.remove('unlock');
     el('levelup-subtitle').textContent =
       `${data.name} chegou ao nível ${member.level}` +
       (member.pendingLevels > 1 ? ` · ${member.pendingLevels} melhorias pendentes` : '');
@@ -269,6 +273,34 @@ export class HUD {
   }
 
   hideLevelUp() { hide(el('levelup-overlay')); }
+
+  /**
+   * O anúncio do Golpe Desperto (0.16): a tela de nível com uma opção só, que
+   * diz o golpe novo; clicar nela segue a partida.
+   */
+  showUnlock(member, moveId, onContinue) {
+    const data = getPokemon(member.pokemonId);
+    const move = getAbility(moveId);
+    el('levelup-sprite').src = animatedUrl(data.dex, member.shiny);
+    el('levelup-sprite').onerror = (e) => { e.target.src = spriteUrl(data.dex, member.shiny); };
+    el('levelup-title').textContent = `${BONUS_MOVE_LABEL}!`;
+    el('levelup-overlay').classList.add('unlock');
+    el('levelup-subtitle').textContent = `${data.name} despertou um novo golpe no nível ${member.level}`;
+
+    const row = clear(el('upgrade-choices'));
+    const card = create('div', 'card unlock');
+    card.innerHTML = `
+      <div class="card-icon">${iconHTML(tmIconForType(move.type), 52)}</div>
+      <span class="type-tag" style="background:${typeColor(move.type)}">${typeName(move.type)}</span>
+      <h3>${move.name}</h3>
+      <p>${move.description}</p>
+      <div class="chip">✦ ${BONUS_MOVE_LABEL.toUpperCase()} · USA OS DOIS GOLPES, PARA SEMPRE</div>
+      <div class="stack-info">Toque para continuar</div>
+    `;
+    card.onclick = () => onContinue();
+    row.appendChild(card);
+    show(el('levelup-overlay'));
+  }
 
   /* ============================== EVOLUÇÃO ============================== */
 
@@ -390,6 +422,11 @@ export class HUD {
 
     const img = pokemonImg(pokemon.dex, { className: 'card-sprite', alt: pokemon.name, shiny: pokemon.shiny });
     card.appendChild(img);
+    if (pokemon.rarity === 'legendary') {
+      // lendário (0.16): já chega com o golpe exclusivo, melhorias e o Golpe Desperto
+      card.classList.add('legendary');
+      card.appendChild(create('span', 'card-badge legendary', '★ Lendário'));
+    }
     if (pokemon.shiny) {
       // raro: o card brilha e diz
       card.classList.add('shiny');

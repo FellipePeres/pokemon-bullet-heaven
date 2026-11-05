@@ -3,6 +3,7 @@ import { clamp } from '../core/utils.js';
 import { drawPokemon, drawPokeball } from './sprites.js';
 import { typeColor } from '../data/types.js';
 import { FloatingText, Beam, SlashArc, SpriteFx } from '../entities/effects.js';
+import { drawSignatures } from './signature.js';
 import { maxHpFor } from '../systems/stats.js';
 import { getSheet, drawFrame } from './assets.js';
 import { trainerFrame } from './trainer.js';
@@ -135,6 +136,7 @@ export class Renderer {
     this._drawActors(ctx, run);
     this._drawOrbs(ctx, run);
     this._drawProjectiles(ctx, run);
+    drawSignatures(ctx, run);      // golpes exclusivos dos lendários
     this._drawEffects(ctx, run);
     this._drawParticles(ctx, run);
     ctx.restore();

@@ -261,6 +261,41 @@ const ROTEIROS = {
     { wait: 700 }, { shot: 'itens-chao' },
     { run: "game.run.pickups.find((x) => x.kind === 'magnet').x = game.run.player.x" }, { wait: 260 }, { shot: 'itens-ima', raw: true }
   ],
+  // os golpes exclusivos dos lendários (0.16), cada um em duas fases; o anúncio do
+  // Golpe Desperto e o card de captura do lendário
+  lendarios: [
+    { open: 'index.html' }, { wait: 500 },
+    { run: START_RUN }, { wait: 1200 },
+    { run: "import('./src/core/config.js').then(({ CONFIG }) => { CONFIG.debug.godMode = true; });" +
+           "const r = game.run; r.spawner.update = () => {}; r.time = 20;" +
+           "['articuno', 'zapdos', 'moltres', 'mewtwo', 'mew'].forEach((id) => { r.team.members.length < 6 ? r.captureSystem.capture(id) : r.captureSystem.captureToPC(id); });" +
+           "window.leg = (id) => { const p = r.player; r.enemies.forEach((e) => { e.dead = true; }); r.signatures.length = 0; r.zones.length = 0;" +
+           "  let m = r.team.members.find((x) => x.pokemonId === id);" +
+           "  if (!m) { m = r.team.members[1]; m.pokemonId = id; m.abilities = []; import('./src/systems/moves.js').then(({ applyLegendaryKit }) => applyLegendaryKit(m)); }" +
+           "  m.abilities = m.abilities.slice(0, 1); m.level = 40;" +
+           "  r.team.active = [m, null, null]; r.syncCompanions(); r.rebuildCompanionAbilities();" +
+           "  const id0 = r.stage.waves[0].enemies[0].id;" +
+           "  for (let i = 0; i < 34; i++) { const a = i * 2.4, d = 110 + (i % 5) * 45; r.spawner.spawnAt(id0, p.x + Math.cos(a) * d, p.y + Math.sin(a) * d); }" +
+           "  r.enemies.forEach((e) => { e.hp = e.maxHp = 99999; });" +
+           "  r.companions[0].x = p.x; r.companions[0].y = p.y - 30; r.companions[0].abilities.forEach((inst) => { inst.timer = 0; }); };" +
+           "game.hud.signature = ''; document.getElementById('toast-container').style.display = 'none'" },
+    { wait: 300 },
+    { run: "leg('articuno')" }, { wait: 200 }, { shot: 'lendario-1-sheer-cold-carga', raw: true },
+    { wait: 380 }, { shot: 'lendario-1-sheer-cold-anel', raw: true },
+    { run: "leg('zapdos')" }, { wait: 700 }, { shot: 'lendario-2-zap-cannon', raw: true },
+    { wait: 1950 }, { shot: 'lendario-2-zap-cannon-explosao', raw: true },
+    { run: "leg('moltres')" }, { wait: 250 }, { shot: 'lendario-3-sacred-fire-asas', raw: true },
+    { wait: 780 }, { shot: 'lendario-3-sacred-fire-colunas', raw: true },
+    { run: "leg('mewtwo')" }, { wait: 550 }, { shot: 'lendario-4-psystrike', raw: true },
+    { wait: 560 }, { shot: 'lendario-4-psystrike-implosao', raw: true },
+    { run: "leg('mew')" }, { wait: 650 }, { shot: 'lendario-5-metronome', raw: true },
+    { wait: 700 }, { shot: 'lendario-5-metronome-estouro', raw: true },
+    { run: "game.run.unlockQueue.push({ member: game.run.team.members[0], moveId: 'leech_seed' })" }, { wait: 600 },
+    { shot: 'lendario-6-golpe-desperto', raw: true },
+    { run: "game.confirmUnlock(); import('./src/data/pokemon.js').then(({ getPokemon }) => { game.run.state = 'capture'; game.captureOpen = true;" +
+           "game.hud.showCapture(['mewtwo', 'articuno', 'pidgey', 'mew'].map((id) => ({ ...getPokemon(id), shiny: id === 'mew' })), () => {}); })" },
+    { wait: 900 }, { shot: 'lendario-7-captura', raw: true }
+  ],
   // o líder entra e, antes de cada golpe, aparece o aviso no chão
   chefe: [
     { open: 'index.html' }, { wait: 500 },

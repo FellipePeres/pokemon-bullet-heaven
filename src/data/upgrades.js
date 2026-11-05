@@ -114,6 +114,34 @@ function genericUpgradesFor(ability) {
     });
   }
 
+  // golpes exclusivos dos lendários (data/legendaries.js): área e quantidade, se tiverem
+  if (behavior === 'signature') {
+    if (base.area) {
+      add('area', {
+        name: `${name}: Amplitude`,
+        description: '+20% de área',
+        icon: 'area', maxStacks: 4, weight: 8,
+        modifiers: { area: { mult: 0.2 } }
+      });
+    }
+    if (base.count) {
+      add('count', {
+        name: `${name}: Multiplicar`,
+        description: '+2 projéteis',
+        icon: 'count', maxStacks: 3, weight: 7,
+        modifiers: { count: { add: 2 } }
+      });
+    }
+    if (base.chains) {
+      add('chains', {
+        name: `${name}: Ricochete`,
+        description: '+1 raio por descarga',
+        icon: 'chains', maxStacks: 3, weight: 7,
+        modifiers: { chains: { add: 1 } }
+      });
+    }
+  }
+
   if (behavior === 'chain') {
     add('chains', {
       name: `${name}: Ricochete`,

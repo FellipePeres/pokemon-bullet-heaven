@@ -2,6 +2,7 @@ import { ABILITIES, RETIRED_ABILITIES } from '../data/abilities.js';
 import { UPGRADES, RENAMED_UPGRADES } from '../data/upgrades.js';
 import { getPokemon } from '../data/pokemon.js';
 import { isBonusMove } from '../data/bonusMoves.js';
+import { LEGENDARY_KITS } from '../data/legendaries.js';
 
 /**
  * Leva as melhorias de um golpe para outro. Cada upgrade do antigo vira o
@@ -56,5 +57,30 @@ export function migrateMember(member) {
       return replacement;
     })
     .filter((id, i, list) => list.indexOf(id) === i);   // sem golpe repetido
+  return applyLegendaryKit(member);
+}
+
+/**
+ * O kit do lendário (data/legendaries.js): o golpe exclusivo como golpe
+ * principal, pelo menos as melhorias do kit nele e o 2º golpe já aprendido.
+ * Pode rodar mais de uma vez (na captura e a cada carregamento) sem somar nada:
+ * as pilhas ficam no maior valor, e quem já tem um 2º golpe fica com o dele.
+ * Um lendário de save antigo (com Ice Beam, Psybeam...) passa para o exclusivo
+ * levando as melhorias, como numa TM.
+ */
+export function applyLegendaryKit(member) {
+  const kit = LEGENDARY_KITS[member.pokemonId];
+  if (!kit) return member;
+
+  const current = member.abilities[0];
+  if (current !== kit.move) {
+    if (current) member.upgrades = transferUpgrades(member.upgrades, current, kit.move);
+    member.abilities = [kit.move, ...member.abilities.filter((id) => isBonusMove(id))];
+  }
+  for (const [suffix, stacks] of Object.entries(kit.upgrades)) {
+    const up = UPGRADES[`${kit.move}_${suffix}`];
+    if (up) member.upgrades[up.id] = Math.min(up.maxStacks, Math.max(member.upgrades[up.id] ?? 0, stacks));
+  }
+  if (kit.bonusMove && !member.abilities.some(isBonusMove)) member.abilities.push(kit.bonusMove);
   return member;
 }

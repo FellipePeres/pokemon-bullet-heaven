@@ -1,4 +1,5 @@
 import { BONUS_MOVES } from './bonusMoves.js';
+import { LEGENDARY_MOVES } from './legendaries.js';
 
 /**
  * HABILIDADES
@@ -590,7 +591,11 @@ export const ABILITIES = {
     description: 'Onda de choque do chefe.',
     base: { damage: 18, cooldown: 5, area: 190, speed: 300, knockback: 260, size: 18 },
     hostile: true
-  }
+  },
+
+  /* ============== GOLPES EXCLUSIVOS DOS LENDÁRIOS (data/legendaries.js) ==============
+     Ficam fora da conta de 4 por tipo: só um Pokémon usa cada um. */
+  ...LEGENDARY_MOVES
 };
 
 // os 2º golpes (data/bonusMoves.js) ficam num registro à parte: não têm melhorias

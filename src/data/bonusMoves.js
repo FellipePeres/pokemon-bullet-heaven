@@ -359,3 +359,9 @@ export const BONUS_BY_TYPE = {};
 for (const move of Object.values(BONUS_MOVES)) (BONUS_BY_TYPE[move.type] ??= []).push(move.id);
 
 export const isBonusMove = (id) => !!BONUS_MOVES[id];
+
+/**
+ * O nome que o jogador vê (0.16: "segundo golpe é muito feio, algo mais
+ * impactante"). Padrão até o Fellipe decidir; trocar aqui troca em todo lugar.
+ */
+export const BONUS_MOVE_LABEL = 'Golpe Desperto';

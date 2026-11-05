@@ -10,6 +10,7 @@ import { Beam, SlashArc } from '../entities/effects.js';
 import { nearestEnemy, enemiesInRadius, damageEnemy } from './combat.js';
 import { isBonusMove } from '../data/bonusMoves.js';
 import { levelDamageMultiplier } from './stats.js';
+import { castSignature } from './signatureMoves.js';
 
 /**
  * Calcula as stats finais de uma habilidade:
@@ -227,6 +228,7 @@ export class AbilitySystem {
       case 'rain': return this._fireRain(companion, inst);
       case 'trail': return this._fireTrail(companion, inst);
       case 'buff': return this._fireBuff(companion, inst);
+      case 'signature': return castSignature(this.run, companion, inst);   // golpe exclusivo de lendário
       default: return false;
     }
   }

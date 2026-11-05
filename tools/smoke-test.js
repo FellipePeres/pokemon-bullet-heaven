@@ -27,6 +27,7 @@ import { BONUS_MOVES, BONUS_BY_TYPE, isBonusMove } from '../src/data/bonusMoves.
 import { RETIRED_ABILITIES } from '../src/data/abilities.js';
 import { abilityFx } from '../src/data/fx.js';
 import { damageEnemy, bonusHeal } from '../src/systems/combat.js';
+import { LEGENDARY_KITS, LEGENDARY_MOVES } from '../src/data/legendaries.js';
 
 let failures = 0;
 
@@ -202,9 +203,9 @@ console.log('\n[habilidades — cada comportamento precisa causar dano]');
   const zone = aura.zones.find((z) => z.kind === 'aura');
   check('aura acompanha o Pokémon', !!zone && Math.hypot(zone.x - zone.owner.x, zone.y - zone.owner.y) < 1);
 
-  // no máximo 4 golpes por tipo (0.6), sem contar os golpes dos líderes
+  // no máximo 4 golpes por tipo (0.6), sem contar os golpes dos líderes nem os exclusivos dos lendários
   const perType = {};
-  for (const a of Object.values(ABILITIES)) if (!a.hostile) perType[a.type] = (perType[a.type] ?? 0) + 1;
+  for (const a of Object.values(ABILITIES)) if (!a.hostile && !a.exclusive) perType[a.type] = (perType[a.type] ?? 0) + 1;
   const crowded = Object.entries(perType).filter(([, n]) => n > 4);
   check('no máximo 4 golpes por tipo', !crowded.length,
         crowded.map(([t, n]) => `${t}: ${n}`).join(', ') || `${Object.keys(perType).length} tipos`);
@@ -677,6 +678,74 @@ console.log('\n[2º golpe]');
     for (let f = 0; f < 120; f++) r.update(1 / 60, { x: 0, y: 0 });
     check('tremor de tela só nos golpes dos líderes', mine === 0 && shakes > 0, `${mine} do jogador, ${shakes - mine} do líder`);
   }
+}
+
+// ---------------------------------------------- 5.13b lendários e o nível de quem tem tudo (0.16)
+console.log('\n[lendários e Golpe Desperto]');
+{
+  const run = new Run('gym_1_pewter', { starter: 'charmander' });
+  run.spawner.update = () => {};
+  run.team.members[0].pokemonId = 'charizard';   // não evolui: a evolução curaria tudo e abriria a tela dela
+  run.team.members[0].level = 40;
+
+  // o lendário chega com o exclusivo, as melhorias do kit e o 2º golpe, no nível da equipe
+  const mew = run.captureSystem.capture('mew');
+  const kit = LEGENDARY_KITS.mew;
+  check('o lendário chega com o golpe exclusivo', mew.abilities[0] === 'metronome' && LEGENDARY_MOVES.metronome.exclusive === 'mew');
+  check('...com as melhorias do kit', Object.entries(kit.upgrades).every(([suffix, n]) => mew.upgrades[`metronome_${suffix}`] === n),
+        JSON.stringify(mew.upgrades));
+  check('...com o 2º golpe já aprendido', mew.abilities.includes(kit.bonusMove), mew.abilities.join(', '));
+  check('...e no nível da equipe (os outros entram 3 abaixo)', mew.level === 40, `nível ${mew.level}`);
+  const strongest = Object.values(POKEMON).filter((p) => p.rarity !== 'legendary').reduce((a, b) => (b.power > a.power ? b : a));
+  check('todo lendário tem mais poder que qualquer outro Pokémon',
+        Object.keys(LEGENDARY_KITS).every((id) => POKEMON[id].power > strongest.power), `o mais forte comum: ${strongest.name} ${strongest.power}`);
+  check('o golpe exclusivo é o fim da linha (sem TM acima)', nextMoveFor('mew', 'metronome') === null);
+
+  // save antigo: o lendário com Psybeam passa para o exclusivo levando as melhorias, sem somar o kit de novo
+  const old = new Run('gym_1_pewter', { team: { members: [
+    { uid: 'm2', pokemonId: 'mewtwo', level: 60, abilities: ['psybeam'], upgrades: { psybeam_damage: 4, psybeam_count: 2 } }
+  ], active: ['m2'] } });
+  const m2 = old.team.members[0];
+  check('save antigo: lendário passa para o golpe exclusivo, com as melhorias e o 2º golpe',
+        m2.abilities[0] === 'psystrike' && m2.upgrades.psystrike_damage === 5 && m2.abilities.includes('future_sight') &&
+        !m2.upgrades.psybeam_damage, `${m2.abilities.join(' + ')} ${JSON.stringify(m2.upgrades)}`);
+  const again = new Run('gym_1_pewter', { team: old.team.serialize() }).team.members[0];
+  check('carregar de novo não soma o kit outra vez', JSON.stringify(again.upgrades) === JSON.stringify(m2.upgrades));
+
+  // com todas as melhorias, o nível de melhoria cura 20% sozinho e não abre tela
+  const member = run.team.members[0];
+  member.abilities = member.abilities.filter((id) => !isBonusMove(id));
+  for (let pass = 0; pass < 6; pass++) {
+    for (const up of Object.values(UPGRADES)) if (up.abilityId === member.abilities[0] || member.abilities.includes(up.abilityId)) member.upgrades[up.id] = up.maxStacks;
+  }
+  const saved = { ...CONFIG.bonusMove, tm: CONFIG.progression.tmChance };
+  CONFIG.bonusMove.chancePrimary = 0;
+  CONFIG.bonusMove.chanceSecondary = 0;
+  CONFIG.progression.tmChance = 0;
+  const bonus = run.playerStats.pokemonHpBonus;
+  member.level = 41;   // o próximo (42) é nível de melhoria
+  member.hp = 10;
+  member.pendingLevels = 0;
+  run.progression.addXpTo(member, run.progression.xpToNext(41) + 1);
+  check('com todas as melhorias, o nível de melhoria cura sozinho (sem tela)',
+        member.pendingLevels === 0 && member.hp > 10 + maxHpFor(member, bonus) * 0.2 - 0.5 && member.hp < maxHpFor(member, bonus),
+        `${Math.round(member.hp)}/${maxHpFor(member, bonus)} HP, ${member.pendingLevels} pendentes`);
+  run.state = 'running';
+  run._checkState();
+  check('...e a partida segue', run.state === 'running', run.state);
+  member.pendingLevels = 2;
+  member.hp = 10;
+  run._checkState();
+  check('níveis guardados de quem já tem tudo viram cura', member.pendingLevels === 0 && member.hp > 10 && run.state === 'running');
+
+  // o Golpe Desperto abre o anúncio (uma tela só)
+  CONFIG.bonusMove.chancePrimary = 1;
+  run.progression.addXpTo(member, run.progression.xpToNext(member.level) + 1);
+  run._checkState();
+  check('aprender o Golpe Desperto abre o anúncio', run.state === 'unlock' && run.unlockQueue.length === 1 &&
+        member.abilities.includes(run.unlockQueue[0].moveId), run.state);
+  Object.assign(CONFIG.bonusMove, { chancePrimary: saved.chancePrimary, chanceSecondary: saved.chanceSecondary });
+  CONFIG.progression.tmChance = saved.tm;
 }
 
 // ---------------------------------------------- 5.14 métricas da fase (o Estojo de Insígnias)

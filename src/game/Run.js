@@ -13,6 +13,7 @@ import { TeamSystem } from '../systems/TeamSystem.js';
 import { CaptureSystem } from '../systems/CaptureSystem.js';
 import { damageEnemy, damageArea, bonusHeal } from '../systems/combat.js';
 import { burst, FloatingText, SpriteFx } from '../entities/effects.js';
+import { updateSignatures } from '../systems/signatureMoves.js';
 import { abilityFx, zoneFx } from '../data/fx.js';
 import { bus, EVENTS } from '../core/events.js';
 import { typeColor } from '../data/types.js';
@@ -49,6 +50,7 @@ export class Run {
     this.pickups = [];
     this.effects = [];
     this.particles = [];
+    this.signatures = [];      // golpes exclusivos dos lendários (systems/signatureMoves.js)
 
     // ---- progressão ----
     // Melhorias de habilidade ficam em cada Pokémon; os bônus globais vêm das
@@ -89,6 +91,7 @@ export class Run {
     this.pendingGift = null;     // presente da fase esperando a escolha (ver stage.gifts)
     this.pendingIntro = null;    // líder que acabou de chegar e se apresenta
     this.levelUpMember = null;   // Pokémon que está com a tela de melhoria aberta
+    this.unlockQueue = [];       // Golpes Despertos esperando o anúncio ({ member, moveId })
 
     // ---- efeitos ----
     this.shakeTime = 0;
@@ -259,6 +262,7 @@ export class Run {
     this._updateProjectiles(dt);
     this._updateOrbs(dt);
     this._updateZones(dt);
+    updateSignatures(this, dt);
     this._updatePickups(dt);
     this._updateEffects(dt);
     this._cleanup();
@@ -621,6 +625,7 @@ export class Run {
     alive(this.pickups);
     alive(this.effects);
     alive(this.particles);
+    alive(this.signatures);
   }
 
   _checkState() {
@@ -637,6 +642,14 @@ export class Run {
     if (this.pendingIntro) { this.state = 'intro'; return; }
     if (this.evolutionQueue.length) { this.state = 'evolution'; return; }
     if (this.pendingBall || this.pendingGift) { this.state = 'capture'; return; }
+
+    // o Golpe Desperto (2º golpe) abre a tela de anúncio, de quem for
+    if (this.unlockQueue.length) { this.state = 'unlock'; return; }
+
+    // quem tem níveis guardados mas já tem todas as melhorias: cura, sem tela
+    for (const member of this.team.members) {
+      if (member.pendingLevels > 0) this.progression.resolveMaxedLevels(member);
+    }
 
     // Pokémon ativo que subiu de nível pausa o jogo na hora.
     // Os da reserva acumulam e sobem quando o jogador quiser (botão ↑).

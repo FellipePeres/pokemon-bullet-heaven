@@ -10,6 +10,7 @@ import { bus, EVENTS } from '../core/events.js';
 import { maxHpFor, xpToNextLevel } from './stats.js';
 import { transferUpgrades } from './moves.js';
 import { BONUS_BY_TYPE, isBonusMove } from '../data/bonusMoves.js';
+import { FloatingText } from '../entities/effects.js';
 
 /** Opção usada quando não há mais upgrades disponíveis para aquele Pokémon. */
 const HEAL_FALLBACK = {
@@ -72,9 +73,11 @@ export class ProgressionSystem {
         member.hp = Math.min(max, member.hp + max * CONFIG.progression.levelUpHeal);
       }
 
-      // a melhoria não vem a cada nível: vem a cada N (menos interrupção)
+      // a melhoria não vem a cada nível: vem a cada N (menos interrupção). Quem
+      // já tem todas não abre tela: cura sozinho (0.16)
       if (member.level % CONFIG.progression.upgradeEveryLevels === 0) {
-        member.pendingLevels++;
+        if (this.isMaxed(member)) this.maxedLevel(member);
+        else member.pendingLevels++;
       }
 
       this.checkEvolution(member);
@@ -135,7 +138,7 @@ export class ProgressionSystem {
    */
   maybeLearnBonusMove(member) {
     if (member.abilities.some(isBonusMove)) return null;
-    if (Object.values(UPGRADES).some((up) => this.isAvailable(up, member))) return null;
+    if (!this.isMaxed(member)) return null;
     const [primary, secondary] = getPokemon(member.pokemonId).types;
     const { chancePrimary, chanceSecondary } = CONFIG.bonusMove;
     const type = Math.random() < chancePrimary ? primary
@@ -145,11 +148,48 @@ export class ProgressionSystem {
     const moveId = options[Math.floor(Math.random() * options.length)];
     member.abilities.push(moveId);
     this.run.rebuildCompanionAbilities();
-    bus.emit(EVENTS.TOAST, {
-      text: `✦ ${getPokemon(member.pokemonId).name} aprendeu ${getAbility(moveId).name}, um 2º golpe!`,
-      icon: tmIconForType(getAbility(moveId).type)
-    });
+    // a única tela que o Pokémon com todas as melhorias ainda abre (0.16): o anúncio
+    this.run.unlockQueue.push({ member, moveId });
     return moveId;
+  }
+
+  /** Já tem todas as melhorias do golpe (só resta a Poção)? */
+  isMaxed(member) {
+    return !Object.values(UPGRADES).some((up) => this.isAvailable(up, member));
+  }
+
+  /**
+   * O nível de melhoria de quem já tem todas (0.16, pedido do Fellipe): sem
+   * tela, cura sozinho a Poção (20%). A TM que a tela poderia trazer vem também
+   * sozinha, com a mesma chance: trocar pela TM nunca é perder.
+   */
+  maxedLevel(member) {
+    if (!member.fainted) {
+      const max = maxHpFor(member, this.run.playerStats.pokemonHpBonus);
+      const healed = Math.min(max - member.hp, max * CONFIG.progression.maxedHeal);
+      member.hp += healed;
+      const companion = this.run.companions?.find((c) => c.member === member);
+      if (companion && healed >= 1 && this.run.effects) {
+        this.run.effects.push(new FloatingText(companion.x, companion.y - 30, `+${Math.round(healed)}`, '#57d18a', 14));
+      }
+    }
+    if (Math.random() < CONFIG.progression.tmChance) {
+      const next = nextMoveFor(member.pokemonId, member.abilities[0]);
+      if (next) {
+        this.learnTM(member, next);
+        this.run.refreshStats?.();
+      }
+    }
+  }
+
+  /** Níveis guardados de quem ficou com todas as melhorias (ex.: um save antigo) viram cura. */
+  resolveMaxedLevels(member) {
+    if (member.pendingLevels <= 0 || !this.isMaxed(member)) return false;
+    while (member.pendingLevels > 0) {
+      member.pendingLevels--;
+      this.maxedLevel(member);
+    }
+    return true;
   }
 
   /** Stats da equipe = base do CONFIG + melhorias do treinador (moedas). */

@@ -3,7 +3,7 @@ import { getPokemon } from '../data/pokemon.js';
 import { bus, EVENTS } from '../core/events.js';
 import { uid } from '../core/utils.js';
 import { maxHpFor } from './stats.js';
-import { migrateMember } from './moves.js';
+import { migrateMember, applyLegendaryKit } from './moves.js';
 
 /**
  * Equipe do jogador.
@@ -46,6 +46,7 @@ export class TeamSystem {
       abilities: [...data.abilities],
       upgrades: {}            // upgrades de habilidade são por Pokémon
     };
+    applyLegendaryKit(member);   // lendário: golpe exclusivo, melhorias e 2º golpe já de saída
     member.hp = maxHpFor(member, this.run.playerStats?.pokemonHpBonus ?? 0);
     return member;
   }

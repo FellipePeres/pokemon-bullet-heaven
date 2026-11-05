@@ -8,6 +8,8 @@
 import { POKEMON } from '../src/data/pokemon.js';
 import { ABILITIES } from '../src/data/abilities.js';
 import { BONUS_MOVES } from '../src/data/bonusMoves.js';
+import { LEGENDARY_MOVES, LEGENDARY_KITS } from '../src/data/legendaries.js';
+import { UPGRADES } from '../src/data/upgrades.js';
 import { ENEMIES } from '../src/data/enemies.js';
 import { STAGES } from '../src/data/stages.js';
 import { nextMoveFor } from '../src/data/tms.js';
@@ -45,10 +47,24 @@ brokenEnemyAbility.length
   ? fail(`inimigo com habilidade inexistente: ${brokenEnemyAbility.map((e) => e.id).join(', ')}`)
   : ok(`${Object.keys(ENEMIES).length} inimigos com habilidades válidas`);
 
-const noLine = species.filter((p) => !p.moveLine || p.moveLine.length !== 3);
+// a linha de 3 golpes; o lendário tem só o golpe exclusivo dele (0.16)
+const lineSize = (p) => (LEGENDARY_KITS[p.id] ? 1 : 3);
+const noLine = species.filter((p) => !p.moveLine || p.moveLine.length !== lineSize(p));
 noLine.length
-  ? fail(`espécies sem linha de 3 golpes: ${noLine.map((p) => p.id).join(', ')}`)
-  : ok('todas as espécies têm linha de 3 golpes');
+  ? fail(`espécies sem a linha de golpes certa: ${noLine.map((p) => p.id).join(', ')}`)
+  : ok('todas as espécies têm linha de 3 golpes (os lendários, o exclusivo)');
+
+// os lendários: golpe exclusivo, de um Pokémon só, com kit que aponta para melhorias e 2º golpe que existem
+const badKits = Object.entries(LEGENDARY_KITS).filter(([id, kit]) =>
+  POKEMON[id]?.rarity !== 'legendary' || POKEMON[id].abilities[0] !== kit.move ||
+  LEGENDARY_MOVES[kit.move]?.exclusive !== id || !BONUS_MOVES[kit.bonusMove] ||
+  Object.keys(kit.upgrades).some((suffix) => !UPGRADES[`${kit.move}_${suffix}`]));
+const sharedSignature = species.filter((p) => p.moveLine?.some((id) => LEGENDARY_MOVES[id] && LEGENDARY_MOVES[id].exclusive !== p.id));
+const legendaryNoKit = species.filter((p) => p.rarity === 'legendary' && !LEGENDARY_KITS[p.id]);
+badKits.length || sharedSignature.length || legendaryNoKit.length
+  ? fail(`lendários: kit quebrado (${badKits.map(([id]) => id).join(', ')}), golpe exclusivo usado por outro ` +
+         `(${sharedSignature.map((p) => p.id).join(', ')}), lendário sem kit (${legendaryNoKit.map((p) => p.id).join(', ')})`)
+  : ok(`${Object.keys(LEGENDARY_KITS).length} lendários com golpe exclusivo, melhorias e 2º golpe de saída`);
 
 const brokenLine = species.filter((p) => (p.moveLine ?? []).some((id) => !ABILITIES[id]));
 brokenLine.length
@@ -60,7 +76,7 @@ outOfLine.length
   ? fail(`começam com um golpe fora da própria linha: ${outOfLine.map((p) => p.id).join(', ')}`)
   : ok('todas começam com um golpe da própria linha');
 
-const deadEnd = species.filter((p) => p.moveLine && p.abilities[0] !== p.moveLine[2] &&
+const deadEnd = species.filter((p) => p.moveLine && p.abilities[0] !== p.moveLine.at(-1) &&
   !nextMoveFor(p.id, p.abilities[0]));
 deadEnd.length
   ? fail(`TM não encontra o próximo golpe: ${deadEnd.map((p) => p.id).join(', ')}`)
@@ -117,7 +133,8 @@ for (const region of Object.values(REGIONS)) {
 // ---- efeitos dos golpes (data/fx.js) ----
 const fxSheetOk = (fxId) => FX[fxId] && ASSET_MANIFEST[FX[fxId].sheet ?? `fx/${fxId}`];
 const playable = Object.values(ABILITIES).filter((a) => !a.hostile);
-const noFx = playable.filter((a) => !ABILITY_FX[a.id]);
+// os exclusivos dos lendários são desenhados em código (render/signature.js)
+const noFx = playable.filter((a) => !ABILITY_FX[a.id] && a.behavior !== 'signature');
 const staleFx = Object.keys(ABILITY_FX).filter((id) => !ABILITIES[id] && !BONUS_MOVES[id]);   // os 2º golpes também
 const fxRefs = [
   ...Object.entries(ABILITY_FX),

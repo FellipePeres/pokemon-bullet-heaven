@@ -2175,3 +2175,24 @@ button { font: inherit; color: inherit; }
 /* o 2º golpe (0.14): no PC e na janela da equipe */
 .pc-data__bonus { color: #f8d888; }
 .node-meta.bonus-move { color: #b07a00; font-weight: 600; }
+
+/* ========================== GOLPE DESPERTO ==========================
+   0.16: o anúncio do 2º golpe (o nome fica em BONUS_MOVE_LABEL). É a tela de
+   nível com uma opção só, dourada e pulsando: o momento raro tem de parecer raro. */
+.card.unlock {
+  width: 300px;
+  box-shadow: inset 0 0 0 3px var(--gba-gold), 0 0 22px rgba(248, 208, 48, .55);
+  animation: unlock-glow 1.6s ease-in-out infinite;
+}
+.card.unlock .card-icon { animation: pulse-up 1.4s steps(2) infinite; }
+.card.unlock h3 { font-size: 20px; }
+.card.unlock .stack-info { opacity: .75; }
+#levelup-overlay.unlock h2 { color: #e09a00; text-shadow: 2px 2px 0 #7a4a00; }
+@keyframes unlock-glow {
+  0%, 100% { box-shadow: inset 0 0 0 3px var(--gba-gold), 0 0 14px rgba(248, 208, 48, .35); }
+  50% { box-shadow: inset 0 0 0 3px #fff2a8, 0 0 30px rgba(248, 208, 48, .8); }
+}
+
+/* o card de captura de um lendário (0.16) */
+.card.legendary { box-shadow: inset 0 0 0 3px #b98cff, 0 0 16px rgba(185, 140, 255, .55); }
+.card-badge.legendary { background: #7d4bd6; }

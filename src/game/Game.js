@@ -59,6 +59,7 @@ export class Game {
     this.runEnded = false;
     this.afterTrainer = null;   // o que vem depois da escolha de treinador
     this.levelUpOpen = false;
+    this.unlockOpen = false;
     this.captureOpen = false;
     this.evolutionOpen = false;
     this.introOpen = false;
@@ -127,6 +128,9 @@ export class Game {
         break;
       case 'capture':
         if (!this.captureOpen) this.openCapture();
+        break;
+      case 'unlock':
+        if (!this.unlockOpen) this.openUnlock();
         break;
       case 'evolution':
         if (!this.evolutionOpen) this.openEvolution();
@@ -260,6 +264,7 @@ export class Game {
     this.preloadStage(stage);
     this.runEnded = false;
     this.levelUpOpen = false;
+    this.unlockOpen = false;
     this.captureOpen = false;
     this.evolutionOpen = false;
     this.autosaveTimer = 0;
@@ -397,6 +402,30 @@ export class Game {
     if (!this.run) return;
     this.run.levelUpMember = null;
     if (this.run.state === 'levelup') this.run.state = 'running';
+  }
+
+  /**
+   * O anúncio do Golpe Desperto (0.16): uma opção só, que o jogador clica para
+   * seguir. Um de cada vez, se vierem dois juntos.
+   */
+  openUnlock() {
+    const next = this.run?.unlockQueue[0];
+    if (!next) { this.closeUnlock(); return; }
+    this.unlockOpen = true;
+    this.hud.showUnlock(next.member, next.moveId, () => this.confirmUnlock());
+  }
+
+  confirmUnlock() {
+    if (!this.run) return;
+    this.run.unlockQueue.shift();
+    if (this.run.unlockQueue.length) { this.openUnlock(); return; }
+    this.closeUnlock();
+  }
+
+  closeUnlock() {
+    this.unlockOpen = false;
+    this.hud.hideLevelUp();
+    if (this.run?.state === 'unlock') this.run.state = 'running';
   }
 
   /** Abre o Hall da Fama de uma equipe campeã; `then` roda ao fechar. */

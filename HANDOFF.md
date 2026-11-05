@@ -5,7 +5,7 @@
 > decisão foi tomada e o que falta fazer. O `README.md` é o manual de uso;
 > este aqui é o contexto de desenvolvimento.
 
-**Versão atual:** `0.15.0` · **Última atualização:** 2026-11-03
+**Versão atual:** `0.16.0` · **Última atualização:** 2026-11-05
 **Stack:** HTML + CSS + JavaScript puro (ES Modules). Sem backend, sem build, sem dependências.
 **Repositório:** https://github.com/FellipePeres/pokemon-bullet-heaven (público)
 **Jogo no ar:** https://fellipeperes.github.io/pokemon-bullet-heaven/
@@ -259,7 +259,12 @@ confirmar com ele**.
   diante** (`CONFIG.progression.levelUpHeal` e `levelUpHealFrom`). Quem está
   desmaiado não volta. Quem já tem todas as melhorias recebe a **Poção** no lugar
   delas (`CONFIG.progression.maxedHeal`: 20% da vida; era 50% até a 0.12.1, forte
-  demais no nível máximo). Antes da 0.11.3 subir de nível não curava (a cura total do começo deixava o
+  demais no nível máximo). **Desde a 0.16 a Poção é automática** ("cure os 20%,
+  não precisa abrir tela"): o nível de melhoria de quem tem tudo cura sozinho, com
+  o número verde em cima dele, sem tela (`ProgressionSystem.maxedLevel`); a TM que
+  a tela poderia trazer vem sozinha, com a mesma chance (trocar nunca é perder).
+  Níveis guardados de quem ficou com tudo viram cura (`resolveMaxedLevels`, no
+  `Run._checkState`). Antes da 0.11.3 subir de nível não curava (a cura total do começo deixava o
   jogo trivial); a 0.11.3 curava 1/4, fácil demais; a 0.11.4 baixou para 1/10, a
   pedido do Fellipe. Bot nas Fases 1 a 3 (Charmander / Bulbasaur / Squirtle):
 
@@ -283,7 +288,14 @@ confirmar com ele**.
 
 Nunca voltar bônus globais para o pool de level up — foi pedido explícito.
 
-### O 2º golpe (0.14)
+### O 2º golpe — "Golpe Desperto" (0.14; nome e anúncio na 0.16)
+- **O nome que o jogador vê é `BONUS_MOVE_LABEL`** (`data/bonusMoves.js`):
+  "Golpe Desperto", padrão até o Fellipe decidir ("segundo golpe é muito feio,
+  algo mais impactante"). No código continua `bonusMove`.
+- **Aprender abre uma tela só** (0.16): a de nível, com uma opção única e dourada
+  que anuncia o golpe; clicar segue a partida (`run.unlockQueue`, estado
+  `'unlock'`, `Game.openUnlock`, `HUD.showUnlock`). É a única tela que o Pokémon
+  com todas as melhorias ainda abre.
 - **Com todas as melhorias, cada nível pode ensinar um 2º golpe** (`data/bonusMoves.js`,
   a D11 do PLANEJAMENTO, aprovada golpe a golpe pelo Fellipe): 2% de um dos 3 do
   tipo principal; se não sair, 1% de um dos 3 do secundário
@@ -307,6 +319,36 @@ Nunca voltar bônus globais para o pool de level up — foi pedido explícito.
 - Os ids não repetem os golpes que saíram (`RETIRED_ABILITIES`): Flame Wheel,
   Whirlpool e Petal Dance têm ids próprios (`flame_ring`, `whirlpool_zone`,
   `petal_spiral`), porque saves antigos ainda trazem os velhos.
+
+### Lendários (0.16)
+- Pedido do Fellipe: "naturalmente mais fortes, já vêm com os atributos upados,
+  até com segundo golpe, e o golpe primário é exclusivo deles, único e
+  visualmente muito bonito". Tudo em `data/legendaries.js`.
+- **Golpe exclusivo** (comportamento `signature`, lógica em
+  `systems/signatureMoves.js`, desenho em `render/signature.js`): Articuno
+  **Sheer Cold** (o floco gigante se forma em volta e estilhaça num anel de gelo
+  que congela), Zapdos **Zap Cannon** (esfera de trovão lenta que atravessa a
+  horda soltando raios e explode), Moltres **Sacred Fire** (asas de fogo, penas
+  em espiral e colunas de chamas onde param), Mewtwo **Psystrike** (singularidade
+  na horda mais densa que puxa todos e implode) e Mew **Metronome** (bolhas de
+  arco-íris, cada uma um golpe ao acaso: fogo, gelo, trovão, veneno ou mente).
+  A linha de golpes deles é só o exclusivo (sem TM acima). Ficam fora da conta
+  de 4 golpes por tipo (`exclusive`). Melhorias geradas: dano, recarga, área,
+  quantidade e raios, conforme o golpe.
+- **Desenhados em código, sem `lighter`**: a luz somada lavava tudo para branco
+  no gramado claro do FireRed. Cores saturadas e contorno escuro por baixo de
+  cada traço claro. Sem tremor de tela (só os líderes tremem).
+- **Kit** (`LEGENDARY_KITS`, `applyLegendaryKit` em `systems/moves.js`): chegam
+  com pilhas de melhoria no exclusivo (dano 2, recarga 1 e área ou quantidade 1)
+  e com o 2º golpe já aprendido (Hail, Bolt Strike, Heat Wave, Future Sight,
+  Psyshock), **no nível da equipe** (os outros entram 3 abaixo). O kit roda na
+  criação e a cada carregamento sem somar (fica no maior valor); um lendário de
+  save antigo passa para o exclusivo levando as melhorias, como numa TM.
+- **Mais fortes por natureza**: poder 2,45 (aves), 2,65 (Mew) e 2,85 (Mewtwo),
+  contra 2,18 do Dragonite, o maior fora deles; vida 285 a 320.
+- O card da Poké Ball marca "★ Lendário", com moldura roxa.
+- Ainda não existe: os lendários como encontro especial (hoje só na tabela da
+  Liga, raros) — ver `PLANEJAMENTO.md`.
 
 ### Evolução
 - **Por nível, fiel aos jogos**: Charmander→Charmeleon 16→Charizard 36,
@@ -583,6 +625,7 @@ O `AbilitySystem` conhece 7 comportamentos. Habilidade nova quase sempre reusa u
 | `ground_zone` | área no chão, no alvo, por alguns segundos | Toxic, String Shot |
 | `nova` | onda que se expande do Pokémon | Gust, Earthquake |
 | `chain` | raio que salta entre inimigos | Thunder Shock, Thunder |
+| `signature` | golpe exclusivo de lendário, com lógica e desenho próprios (0.16) | Sheer Cold, Psystrike |
 
 Stats suportadas: `damage, cooldown, count, speed, range, pierce, size, duration,
 area, arc, spread, tickRate, chains, knockback, homing, explodeDamage` +
@@ -845,6 +888,7 @@ tipo, som e o polimento de troca e captura.
 | 18 | lobby mais bonito e único (planejado junto: o Town Map, o estojo com as métricas, tudo na barra do topo); o 2º golpe no lugar do bônus de ataque; shiny só na captura e do jogador; publicar o lobby | 0.13: `ui/lobby.js`, `ui/badgeCase.js`, `systems/stageStats.js`, `data/regionMap.js`, mapa e cartão por script; D11 reescrita (publicada com a Poção e os líderes). 0.13.1: shiny (1% por opção da Poké Ball), com sprites shiny no campo, nos cards e no PC, ✦ na Pokédex e a conquista Brilho Raro |
 | 19 | o inicial também shiny (1%) e publicar; refinar os 3 2º golpes por tipo (aprovados com ajustes: Whirlpool longe, curas com teto, 2%/1% pelos tipos, nome oficial, 60% do dano); tremor só nos golpes dos líderes; o nível passando de 100 (o número saía do selo) e os líderes fáceis demais | 0.13.2: inicial shiny. 0.14: `data/bonusMoves.js` (51 golpes) e o motor deles; o líder acompanha a equipe (`leaderLevel`, `bossLift`); tremor só dos líderes; selo do nível que cresce com o número |
 | 20 | fases levemente mais rápidas: de 3:30 para 2:45 | 0.15: a linha do tempo das 13 fases comprimida (×165/210; levas ×√f mais densas, XP ×1/√f); a equipe chega ao líder no mesmo nível (medido) |
+| 21 | lendários naturalmente mais fortes, com melhorias e 2º golpe de saída, e um golpe exclusivo, único e muito bonito; com todas as melhorias, curar os 20% sem abrir tela, e a tela só para o 2º golpe, com uma opção única; um nome mais impactante para o 2º golpe | 0.16: `data/legendaries.js` (5 golpes exclusivos desenhados em código, kit, poder maior, entram no nível da equipe); Poção automática e anúncio do "Golpe Desperto" (nome padrão até o Fellipe escolher; sugestões dadas na conversa); roteiro `lendarios` no `screenshot.mjs` |
 
 ---
 

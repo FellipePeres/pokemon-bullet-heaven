@@ -14,7 +14,7 @@ import { iconHTML, itemUrl } from '../render/icons.js';
 import { maxHpFor } from '../systems/stats.js';
 import { TitleMenu } from './titleMenu.js';
 import { PCScreen } from './pcScreen.js';
-import { isBonusMove } from '../data/bonusMoves.js';
+import { isBonusMove, BONUS_MOVE_LABEL } from '../data/bonusMoves.js';
 import { Lobby } from './lobby.js';
 import { BadgeCase } from './badgeCase.js';
 
@@ -342,7 +342,7 @@ export class Menus {
         <p>${data.role} · ${data.types.map(typeName).join(' / ')}</p>
         <div class="node-meta">${moves}</div>
         <div class="node-meta">${upgrades} melhoria(s)${extras.length ? ` · extra: ${extras.join(', ')}` : ''}</div>
-        ${second ? `<div class="node-meta bonus-move" title="${getAbility(second).description}">✦ 2º golpe: ${getAbility(second).name}</div>` : ''}
+        ${second ? `<div class="node-meta bonus-move" title="${getAbility(second).description}">✦ ${BONUS_MOVE_LABEL}: ${getAbility(second).name}</div>` : ''}
       `;
       node.appendChild(body);
 

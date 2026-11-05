@@ -104,6 +104,7 @@ export function simulate(stageId, starter, { maxSeconds = 600, journey = null } 
     if (run.state === 'intro') { run.pendingIntro = null; run.state = 'running'; continue; }
     if (run.state === 'evolution') { run.evolutionQueue.shift(); if (!run.evolutionQueue.length) run.state = 'running'; continue; }
     if (run.state === 'levelup') { resolveLevelUp(run); levelUps++; continue; }
+    if (run.state === 'unlock') { run.unlockQueue.length = 0; run.state = 'running'; continue; }
 
     if (run.state === 'capture') {
       const options = run.captureSystem.rollChoices();

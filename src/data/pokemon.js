@@ -922,21 +922,21 @@ export const POKEMON = {
   },
   articuno: {
     id: 'articuno', dex: 144, name: 'Articuno', types: ['ice', 'flying'],
-    abilities: ['ice_beam'], moveLine: ['powder_snow', 'ice_beam', 'blizzard'], role: 'Dano à distância', rarity: 'legendary',
-    power: 2.11, hp: 275,
-    description: 'Lendário: nevascas que congelam a horda.'
+    abilities: ['sheer_cold'], moveLine: ['sheer_cold'], role: 'Lendário · gelo em área', rarity: 'legendary',
+    power: 2.45, hp: 310,
+    description: 'Lendário: o frio absoluto que congela a horda inteira.'
   },
   zapdos: {
     id: 'zapdos', dex: 145, name: 'Zapdos', types: ['electric', 'flying'],
-    abilities: ['thunderbolt'], moveLine: ['thunder_shock', 'thunderbolt', 'thunder'], role: 'Raio em cadeia', rarity: 'legendary',
-    power: 2.11, hp: 240,
-    description: 'Lendário: tempestades de raios.'
+    abilities: ['zap_cannon'], moveLine: ['zap_cannon'], role: 'Lendário · esfera de trovão', rarity: 'legendary',
+    power: 2.45, hp: 285,
+    description: 'Lendário: a tempestade em forma de pássaro.'
   },
   moltres: {
     id: 'moltres', dex: 146, name: 'Moltres', types: ['fire', 'flying'],
-    abilities: ['flamethrower'], moveLine: ['ember', 'flamethrower', 'fire_blast'], role: 'Dano à distância', rarity: 'legendary',
-    power: 2.11, hp: 240,
-    description: 'Lendário: chamas que iluminam o céu.'
+    abilities: ['sacred_fire'], moveLine: ['sacred_fire'], role: 'Lendário · penas de fogo', rarity: 'legendary',
+    power: 2.45, hp: 285,
+    description: 'Lendário: chamas sagradas que iluminam o céu.'
   },
   dratini: {
     id: 'dratini', dex: 147, name: 'Dratini', types: ['dragon'],
@@ -960,14 +960,14 @@ export const POKEMON = {
   },
   mewtwo: {
     id: 'mewtwo', dex: 150, name: 'Mewtwo', types: ['psychic'],
-    abilities: ['psybeam'], moveLine: ['confusion', 'psybeam', 'psychic_wave'], role: 'Dano à distância', rarity: 'legendary',
-    power: 2.47, hp: 265,
+    abilities: ['psystrike'], moveLine: ['psystrike'], role: 'Lendário · singularidade', rarity: 'legendary',
+    power: 2.85, hp: 320,
     description: 'Lendário: o Pokémon mais poderoso já criado.'
   },
   mew: {
     id: 'mew', dex: 151, name: 'Mew', types: ['psychic'],
-    abilities: ['psybeam'], moveLine: ['confusion', 'psybeam', 'psychic_wave'], role: 'Dano à distância', rarity: 'legendary',
-    power: 2.18, hp: 270,
+    abilities: ['metronome'], moveLine: ['metronome'], role: 'Lendário · golpe ao acaso', rarity: 'legendary',
+    power: 2.65, hp: 305,
     description: 'Lendário: dizem que guarda o código de todos.'
   }
 };
