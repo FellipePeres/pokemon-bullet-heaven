@@ -214,8 +214,9 @@ export class ProfileTracker {
     const stats = () => this.profile.stats;
     bus.on(EVENTS.ENEMY_KILLED, ({ enemy }) => {
       stats().totalKills++;
-      if (enemy?.boss) stats().leaderPokemonDefeated++;
-      else if (enemy?.elite) stats().elitesDefeated++;
+      // chefes pagam Shards na hora (0.22): ficam mesmo se a tentativa terminar em derrota
+      if (enemy?.boss) { stats().leaderPokemonDefeated++; this.addShards(CONFIG.shards.leaderPokemon); }
+      else if (enemy?.elite) { stats().elitesDefeated++; this.addShards(CONFIG.shards.elite); }
     });
     bus.on(EVENTS.POKEMON_CAPTURED, ({ dex, shiny }) => {
       stats().totalCaptures++;
@@ -339,11 +340,9 @@ export class ProfileTracker {
     if (victory) {
       p.stats.stagesCleared++;
       p.stats.bossesDefeated++;
-      // Shards da fase (com bônus na primeira vez)
+      // Shards da fase: só na primeira vitória (0.22; rejogar não ganha nada)
       const firstTime = !campaign.clearedStages.includes(stage.id);
-      const reward = (stage.reward?.shards ?? CONFIG.shards.perStageClear)
-                     + (firstTime ? CONFIG.shards.firstClearBonus : 0);
-      this.addShards(reward);
+      if (firstTime) this.addShards((stage.reward?.shards ?? CONFIG.shards.perStageClear) + CONFIG.shards.firstClearBonus);
       if (!campaign.clearedStages.includes(stage.id)) campaign.clearedStages.push(stage.id);
       const badge = stage.leader?.badge;
       if (badge && !campaign.badges.includes(badge)) {

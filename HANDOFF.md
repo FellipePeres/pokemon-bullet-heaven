@@ -5,7 +5,7 @@
 > decisão foi tomada e o que falta fazer. O `README.md` é o manual de uso;
 > este aqui é o contexto de desenvolvimento.
 
-**Versão atual:** `0.21.1` · **Última atualização:** 2026-11-05
+**Versão atual:** `0.22.0` · **Última atualização:** 2026-11-05
 **Stack:** HTML + CSS + JavaScript puro (ES Modules). Sem backend, sem build, sem dependências.
 **Repositório:** https://github.com/FellipePeres/pokemon-bullet-heaven (público)
 **Jogo no ar:** https://fellipeperes.github.io/pokemon-bullet-heaven/
@@ -445,7 +445,9 @@ Nunca voltar bônus globais para o pool de level up — foi pedido explícito.
 - **Fica cada vez mais difícil** (`CONFIG.endless`, padrão até o Fellipe decidir):
   vida e dano dos inimigos ×1,2 por minuto, composto (5 min ×2,5; 10 min ×6,2;
   `SpawnSystem.endlessFactor`, que multiplica a força da fase), e +8% de inimigos
-  por minuto até o dobro. **XP ×0,4** (era ×0,5: "ainda é muito"). As Poké Balls
+  por minuto até o dobro. **Uma Poké Ball a cada 3 minutos** sobrevividos, fora do
+  teto da fase (0.22, `CONFIG.endless.ballEvery`), com o sorteio de lendário da
+  Fase 7 em diante. **XP ×0,4** (era ×0,5: "ainda é muito"). As Poké Balls
   seguem o teto da fase.
 - **HUD**: o relógio mostra "∞" e o tempo no modo; a faixa, "MODO LIVRE -
   INIMIGOS MAIS FORTES" (texto do Fellipe). **"Voltar para o Centro Pokémon"** (vermelho, no canto) e cair
@@ -613,8 +615,14 @@ Nunca voltar bônus globais para o pool de level up — foi pedido explícito.
   Lickitung e Hitmonlee ou Hitmonchan na Fase 6). Um de cada vez.
 
 ### Shards (moeda)
-- Vêm de concluir fases (automático: 120 + 180 na primeira vez) e de
-  **coletar conquistas** — a conquista concluída fica com botão "coletar" na aba.
+- **Regras do Fellipe (0.22):** a recompensa da fase é **única** (só a primeira
+  vitória paga: `stage.reward.shards` + 180; rejogar não ganha nada); cada
+  **Pokémon de líder** derrotado dá **10** e cada **chefe simples** (elite) dá **5**,
+  na hora (`ProfileTracker`, em `ENEMY_KILLED`), mesmo que a tentativa termine em
+  derrota; no **Modo Livre** só os chefes simples pagam. O campo mostra "+10
+  Shards" sobre o chefe e o resultado da fase, "Shards dos chefes". Mais as
+  **conquistas** (o botão "coletar" na aba; vão ser refinadas).
+- Serão gastos no **Poké Mart** (aprovado como ideia; a planejar item por item).
 - Eram gastos na loja de melhorias do treinador, que saiu na 0.21 (o que fazer
   com eles fica para o Fellipe decidir).
 - Saves antigos com `coins` migram para `shards` sozinhos.
@@ -1019,6 +1027,7 @@ tipo, som e o polimento de troca e captura.
 | 18 | lobby mais bonito e único (planejado junto: o Town Map, o estojo com as métricas, tudo na barra do topo); o 2º golpe no lugar do bônus de ataque; shiny só na captura e do jogador; publicar o lobby | 0.13: `ui/lobby.js`, `ui/badgeCase.js`, `systems/stageStats.js`, `data/regionMap.js`, mapa e cartão por script; D11 reescrita (publicada com a Poção e os líderes). 0.13.1: shiny (1% por opção da Poké Ball), com sprites shiny no campo, nos cards e no PC, ✦ na Pokédex e a conquista Brilho Raro |
 | 19 | o inicial também shiny (1%) e publicar; refinar os 3 2º golpes por tipo (aprovados com ajustes: Whirlpool longe, curas com teto, 2%/1% pelos tipos, nome oficial, 60% do dano); tremor só nos golpes dos líderes; o nível passando de 100 (o número saía do selo) e os líderes fáceis demais | 0.13.2: inicial shiny. 0.14: `data/bonusMoves.js` (51 golpes) e o motor deles; o líder acompanha a equipe (`leaderLevel`, `bossLift`); tremor só dos líderes; selo do nível que cresce com o número |
 | 20 | fases levemente mais rápidas: de 3:30 para 2:45 | 0.15: a linha do tempo das 13 fases comprimida (×165/210; levas ×√f mais densas, XP ×1/√f); a equipe chega ao líder no mesmo nível (medido) |
+| 29 | Modo Livre com Poké Ball (1 a cada 3 min); Shards: a fase paga uma vez só, Pokémon de líder 10, chefe simples 5, no Modo Livre só os chefes simples; base para os preços do Poké Mart | 0.22: `CONFIG.shards.leaderPokemon/elite`, `CONFIG.endless.ballEvery`, recompensa só na primeira vitória; "+N Shards" no campo e no resultado |
 | 28 | o Articuno em campo muito pequeno | 0.21.1: `fieldScale` por espécie (Articuno ×1,8, Moltres ×1,5) |
 | 27 | remover a aba de melhorias do treinador; conquistas e Pokédex valem para todas as jornadas | 0.21: a loja saiu inteira (botões, janela, bônus, `data/trainerUpgrades.js`, a conquista "Cliente Fiel"); saves antigos carregam sem ela |
 | 26 | "tá tudo meio bugado": capturar trocando um ativo deixava ele no mapa; barras de vida vazias com o Pokémon ativo; trocas quebradas; o botão do Modo Livre direto para o mapa da jornada | 0.20.1: ids de Pokémon únicos entre sessões (`uniqueId`) e conserto dos saves com ids repetidos; o Modo Livre em si estava certo (conferido no Chrome); "Voltar para o Centro Pokémon" vai direto ao mapa |

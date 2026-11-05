@@ -487,6 +487,7 @@ export class HUD {
       ['Tempo', formatTime(run.time)],
       ['Inimigos derrotados', String(run.stats.kills)],
       ['Capturas', String(run.stats.captures)],
+      ['Shards dos chefes', String(run.stats.shards ?? 0)],
       ['Desmaios', String(run.stats.faints)],
       ['Dano total', String(Math.round(run.stats.damageDealt))],
       ['Maior nível', best ? `${getPokemon(best.pokemonId).name} Nv.${best.level}` : '—']

@@ -3,7 +3,7 @@
  * Nada de número mágico espalhado pelo gameplay: se precisar ajustar, ajuste aqui.
  */
 export const CONFIG = {
-  version: '0.21.1',
+  version: '0.22.0',
 
   canvas: { width: 1280, height: 720 },
 
@@ -155,6 +155,7 @@ export const CONFIG = {
     densityPerMinute: 0.08,  // +8% de inimigos por minuto...
     densityMax: 2,           // ...até o dobro
     eliteEvery: 60,          // um elite da fase a cada minuto
+    ballEvery: 180,          // uma Poké Ball a cada 3 minutos sobrevividos, fora do teto da fase (0.22)
     loopFrom: 0.5            // as ondas repetem a segunda metade da fase (a mais forte)
   },
 
@@ -176,10 +177,18 @@ export const CONFIG = {
     potionChance: 0.04       // chance de um selvagem comum deixar uma poção
   },
 
-  /** SHARDS: vêm de vencer fases e coletar conquistas (a loja do treinador saiu na 0.21). */
+  /**
+   * SHARDS (0.22, regras do Fellipe): a recompensa da fase é única (só a
+   * primeira vitória paga; rejogar não ganha nada); cada Pokémon de líder
+   * derrotado dá 10 e cada chefe simples (elite) dá 5, na hora, mesmo que a
+   * tentativa termine em derrota. No Modo Livre só os chefes simples pagam.
+   * Mais as conquistas. Os Shards serão gastos no Poké Mart (planejado).
+   */
   shards: {
-    perStageClear: 120,     // ao vencer uma fase
-    firstClearBonus: 180,   // bônus na primeira vez que conclui aquela fase
+    perStageClear: 120,     // a recompensa da fase sem `reward` próprio (só na primeira vitória)
+    firstClearBonus: 180,   // somado à recompensa, na primeira vitória
+    leaderPokemon: 10,      // cada Pokémon do líder derrotado
+    elite: 5,               // cada chefe simples (elite) derrotado
     perAchievement: 60      // padrão quando a conquista não define recompensa
   },
 

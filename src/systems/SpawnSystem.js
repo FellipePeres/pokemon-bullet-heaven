@@ -65,7 +65,7 @@ export class SpawnSystem {
    * minuto; e tudo fica mais forte com o tempo (`endlessFactor`).
    */
   startEndless() {
-    this.endless = { since: this.run.time, eliteTimer: CONFIG.endless.eliteEvery };
+    this.endless = { since: this.run.time, eliteTimer: CONFIG.endless.eliteEvery, ballTimer: CONFIG.endless.ballEvery };
     this.waveTimers = this.stage.waves.map((w) => w.interval * Math.random());
   }
 
@@ -95,6 +95,14 @@ export class SpawnSystem {
       if (run.enemies.length >= wave.maxAlive * CONFIG.enemies.spawnMult * density) return;
       for (let n = 0; n < wave.batch; n++) this.spawn(weightedPick(wave.enemies).id, null, pickLevel(wave.level));
     });
+
+    // uma Poké Ball a cada 3 minutos sobrevividos, fora do teto da fase (0.22);
+    // da Fase 7 em diante ela traz o sorteio de lendário, como as outras
+    this.endless.ballTimer -= dt;
+    if (this.endless.ballTimer <= 0) {
+      this.endless.ballTimer = CONFIG.endless.ballEvery;
+      this.dropBall();
+    }
 
     const elites = this.stage.elites ?? [];
     this.endless.eliteTimer -= dt;

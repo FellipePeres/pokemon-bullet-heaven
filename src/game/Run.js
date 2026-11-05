@@ -63,7 +63,7 @@ export class Run {
     this.world.terrain = this.terrain;
     this._settleTerrain();
     this.evolutionQueue = [];
-    this.stats = { kills: 0, captures: 0, damageDealt: 0, faints: 0, ballsDropped: 0 };
+    this.stats = { kills: 0, captures: 0, damageDealt: 0, faints: 0, ballsDropped: 0, shards: 0 };
     // Pokémon mandados para o PC nesta partida (vão para o PC da jornada se a fase for vencida)
     this.pc = [...(options.pc ?? [])];
     // espécies que a jornada já tem fora da equipe (o PC do lobby): um lendário

@@ -152,6 +152,13 @@ export function killEnemy(run, enemy, opts = {}) {
     run.pickups.push(new Pickup('heal', enemy.x - 6, enemy.y, 18));
   }
 
+  // chefes pagam Shards (0.22; quem credita é o perfil, ao ouvir ENEMY_KILLED)
+  const shards = enemy.boss ? CONFIG.shards.leaderPokemon : enemy.elite ? CONFIG.shards.elite : 0;
+  if (shards) {
+    run.stats.shards = (run.stats.shards ?? 0) + shards;
+    run.effects.push(new FloatingText(enemy.x, enemy.y - enemy.radius - 18, `+${shards} Shards`, '#ffd970', 15));
+  }
+
   bus.emit(EVENTS.ENEMY_KILLED, { enemy, run });
 }
 

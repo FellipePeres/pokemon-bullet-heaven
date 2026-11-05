@@ -861,9 +861,10 @@ console.log('\n[Modo Livre]');
   const wild = run.stage.waves[0].enemies[0].id;
   const hpAt = () => run.spawner.spawnAt(wild, 0, 0).maxHp;
   const hpStart = hpAt();
+  const ballsBefore = run.stats.ballsDropped;
   CONFIG.debug.godMode = true;
   let victories = 0;
-  for (let i = 0; i < 180 * 60; i++) {
+  for (let i = 0; i < 181 * 60; i++) {
     run.update(1 / 60, { x: Math.sin(i / 90), y: Math.cos(i / 70) });
     if (run.state === 'victory') victories++;
     if (run.state !== 'running') { run.state = 'running'; run.levelUpMember = null; run.pendingBall = false; run.evolutionQueue.length = 0; run.unlockQueue.length = 0; }
@@ -872,8 +873,12 @@ console.log('\n[Modo Livre]');
   const factor = run.spawner.endlessFactor;
   check('no Modo Livre a fase não termina e os inimigos continuam vindo', victories === 0 && run.stats.kills > 20,
         `${run.stats.kills} abates em 3 min`);
-  check('...e ficam mais fortes a cada minuto', Math.abs(factor - Math.pow(CONFIG.endless.growthPerMinute, 3)) < 0.01 &&
+  check('...e ficam mais fortes a cada minuto',
+        Math.abs(factor - Math.pow(CONFIG.endless.growthPerMinute, run.spawner.endlessMinutes)) < 0.01 &&
         Math.abs(hpAt() / hpStart - factor) < 0.01, `×${factor.toFixed(2)} em 3 min`);
+  check('no Modo Livre cai uma Poké Ball a cada 3 minutos, fora do teto da fase',
+        run.stats.ballsDropped - ballsBefore >= 1 && run.stats.ballsDropped > run.stage.maxBalls - 1,
+        `${run.stats.ballsDropped - ballsBefore} em 3 min (teto da fase ${run.stage.maxBalls})`);
 }
 
 // ---------------------------------------------- 5.14 métricas da fase (o Estojo de Insígnias)

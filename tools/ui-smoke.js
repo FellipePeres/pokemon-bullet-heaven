@@ -316,6 +316,20 @@ check('vitória registra a insígnia do líder',
       game.campaign.badges.includes('Insígnia Pedra') && game.profile.stats.badges === 1);
 check('vitória rende Shards', game.profile.shards > 0, `${game.profile.shards} Shards`);
 
+// ---- Shards (0.22): a fase paga uma vez; chefes pagam na hora ----
+{
+  const { killEnemy } = await import('../src/systems/combat.js');
+  const shards = () => game.profile.shards;
+  const before = shards();
+  const boss = game.run.spawner.spawnAt(game.run.stage.bossTeam[0], game.run.player.x + 200, game.run.player.y);
+  killEnemy(game.run, boss);
+  check('cada Pokémon do líder derrotado dá 10 Shards', shards() === before + CONFIG.shards.leaderPokemon, `${shards() - before}`);
+  const eliteId = game.run.stage.elites[0].id;
+  const elite = game.run.spawner.spawnAt(eliteId, game.run.player.x - 200, game.run.player.y);
+  killEnemy(game.run, elite);
+  check('cada chefe simples (elite) dá 5 Shards', shards() === before + CONFIG.shards.leaderPokemon + CONFIG.shards.elite);
+}
+
 // ---- Modo Livre (0.20): da vitória, a fase sem fim; o botão do canto volta ao Centro ----
 check('a vitória oferece o Modo Livre', !registry.get('btn-result-endless').classes.has('hidden'));
 game.run.team.members[0].fainted = true;
@@ -432,6 +446,17 @@ check('save sem treinador pede a escolha ao continuar', !registry.get('screen-tr
 game.chooseTrainer('red');
 check('depois da escolha, o Continuar segue para a jornada',
       game.profile.trainer === 'red' && !registry.get('screen-campaign').classes.has('hidden'));
+
+// ---- rejogar uma fase já vencida não paga a recompensa de novo (0.22) ----
+{
+  const before = game.profile.shards;
+  game.startStage('gym_1_pewter');
+  game.run.state = 'victory';
+  game._handleRunState();
+  check('rejogar e vencer uma fase já concluída não paga a recompensa da fase',
+        game.campaign.clearedStages.includes('gym_1_pewter') && game.profile.shards === before, `${game.profile.shards - before}`);
+  game.quitToMenu();
+}
 
 // ---- derrota → Centro Pokémon → mapa da jornada ----
 game.startStage('gym_1_pewter');
