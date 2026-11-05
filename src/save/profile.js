@@ -342,7 +342,7 @@ export class ProfileTracker {
       p.stats.bossesDefeated++;
       // Shards da fase: só na primeira vitória (0.22; rejogar não ganha nada)
       const firstTime = !campaign.clearedStages.includes(stage.id);
-      if (firstTime) this.addShards((stage.reward?.shards ?? CONFIG.shards.perStageClear) + CONFIG.shards.firstClearBonus);
+      if (firstTime) this.addShards(stage.reward?.shards ?? CONFIG.shards.perStageClear);
       if (!campaign.clearedStages.includes(stage.id)) campaign.clearedStages.push(stage.id);
       const badge = stage.leader?.badge;
       if (badge && !campaign.badges.includes(badge)) {

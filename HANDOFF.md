@@ -616,12 +616,20 @@ Nunca voltar bônus globais para o pool de level up — foi pedido explícito.
 
 ### Shards (moeda)
 - **Regras do Fellipe (0.22):** a recompensa da fase é **única** (só a primeira
-  vitória paga: `stage.reward.shards` + 180; rejogar não ganha nada); cada
+  vitória paga `stage.reward.shards`: **100** nos ginásios, **150** em cada sala da
+  Liga, **300** no Campeão; eram 140–800 + 180 da primeira vez; rejogar não ganha
+  nada); cada
   **Pokémon de líder** derrotado dá **10** e cada **chefe simples** (elite) dá **5**,
   na hora (`ProfileTracker`, em `ENEMY_KILLED`), mesmo que a tentativa termine em
   derrota; no **Modo Livre** só os chefes simples pagam. O campo mostra "+10
   Shards" sobre o chefe e o resultado da fase, "Shards dos chefes". Mais as
-  **conquistas** (o botão "coletar" na aba; vão ser refinadas).
+  **conquistas** (o botão "coletar" na aba), reescaladas para ~11% do que pagavam
+  (de 35.070 para 3.915 no total, mínimo 10 por degrau; a "Fortuna" com as metas
+  divididas por 10).
+- **Quanto rende:** os chefes de uma fase vencida de primeira dão 50–90; uma
+  jornada inteira, ~1.300 dos chefes (com as tentativas extras) + 1.700 das fases
+  ≈ 3.000. Depois da campanha, rejogar paga só os chefes (~20–30 por minuto) e o
+  Modo Livre, 5 por minuto.
 - Serão gastos no **Poké Mart** (aprovado como ideia; a planejar item por item).
 - Eram gastos na loja de melhorias do treinador, que saiu na 0.21 (o que fazer
   com eles fica para o Fellipe decidir).

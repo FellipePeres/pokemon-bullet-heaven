@@ -185,8 +185,7 @@ export const CONFIG = {
    * Mais as conquistas. Os Shards serão gastos no Poké Mart (planejado).
    */
   shards: {
-    perStageClear: 120,     // a recompensa da fase sem `reward` próprio (só na primeira vitória)
-    firstClearBonus: 180,   // somado à recompensa, na primeira vitória
+    perStageClear: 100,     // a recompensa da fase sem `reward` próprio (só na primeira vitória)
     leaderPokemon: 10,      // cada Pokémon do líder derrotado
     elite: 5,               // cada chefe simples (elite) derrotado
     perAchievement: 60      // padrão quando a conquista não define recompensa

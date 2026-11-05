@@ -38,7 +38,7 @@
  *   maxBalls       teto de Poké Balls da fase (controla o ritmo das capturas)
  *   scriptedBalls  segundos em que uma Poké Ball aparece garantida (0.10: só uma,
  *                  na Fase 1, para o inicial ganhar companhia; o resto é sorte)
- *   reward         Shards ganhos ao concluir
+ *   reward         Shards da primeira vitória (0.22: só ela paga; 100 nos ginásios, 150 na Liga, 300 no Campeão)
  */
 export const STAGES = {
   /* ============================================================
@@ -96,7 +96,7 @@ export const STAGES = {
     ballChance: 1,
     maxBalls: 3,
     scriptedBalls: [24, 77],
-    reward: { shards: 140 }
+    reward: { shards: 100 }
   },
 
   /* ============================================================
@@ -154,7 +154,7 @@ export const STAGES = {
     capturePool: 'phase2',
     ballChance: 1,
     maxBalls: 2,
-    reward: { shards: 200 }
+    reward: { shards: 100 }
   },
 
   /* ============================================================
@@ -218,7 +218,7 @@ export const STAGES = {
     capturePool: 'phase3',
     ballChance: 1,
     maxBalls: 2,
-    reward: { shards: 260 }
+    reward: { shards: 100 }
   },
 
   /* ============================================================
@@ -279,7 +279,7 @@ export const STAGES = {
     capturePool: 'phase4',
     ballChance: 1,
     maxBalls: 2,
-    reward: { shards: 320 }
+    reward: { shards: 100 }
   },
 
   /* ============================================================
@@ -341,7 +341,7 @@ export const STAGES = {
     capturePool: 'phase5',
     ballChance: 1,
     maxBalls: 2,
-    reward: { shards: 380 }
+    reward: { shards: 100 }
   },
 
   /* ============================================================
@@ -409,7 +409,7 @@ export const STAGES = {
     capturePool: 'phase6',
     ballChance: 1,
     maxBalls: 2,
-    reward: { shards: 440 }
+    reward: { shards: 100 }
   },
 
   /* ============================================================
@@ -474,7 +474,7 @@ export const STAGES = {
     capturePool: 'phase7',
     ballChance: 1,
     maxBalls: 2,
-    reward: { shards: 500 }
+    reward: { shards: 100 }
   },
 
   /* ============================================================
@@ -536,7 +536,7 @@ export const STAGES = {
     capturePool: 'phase8',
     ballChance: 1,
     maxBalls: 2,
-    reward: { shards: 560 }
+    reward: { shards: 100 }
   },
 
   /* ============================================================
@@ -594,7 +594,7 @@ export const STAGES = {
     capturePool: 'phase9',
     ballChance: 1,
     maxBalls: 1,
-    reward: { shards: 300 }
+    reward: { shards: 150 }
   },
 
   /* ============================================================
@@ -650,7 +650,7 @@ export const STAGES = {
     capturePool: 'phase9',
     ballChance: 1,
     maxBalls: 1,
-    reward: { shards: 320 }
+    reward: { shards: 150 }
   },
 
   /* ============================================================
@@ -705,7 +705,7 @@ export const STAGES = {
     capturePool: 'phase9',
     ballChance: 1,
     maxBalls: 1,
-    reward: { shards: 340 }
+    reward: { shards: 150 }
   },
 
   /* ============================================================
@@ -760,7 +760,7 @@ export const STAGES = {
     capturePool: 'phase9',
     ballChance: 1,
     maxBalls: 1,
-    reward: { shards: 360 }
+    reward: { shards: 150 }
   },
 
   /* ============================================================
@@ -821,7 +821,7 @@ export const STAGES = {
     capturePool: 'phase9',
     ballChance: 1,
     maxBalls: 1,   // 0.18: uma, para o lendário (era 0)
-    reward: { shards: 800 }
+    reward: { shards: 300 }
   }
 };
 

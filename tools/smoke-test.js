@@ -861,6 +861,7 @@ console.log('\n[Modo Livre]');
   const wild = run.stage.waves[0].enemies[0].id;
   const hpAt = () => run.spawner.spawnAt(wild, 0, 0).maxHp;
   const hpStart = hpAt();
+  run.stats.ballsDropped = run.stage.maxBalls;   // o teto da fase já esgotado
   const ballsBefore = run.stats.ballsDropped;
   CONFIG.debug.godMode = true;
   let victories = 0;
@@ -877,8 +878,8 @@ console.log('\n[Modo Livre]');
         Math.abs(factor - Math.pow(CONFIG.endless.growthPerMinute, run.spawner.endlessMinutes)) < 0.01 &&
         Math.abs(hpAt() / hpStart - factor) < 0.01, `×${factor.toFixed(2)} em 3 min`);
   check('no Modo Livre cai uma Poké Ball a cada 3 minutos, fora do teto da fase',
-        run.stats.ballsDropped - ballsBefore >= 1 && run.stats.ballsDropped > run.stage.maxBalls - 1,
-        `${run.stats.ballsDropped - ballsBefore} em 3 min (teto da fase ${run.stage.maxBalls})`);
+        run.stats.ballsDropped - ballsBefore === 1,
+        `${run.stats.ballsDropped - ballsBefore} em 3 min, com o teto da fase (${run.stage.maxBalls}) já esgotado`);
 }
 
 // ---------------------------------------------- 5.14 métricas da fase (o Estojo de Insígnias)
