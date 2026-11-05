@@ -5,7 +5,7 @@
 > decisão foi tomada e o que falta fazer. O `README.md` é o manual de uso;
 > este aqui é o contexto de desenvolvimento.
 
-**Versão atual:** `0.19.0` · **Última atualização:** 2026-11-05
+**Versão atual:** `0.20.0` · **Última atualização:** 2026-11-05
 **Stack:** HTML + CSS + JavaScript puro (ES Modules). Sem backend, sem build, sem dependências.
 **Repositório:** https://github.com/FellipePeres/pokemon-bullet-heaven (público)
 **Jogo no ar:** https://fellipeperes.github.io/pokemon-bullet-heaven/
@@ -418,6 +418,29 @@ Nunca voltar bônus globais para o pool de level up — foi pedido explícito.
   28 espécies, 96% do peso em formas básicas (Rotas 1, 2, 22 e 3, Floresta de
   Viridian e a pesca do começo) e 4% nos evoluídos. Água e Planta (Poliwag,
   Goldeen, Oddish) ficaram em 2% cada porque tiram 4x do Brock.
+
+### Modo Livre (0.20)
+- Pedido do Fellipe: "quando ganhar do Brock, além dos botões de hoje, um botão
+  Modo Livre: um Endless Mode daquela fase, com XP reduzido; no canto superior
+  direito, ao lado do contador de inimigos e da configuração, um botão Voltar para
+  o Centro Pokémon"; e "os inimigos vão ganhando gradativamente mais status até
+  que fique quase impossível".
+- **Na tela de vitória** (menos a do Campeão, que vai para o Hall da Fama),
+  **Modo Livre** (`Game.startEndless`): a equipe volta curada e a fase continua
+  sem fim (`Run.startEndless`, `SpawnSystem.startEndless`). As ondas da segunda
+  metade da fase se repetem, sem o líder, e um elite da fase aparece a cada
+  minuto. A vitória já ficou registrada; `_checkState` não dá outra.
+- **Fica cada vez mais difícil** (`CONFIG.endless`, padrão até o Fellipe decidir):
+  vida e dano dos inimigos ×1,2 por minuto, composto (5 min ×2,5; 10 min ×6,2;
+  `SpawnSystem.endlessFactor`, que multiplica a força da fase), e +8% de inimigos
+  por minuto até o dobro. **XP ×0,5.** As Poké Balls seguem o teto da fase.
+- **HUD**: o relógio mostra "∞" e o tempo no modo; o objetivo, "MODO LIVRE ·
+  INIMIGOS ×2,1". **"Voltar para o Centro Pokémon"** (vermelho, no canto) e cair
+  com a equipe toda fazem o mesmo (`Game.leaveEndless`): guardam na jornada o que
+  a equipe ganhou e abrem o Centro Pokémon (de lá, a fase de novo ou o mapa).
+  Abandonar pela pausa também guarda. O PC: o da vitória já está na jornada, então
+  o da partida recomeça vazio e a jornada soma ao que havia na entrada
+  (`endlessBasePc`); o autosave do loop atualiza a jornada a cada 15 s.
 
 ### Os espaços de jornada (0.19)
 - Pedido do Fellipe: "no lugar de continuar, estar escrito Jornada; quando clica,
@@ -973,6 +996,7 @@ tipo, som e o polimento de troca e captura.
 | 18 | lobby mais bonito e único (planejado junto: o Town Map, o estojo com as métricas, tudo na barra do topo); o 2º golpe no lugar do bônus de ataque; shiny só na captura e do jogador; publicar o lobby | 0.13: `ui/lobby.js`, `ui/badgeCase.js`, `systems/stageStats.js`, `data/regionMap.js`, mapa e cartão por script; D11 reescrita (publicada com a Poção e os líderes). 0.13.1: shiny (1% por opção da Poké Ball), com sprites shiny no campo, nos cards e no PC, ✦ na Pokédex e a conquista Brilho Raro |
 | 19 | o inicial também shiny (1%) e publicar; refinar os 3 2º golpes por tipo (aprovados com ajustes: Whirlpool longe, curas com teto, 2%/1% pelos tipos, nome oficial, 60% do dano); tremor só nos golpes dos líderes; o nível passando de 100 (o número saía do selo) e os líderes fáceis demais | 0.13.2: inicial shiny. 0.14: `data/bonusMoves.js` (51 golpes) e o motor deles; o líder acompanha a equipe (`leaderLevel`, `bossLift`); tremor só dos líderes; selo do nível que cresce com o número |
 | 20 | fases levemente mais rápidas: de 3:30 para 2:45 | 0.15: a linha do tempo das 13 fases comprimida (×165/210; levas ×√f mais densas, XP ×1/√f); a equipe chega ao líder no mesmo nível (medido) |
+| 25 | Modo Livre: depois da vitória, a fase sem fim com XP reduzido, inimigos cada vez mais fortes até ficar quase impossível, e o botão "Voltar para o Centro Pokémon" no canto | 0.20: `Game.startEndless/leaveEndless`, `Run.startEndless`, `SpawnSystem` com as ondas da segunda metade em laço, um elite por minuto e ×1,2 por minuto; XP ×0,5; testes e roteiro de screenshot "livre" |
 | 24 | no título, "Jornada" no lugar de "Continuar", com os espaços das jornadas: fazer mais de uma, com novos Pokémon, e voltar para a outra | 0.19: 3 espaços de jornada (`ui/journeys.js`, `Game.openJourney/newJourney/deleteJourney`); cada uma com treinador, inicial, insígnias, equipe, PC e partida; Pokédex, conquistas, Shards e melhorias valem para todas; save antigo vira a jornada 1 |
 | 23 | taxa dos lendários: aparecer desde a Fase 7, com chance baixa que cresce até o Campeão; um de cada por jornada; depois, subir levemente lendários e Poké Balls | 0.18: sorteio próprio por Poké Ball (3% → 12%), aves desde a Fase 7, Mewtwo e Mew só na Liga; um de cada (equipe, PC) e uma vez por tentativa; o Campeão com 1 Poké Ball; Poké Ball ×0,085 (era ×0,07); `balance.mjs` mostra as Poké Balls; corrigido o travamento dos golpes que caem do céu (inimigo na borda do alcance) |
 | 22 | equilibrar de novo: forçar o jogador a melhorar os Pokémon para passar; ao morrer não perde o progresso da fase, só não libera a seguinte (a Elite Four estava "a coisa mais fácil"); Pokémon já registrados com uma Poké Ball na captura | 0.17: derrota e abandono guardam o progresso; o líder não cresce mais com a equipe (`bossLift` saiu); `stage.difficulty` (a força da fase) calibrada em tentativas até passar, com a Liga mais forte; nível recomendado no lobby; `balance.mjs` mede tentativas e o nível de entrada; Poké Ball no card de quem já está na Pokédex |

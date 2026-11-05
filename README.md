@@ -133,6 +133,9 @@ Perder devolve você ao início da fase com a equipe como estava ao entrar nela.
   jornada.
 - **Shiny**: raro (1%), na captura e no inicial — o card da Poké Ball brilha, e o
   Pokémon fica com as cores raras no campo, no PC e na Pokédex.
+- **Modo Livre**: ao vencer uma fase, dá para seguir nela sem fim, com XP
+  reduzido e inimigos cada vez mais fortes, até ficar quase impossível. O botão
+  "Voltar para o Centro Pokémon", no canto, sai guardando o que a equipe ganhou.
 - **Jornadas**: até 3 ao mesmo tempo, cada uma com o seu treinador, inicial,
   insígnias e equipe. No título, **Jornada** mostra os espaços (Jogar, Apagar ou
   começar outra) e **Nova jornada** abre uma sem apagar as outras. A Pokédex, as

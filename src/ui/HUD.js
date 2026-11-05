@@ -64,7 +64,7 @@ export class HUD {
     if (run.endless) {
       // Modo Livre: o tempo nele e o quanto os inimigos já cresceram
       el('timer').textContent = `∞ ${formatTime(run.spawner.endlessMinutes * 60)}`;
-      el('objective').textContent = `MODO LIVRE · INIMIGOS ×${run.spawner.endlessFactor.toFixed(1)}`;
+      el('objective').textContent = `MODO LIVRE · INIMIGOS ×${run.spawner.endlessFactor.toFixed(1).replace('.', ',')}`;
     } else {
       el('timer').textContent = run.boss ? '⚔' : formatTime(run.timeToBoss);
       el('objective').textContent = run.objective;
