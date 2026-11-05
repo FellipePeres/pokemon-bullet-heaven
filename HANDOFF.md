@@ -354,14 +354,19 @@ Nunca voltar bônus globais para o pool de level up — foi pedido explícito.
   run"; números padrão até o Fellipe decidir): saíram das tabelas de captura e
   têm sorteio próprio (`LEGENDARY_ENCOUNTERS`, `CaptureSystem.rollLegendary`).
   Em cada Poké Ball, com a chance da fase, a última opção vira um lendário:
-  Fase 7 2% e Fase 8 3% (só as aves), Lorelei 4%, Bruno 5%, Agatha 6%, Lance 7%
-  e Campeão 10% (aves, Mewtwo e Mew). Entre eles, peso 1 por ave, 0,35 Mewtwo e
+  Fase 7 3% e Fase 8 4% (só as aves), Lorelei 5%, Bruno 6%, Agatha 7%, Lance 8%
+  e Campeão 12% (aves, Mewtwo e Mew; eram 2% a 10%, e o Fellipe pediu "aumentar
+  levemente"). Entre eles, peso 1 por ave, 0,35 Mewtwo e
   0,15 Mew. O Campeão ganhou 1 Poké Ball (tinha 0). **Um de cada**: quem está na
   equipe, no PC da partida ou no do lobby (`run.ownedElsewhere`) não volta, e na
   mesma tentativa cada um aparece uma vez só, mesmo recusado
-  (`run.legendariesOffered`). Medido: ~1,6 Poké Ball por tentativa nas Fases 7
-  e 8, ~0,9 por sala da Liga; passando cada fase em ~1,5 tentativa, ~45% das
-  jornadas veem algum lendário (cada ave ~15%, Mewtwo ~4%, Mew ~2%).
+  (`run.legendariesOffered`). Medido: ~1,7 Poké Ball por tentativa nas Fases 7
+  e 8, ~0,9 por sala da Liga; passando cada fase em ~1,5 tentativa, ~50% das
+  jornadas veem algum lendário (cada ave ~19%, Mewtwo ~5%, Mew ~2%).
+- **Poké Balls por tentativa** (0.18, bot, `balance.mjs` coluna "bolas"): Fase 1
+  2,5 (teto 3), Fases 2 a 8 de 1,25 a 1,84 (teto 2; a chance de cair subiu de
+  ×0,07 para ×0,085, +20%, mas o teto corta: a média foi de 1,50 para 1,62), Liga
+  e Campeão ~0,9–1,0 (teto 1). Uma jornada passando tudo de primeira dá ~17.
 
 ### Evolução
 - **Por nível, fiel aos jogos**: Charmander→Charmeleon 16→Charizard 36,
@@ -569,7 +574,7 @@ Valores em `src/core/config.js` (o que não estiver lá está em `/data`):
 | Invencibilidade após golpe | 0,5s |
 | Regeneração: campo / reserva | 0,6 / 2,5 HP/s |
 | Chance de poção (selvagem comum) | 4% |
-| Poké Balls por fase | até 3 na Fase 1 (2 garantidas), 2 nas outras, 1 em cada sala da Liga, 0 no Campeão; chance de cair ×0,07 |
+| Poké Balls por fase | até 3 na Fase 1 (uma garantida), 2 nas outras, 1 em cada sala da Liga e no Campeão (desde a 0.18); chance de cair ×0,085 (×0,07 até a 0.17) |
 | Ímã | 0,05% por selvagem, 1,5% por elite ou Pokémon de líder |
 | Jogador virtual (`tools/bot.mjs`) | escolhe a melhoria que mais dá dano (TM primeiro), circula pela arena desviando do que encosta, dos avisos e dos projéteis dos líderes, e vai atrás das Poké Balls |
 | Dano, vida e quantidade de inimigos | dano ×1,3, vida ×1,2 e ondas ×1,2 em todas as fases (`CONFIG.enemies`), além do `scaling` de cada fase |
@@ -944,7 +949,7 @@ tipo, som e o polimento de troca e captura.
 | 18 | lobby mais bonito e único (planejado junto: o Town Map, o estojo com as métricas, tudo na barra do topo); o 2º golpe no lugar do bônus de ataque; shiny só na captura e do jogador; publicar o lobby | 0.13: `ui/lobby.js`, `ui/badgeCase.js`, `systems/stageStats.js`, `data/regionMap.js`, mapa e cartão por script; D11 reescrita (publicada com a Poção e os líderes). 0.13.1: shiny (1% por opção da Poké Ball), com sprites shiny no campo, nos cards e no PC, ✦ na Pokédex e a conquista Brilho Raro |
 | 19 | o inicial também shiny (1%) e publicar; refinar os 3 2º golpes por tipo (aprovados com ajustes: Whirlpool longe, curas com teto, 2%/1% pelos tipos, nome oficial, 60% do dano); tremor só nos golpes dos líderes; o nível passando de 100 (o número saía do selo) e os líderes fáceis demais | 0.13.2: inicial shiny. 0.14: `data/bonusMoves.js` (51 golpes) e o motor deles; o líder acompanha a equipe (`leaderLevel`, `bossLift`); tremor só dos líderes; selo do nível que cresce com o número |
 | 20 | fases levemente mais rápidas: de 3:30 para 2:45 | 0.15: a linha do tempo das 13 fases comprimida (×165/210; levas ×√f mais densas, XP ×1/√f); a equipe chega ao líder no mesmo nível (medido) |
-| 23 | taxa dos lendários: aparecer desde a Fase 7, com chance baixa que cresce até o Campeão; um de cada por jornada | 0.18: sorteio próprio por Poké Ball (2% → 10%), aves desde a Fase 7, Mewtwo e Mew só na Liga; um de cada (equipe, PC) e uma vez por tentativa; o Campeão com 1 Poké Ball |
+| 23 | taxa dos lendários: aparecer desde a Fase 7, com chance baixa que cresce até o Campeão; um de cada por jornada; depois, subir levemente lendários e Poké Balls | 0.18: sorteio próprio por Poké Ball (3% → 12%), aves desde a Fase 7, Mewtwo e Mew só na Liga; um de cada (equipe, PC) e uma vez por tentativa; o Campeão com 1 Poké Ball; Poké Ball ×0,085 (era ×0,07); `balance.mjs` mostra as Poké Balls; corrigido o travamento dos golpes que caem do céu (inimigo na borda do alcance) |
 | 22 | equilibrar de novo: forçar o jogador a melhorar os Pokémon para passar; ao morrer não perde o progresso da fase, só não libera a seguinte (a Elite Four estava "a coisa mais fácil"); Pokémon já registrados com uma Poké Ball na captura | 0.17: derrota e abandono guardam o progresso; o líder não cresce mais com a equipe (`bossLift` saiu); `stage.difficulty` (a força da fase) calibrada em tentativas até passar, com a Liga mais forte; nível recomendado no lobby; `balance.mjs` mede tentativas e o nível de entrada; Poké Ball no card de quem já está na Pokédex |
 | 21 | lendários naturalmente mais fortes, com melhorias e 2º golpe de saída, e um golpe exclusivo, único e muito bonito; com todas as melhorias, curar os 20% sem abrir tela, e a tela só para o 2º golpe, com uma opção única; um nome mais impactante para o 2º golpe | 0.16: `data/legendaries.js` (5 golpes exclusivos desenhados em código, kit, poder maior, entram no nível da equipe); Poção automática e anúncio do "Golpe Desperto" (nome padrão até o Fellipe escolher; sugestões dadas na conversa); roteiro `lendarios` no `screenshot.mjs` |
 

@@ -772,7 +772,8 @@ console.log('\n[encontros de lendário]');
     if (found.some((id) => id === 'mewtwo' || id === 'mew')) hits = -1e9;
   }
   const pct = hits / 4000;
-  check('na Fase 7 a chance é baixa (~2%) e só aparecem as aves', pct > 0.01 && pct < 0.03, `${(pct * 100).toFixed(2)}%`);
+  const want = LEGENDARY_ENCOUNTERS.gym_7_cinnabar.chance;
+  check(`na Fase 7 a chance é baixa (~${want * 100}%) e só aparecem as aves`, Math.abs(pct - want) < 0.01, `${(pct * 100).toFixed(2)}%`);
 
   // um de cada: na mesma tentativa não repete, mesmo recusado; quem está no PC não volta
   for (const enc of Object.values(LEGENDARY_ENCOUNTERS)) enc.chance = 1;

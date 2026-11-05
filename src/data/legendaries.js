@@ -102,21 +102,22 @@ export const LEGENDARY_KITS = {
  *   - um lendário que já está na equipe ou no PC da jornada (um de cada);
  *   - de novo, na mesma tentativa, um que já apareceu nela (mesmo recusado).
  *
- * Medido com o bot: ~1,6 Poké Ball por tentativa nas Fases 7 e 8, ~0,9 em cada
- * sala da Liga. Quem passa cada fase em ~1,5 tentativa vê algum lendário em
- * ~45% das jornadas (cada ave ~15–20%, Mewtwo ~3–4%, Mew ~1–2%).
+ * Medido com o bot: ~1,7 Poké Ball por tentativa nas Fases 7 e 8, ~0,9 em cada
+ * sala da Liga e no Campeão. Quem passa cada fase em ~1,5 tentativa vê algum
+ * lendário em ~50% das jornadas (cada ave ~19%, Mewtwo ~5%, Mew ~2%).
  */
 const BIRDS = ['articuno', 'zapdos', 'moltres'];
 const ALL = [...BIRDS, 'mewtwo', 'mew'];
 
 export const LEGENDARY_ENCOUNTERS = {
-  gym_7_cinnabar: { chance: 0.02, pool: BIRDS },
-  gym_8_viridian: { chance: 0.03, pool: BIRDS },
-  e4_lorelei: { chance: 0.04, pool: ALL },
-  e4_bruno: { chance: 0.05, pool: ALL },
-  e4_agatha: { chance: 0.06, pool: ALL },
-  e4_lance: { chance: 0.07, pool: ALL },
-  champion: { chance: 0.10, pool: ALL }
+  // +1 ponto em cada e 12% no Campeão ("aumentar levemente"; eram 2% a 10%)
+  gym_7_cinnabar: { chance: 0.03, pool: BIRDS },
+  gym_8_viridian: { chance: 0.04, pool: BIRDS },
+  e4_lorelei: { chance: 0.05, pool: ALL },
+  e4_bruno: { chance: 0.06, pool: ALL },
+  e4_agatha: { chance: 0.07, pool: ALL },
+  e4_lance: { chance: 0.08, pool: ALL },
+  champion: { chance: 0.12, pool: ALL }
 };
 
 /** Entre os lendários sorteados: as aves comuns, Mewtwo e Mew raros. */

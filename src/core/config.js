@@ -155,8 +155,9 @@ export const CONFIG = {
     shinyChance: 0.01,
     levelsBehindTeam: 3,     // quem entra chega com a média da equipe menos isso
     // Poké Ball rara (pedidos do Fellipe: ×0,45 na 0.8, ×0,15 na 0.9, ×0,07 na
-    // 0.10, quando as garantidas também saíram: sobrou uma, na Fase 1)
-    dropChanceMultiplier: 0.07,
+    // 0.10, quando as garantidas também saíram: sobrou uma, na Fase 1; ×0,085 na
+    // 0.18, "aumentar levemente": ~20% mais, onde a fase não está no teto)
+    dropChanceMultiplier: 0.085,
     // Ímã: puxa todo o XP do mapa até o treinador. Raríssimo; um por vez no chão.
     magnetChance: 0.0005,
     magnetChanceElite: 0.015,
