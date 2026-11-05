@@ -62,9 +62,9 @@ export class HUD {
     el('stage-name').textContent = run.stage.name;
     el('segment-name').textContent = run.segmentName;
     if (run.endless) {
-      // Modo Livre: o tempo nele e o quanto os inimigos já cresceram
+      // Modo Livre: o tempo nele e o aviso de que os inimigos crescem
       el('timer').textContent = `∞ ${formatTime(run.spawner.endlessMinutes * 60)}`;
-      el('objective').textContent = `MODO LIVRE · INIMIGOS ×${run.spawner.endlessFactor.toFixed(1).replace('.', ',')}`;
+      el('objective').textContent = 'MODO LIVRE - INIMIGOS MAIS FORTES';
     } else {
       el('timer').textContent = run.boss ? '⚔' : formatTime(run.timeToBoss);
       el('objective').textContent = run.objective;

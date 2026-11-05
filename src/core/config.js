@@ -150,7 +150,7 @@ export const CONFIG = {
   // reduzido; os inimigos vão ganhando gradativamente mais status até que fique
   // quase impossível"). Padrão até o Fellipe decidir.
   endless: {
-    xpMult: 0.5,             // metade do XP
+    xpMult: 0.4,             // 40% do XP (era a metade; "ainda é muito")
     growthPerMinute: 1.2,    // vida e dano dos inimigos ×1,2 por minuto, composto (5 min ×2,5; 10 min ×6,2)
     densityPerMinute: 0.08,  // +8% de inimigos por minuto...
     densityMax: 2,           // ...até o dobro
