@@ -3,7 +3,7 @@
  * Nada de número mágico espalhado pelo gameplay: se precisar ajustar, ajuste aqui.
  */
 export const CONFIG = {
-  version: '0.18.0',
+  version: '0.19.0',
 
   canvas: { width: 1280, height: 720 },
 
@@ -189,7 +189,8 @@ export const CONFIG = {
   save: {
     fileName: 'pokemon-bullet-heaven-save.json',
     useLocalStorage: true,
-    storageKey: 'pbh.autosave'
+    storageKey: 'pbh.autosave',
+    maxJourneys: 3           // espaços de jornada (0.19; padrão até o Fellipe decidir)
   },
 
   debug: {

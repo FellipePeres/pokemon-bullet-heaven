@@ -71,9 +71,9 @@
 
       <!-- cada entrada é uma caixa de diálogo; a Poké Ball aponta a escolhida (↑ ↓ e Enter) -->
       <nav id="title-menu" class="title-menu" aria-label="Menu principal">
-        <button id="btn-continue" class="title-item" disabled>
-          <span class="title-pointer btn-ball"></span><span class="btn-text title-label">Continuar</span>
-          <span class="title-seal" id="continue-seal">Sem jogo salvo</span>
+        <button id="btn-continue" class="title-item">
+          <span class="title-pointer btn-ball"></span><span class="btn-text title-label">Jornada</span>
+          <span class="title-seal" id="continue-seal">Nenhuma ainda</span>
         </button>
         <button id="btn-new-game" class="title-item">
           <span class="title-pointer btn-ball"></span><span class="btn-text title-label">Nova jornada</span>
@@ -108,6 +108,18 @@
       </div>
     </div>
     <div id="trainer-choices" class="trainer-grid"></div>
+    <button class="menu-btn ghost back" data-back="screen-title">Voltar</button>
+  </section>
+
+  <!-- ============================================================
+       JORNADAS — os espaços de jornada (0.19)
+       ============================================================ -->
+  <section id="screen-journeys" class="screen hidden">
+    <header class="screen-head">
+      <h2 class="screen-title">Jornadas</h2>
+      <p class="subtitle">Cada jornada tem o seu treinador, inicial, insígnias e equipe. A Pokédex, as conquistas, os Shards e as melhorias do treinador valem para todas.</p>
+    </header>
+    <div id="journey-slots" class="journey-grid"></div>
     <button class="menu-btn ghost back" data-back="screen-title">Voltar</button>
   </section>
 

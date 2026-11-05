@@ -5,7 +5,7 @@
 > decisão foi tomada e o que falta fazer. O `README.md` é o manual de uso;
 > este aqui é o contexto de desenvolvimento.
 
-**Versão atual:** `0.18.0` · **Última atualização:** 2026-11-05
+**Versão atual:** `0.19.0` · **Última atualização:** 2026-11-05
 **Stack:** HTML + CSS + JavaScript puro (ES Modules). Sem backend, sem build, sem dependências.
 **Repositório:** https://github.com/FellipePeres/pokemon-bullet-heaven (público)
 **Jogo no ar:** https://fellipeperes.github.io/pokemon-bullet-heaven/
@@ -418,6 +418,30 @@ Nunca voltar bônus globais para o pool de level up — foi pedido explícito.
   28 espécies, 96% do peso em formas básicas (Rotas 1, 2, 22 e 3, Floresta de
   Viridian e a pesca do começo) e 4% nos evoluídos. Água e Planta (Poliwag,
   Goldeen, Oddish) ficaram em 2% cada porque tiram 4x do Brock.
+
+### Os espaços de jornada (0.19)
+- Pedido do Fellipe: "no lugar de continuar, estar escrito Jornada; quando clica,
+  aparecem os espaços das jornadas que você fez, podendo fazer mais de uma com
+  novos Pokémon, mas se eu quiser voltar para a outra eu posso também".
+- **No título**, "Continuar" virou **Jornada** (selo "2 de 3"), que abre a tela
+  de jornadas (`ui/journeys.js`); **Nova jornada** abre um espaço novo sem apagar
+  as outras (`Game.newJourney`). São **3 espaços** (`CONFIG.save.maxJourneys`,
+  padrão até o Fellipe decidir); cheios, a Nova jornada pede para apagar uma.
+- **Cada card**: o treinador, as 8 insígnias, a equipe (ou o inicial), a próxima
+  fase, a partida em andamento e quando foi jogada; **Jogar** (ou Continuar, com
+  partida em andamento) e **Apagar**, que pergunta no próprio card.
+- **Cada jornada tem o seu**: treinador (Red/Leaf), inicial, insígnias, fases,
+  equipe, PC, métricas e a partida em andamento. **Do jogador, para todas**:
+  Pokédex, conquistas, Shards, melhorias do treinador e Hall da Fama.
+- **Como fica no save** (`save/profile.js`): a jornada ATIVA mora nos campos de
+  sempre (`trainer`, `region`, `regions`, e o `run` do save), então o resto do
+  jogo não mudou. `profile.journeys` guarda os espaços, e cada um guarda a sua em
+  `data` (e a partida em `pendingRun`) enquanto não é a ativa; `activeJourney` é
+  o id da ativa. Trocar (`openJourney`) guarda a ativa no espaço dela
+  (`_stashActive`) e põe a escolhida nos campos de cima (`_activate`). Um espaço
+  largado antes de escolher o inicial some sozinho. Save de antes da 0.19 vira o
+  espaço 1 (`normalizeJourneys`). `newGame` continua sendo "recomeçar a jornada
+  ativa" (o da derrota).
 
 ### O lobby (0.13)
 - **O mapa da jornada é o Town Map de Kanto do FireRed** (`ui/lobby.js`, Etapa 9
@@ -949,6 +973,7 @@ tipo, som e o polimento de troca e captura.
 | 18 | lobby mais bonito e único (planejado junto: o Town Map, o estojo com as métricas, tudo na barra do topo); o 2º golpe no lugar do bônus de ataque; shiny só na captura e do jogador; publicar o lobby | 0.13: `ui/lobby.js`, `ui/badgeCase.js`, `systems/stageStats.js`, `data/regionMap.js`, mapa e cartão por script; D11 reescrita (publicada com a Poção e os líderes). 0.13.1: shiny (1% por opção da Poké Ball), com sprites shiny no campo, nos cards e no PC, ✦ na Pokédex e a conquista Brilho Raro |
 | 19 | o inicial também shiny (1%) e publicar; refinar os 3 2º golpes por tipo (aprovados com ajustes: Whirlpool longe, curas com teto, 2%/1% pelos tipos, nome oficial, 60% do dano); tremor só nos golpes dos líderes; o nível passando de 100 (o número saía do selo) e os líderes fáceis demais | 0.13.2: inicial shiny. 0.14: `data/bonusMoves.js` (51 golpes) e o motor deles; o líder acompanha a equipe (`leaderLevel`, `bossLift`); tremor só dos líderes; selo do nível que cresce com o número |
 | 20 | fases levemente mais rápidas: de 3:30 para 2:45 | 0.15: a linha do tempo das 13 fases comprimida (×165/210; levas ×√f mais densas, XP ×1/√f); a equipe chega ao líder no mesmo nível (medido) |
+| 24 | no título, "Jornada" no lugar de "Continuar", com os espaços das jornadas: fazer mais de uma, com novos Pokémon, e voltar para a outra | 0.19: 3 espaços de jornada (`ui/journeys.js`, `Game.openJourney/newJourney/deleteJourney`); cada uma com treinador, inicial, insígnias, equipe, PC e partida; Pokédex, conquistas, Shards e melhorias valem para todas; save antigo vira a jornada 1 |
 | 23 | taxa dos lendários: aparecer desde a Fase 7, com chance baixa que cresce até o Campeão; um de cada por jornada; depois, subir levemente lendários e Poké Balls | 0.18: sorteio próprio por Poké Ball (3% → 12%), aves desde a Fase 7, Mewtwo e Mew só na Liga; um de cada (equipe, PC) e uma vez por tentativa; o Campeão com 1 Poké Ball; Poké Ball ×0,085 (era ×0,07); `balance.mjs` mostra as Poké Balls; corrigido o travamento dos golpes que caem do céu (inimigo na borda do alcance) |
 | 22 | equilibrar de novo: forçar o jogador a melhorar os Pokémon para passar; ao morrer não perde o progresso da fase, só não libera a seguinte (a Elite Four estava "a coisa mais fácil"); Pokémon já registrados com uma Poké Ball na captura | 0.17: derrota e abandono guardam o progresso; o líder não cresce mais com a equipe (`bossLift` saiu); `stage.difficulty` (a força da fase) calibrada em tentativas até passar, com a Liga mais forte; nível recomendado no lobby; `balance.mjs` mede tentativas e o nível de entrada; Poké Ball no card de quem já está na Pokédex |
 | 21 | lendários naturalmente mais fortes, com melhorias e 2º golpe de saída, e um golpe exclusivo, único e muito bonito; com todas as melhorias, curar os 20% sem abrir tela, e a tela só para o 2º golpe, com uma opção única; um nome mais impactante para o 2º golpe | 0.16: `data/legendaries.js` (5 golpes exclusivos desenhados em código, kit, poder maior, entram no nível da equipe); Poção automática e anúncio do "Golpe Desperto" (nome padrão até o Fellipe escolher; sugestões dadas na conversa); roteiro `lendarios` no `screenshot.mjs` |

@@ -2204,3 +2204,36 @@ button { font: inherit; color: inherit; }
 /* o card de captura de um lendário (0.16) */
 .card.legendary { box-shadow: inset 0 0 0 3px #b98cff, 0 0 16px rgba(185, 140, 255, .55); }
 .card-badge.legendary { background: #7d4bd6; }
+
+/* ============================== JORNADAS ==============================
+   0.19: os espaços de jornada. Cada card na moldura do FireRed: o treinador,
+   as insígnias, a equipe, onde ela está e Jogar/Apagar; o livre, Nova jornada. */
+.journey-grid { display: flex; gap: 18px; flex-wrap: wrap; justify-content: center; align-items: stretch; max-width: 1040px; }
+.journey-card {
+  width: 300px;
+  display: flex; flex-direction: column; gap: 8px;
+  padding: 6px 8px 8px;
+  color: var(--gba-ink);
+  border: 16px solid transparent;
+  border-image: url(../assets/ui/window-frame-button.png) 16 fill stretch;
+  filter: drop-shadow(0 6px 8px rgba(0, 0, 0, .45));
+}
+.journey-card.active { box-shadow: inset 0 0 0 3px var(--gba-gold); }
+.journey-card.empty { justify-content: center; align-items: center; text-align: center; min-height: 260px; opacity: .92; }
+.journey-head { display: flex; align-items: center; gap: 10px; }
+.journey-portrait { width: 56px; height: 56px; object-fit: contain; image-rendering: pixelated; }
+.journey-who { display: flex; flex-direction: column; gap: 2px; flex: 1; }
+.journey-who b, .journey-free { font-family: var(--font-arcade); font-size: 12px; font-weight: 400; color: var(--gba-frame); }
+.journey-who span { font-size: 14px; color: var(--gba-ink-soft); }
+.journey-tag { font-family: var(--font-arcade); font-size: 8px; padding: 3px 6px; color: #3a2a0c; background: #f8d030; border-radius: 3px; }
+.journey-badges { display: flex; gap: 3px; padding: 4px 0; border-top: 3px dotted var(--gba-shade); }
+.journey-badges img { width: 18px; height: 18px; image-rendering: pixelated; filter: grayscale(1) brightness(.45); opacity: .6; }
+.journey-badges img.got { filter: none; opacity: 1; }
+.journey-team { display: flex; gap: 4px; flex-wrap: wrap; min-height: 44px; }
+.journey-mon { display: flex; flex-direction: column; align-items: center; width: 40px; }
+.journey-next { margin: 0; font-size: 15px; line-height: 1.3; }
+.journey-run { margin: 0; font-size: 14px; color: #b8740a; }
+.journey-date { margin: 0; font-size: 13px; color: var(--gba-ink-soft); }
+.journey-actions { display: flex; flex-direction: column; gap: 6px; margin-top: auto; }
+.journey-actions .menu-btn { width: 100%; justify-content: center; text-align: center; }
+.journey-confirm { margin: 0; font-size: 14px; line-height: 1.3; color: #c0392b; }

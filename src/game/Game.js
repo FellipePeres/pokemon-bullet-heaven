@@ -18,10 +18,10 @@ const RESERVE_BUTTONS = { x: 3, y: 4, b: 5 };
 import { SaveManager } from '../save/SaveManager.js';
 import {
   createProfile, normalizeProfile, ProfileTracker,
-  regionProgress, createRegionProgress, countBadges
+  regionProgress, createRegionProgress, countBadges, createJourneySlot
 } from '../save/profile.js';
 import { STAGES, isStageUnlocked } from '../data/stages.js';
-import { getRegion } from '../data/regions.js';
+import { getRegion, DEFAULT_REGION } from '../data/regions.js';
 import { TRAINER_LOOKS, getTrainerLook } from '../data/trainers.js';
 import { POKEMON, getPokemon } from '../data/pokemon.js';
 import { ENEMIES } from '../data/enemies.js';
@@ -158,9 +158,19 @@ export class Game {
     return getRegion(this.profile.region);
   }
 
+  /**
+   * Recomeça a jornada ATIVA do zero (o "Recomeçar a jornada" da derrota). Sem
+   * jornada ativa, ela nasce aqui. Uma jornada nova, ao lado das outras, é o
+   * `newJourney`.
+   */
   newGame() {
     // Pokédex e conquistas são progresso permanente e permanecem;
     // apenas a campanha da região e a partida em andamento recomeçam.
+    if (!this.activeSlot) {
+      const slot = createJourneySlot();
+      this.profile.journeys.push(slot);
+      this.profile.activeJourney = slot.id;
+    }
     this.profile.regions[this.profile.region] = createRegionProgress();
     this.profile.stats.badges = countBadges(this.profile);
     this.pendingRun = null;
@@ -212,13 +222,104 @@ export class Game {
     return !!this.pendingRun || !!this.campaign.starter;
   }
 
-  continueLabel() {
-    if (this.pendingRun) {
-      const stage = STAGES[this.pendingRun.stageId];
-      const size = this.pendingRun.team?.members?.length ?? 0;
-      return `${stage ? stage.name : 'Partida salva'} (${size} Pokémon)`;
+  /* ======================= os espaços de jornada (0.19) ======================= */
+
+  /** O espaço da jornada ativa (a que está nos campos de cima do perfil). */
+  get activeSlot() {
+    return this.profile.journeys.find((slot) => slot.id === this.profile.activeJourney) ?? null;
+  }
+
+  /**
+   * As jornadas começadas, para a tela de jornadas: a ativa vem do perfil (e a
+   * partida em andamento dela, do `pendingRun`); as outras, do espaço delas.
+   */
+  listJourneys() {
+    return this.profile.journeys.map((slot) => {
+      const active = slot.id === this.profile.activeJourney;
+      const data = active
+        ? { trainer: this.profile.trainer, region: this.profile.region, regions: this.profile.regions }
+        : slot.data;
+      const progress = data?.regions?.[data.region];
+      if (!progress?.starter) return null;   // começada e largada antes do inicial
+      return {
+        id: slot.id, active, trainer: data.trainer, region: data.region, progress,
+        pendingRun: active ? this.pendingRun : slot.pendingRun, updatedAt: slot.updatedAt
+      };
+    }).filter(Boolean);
+  }
+
+  /** Guarda a jornada ativa no espaço dela (antes de trocar de jornada). */
+  _stashActive() {
+    const slot = this.activeSlot;
+    if (!slot) return;
+    if (!this.campaign.starter) {
+      // nem escolheu o inicial: não há o que guardar, o espaço volta a ficar livre
+      this.profile.journeys.splice(this.profile.journeys.indexOf(slot), 1);
+    } else {
+      slot.data = JSON.parse(JSON.stringify({
+        trainer: this.profile.trainer, region: this.profile.region, regions: this.profile.regions
+      }));
+      slot.pendingRun = this.pendingRun ? JSON.parse(JSON.stringify(this.pendingRun)) : null;
+      slot.updatedAt = new Date().toISOString();
     }
-    return 'Jornada';
+    this.profile.activeJourney = null;
+  }
+
+  /** Põe um espaço nos campos de cima: ele vira a jornada ativa. */
+  _activate(slot) {
+    const data = slot.data;
+    this.profile.activeJourney = slot.id;
+    this.profile.trainer = data?.trainer ?? null;
+    this.profile.region = data?.region ?? DEFAULT_REGION;
+    this.profile.regions = data?.regions ?? { [DEFAULT_REGION]: createRegionProgress() };
+    this.pendingRun = slot.pendingRun ?? null;
+    slot.data = null;
+    slot.pendingRun = null;
+    this.profile.stats.badges = countBadges(this.profile);
+  }
+
+  /** Abre uma jornada (de onde ela parou: a partida em andamento ou o mapa). */
+  openJourney(id) {
+    const slot = this.profile.journeys.find((s) => s.id === id);
+    if (!slot) return;
+    if (slot.id !== this.profile.activeJourney) {
+      this._stashActive();
+      this._activate(slot);
+      this.autosave();
+    }
+    this.continueGame();
+  }
+
+  /** Começa uma jornada nova num espaço livre, sem mexer nas outras. */
+  newJourney() {
+    // a ativa ainda nem começou (sem inicial): é ela mesma que recomeça
+    if (this.activeSlot && !this.campaign.starter) { this.newGame(); return; }
+    if (this.listJourneys().length >= CONFIG.save.maxJourneys) {
+      toast(`Os ${CONFIG.save.maxJourneys} espaços de jornada estão ocupados: apague uma para começar outra.`, '🗂️');
+      this.menus.showJourneys();
+      return;
+    }
+    this._stashActive();
+    const slot = createJourneySlot();
+    this.profile.journeys.push(slot);
+    this._activate(slot);
+    this.newGame();
+  }
+
+  /** Apaga uma jornada (a tela confirma antes). O que é do jogador fica. */
+  deleteJourney(id) {
+    const index = this.profile.journeys.findIndex((s) => s.id === id);
+    if (index === -1) return;
+    this.profile.journeys.splice(index, 1);
+    if (id === this.profile.activeJourney) {
+      this.profile.activeJourney = null;
+      this.profile.trainer = null;
+      this.profile.regions = { [DEFAULT_REGION]: createRegionProgress() };
+      this.profile.region = DEFAULT_REGION;
+      this.pendingRun = null;
+      this.profile.stats.badges = countBadges(this.profile);
+    }
+    this.autosave();
   }
 
   continueGame() {
@@ -729,6 +830,8 @@ export class Game {
   }
 
   autosave() {
+    const slot = this.activeSlot;
+    if (slot) slot.updatedAt = new Date().toISOString();
     SaveManager.saveLocal(this.buildSaveData());
   }
 

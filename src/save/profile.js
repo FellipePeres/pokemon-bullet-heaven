@@ -65,8 +65,24 @@ export function createProfile() {
     hallOfFame: [],
     // a campanha é guardada por região (data/regions.js); `region` é a da jornada atual
     region: DEFAULT_REGION,
-    regions: { [DEFAULT_REGION]: createRegionProgress() }
+    regions: { [DEFAULT_REGION]: createRegionProgress() },
+    // OS ESPAÇOS DE JORNADA (0.19, pedido do Fellipe: "fazer mais de uma jornada
+    // com novos Pokémon, mas poder voltar para a outra"). A jornada ATIVA mora nos
+    // campos de cima (`trainer`, `region`, `regions`; a partida em andamento é o
+    // `run` do save), e todo o resto do jogo continua lendo dali. Cada espaço
+    // guarda a sua em `data` enquanto está guardado (null enquanto é a ativa).
+    // Pokédex, conquistas, Shards, melhorias do treinador e Hall da Fama são do
+    // jogador e valem para todas.
+    journeys: [],          // [{ id, createdAt, updatedAt, data: { trainer, region, regions } | null, pendingRun }]
+    activeJourney: null    // o id do espaço que está nos campos de cima
   };
+}
+
+/** Um espaço de jornada novo (vazio até o jogador escolher treinador e inicial). */
+export function createJourneySlot() {
+  const now = new Date().toISOString();
+  const id = `journey-${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`;
+  return { id, createdAt: now, updatedAt: now, data: null, pendingRun: null };
 }
 
 /** Progresso de campanha de uma região. */
@@ -96,18 +112,14 @@ export function countBadges(profile) {
   return Object.values(profile.regions).reduce((total, region) => total + region.badges.length, 0);
 }
 
-/** Garante que um perfil carregado tenha todos os campos atuais. */
-export function normalizeProfile(loaded) {
-  const base = createProfile();
-  if (!loaded || typeof loaded !== 'object') return base;
-
-  const regions = { ...base.regions };
-  for (const [id, progress] of Object.entries(loaded.regions ?? {})) {
+/** As campanhas de um save, com todos os campos atuais (e as migrações antigas). */
+function normalizeRegions(loadedRegions, legacy = null) {
+  const regions = { [DEFAULT_REGION]: createRegionProgress() };
+  for (const [id, progress] of Object.entries(loadedRegions ?? {})) {
     regions[id] = { ...createRegionProgress(), ...progress };
   }
   // saves de antes das regiões guardavam a campanha de Kanto em `campaign`
-  const { campaign: legacy, ...rest } = loaded;
-  if (!loaded.regions && legacy) {
+  if (!loadedRegions && legacy) {
     const { region, ...progress } = legacy;   // `region: 'Kanto'` era só um rótulo
     regions.kanto = { ...createRegionProgress(), ...progress };
   }
@@ -119,6 +131,39 @@ export function normalizeProfile(loaded) {
       if (badge && !progress.badges.includes(badge)) progress.badges.push(badge);
     }
   }
+  return regions;
+}
+
+/** Os espaços de jornada de um save; o de antes da 0.19 vira o espaço 1. */
+function normalizeJourneys(loaded, regions) {
+  if (!Array.isArray(loaded.journeys)) {
+    // save antigo: a jornada que ele tem (se já começou) vira o primeiro espaço
+    const region = REGIONS[loaded.region] ? loaded.region : DEFAULT_REGION;
+    if (!regions[region]?.starter) return { journeys: [], activeJourney: null };
+    const slot = createJourneySlot();
+    return { journeys: [slot], activeJourney: slot.id };
+  }
+  const journeys = loaded.journeys.filter((slot) => slot?.id).map((slot) => ({
+    ...createJourneySlot(),
+    ...slot,
+    data: slot.data ? {
+      trainer: slot.data.trainer ?? null,
+      region: REGIONS[slot.data.region] ? slot.data.region : DEFAULT_REGION,
+      regions: normalizeRegions(slot.data.regions)
+    } : null,
+    pendingRun: slot.pendingRun ?? null
+  }));
+  const activeJourney = journeys.some((slot) => slot.id === loaded.activeJourney) ? loaded.activeJourney : null;
+  return { journeys, activeJourney };
+}
+
+/** Garante que um perfil carregado tenha todos os campos atuais. */
+export function normalizeProfile(loaded) {
+  const base = createProfile();
+  if (!loaded || typeof loaded !== 'object') return base;
+
+  const { campaign: legacy, ...rest } = loaded;
+  const regions = normalizeRegions(loaded.regions, legacy);
   const stats = { ...base.stats, ...(loaded.stats ?? {}) };
   stats.badges = countBadges({ regions });
 
@@ -137,7 +182,8 @@ export function normalizeProfile(loaded) {
     shards: loaded.shards ?? loaded.coins ?? base.shards,
     stats,
     region: REGIONS[loaded.region] ? loaded.region : base.region,
-    regions
+    regions,
+    ...normalizeJourneys(loaded, regions)
   };
 }
 

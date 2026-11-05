@@ -127,6 +127,7 @@ global.setTimeout = ((fn) => { fn(); return 0; });
 
 const { Game } = await import('../src/game/Game.js');
 const { CONFIG } = await import('../src/core/config.js');
+const { normalizeProfile } = await import('../src/save/profile.js');
 
 console.log('\n=== INTERFACE — teste sem navegador ===\n');
 
@@ -467,6 +468,63 @@ check('o inicial sorteado shiny fica marcado na jornada, na Pokédex e na equipe
 game.startStage('gym_1_pewter');
 check('e entra shiny na primeira fase', game.run.team.members[0].shiny === true);
 game.quitToMenu();
+
+// ---- os espaços de jornada (0.19): mais de uma jornada, e voltar para a outra ----
+{
+  const dexBefore = game.profile.pokedex.caught.length;
+  // a jornada atual (Bulbasaur) tem uma fase vencida e um Pokémon no nível 30
+  game.campaign.clearedStages.push('gym_1_pewter');
+  game.campaign.journey = { team: { members: [{ uid: 'j-a', pokemonId: 'bulbasaur', level: 30, xp: 0, hp: 50, abilities: ['vine_whip'], upgrades: {} }], active: ['j-a'] }, pc: [] };
+  const first = game.profile.activeJourney;
+  game.menus.show('screen-title');
+  check('o título mostra "Jornada" com quantos espaços estão em uso',
+        registry.get('continue-seal').textContent === `1 de ${CONFIG.save.maxJourneys}`, registry.get('continue-seal').textContent);
+  game.menus.showJourneys();
+  const cards = () => registry.get('journey-slots').children;
+  check('a tela de jornadas mostra a jornada e os espaços livres',
+        !registry.get('screen-journeys').classes.has('hidden') && cards().length === CONFIG.save.maxJourneys &&
+        cards().filter((c) => c.classes.has('empty')).length === CONFIG.save.maxJourneys - 1);
+
+  // uma jornada nova, com outro treinador e outro inicial, sem mexer na primeira
+  game.newJourney();
+  check('a jornada nova começa pela escolha de treinador, do zero',
+        !registry.get('screen-trainer').classes.has('hidden') && !game.campaign.starter && game.profile.activeJourney !== first);
+  game.chooseTrainer('leaf');
+  game.chooseStarter('charmander');
+  check('...com o inicial dela e as fases dela', game.campaign.starter === 'charmander' && game.campaign.clearedStages.length === 0
+        && game.profile.trainer === 'leaf');
+  check('a Pokédex é a mesma (é do jogador)', game.profile.pokedex.caught.length >= dexBefore);
+  check('as duas aparecem na tela de jornadas', game.listJourneys().length === 2);
+
+  // voltar para a primeira: tudo dela como estava
+  game.openJourney(first);
+  check('voltar para a outra jornada traz tudo dela de volta',
+        game.campaign.starter === 'bulbasaur' && game.campaign.clearedStages.includes('gym_1_pewter') &&
+        game.campaign.journey.team.members[0].level === 30 && game.profile.trainer === 'red' &&
+        !registry.get('screen-campaign').classes.has('hidden'));
+  const second = game.listJourneys().find((j) => !j.active);
+  check('e a segunda continua guardada', second?.progress.starter === 'charmander' && second.trainer === 'leaf');
+
+  // o save leva as duas, e carregar um save de antes da 0.19 cria o espaço 1
+  const reloaded = normalizeProfile(JSON.parse(JSON.stringify(game.profile)));
+  check('o save guarda os espaços de jornada', reloaded.journeys.length === 2 && reloaded.activeJourney === first
+        && reloaded.journeys.find((j) => j.id === second.id)?.data?.regions?.kanto?.starter === 'charmander');
+  const legacy = normalizeProfile({ trainer: 'red', regions: { kanto: { starter: 'squirtle', clearedStages: ['gym_1_pewter'], badges: [] } } });
+  check('um save de antes da 0.19 vira a jornada 1', legacy.journeys.length === 1 && legacy.activeJourney === legacy.journeys[0].id
+        && legacy.regions.kanto.starter === 'squirtle');
+
+  // o limite e o apagar
+  game.newJourney(); game.chooseTrainer('red'); game.chooseStarter('squirtle');
+  game.newJourney();
+  check(`com os ${CONFIG.save.maxJourneys} espaços ocupados, não abre outra (pede para apagar)`,
+        game.listJourneys().length === CONFIG.save.maxJourneys && !registry.get('screen-journeys').classes.has('hidden'));
+  game.deleteJourney(second.id);
+  check('apagar libera o espaço e não mexe nas outras', game.listJourneys().length === CONFIG.save.maxJourneys - 1
+        && game.listJourneys().some((j) => j.progress.starter === 'bulbasaur'));
+  game.deleteJourney(game.profile.activeJourney);
+  check('apagar a jornada atual deixa sem jornada ativa, e a outra continua', !game.profile.activeJourney
+        && !game.campaign.starter && game.listJourneys().length === 1);
+}
 
 console.log(`\n=== ${failures === 0 ? 'TUDO OK' : failures + ' FALHA(S)'} ===\n`);
 process.exit(failures ? 1 : 0);

@@ -17,8 +17,9 @@ import { PCScreen } from './pcScreen.js';
 import { isBonusMove, BONUS_MOVE_LABEL } from '../data/bonusMoves.js';
 import { Lobby } from './lobby.js';
 import { BadgeCase } from './badgeCase.js';
+import { JourneyScreen } from './journeys.js';
 
-const SCREENS = ['screen-title', 'screen-trainer', 'screen-starter', 'screen-campaign'];
+const SCREENS = ['screen-title', 'screen-journeys', 'screen-trainer', 'screen-starter', 'screen-campaign'];
 const MODALS = ['modal-pokedex', 'modal-achievements', 'modal-team', 'modal-trainer', 'modal-options', 'modal-help', 'modal-pc', 'modal-badges'];
 
 /**
@@ -33,13 +34,15 @@ export class Menus {
     this.pcScreen = new PCScreen(game);
     this.lobby = new Lobby(game);
     this.badgeCase = new BadgeCase(game);
+    this.journeys = new JourneyScreen(game);
     this._bind();
     this.titleMenu = new TitleMenu(this);
   }
 
   _bind() {
-    el('btn-new-game').onclick = () => this.leaveTitle(() => this.game.newGame());
-    el('btn-continue').onclick = () => this.leaveTitle(() => this.game.continueGame());
+    // "Nova jornada" abre um espaço novo, sem apagar as outras; "Jornada" mostra os espaços (0.19)
+    el('btn-new-game').onclick = () => this.leaveTitle(() => this.game.newJourney());
+    el('btn-continue').onclick = () => this.leaveTitle(() => this.showJourneys());
     el('btn-load-game').onclick = () => el('save-file-input').click();
     el('btn-save-campaign').onclick = () => this.game.saveToFile();
     el('btn-hall').onclick = () => this.game.showHallOfFame(this.game.profile.hallOfFame.at(-1));
@@ -82,6 +85,13 @@ export class Menus {
       this.lobby.selected = null;
       this.lobby.render();
     }
+  }
+
+  /** A tela de jornadas: os espaços, com Jogar, Apagar e Nova jornada. */
+  showJourneys() {
+    this.journeys.confirming = null;
+    this.journeys.render();
+    this.show('screen-journeys');
   }
 
   /** Sai do título com o esmaecimento da abertura e só então segue. */
@@ -130,10 +140,9 @@ export class Menus {
 
   refreshTitle() {
     const profile = this.game.profile;
-    const canContinue = this.game.canContinue();
-    el('btn-continue').disabled = !canContinue;
-    // o selo diz de onde a jornada continua (ou que não há jogo salvo)
-    el('continue-seal').textContent = canContinue ? this.game.continueLabel().split(' — ')[0] : 'Sem jogo salvo';
+    // o selo diz quantos espaços de jornada estão em uso (0.19)
+    const journeys = this.game.listJourneys().length;
+    el('continue-seal').textContent = journeys ? `${journeys} de ${CONFIG.save.maxJourneys}` : 'Nenhuma ainda';
     this.titleMenu?.reset();
 
     const strip = clear(el('title-progress'));

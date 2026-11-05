@@ -261,6 +261,19 @@ const ROTEIROS = {
     { wait: 700 }, { shot: 'itens-chao' },
     { run: "game.run.pickups.find((x) => x.kind === 'magnet').x = game.run.player.x" }, { wait: 260 }, { shot: 'itens-ima', raw: true }
   ],
+  // os espaços de jornada (0.19): o título com "Jornada" e a tela dos espaços
+  jornadas: [
+    { open: 'index.html' }, { wait: 500 },
+    { run: "game.newGame(); game.chooseTrainer('red'); game.chooseStarter('charmander');" +
+           "game.campaign.clearedStages.push('gym_1_pewter', 'gym_2_cerulean', 'gym_3_vermilion');" +
+           "game.campaign.badges.push('Insígnia Pedra', 'Insígnia Cascata', 'Insígnia Trovão');" +
+           "game.campaign.journey = { team: { members: ['charmeleon', 'pidgeotto', 'pikachu', 'geodude'].map((id, i) => ({ uid: 'm' + i, pokemonId: id, level: 30 + i, xp: 0, hp: 50, abilities: [], upgrades: {} })), active: ['m0', 'm1', 'm2'] }, pc: [] };" +
+           "game.newJourney(); game.chooseTrainer('leaf'); game.chooseStarter('squirtle'); game.campaign.clearedStages.push('gym_1_pewter'); game.campaign.badges.push('Insígnia Pedra');" +
+           "game.quitToMenu(); game.menus.show('screen-title')" },
+    { wait: 900 }, { shot: 'jornadas-1-titulo' },
+    { run: 'game.menus.showJourneys()' }, { wait: 900 }, { shot: 'jornadas-2-espacos' },
+    { run: "game.menus.journeys.confirming = game.listJourneys()[0].id; game.menus.journeys.render()" }, { wait: 400 }, { shot: 'jornadas-3-apagar' }
+  ],
   // os golpes exclusivos dos lendários (0.16), cada um em duas fases; o anúncio do
   // Golpe Desperto e o card de captura do lendário
   lendarios: [

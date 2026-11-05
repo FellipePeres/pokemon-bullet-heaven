@@ -133,6 +133,10 @@ Perder devolve você ao início da fase com a equipe como estava ao entrar nela.
   jornada.
 - **Shiny**: raro (1%), na captura e no inicial — o card da Poké Ball brilha, e o
   Pokémon fica com as cores raras no campo, no PC e na Pokédex.
+- **Jornadas**: até 3 ao mesmo tempo, cada uma com o seu treinador, inicial,
+  insígnias e equipe. No título, **Jornada** mostra os espaços (Jogar, Apagar ou
+  começar outra) e **Nova jornada** abre uma sem apagar as outras. A Pokédex, as
+  conquistas, os Shards e as melhorias do treinador valem para todas.
 - **Derrota sem perda**: o que a equipe ganhou na tentativa (níveis, melhorias,
   evoluções e capturas) fica; só a próxima fase não abre. No Centro Pokémon a
   equipe é curada e você tenta de novo, ou rejoga fases anteriores para upar. O
