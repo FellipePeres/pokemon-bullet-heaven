@@ -16,13 +16,31 @@
  * vazia da equipe é o fim da fila; a equipe nunca fica vazia.
  */
 
+import { uniqueId } from '../core/utils.js';
+
 export const BOX_SIZE = 30;
 export const MIN_BOXES = 8;
 
 /** Dá casa a quem não tem (ou tem uma repetida) e devolve a lista do PC. */
+/**
+ * Ids repetidos entre a equipe e o PC (0.20.1): até a 0.20 o id dos Pokémon
+ * recomeçava a cada sessão (`uid`) e podia repetir. Quem repete ganha um id novo;
+ * na equipe, o primeiro fica com o dele (é a ele que a lista de ativos aponta).
+ */
+export function fixDuplicateUids(journey) {
+  if (!journey) return journey;
+  const seen = new Set();
+  for (const mon of [...(journey.team?.members ?? []), ...(journey.pc ?? [])]) {
+    if (!mon.uid || seen.has(mon.uid)) mon.uid = uniqueId('mon');
+    seen.add(mon.uid);
+  }
+  return journey;
+}
+
 export function normalizePC(journey) {
   if (!journey) return [];
   journey.pc ??= [];
+  fixDuplicateUids(journey);
   const taken = new Set();
   const homeless = [];
   for (const mon of journey.pc) {

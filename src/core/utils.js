@@ -53,6 +53,15 @@ export const angle = (ax, ay, bx, by) => Math.atan2(by - ay, bx - ax);
 let _idCounter = 0;
 export const uid = (prefix = 'e') => `${prefix}${++_idCounter}`;
 
+/**
+ * Id que não se repete entre sessões (0.20.1). O `uid` acima recomeça do 1 a cada
+ * vez que o jogo abre: serve para o que vive só numa partida, mas os Pokémon da
+ * equipe e do PC vão no save, e um capturado hoje podia ganhar o mesmo id de um
+ * salvo ontem — o campo, as trocas e as barras do HUD confundiam os dois.
+ */
+export const uniqueId = (prefix = 'id') =>
+  `${prefix}-${Date.now().toString(36)}${Math.random().toString(36).slice(2, 7)}${(++_idCounter).toString(36)}`;
+
 /** 125 -> "02:05" */
 export function formatTime(seconds) {
   const s = Math.max(0, Math.floor(seconds));

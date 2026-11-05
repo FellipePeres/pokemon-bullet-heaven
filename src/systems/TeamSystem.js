@@ -1,7 +1,7 @@
 import { CONFIG } from '../core/config.js';
 import { getPokemon } from '../data/pokemon.js';
 import { bus, EVENTS } from '../core/events.js';
-import { uid } from '../core/utils.js';
+import { uniqueId } from '../core/utils.js';
 import { maxHpFor } from './stats.js';
 import { migrateMember, applyLegendaryKit } from './moves.js';
 
@@ -34,7 +34,7 @@ export class TeamSystem {
   createMember(pokemonId, level = 1, { shiny = false } = {}) {
     const data = getPokemon(pokemonId);
     const member = {
-      uid: uid('mon'),
+      uid: uniqueId('mon'),   // único entre sessões (0.20.1)
       pokemonId,
       level,
       xp: 0,
@@ -176,9 +176,14 @@ export class TeamSystem {
 
   restore(data, { healAll = false } = {}) {
     if (!data) return;
+    // saves de até a 0.20 podem ter dois Pokémon com o mesmo id: o segundo ganha
+    // um novo (os ativos continuam apontando para o primeiro)
+    const seen = new Set();
     this.members = (data.members ?? []).map((m) => {
+      const id = m.uid && !seen.has(m.uid) ? m.uid : uniqueId('mon');
+      seen.add(id);
       const member = {
-        uid: m.uid ?? uid('mon'),
+        uid: id,
         pokemonId: m.pokemonId,
         level: m.level ?? 1,
         xp: m.xp ?? 0,

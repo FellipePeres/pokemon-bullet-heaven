@@ -27,7 +27,7 @@ import { POKEMON, getPokemon } from '../data/pokemon.js';
 import { ENEMIES } from '../data/enemies.js';
 import { TRAINER_UPGRADES, getTrainerUpgrade, nextCost } from '../data/trainerUpgrades.js';
 import { MusicPlayer } from '../audio/music.js';
-import { swapWithPC, moveMon, normalizePC } from '../systems/pc.js';
+import { swapWithPC, moveMon, normalizePC, fixDuplicateUids } from '../systems/pc.js';
 
 /**
  * GAME — junta tudo: perfil, telas, partida e loop principal.
@@ -355,6 +355,7 @@ export class Game {
     if (snapshot) {
       options = { team: snapshot.team, pc: snapshot.pc };
     } else if (journey) {
+      fixDuplicateUids(journey);   // saves de até a 0.20 (ids repetidos)
       options = { team: journey.team };
     } else {
       options = { starter: this.campaign.starter, starterShiny: this.campaign.starterShiny };
@@ -710,21 +711,16 @@ export class Game {
 
   /**
    * Sai do Modo Livre (o botão do canto ou a equipe toda caída): guarda o que a
-   * equipe ganhou e abre o Centro Pokémon, que cura e leva de volta à fase ou ao mapa.
+   * equipe ganhou e vai direto para o mapa da jornada (0.20.1, pedido do Fellipe;
+   * antes abria a janela do Centro). A equipe chega curada na próxima fase.
    */
   leaveEndless() {
     const run = this.run;
-    if (!run?.endless || this.centerOpen) return;
-    this.campaign.journey = this._journeyFrom(run);
-    this.autosave();
+    if (!run?.endless) return;
     run.state = 'ended';
-    this.hud.hideLevelUp();
-    this.hud.hideCapture();
-    this.hud.hidePause();
-    this.centerStage = run.stage.id;
-    this.centerOpen = true;
     this.music.jingle('mus_heal');
-    this._showCenter();
+    this.quitToMenu();   // guarda a jornada (Modo Livre) e abre o mapa
+    toast('Sua equipe descansou no Centro Pokémon. O que ela ganhou no Modo Livre ficou.', 'potion');
   }
 
   /* ======================= derrota: as duas saídas ======================= */

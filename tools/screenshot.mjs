@@ -261,6 +261,51 @@ const ROTEIROS = {
     { wait: 700 }, { shot: 'itens-chao' },
     { run: "game.run.pickups.find((x) => x.kind === 'magnet').x = game.run.player.x" }, { wait: 260 }, { shot: 'itens-ima', raw: true }
   ],
+  // diagnóstico do Modo Livre: o HUD da equipe acompanha a vida, o XP e a troca?
+  livrediag: [
+    { open: 'index.html' }, { wait: 500 },
+    { run: START_RUN }, { wait: 800 },
+    { run: "['pidgey', 'rattata', 'caterpie'].forEach((id) => game.run.captureSystem.capture(id)); game.hud.signature = ''" }, { wait: 600 },
+    { run: "game.run.state = 'victory'" }, { wait: 600 },
+    { run: 'game.startEndless()' }, { wait: 2500 },
+    { log: "JSON.stringify(game.run.team.active.map((m) => m && [m.pokemonId, Math.round(m.hp), Math.round(m.xp)]))" },
+    { log: "JSON.stringify([...document.querySelectorAll('#active-slots .mon-card')].map((c) => [c.querySelector('.mon-name')?.textContent, c.querySelector('.bar.hp i')?.style.width, c.querySelector('.bar.xp i')?.style.width]))" },
+    { log: "JSON.stringify([...game.hud.nodes.keys()])" },
+    { log: "JSON.stringify(game.run.team.members.map((m) => m.uid))" },
+    { run: "game.run.team.members[0].hp = 5; game.run.progression.addXpTo(game.run.team.members[0], 3)" }, { wait: 500 },
+    { log: "JSON.stringify([...document.querySelectorAll('#active-slots .mon-card')].map((c) => [c.querySelector('.mon-name')?.textContent, c.querySelector('.bar.hp i')?.style.width, c.querySelector('.bar.xp i')?.style.width]))" },
+    { run: "game.run.team.swapTimer = 0; game.handleAction('team:3')" }, { wait: 400 },
+    { log: "JSON.stringify(game.run.team.active.map((m) => m && m.pokemonId)) + ' state=' + game.run.state" },
+    { shot: 'livrediag', raw: true }
+  ],
+  // diagnóstico 2: vitória de verdade (líder derrotado em jogo) e o botão da tela
+  livrediag2: [
+    { open: 'index.html' }, { wait: 500 },
+    { run: START_RUN }, { wait: 800 },
+    { run: "['pidgey', 'rattata', 'caterpie', 'weedle'].forEach((id) => game.run.captureSystem.capture(id)); game.run.team.members.forEach((m) => { m.level = 25; });" +
+           "game.run.time = game.run.stage.duration + 0.2;" +
+           "window.__tick = setInterval(() => { if (game.introOpen) game.closeLeaderIntro(); if (game.captureOpen) game.resolveCapture(); if (game.evolutionOpen) game.closeEvolution();" +
+           " if (game.levelUpOpen) game.pickUpgrade(game.run.progression.rollChoices(game.run.levelUpMember)[0].id); if (game.unlockOpen) game.confirmUnlock();" +
+           " const b = game.run?.spawner.boss; if (b && !b.dead && !game.run.endless) b.hp = Math.min(b.hp, 5); }, 100)" },
+    { wait: 16000 },
+    { log: "game.run.state + ' runEnded=' + game.runEnded + ' result=' + !document.getElementById('result-overlay').classList.contains('hidden')" },
+    { run: "document.getElementById('btn-result-endless').click()" },
+    { wait: 5000 },
+    { log: "'A ' + game.run.state + ' endless=' + game.run.endless + ' ' + JSON.stringify(game.run.team.members.map((m) => [m.pokemonId, Math.round(m.hp), m.level, Math.round(m.xp), m.fainted]))" },
+    { log: "'A hud ' + JSON.stringify([...document.querySelectorAll('#active-slots .mon-card')].map((c) => [c.querySelector('.mon-name')?.textContent, c.querySelector('.bar.hp i')?.style.width, c.querySelector('.bar.xp i')?.style.width]))" },
+    { wait: 5000 },
+    { log: "'B ' + JSON.stringify(game.run.team.members.map((m) => [m.pokemonId, Math.round(m.hp), m.level, Math.round(m.xp), m.fainted]))" },
+    { log: "'B hud ' + JSON.stringify([...document.querySelectorAll('#active-slots .mon-card')].map((c) => [c.querySelector('.mon-name')?.textContent, c.querySelector('.bar.hp i')?.style.width, c.querySelector('.bar.xp i')?.style.width]))" },
+    { run: "game.run.team.swapTimer = 0; game.hud.signature = ''" }, { wait: 300 },
+    { run: "document.querySelector('#reserve-slots .bench-mon:not(.empty)')?.dispatchEvent(new Event('pointerdown'))" }, { wait: 400 },
+    { log: "'troca ' + JSON.stringify(game.run.team.active.map((m) => m && m.pokemonId)) + ' state=' + game.run.state" },
+    { log: "'endless=' + game.run.endless" },
+    { wait: 12000 },
+    { log: "'C ' + game.run?.state + ' center=' + game.centerOpen + ' ' + JSON.stringify(game.run?.team.members.map((m) => [m.pokemonId, Math.round(m.hp), m.fainted]))" },
+    { log: "'C ativos ' + JSON.stringify(game.run?.team.active.map((m) => m && [m.pokemonId, m.fainted])) + ' campo ' + JSON.stringify(game.run?.companions.map((c) => [c.member.pokemonId, c.dead]))" },
+    { log: "'C hud ' + JSON.stringify([...document.querySelectorAll('#active-slots .mon-card')].map((c) => [c.querySelector('.mon-name')?.textContent, c.querySelector('.bar.hp i')?.style.width, c.className]))" },
+    { shot: 'livrediag2', raw: true }
+  ],
   // o Modo Livre (0.20): o botão na vitória e a partida sem fim, com o botão do Centro no canto
   livre: [
     { open: 'index.html' }, { wait: 500 },

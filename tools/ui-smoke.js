@@ -325,10 +325,9 @@ check('o Modo Livre continua a fase, com a equipe curada e o botão do Centro no
       game.run.team.members.every((m) => !m.fainted) && (game.hud.update(game.run), !registry.get('btn-endless-center').classes.has('hidden')));
 game.run.team.members[0].level = 17;
 registry.get('btn-endless-center').click();
-check('"Voltar para o Centro Pokémon" guarda o que a equipe ganhou e abre o Centro',
-      game.centerOpen && !registry.get('center-overlay').classes.has('hidden') &&
+check('"Voltar para o Centro Pokémon" guarda o que a equipe ganhou e vai direto ao mapa da jornada',
+      !game.run && !registry.get('screen-campaign').classes.has('hidden') &&
       game.campaign.journey.team.members[0].level === 17 && game.campaign.clearedStages.includes('gym_1_pewter'));
-registry.get('btn-center-map').click();
 
 // conquistas: concluídas ficam para coletar, não entram sozinhas
 const claimable = game.tracker.claimableAchievements;

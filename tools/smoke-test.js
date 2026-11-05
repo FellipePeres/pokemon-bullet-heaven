@@ -20,7 +20,7 @@ import { hpRatio } from '../src/systems/stats.js';
 import { nextMoveFor, moveLineOf } from '../src/data/tms.js';
 import { getPokemon } from '../src/data/pokemon.js';
 import { Pickup } from '../src/entities/Pickup.js';
-import { swapWithPC, normalizePC, monAt, previewMove, moveMon, boxCount } from '../src/systems/pc.js';
+import { swapWithPC, normalizePC, monAt, previewMove, moveMon, boxCount, fixDuplicateUids } from '../src/systems/pc.js';
 import { TILE } from '../src/systems/terrain.js';
 import { recordStageResult } from '../src/systems/stageStats.js';
 import { BONUS_MOVES, BONUS_BY_TYPE, isBonusMove } from '../src/data/bonusMoves.js';
@@ -795,6 +795,41 @@ console.log('\n[encontros de lendário]');
         !ligaOffers.includes('mewtwo') && ligaOffers.includes('mew'), ligaOffers.join(', '));
   check('o Campeão tem uma Poké Ball (para o lendário)', liga.stage.maxBalls === 1);
   for (const [id, enc] of Object.entries(keep)) Object.assign(LEGENDARY_ENCOUNTERS[id], enc);
+}
+
+// ---------------------------------------------- 5.13e ids dos Pokémon (0.20.1)
+console.log('\n[ids dos Pokémon]');
+{
+  // o bug: o id recomeçava a cada sessão; um capturado hoje repetia o de um salvo ontem
+  const mk = (uid, pokemonId, level) => ({ uid, pokemonId, level, xp: 0, hp: 0, abilities: [], upgrades: {} });
+  const saved = { members: [mk('mon1', 'bulbasaur', 30), mk('mon2', 'pidgey', 30), mk('mon1', 'clefable', 30), mk('mon2', 'poliwrath', 30)],
+                  active: ['mon1', 'mon2', null] };
+  const run = new Run('gym_1_pewter', { team: saved });
+  const ids = run.team.members.map((m) => m.uid);
+  check('um save com ids repetidos é consertado ao carregar', new Set(ids).size === ids.length, ids.join(', '));
+  check('...e quem estava em campo continua em campo', run.team.active[0].pokemonId === 'bulbasaur' && run.team.active[1].pokemonId === 'pidgey');
+  const bonus = run.playerStats.pokemonHpBonus;
+  check('...com a vida de cada um certa (a barra do HUD não fica vazia)',
+        run.team.members.every((m) => m.hp === maxHpFor(m, bonus)));
+
+  // capturar trocando um que está em campo: ele sai do mapa, e o novo entra
+  const fresh = new Run('gym_1_pewter', { starter: 'charmander' });
+  ['pidgey', 'rattata', 'spearow', 'caterpie', 'weedle'].forEach((id) => fresh.team.add(id, 10));
+  const leaving = fresh.team.active[1];
+  fresh.captureSystem.captureReplacing(leaving.uid, 'oddish');
+  check('capturar no lugar de um ativo tira ele do campo e põe o novo',
+        !fresh.companions.some((c) => c.member === leaving) && fresh.companions.some((c) => c.member.pokemonId === 'oddish')
+        && fresh.companions.length === 3, fresh.companions.map((c) => c.member.pokemonId).join(', '));
+  const all = [...fresh.team.members.map((m) => m.uid), ...fresh.pc.map((m) => m.uid)];
+  check('os ids novos não se repetem', new Set(all).size === all.length);
+
+  // a jornada (equipe + PC) também é consertada
+  const journey = { team: { members: [mk('mon3', 'abra', 20), mk('mon4', 'gastly', 20)], active: ['mon3'] },
+                    pc: [mk('mon3', 'zubat', 10), mk('mon4', 'onix', 10), mk('mon4', 'jynx', 10)] };
+  fixDuplicateUids(journey);
+  const jids = [...journey.team.members, ...journey.pc].map((m) => m.uid);
+  check('a jornada com ids repetidos entre a equipe e o PC é consertada', new Set(jids).size === jids.length
+        && journey.team.members[0].uid === 'mon3', jids.join(', '));
 }
 
 // ---------------------------------------------- 5.13d Modo Livre (0.20)
