@@ -411,7 +411,10 @@ export class AbilitySystem {
     } else if (s.target === 'strongest') {
       spots = [near.reduce((a, b) => (b.hp > a.hp ? b : a))];
     } else {
-      const center = nearestEnemy(run, companion.x, companion.y, s.range);
+      // `enemiesInRadius` aceita quem está com o corpo na borda do alcance e o
+      // `nearestEnemy` não: sem a reserva, esse inimigo deixava o centro nulo e o
+      // jogo travava (0.18, achado pelo balance.mjs)
+      const center = nearestEnemy(run, companion.x, companion.y, s.range) ?? near[0];
       const scatter = s.scatter ?? 0;
       spots = Array.from({ length: s.count }, (_, i) => ({
         x: center.x + (i ? (Math.random() - 0.5) * scatter * 2 : 0),

@@ -21,6 +21,7 @@
  *   luta         quanto tempo o time do líder levou para cair
  *   desmaios     média por tentativa
  *   pico         maior número de inimigos vivos ao mesmo tempo
+ *   bolas        Poké Balls que caíram por tentativa (média), e o teto da fase
  *
  * Alvo (0.17, "forçar o jogador a melhorar os Pokémon para passar"): o bot
  * passa as Fases 1 e 2 em 1–2 tentativas e precisa de ~2–4 nas seguintes,
@@ -59,7 +60,7 @@ for (const entry of getRegion('kanto').campaign) {
   if (entry.stage === UNTIL) break;
 }
 
-const stats = new Map(stages.map((s) => [s.id, { tries: 0, wins: 0, first: 0, journeys: 0, attempts: [], entry: [], levels: [], fights: [], faints: [], peaks: [], blocked: 0 }]));
+const stats = new Map(stages.map((s) => [s.id, { tries: 0, wins: 0, first: 0, journeys: 0, attempts: [], entry: [], levels: [], balls: [], fights: [], faints: [], peaks: [], blocked: 0 }]));
 const teamLevel = (team) => avg(team.members.map((m) => m.level));
 const avg = (list) => (list.length ? list.reduce((a, b) => a + b, 0) / list.length : NaN);
 const startedAt = Date.now();
@@ -81,6 +82,7 @@ for (let r = 0; r < RUNS; r++) {
       s.tries++;
       s.faints.push(run.stats.faints);
       s.peaks.push(result.peakEnemies);
+      s.balls.push(result.ballsDropped);
       // vencendo ou não, a equipe leva o que ganhou (0.17)
       journey = { team: run.team.serialize() };
       if (run.state === 'victory') {
@@ -100,7 +102,7 @@ for (let r = 0; r < RUNS; r++) {
 }
 
 console.log(`\n\nBALANCEAMENTO — ${RUNS} jornada(s), ${((Date.now() - startedAt) / 1000).toFixed(0)}s\n`);
-console.log('fase                 1ª tent.   tentativas  entrada  nível ao vencer (ace)   luta    desmaios  pico');
+console.log('fase                 1ª tent.   tentativas  entrada  nível ao vencer (ace)   luta    desmaios  pico   bolas (teto)');
 for (const stage of stages) {
   const s = stats.get(stage.id);
   const ace = Math.max(...(stage.bossTeam ?? []).map((id) => getEnemy(id)?.level ?? 0));
@@ -108,7 +110,7 @@ for (const stage of stages) {
     `${stage.id.padEnd(20)} ${`${s.first}/${s.journeys}`.padEnd(10)} ${avg(s.attempts).toFixed(1).padStart(6)}  ` +
     `${avg(s.entry).toFixed(1).padStart(7)}      ` +
     `${avg(s.levels).toFixed(1).padStart(5)} (${ace || '?'})`.padEnd(24) +
-    `${avg(s.fights).toFixed(0).padStart(4)}s  ${avg(s.faints).toFixed(1).padStart(6)}  ${Math.round(avg(s.peaks)).toString().padStart(5)}` +
+    `${avg(s.fights).toFixed(0).padStart(4)}s  ${avg(s.faints).toFixed(1).padStart(6)}  ${Math.round(avg(s.peaks)).toString().padStart(5)}   ${avg(s.balls).toFixed(2)} (${stage.maxBalls ?? '∞'})` +
     (s.blocked ? `   ${s.blocked} jornada(s) parada(s) aqui` : '')
   );
 }
