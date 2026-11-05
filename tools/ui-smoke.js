@@ -276,11 +276,17 @@ check('"Lutar!" fecha a apresentação e a partida volta',
       game.run.state === 'running' && registry.get('leader-overlay').classes.has('hidden'));
 
 // ---- fim de partida ----
+// a derrota guarda o progresso da tentativa (0.17): o nível que ela ganhou fica
+game.run.team.members[0].level = 9;
+game.run.team.members[0].upgrades = { ...game.run.team.members[0].upgrades, keep_test: 1 };
 for (const member of game.run.team.members) member.fainted = true;
 game.run.state = 'defeat';
 game._handleRunState();
 check('derrota mostra o resultado', !registry.get('result-overlay').classes.has('hidden'));
 check('derrota não avança a jornada', game.campaign.clearedStages.length === 0);
+check('derrota guarda o que a equipe ganhou (níveis e melhorias)',
+      game.campaign.journey?.team?.members[0]?.level === 9 && game.campaign.journey.team.members[0].upgrades.keep_test === 1,
+      `nível ${game.campaign.journey?.team?.members[0]?.level}`);
 check('derrota oferece o Centro Pokémon e recomeçar a jornada',
       !registry.get('result-defeat').classes.has('hidden') && registry.get('result-victory').classes.has('hidden'));
 registry.get('btn-result-center').click();
@@ -291,10 +297,12 @@ registry.get('btn-center-go').click();
 check('do Centro Pokémon a fase recomeça com a equipe curada',
       !game.centerOpen && registry.get('center-overlay').classes.has('hidden') &&
       game.run?.stage.id === 'gym_1_pewter' && game.run.time === 0 &&
-      game.run.team.members.every((m) => !m.fainted && m.hp > 0));
+      game.run.team.members.every((m) => !m.fainted && m.hp > 0) && game.run.team.members[0].level === 9);
 
+game.run.team.members[0].level = 11;
 game.quitToMenu();
 check('voltar ao mapa funciona', !registry.get('screen-campaign').classes.has('hidden'));
+check('abandonar no meio também guarda o progresso', game.campaign.journey.team.members[0].level === 11);
 
 // ---- vitória e save ----
 game.startStage('gym_1_pewter');
@@ -347,6 +355,9 @@ check('vitória guarda a equipe da jornada', !!game.campaign.journey?.team?.memb
 
 // ---- o PC (0.12): a tela do FireRed, pegar e soltar ----
 const pcJourney = game.campaign.journey;
+// a derrota guarda as capturas (0.17): a equipe pode chegar cheia; o teste precisa de uma vaga
+pcJourney.team.members = pcJourney.team.members.slice(0, 3);
+pcJourney.team.active = pcJourney.team.members.map((m) => m.uid);
 pcJourney.pc = [{ ...pcJourney.team.members[0], uid: 'pc-test-1', pokemonId: 'psyduck', level: 9, slot: 0 }];
 game.menus.showModal('modal-pc');
 const pcs = game.menus.pcScreen;

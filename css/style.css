@@ -1210,6 +1210,8 @@ button { font: inherit; color: inherit; }
 .card:hover { filter: drop-shadow(0 7px 6px rgba(0, 0, 0, .35)); }
 .card.evolution { box-shadow: inset 0 0 0 3px var(--gba-gold); }
 .card h3 { font-size: 17px; font-weight: 700; color: var(--gba-ink); }
+/* já registrado na Pokédex (0.17): a Poké Ball ao lado do nome, como no FireRed */
+.card h3 .caught-ball { width: 16px; height: 16px; margin-right: 5px; vertical-align: -2px; image-rendering: pixelated; }
 .card p { font-size: 14.5px; color: var(--gba-ink-soft); line-height: 1.4; }
 .card .card-icon { line-height: 1; }
 .card img.card-sprite { width: 92px; height: 92px; object-fit: contain; image-rendering: pixelated; }
@@ -2027,6 +2029,12 @@ button { font: inherit; color: inherit; }
 .panel-badge.missing { filter: grayscale(1) brightness(.5); opacity: .5; }
 .panel-trail { margin: 0; font-size: 15px; line-height: 1.35; }
 .panel-time { margin: 0; font-size: 14px; color: var(--gba-ink-soft); }
+/* o nível recomendado (0.17): verde quando a equipe está pronta, laranja perto, vermelho longe */
+.panel-level { margin: 0; padding: 4px 8px; font-size: 14px; border-radius: 3px; border: 2px solid currentColor; }
+.panel-level b { font-family: var(--font-arcade); font-size: 11px; font-weight: 400; }
+.panel-level.ok { color: #2f8a4c; background: rgba(87, 209, 138, .12); }
+.panel-level.close { color: #b8740a; background: rgba(248, 176, 48, .14); }
+.panel-level.far { color: #c0392b; background: rgba(240, 90, 70, .12); }
 .panel-stats, .stats-list {
   display: grid;
   grid-template-columns: 1fr auto;

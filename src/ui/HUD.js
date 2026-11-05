@@ -373,8 +373,12 @@ export class HUD {
       : `Entra direto na equipe (${teamSize + 1}/${maxSize}). Quando ela encher, o PC guarda os próximos.`,
       teamSize >= maxSize);
 
+    // quem já está registrado na Pokédex ganha a Poké Ball ao lado do nome, como no
+    // FireRed: na hora de escolher, o jogador sabe o que é novo (0.17)
+    const dex = this.game.profile?.pokedex?.caught ?? [];
     choices.forEach((pokemon) => {
-      row.appendChild(this._pokemonCard(pokemon, () => onPick(pokemon.id, pokemon.shiny)));
+      const card = { ...pokemon, registered: dex.includes(pokemon.dex) };
+      row.appendChild(this._pokemonCard(card, () => onPick(pokemon.id, pokemon.shiny)));
     });
     show(el('capture-overlay'));
   }
@@ -434,7 +438,7 @@ export class HUD {
     }
     const body = create('div');
     body.innerHTML = `
-      <h3>${pokemon.name}</h3>
+      <h3>${pokemon.registered ? '<img class="caught-ball" src="assets/items/poke-ball.png" alt="" title="Já registrado na Pokédex">' : ''}${pokemon.name}</h3>
       <div class="type-row" style="margin:6px 0">${types}</div>
       <p>${pokemon.description ?? ''}</p>
       <div class="stack-info">${footer || pokemon.role || ''}</div>
@@ -460,7 +464,7 @@ export class HUD {
 
     el('result-subtitle').textContent = victory
       ? `Você concluiu ${run.stage.name}!`
-      : 'Todos os seus Pokémon desmaiaram. E agora?';
+      : 'Todos os seus Pokémon desmaiaram, mas o que eles ganharam fica. A próxima fase só abre quando você vencer esta.';
 
     el('result-victory').classList.toggle('hidden', !victory);
     el('result-defeat').classList.toggle('hidden', victory);
@@ -495,15 +499,13 @@ export class HUD {
   }
 
   /**
-   * O Centro Pokémon: a equipe que volta para a fase, curada (a do começo da
-   * fase; as capturas da tentativa perdida ficam para trás).
+   * O Centro Pokémon: a equipe que volta para a fase, curada. Desde a 0.17 é a
+   * do fim da tentativa: níveis, melhorias e capturas ficam.
    */
-  showCenter({ members, stage, lost, pcCount, hasJourney }) {
+  showCenter({ members, stage, pcCount, hasJourney }) {
     clear(el('center-team')).append(...this._teamSummary(members));
-    const names = lost.length > 1 ? `${lost.slice(0, -1).join(', ')} e ${lost.at(-1)}` : lost[0];
-    el('center-note').textContent = lost.length
-      ? `${names}, ${lost.length > 1 ? 'capturados na tentativa perdida, não ficaram' : 'capturado na tentativa perdida, não ficou'}: a equipe volta como estava no começo da fase.`
-      : '';
+    el('center-note').textContent = 'Nada se perdeu: os níveis, as melhorias e as capturas desta tentativa ficaram. ' +
+      'Se a fase ainda estiver difícil, rejogue as anteriores para fortalecer a equipe.';
     const phase = stage.name.split(' — ')[0];
     el('center-go-label').textContent = phase.startsWith('Fase') ? `Voltar para a ${phase}` : 'Voltar para a luta';
     const pc = el('btn-center-pc');

@@ -25,8 +25,12 @@
  *                  líder na 0.11, 2:45 na 0.15); menos inimigos, cada um vale mais
  *   music          a música da fase (assets/music, data/musicTracks.js); leaderMusic
  *                  toca quando o líder entra
- *   leaderLevel    a média de nível com que a equipe costuma chegar ao líder (medida com o
- *                  bot); acima dela, o líder cresce junto (SpawnSystem.bossLift, 0.14)
+ *   difficulty     a força da fase (0.17): multiplica a vida e o dano de tudo nela,
+ *                  selvagens, elites e o time do líder. É a alavanca da campanha: a
+ *                  derrota guarda o progresso, e a fase pede uma equipe mais forte
+ *   recommendedLevel  o nível médio com que a equipe ENTRA na tentativa que vence a
+ *                  fase (coluna "entrada" do tools/balance.mjs); o lobby mostra como
+ *                  "nível recomendado"
  *   bossTuning     { hp, damage } — multiplica a vida e o dano (golpes inclusive) do time
  *                  do líder; as últimas fases ficavam fáceis para quem joga bem (0.12.2)
  *   starterTuning  { inicial: fator } — vida e dano dos inimigos (e do líder) multiplicados
@@ -84,7 +88,6 @@ export const STAGES = {
       portrait: 'portrait/brock',
       quote: 'Minha defesa de rocha é intransponível!'
     },
-    leaderLevel: 21,
     bossTeam: ['brock_geodude', 'brock_onix'],
 
     // o Squirtle sobrava aqui (0.11.5: 100% de vitórias quase sem desmaio, contra 43–67% dos outros)
@@ -111,6 +114,7 @@ export const STAGES = {
     xpScale: 1.41,   // 2:45 até o líder (0.15; era 3:30, e antes da 0.11, mais): cada inimigo vale mais XP
     world: { width: 3000, height: 2000, theme: 'cave' },
     scaling: { hp: 2.9, speed: 0.34, damage: 1.0 },
+    difficulty: 1.08,   // a força da fase (0.17)
     unlockedBy: 'gym_1_pewter',
 
     segments: [
@@ -144,7 +148,7 @@ export const STAGES = {
       portrait: 'portrait/misty',
       quote: 'Você vai afundar na minha onda!'
     },
-    leaderLevel: 28,
+    recommendedLevel: 25,
     bossTeam: ['misty_staryu', 'misty_starmie'],
 
     capturePool: 'phase2',
@@ -168,6 +172,7 @@ export const STAGES = {
     xpScale: 1.44,   // 2:45 até o líder (0.15; era 3:30, e antes da 0.11, mais): cada inimigo vale mais XP
     world: { width: 3000, height: 2000, theme: 'grass' },
     scaling: { hp: 3.0, speed: 0.3, damage: 2.3 },
+    difficulty: 1.4,   // a força da fase (0.17)
     unlockedBy: 'gym_2_cerulean',
 
     segments: [
@@ -203,7 +208,7 @@ export const STAGES = {
       portrait: 'portrait/lt_surge',
       quote: 'Ei, garoto! Eletricidade de verdade não perdoa amador!'
     },
-    leaderLevel: 39,
+    recommendedLevel: 33,
     bossTeam: ['lt_surge_voltorb', 'lt_surge_pikachu', 'lt_surge_raichu'],
     // presentes (como as trocas e o Dojo do FireRed): oferecidos uma vez, na hora marcada
     gifts: [
@@ -268,7 +273,7 @@ export const STAGES = {
     },
     // líder mais forte nas últimas fases (0.12.2: "no final tá muito fácil")
     bossTuning: { hp: 1.25, damage: 1.1 },
-    leaderLevel: 48,
+    recommendedLevel: 44,
     bossTeam: ['erika_victreebel', 'erika_tangela', 'erika_vileplume'],
 
     capturePool: 'phase4',
@@ -330,7 +335,7 @@ export const STAGES = {
     },
     // líder mais forte nas últimas fases (0.12.2: "no final tá muito fácil")
     bossTuning: { hp: 1.35, damage: 1.15 },
-    leaderLevel: 52,
+    recommendedLevel: 58,
     bossTeam: ['koga_koffing', 'koga_muk', 'koga_koffing', 'koga_weezing'],
 
     capturePool: 'phase5',
@@ -391,7 +396,7 @@ export const STAGES = {
     },
     // líder mais forte nas últimas fases (0.12.2: "no final tá muito fácil")
     bossTuning: { hp: 1.5, damage: 1.2 },
-    leaderLevel: 62,
+    recommendedLevel: 67,
     bossTeam: ['sabrina_kadabra', 'sabrina_mr_mime', 'sabrina_venomoth', 'sabrina_alakazam'],
     // presentes (como as trocas e o Dojo do FireRed): oferecidos uma vez, na hora marcada
     gifts: [
@@ -461,7 +466,7 @@ export const STAGES = {
     },
     // líder mais forte nas últimas fases (0.12.2: "no final tá muito fácil")
     bossTuning: { hp: 1.6, damage: 1.2 },
-    leaderLevel: 68,
+    recommendedLevel: 76,
     bossTeam: ['blaine_growlithe', 'blaine_ponyta', 'blaine_rapidash', 'blaine_arcanine'],
 
     // o Squirtle sobrava aqui (0.11.5: 100%: Água contra o Blaine)
@@ -525,7 +530,7 @@ export const STAGES = {
     },
     // líder mais forte nas últimas fases (0.12.2: "no final tá muito fácil")
     bossTuning: { hp: 1.7, damage: 1.25 },
-    leaderLevel: 75,
+    recommendedLevel: 85,
     bossTeam: ['giovanni_rhyhorn', 'giovanni_dugtrio', 'giovanni_nidoqueen', 'giovanni_nidoking', 'giovanni_rhyhorn_ace'],
 
     capturePool: 'phase8',
@@ -549,6 +554,7 @@ export const STAGES = {
     xpScale: 1.35,   // 2:45 até o líder (0.15; era 3:30, e antes da 0.11, mais): cada inimigo vale mais XP
     world: { width: 3000, height: 2000, theme: 'cave' },
     scaling: { hp: 4.0, speed: 0.3, damage: 4.6 },
+    difficulty: 1.05,   // a força da fase (0.17)
     unlockedBy: 'gym_8_viridian',
 
     segments: [
@@ -582,7 +588,7 @@ export const STAGES = {
     },
     // líder mais forte nas últimas fases (0.12.2: "no final tá muito fácil")
     bossTuning: { hp: 1.7, damage: 1.25 },
-    leaderLevel: 81,
+    recommendedLevel: 92,
     bossTeam: ['lorelei_dewgong', 'lorelei_cloyster', 'lorelei_slowbro', 'lorelei_jynx', 'lorelei_lapras'],
 
     capturePool: 'phase9',
@@ -606,6 +612,7 @@ export const STAGES = {
     xpScale: 1.3,   // 2:45 até o líder (0.15; era 3:30, e antes da 0.11, mais): cada inimigo vale mais XP
     world: { width: 3000, height: 2000, theme: 'gym' },
     scaling: { hp: 2.4, speed: 0.3, damage: 10 },
+    difficulty: 1.12,   // a força da fase (0.17)
     unlockedBy: 'e4_lorelei',
 
     segments: [
@@ -637,7 +644,7 @@ export const STAGES = {
     },
     // líder mais forte nas últimas fases (0.12.2: "no final tá muito fácil")
     bossTuning: { hp: 1.7, damage: 1.25 },
-    leaderLevel: 85,
+    recommendedLevel: 94,
     bossTeam: ['bruno_onix', 'bruno_hitmonchan', 'bruno_hitmonlee', 'bruno_onix', 'bruno_machamp'],
 
     capturePool: 'phase9',
@@ -661,6 +668,7 @@ export const STAGES = {
     xpScale: 1.3,   // 2:45 até o líder (0.15; era 3:30, e antes da 0.11, mais): cada inimigo vale mais XP
     world: { width: 3000, height: 2000, theme: 'cave' },
     scaling: { hp: 2.9, speed: 0.3, damage: 3.8 },
+    difficulty: 1.05,   // a força da fase (0.17)
     unlockedBy: 'e4_bruno',
 
     segments: [
@@ -691,7 +699,7 @@ export const STAGES = {
     },
     // líder mais forte nas últimas fases (0.12.2: "no final tá muito fácil")
     bossTuning: { hp: 1.7, damage: 1.25 },
-    leaderLevel: 88,
+    recommendedLevel: 99,
     bossTeam: ['agatha_gengar', 'agatha_golbat', 'agatha_haunter', 'agatha_arbok', 'agatha_gengar_ace'],
 
     capturePool: 'phase9',
@@ -715,6 +723,7 @@ export const STAGES = {
     xpScale: 1.3,   // 2:45 até o líder (0.15; era 3:30, e antes da 0.11, mais): cada inimigo vale mais XP
     world: { width: 3000, height: 2000, theme: 'cave' },
     scaling: { hp: 2.7, speed: 0.3, damage: 2.8 },
+    difficulty: 1.15,   // a força da fase (0.17)
     unlockedBy: 'e4_agatha',
 
     segments: [
@@ -745,7 +754,7 @@ export const STAGES = {
     },
     // líder mais forte nas últimas fases (0.12.2: "no final tá muito fácil")
     bossTuning: { hp: 1.75, damage: 1.25 },
-    leaderLevel: 93,
+    recommendedLevel: 104,
     bossTeam: ['lance_gyarados', 'lance_dragonair', 'lance_dragonair', 'lance_aerodactyl', 'lance_dragonite'],
 
     capturePool: 'phase9',
@@ -769,6 +778,7 @@ export const STAGES = {
     xpScale: 1.21,   // 2:45 até o líder (0.15; era 3:30, e antes da 0.11, mais): cada inimigo vale mais XP
     world: { width: 3000, height: 2000, theme: 'gym' },
     scaling: { hp: 2.4, speed: 0.3, damage: 2.1 },
+    difficulty: 1.25,   // a força da fase (0.17)
     unlockedBy: 'e4_lance',
 
     segments: [
@@ -800,7 +810,7 @@ export const STAGES = {
     // como no FireRed, o rival escolheu o inicial com vantagem sobre o seu
     // líder mais forte nas últimas fases (0.12.2: "no final tá muito fácil")
     bossTuning: { hp: 1.8, damage: 1.3 },
-    leaderLevel: 97,
+    recommendedLevel: 106,
     bossTeam: ['rival_pidgeot', 'rival_alakazam', 'rival_rhydon', 'rival_arcanine', 'rival_exeggutor', 'rival_blastoise'],
     bossTeamByStarter: {
       charmander: ['rival_pidgeot', 'rival_alakazam', 'rival_rhydon', 'rival_arcanine', 'rival_exeggutor', 'rival_blastoise'],

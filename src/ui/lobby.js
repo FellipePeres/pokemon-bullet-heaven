@@ -233,6 +233,21 @@ export class Lobby {
     panel.appendChild(create('p', 'panel-trail', `${trail}`));
     panel.appendChild(create('p', 'panel-time', `${formatTime(stage.duration)} de travessia até o líder`));
 
+    // o nível recomendado (0.17): a derrota guarda o progresso e a próxima fase só
+    // abre vencendo; aqui o jogador vê se é hora de fortalecer a equipe antes
+    if (stage.recommendedLevel) {
+      const members = this.campaign.journey?.team?.members ?? [];
+      const team = members.length ? Math.round(members.reduce((sum, m) => sum + m.level, 0) / members.length) : 1;
+      const gap = stage.recommendedLevel - team;
+      const tone = done || gap <= 0 ? 'ok' : gap <= 5 ? 'close' : 'far';
+      const line = create('p', `panel-level ${tone}`);
+      line.innerHTML = `Nível recomendado <b>${stage.recommendedLevel}</b> · sua equipe <b>${team}</b>`;
+      line.title = tone === 'far'
+        ? 'Sua equipe está bem abaixo: rejogue as fases anteriores para fortalecer os Pokémon.'
+        : 'A média de nível da equipe com que a fase costuma ser vencida.';
+      panel.appendChild(line);
+    }
+
     // as métricas da fase, as mesmas do estojo
     const stats = { ...emptyStageStats(), ...this.campaign.stageStats?.[stage.id] };
     const rows = create('dl', 'panel-stats');

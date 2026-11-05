@@ -131,8 +131,12 @@ Perder devolve você ao início da fase com a equipe como estava ao entrar nela.
   melhorias e o Golpe Desperto.
 - **Shiny**: raro (1%), na captura e no inicial — o card da Poké Ball brilha, e o
   Pokémon fica com as cores raras no campo, no PC e na Pokédex.
-- **Derrota**: vá ao Centro Pokémon (a equipe é curada; dali você volta para a
-  fase, mexe no PC ou vai ao mapa) ou recomece a jornada do zero.
+- **Derrota sem perda**: o que a equipe ganhou na tentativa (níveis, melhorias,
+  evoluções e capturas) fica; só a próxima fase não abre. No Centro Pokémon a
+  equipe é curada e você tenta de novo, ou rejoga fases anteriores para upar. O
+  lobby mostra o **nível recomendado** de cada fase ao lado do nível da sua equipe.
+- **Pokédex na captura**: quem você já registrou aparece com uma Poké Ball ao
+  lado do nome.
 - **PC do FireRed**: com a equipe cheia, nada se perde — quem sai (ou quem chega)
   vai para o PC. No mapa da jornada, o PC é o do jogo: caixas com papel de parede,
   a mão como cursor, pegar e soltar para montar a equipe da próxima fase.

@@ -5,7 +5,7 @@
 > decisão foi tomada e o que falta fazer. O `README.md` é o manual de uso;
 > este aqui é o contexto de desenvolvimento.
 
-**Versão atual:** `0.16.0` · **Última atualização:** 2026-11-05
+**Versão atual:** `0.17.0` · **Última atualização:** 2026-11-05
 **Stack:** HTML + CSS + JavaScript puro (ES Modules). Sem backend, sem build, sem dependências.
 **Repositório:** https://github.com/FellipePeres/pokemon-bullet-heaven (público)
 **Jogo no ar:** https://fellipeperes.github.io/pokemon-bullet-heaven/
@@ -40,7 +40,7 @@ npm run smoke:ui             # interface: DOM simulado a partir do index.html re
 
 npm run screens -- <roteiro> --out <pasta>   # screenshots no Chrome sem janela
 npm run assets               # regera os sprites a partir do Pokemon All (Python + Pillow)
-npm run balance -- --runs 12 # joga a campanha com o bot e mede vitórias, níveis e lutas
+npm run balance -- --runs 12 # joga a campanha com o bot: tentativas até passar cada fase, níveis e lutas
 ```
 
 Os testes são a rede de segurança do projeto — **rode sempre que mexer em
@@ -48,11 +48,13 @@ balanceamento, dados ou interface**. `smoke` usa um "jogador virtual" que foge d
 horda em círculos, desvia para pegar Poké Balls, troca Pokémon machucado por
 descansado, escolhe melhorias e prefere TMs.
 
-**Balanceamento (desde a 0.6).** `tools/balance.mjs` joga a campanha inteira
-várias vezes com o jogador virtual (`tools/bot.mjs`, o mesmo do `smoke`), levando a
-equipe de uma fase para a outra, e mostra por fase: vitórias por tentativa, nível
-da equipe quando o líder aparece, duração da luta, desmaios e pico de inimigos.
-Na 0.6: Fase 1 com 67% e Fase 2 com 61% de vitórias, nível ~16 e ~21 no líder.
+**Balanceamento (desde a 0.6; métrica nova na 0.17).** `tools/balance.mjs` joga a
+campanha inteira várias vezes com o jogador virtual (`tools/bot.mjs`, o mesmo do
+`smoke`), levando a equipe de uma fase para a outra **e de uma tentativa para a
+outra** (a derrota guarda o progresso, como no jogo). Mostra por fase: quantas
+jornadas venceram de primeira, a média de tentativas até passar (`--attempts`,
+padrão 10, é o teto; quem não passa "para ali"), o nível médio da equipe ao
+vencer, a duração da luta, desmaios e pico de inimigos.
 
 **Conferência visual (desde a 0.5).** `tools/screenshot.mjs` abre o jogo no Chrome
 (ou Edge) sem janela, executa um roteiro (`vitrine`, `treinador`, `jornada`,
@@ -475,11 +477,11 @@ Nunca voltar bônus globais para o pool de level up — foi pedido explícito.
 - O chefe final é o **time do líder, enfrentado em sequência** (`bossTeam`),
   terminando no ace. Vencer dá insígnia + Shards.
 - A **jornada carrega equipe, níveis e build** de uma fase para a próxima
-  (`regions.kanto.journey`). A **derrota tem duas saídas** (0.11.1): o **Centro
-  Pokémon** (`Game.pokemonCenter`) cura a equipe da jornada — a do começo da fase;
-  quem foi capturado na tentativa perdida fica para trás, e a tela diz quem — e a
-  fase recomeça (`leaveCenter`); ali mesmo dá para abrir o PC ou ir ao mapa da
-  jornada. Ou **recomeçar a
+  (`regions.kanto.journey`). **Desde a 0.17 a derrota também carrega** (ver
+  "Progressão por tentativas" abaixo). A **derrota tem duas saídas** (0.11.1): o
+  **Centro Pokémon** (`Game.pokemonCenter`) cura a equipe da jornada — a do fim
+  da tentativa, com o que ela ganhou — e a fase recomeça (`leaveCenter`); ali
+  mesmo dá para abrir o PC ou ir ao mapa da jornada. Ou **recomeçar a
   jornada** do zero (`restartJourney` → `newGame`), com confirmação: perde
   insígnias, equipe e PC da região; Pokédex, conquistas, Shards, melhorias do
   treinador e Hall da Fama ficam.
@@ -487,13 +489,26 @@ Nunca voltar bônus globais para o pool de level up — foi pedido explícito.
   membro, cada uma com o time de 5 do FireRed) e o Campeão. Os times são os do
   FireRed, com os níveis dele; o do rival muda pelo seu inicial
   (`bossTeamByStarter`), como no jogo.
-- **O líder acompanha a equipe** (0.14, "fiz um agora que achei MUITO fácil",
-  com a equipe acima do nível 100): o nível não tem teto, e os líderes tinham vida
-  e dano fixos. Agora cada fase sabe a média de nível com que a equipe costuma
-  chegar ao líder (`stage.leaderLevel`, do bot: 21 no Brock ... 97 no Campeão);
-  com a média da equipe acima disso, a vida e o dano do líder crescem no mesmo
-  passo do dano dela (`SpawnSystem.bossLift`: a razão de
-  `levelDamageMultiplier`). Chegando no nível de sempre, nada muda.
+- ~~O líder acompanha a equipe~~ (0.14) **saiu na 0.17**: com a derrota
+  guardando o progresso, upar tem de valer. O líder tem força fixa (o
+  `bossLift` e o `stage.leaderLevel` saíram; o smoke confere que o líder é o
+  mesmo com a equipe no nível 30 ou no 120).
+- **Progressão por tentativas** (0.17, pedido do Fellipe: "forçar o jogador a
+  melhorar seus Pokémon para passar as fases; ao morrer você não perde progresso
+  daquela fase, apenas não desbloqueia a seguinte"):
+  - a derrota guarda níveis, melhorias, evoluções, capturas e o PC da tentativa
+    (`Game._journeyFrom`, gravado em `applyRunResult` vencendo ou não); abandonar
+    no meio também guarda (sem contar nas métricas);
+  - a próxima fase só abre vencendo; fases vencidas podem ser rejogadas para upar;
+  - cada fase tem uma **força** (`stage.difficulty`): multiplica a vida e o dano
+    de tudo nela, selvagens, elites e o time do líder. É a alavanca da campanha;
+  - o lobby mostra o **nível recomendado** (`stage.recommendedLevel`: a média com
+    que a equipe do bot ENTRA na tentativa que vence — a coluna "entrada" do
+    `balance.mjs`; não o nível ao vencer, que já inclui o que a fase dá) ao lado
+    da média da equipe: verde pronta, laranja perto (até 5 abaixo), vermelho longe;
+  - a meta (padrão até o Fellipe decidir) é medida em tentativas do bot até
+    passar: ~1,5 nas Fases 1 e 2, ~2 na 3 a 5, mais nas seguintes e ~4–5 na Liga,
+    onde o Fellipe achava tudo fácil. O bot joga pior que ele.
 - **Tremor de tela só nos golpes dos líderes** (0.14, pedido do Fellipe): saiu o
   dos golpes do jogador (Earthquake, explosões), do Ímã, da fúria e da queda do
   líder.
@@ -554,7 +569,35 @@ Valores em `src/core/config.js` (o que não estiver lá está em `/data`):
 | Opções por Poké Ball | 4 (tabelas acumuladas; os outros iniciais raros da Fase 3 em diante) |
 | Selvagens por nível (Fase 3+) | vida ×1,075 e dano ×1,035 por nível acima do 5; XP +8% por nível |
 
-**Dificuldade medida** (0.11: fases de 3:30 até o líder, 4 opções por Poké Ball e
+**Dificuldade medida na 0.17** (a derrota guarda o progresso; o bot repete a fase,
+levando o que ganhou, até vencer — teto de 10 tentativas; 15 jornadas do zero,
+`npm run balance -- --runs 15`). "Entrada" é o nível com que a equipe começa a
+tentativa que vence: é o `recommendedLevel` (a Fase 1 não tem, vence-se do nível 1).
+
+| Etapa | `difficulty` | 1ª tentativa | Tentativas até passar | Entrada | Ao vencer |
+|---|---|---|---|---|---|
+| Fase 1 (Brock) | 1 | 8/15 | 1,5 | 7 | 20 |
+| Fase 2 (Misty) | 1,08 | 6/15 | 1,6 | 25 | 31 |
+| Fase 3 (Lt. Surge) | 1,4 | 7/15 | 1,6 | 33 | 41 |
+| Fase 4 (Erika) | 1 | 9/15 | 1,9 | 44 | 52 |
+| Fase 5 (Koga) | 1 | 5/15 | 4,3 ² | 59 | 63 |
+| Fase 6 (Sabrina) | 1 | 3/13 | 5,3 ² | 68 | 73 |
+| Fase 7 (Blaine) | 1 | 6/10 | 2,1 | 77 | 82 |
+| Fase 8 (Giovanni) | 1 | 5/10 | 2,7 | 86 | 90 |
+| Lorelei | 1,05 | 5/10 | 3,8 | 93 | 97 |
+| Bruno | 1,12 | 5/9 | 3,2 | 93 | 96 |
+| Agatha | 1,05 | 4/7 | 2,7 | 99 | 102 |
+| Lance | 1,15 | 1/7 | 2,9 | 105 | 108 |
+| Campeão | 1,25 | 3/7 | 3,3 | 106 | 108 |
+
+² As Fases 5 e 6 são a parede do bot desde antes (ele morre nas ondas; de 1,9 a
+4,3 tentativas entre medições, sem mudar nada). Não foram mexidas: o Fellipe
+passou por elas sem reclamar. A Liga, a parte que ele achava fácil, subiu de
+~1,3–3 tentativas para ~3–4 (numa medição a partir das equipes que venceram o
+Giovanni, 16 jornadas: 3,4 / 5,3 / 3,0 / 5,3 / 3,7). A variação entre medições é
+grande: a mesma fase já deu de 3 a 5 tentativas.
+
+**Dificuldade medida na 0.11** (histórico: fases de 3:30 até o líder, 4 opções por Poké Ball e
 tabelas acumuladas; jogador virtual esperto, `npm run balance` em blocos
 encadeados). A meta é ~40–50% para o bot: quem joga bem vence mais.
 
@@ -592,6 +635,8 @@ joga melhor que o bot: se a sensação for de jogo fácil, a primeira alavanca �
 `scaling.damage` da fase.
 
 **Como ajustar dificuldade** (na ordem de impacto):
+0. **`stage.difficulty`** (0.17) — a força da fase: vida e dano de tudo nela, o
+   líder inclusive. É a primeira alavanca agora; meça em tentativas até passar.
 1. `scaling.damage` da fase — é o que mais mata. Por cima dele vale o
    `CONFIG.enemies.damageMult` (1,2), igual para todas.
 2. Densidade das ondas (`batch`, `interval`, `maxAlive`) e quantidade de elites;
@@ -888,6 +933,7 @@ tipo, som e o polimento de troca e captura.
 | 18 | lobby mais bonito e único (planejado junto: o Town Map, o estojo com as métricas, tudo na barra do topo); o 2º golpe no lugar do bônus de ataque; shiny só na captura e do jogador; publicar o lobby | 0.13: `ui/lobby.js`, `ui/badgeCase.js`, `systems/stageStats.js`, `data/regionMap.js`, mapa e cartão por script; D11 reescrita (publicada com a Poção e os líderes). 0.13.1: shiny (1% por opção da Poké Ball), com sprites shiny no campo, nos cards e no PC, ✦ na Pokédex e a conquista Brilho Raro |
 | 19 | o inicial também shiny (1%) e publicar; refinar os 3 2º golpes por tipo (aprovados com ajustes: Whirlpool longe, curas com teto, 2%/1% pelos tipos, nome oficial, 60% do dano); tremor só nos golpes dos líderes; o nível passando de 100 (o número saía do selo) e os líderes fáceis demais | 0.13.2: inicial shiny. 0.14: `data/bonusMoves.js` (51 golpes) e o motor deles; o líder acompanha a equipe (`leaderLevel`, `bossLift`); tremor só dos líderes; selo do nível que cresce com o número |
 | 20 | fases levemente mais rápidas: de 3:30 para 2:45 | 0.15: a linha do tempo das 13 fases comprimida (×165/210; levas ×√f mais densas, XP ×1/√f); a equipe chega ao líder no mesmo nível (medido) |
+| 22 | equilibrar de novo: forçar o jogador a melhorar os Pokémon para passar; ao morrer não perde o progresso da fase, só não libera a seguinte (a Elite Four estava "a coisa mais fácil"); Pokémon já registrados com uma Poké Ball na captura | 0.17: derrota e abandono guardam o progresso; o líder não cresce mais com a equipe (`bossLift` saiu); `stage.difficulty` (a força da fase) calibrada em tentativas até passar, com a Liga mais forte; nível recomendado no lobby; `balance.mjs` mede tentativas e o nível de entrada; Poké Ball no card de quem já está na Pokédex |
 | 21 | lendários naturalmente mais fortes, com melhorias e 2º golpe de saída, e um golpe exclusivo, único e muito bonito; com todas as melhorias, curar os 20% sem abrir tela, e a tela só para o 2º golpe, com uma opção única; um nome mais impactante para o 2º golpe | 0.16: `data/legendaries.js` (5 golpes exclusivos desenhados em código, kit, poder maior, entram no nível da equipe); Poção automática e anúncio do "Golpe Desperto" (nome padrão até o Fellipe escolher; sugestões dadas na conversa); roteiro `lendarios` no `screenshot.mjs` |
 
 ---

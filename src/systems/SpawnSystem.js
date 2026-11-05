@@ -5,7 +5,6 @@ import { CONFIG } from '../core/config.js';
 import { weightedPick, rand, clamp } from '../core/utils.js';
 import { bus, EVENTS } from '../core/events.js';
 import { getAbility } from '../data/abilities.js';
-import { levelDamageMultiplier } from './stats.js';
 
 /** Nível sorteado dentro da faixa da onda ([mínimo, máximo]), ou null. */
 const pickLevel = (range) => (range ? range[0] + Math.floor(Math.random() * (range[1] - range[0] + 1)) : null);
@@ -189,21 +188,6 @@ export class SpawnSystem {
     }
   }
 
-  /**
-   * O líder acompanha a equipe (0.14): com a média de nível da equipe acima do
-   * nível com que ela costuma chegar a ele (`stage.leaderLevel`, medido com o
-   * bot), a vida e o dano dele crescem no mesmo passo do dano da equipe — sem
-   * isso, quem passa do nível 100 (o nível não tem teto) vence qualquer líder
-   * sem esforço. Chegando no nível de sempre (ou abaixo), nada muda.
-   */
-  bossLift() {
-    const members = this.run.team.members;
-    const expected = this.stage.leaderLevel;
-    if (!members.length || !expected) return 1;
-    const team = members.reduce((sum, m) => sum + m.level, 0) / members.length;
-    return team > expected ? levelDamageMultiplier(team) / levelDamageMultiplier(expected) : 1;
-  }
-
   /** Spawna fora da tela, ao redor do jogador. */
   spawn(enemyId, distance = null, level = null) {
     const { player, world } = this.run;
@@ -224,18 +208,22 @@ export class SpawnSystem {
     const tilt = this.stage.starterTuning?.[this.run.campaignStarter] ?? 1;
     // o líder da fase (0.12.2): das últimas fases, mais vida e mais dano
     const lead = isBoss ? { hp: 1, damage: 1, ...this.stage.bossTuning } : { hp: 1, damage: 1 };
-    const lift = isBoss ? this.bossLift() : 1;
-    let scaling = { hp: tilt * lead.hp * lift, speed: 1, damage: tilt * lead.damage * lift };
+    // o líder não cresce mais com a equipe (0.17; na 0.14 crescia): upar tem de
+    // valer, porque a derrota guarda o progresso e a próxima fase só abre vencendo
+    // a força da fase (0.17): vida e dano de tudo nela, o líder inclusive — a
+    // alavanca da campanha que pede equipe mais forte (stage.difficulty)
+    const force = this.stage.difficulty ?? 1;
+    let scaling = { hp: tilt * lead.hp * force, speed: 1, damage: tilt * lead.damage * force };
     if (!isBoss) {
       const ramp = this.scaling;
       const byLevel = levelScaling(level);
       scaling = {
-        hp: ramp.hp * byLevel.hp * tilt, speed: ramp.speed, damage: ramp.damage * byLevel.damage * tilt,
+        hp: ramp.hp * byLevel.hp * tilt * force, speed: ramp.speed, damage: ramp.damage * byLevel.damage * tilt * force,
         xp: byLevel.xp * (this.stage.xpScale ?? 1)
       };
     }
     const enemy = new Enemy(enemyId, x, y, scaling, level);
-    enemy.attackMult = tilt * lead.damage * lift;   // os golpes do líder também
+    enemy.attackMult = tilt * lead.damage * force;   // os golpes do líder também
     // nasce fora das árvores, pedras e paredes
     this.run.terrain?.place(enemy, enemy.box);
     this.run.enemies.push(enemy);

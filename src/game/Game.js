@@ -295,7 +295,27 @@ export class Game {
     SceneryCache.preload(stageScenes(stage));
   }
 
+  /**
+   * O que a tentativa deixa para a jornada (0.17, pedido do Fellipe: "ao morrer
+   * você não perde progresso daquela fase, apenas não desbloqueia a seguinte"):
+   * níveis, melhorias, evoluções, capturas e o PC.
+   */
+  _journeyFrom(run) {
+    const bestLevel = run.team.members.reduce((max, m) => Math.max(max, m.level), 0);
+    return {
+      team: run.team.serialize(), upgrades: { ...run.upgrades }, level: bestLevel,
+      pc: [...(this.campaign.journey?.pc ?? []), ...run.pc]
+    };
+  }
+
   quitToMenu() {
+    // abandonar no meio também guarda o que a equipe ganhou (como uma derrota),
+    // mas não conta nas métricas da fase
+    const run = this.run;
+    if (run && !this.runEnded && run.team?.members.length) {
+      this.campaign.journey = this._journeyFrom(run);
+      this.autosave();
+    }
     this.run = null;
     this.runEnded = false;
     this.centerOpen = false;
@@ -534,11 +554,8 @@ export class Game {
       stats: run.stats,
       time: run.time,
       team: run.team.members,
-      // vitória leva a equipe, a build e o PC para a próxima fase
-      journey: {
-        team: run.team.serialize(), upgrades: { ...run.upgrades }, level: bestLevel,
-        pc: [...(this.campaign.journey?.pc ?? []), ...run.pc]
-      }
+      // vencendo ou não, a equipe, a build e o PC ficam (0.17)
+      journey: this._journeyFrom(run)
     });
 
     this.pendingRun = null;
@@ -569,15 +586,13 @@ export class Game {
   /* ======================= derrota: as duas saídas ======================= */
 
   /**
-   * Centro Pokémon: a equipe da jornada (a do começo da fase) é curada e o
-   * jogador volta para a mesma fase. O que foi capturado na tentativa perdida
-   * fica para trás, como sempre foi numa derrota.
+   * Centro Pokémon: a equipe da jornada é curada e o jogador volta para a mesma
+   * fase. Desde a 0.17 ela é a equipe do fim da tentativa: nada se perde.
    */
   pokemonCenter() {
     const run = this.run;
     if (!run || run.state !== 'defeat') return;
     this.centerStage = run.stage.id;
-    this.centerLost = [...run.captured];
     this.centerOpen = true;
     this.music.jingle('mus_heal');
     this.hud.hideResult();
@@ -592,7 +607,6 @@ export class Game {
     this.hud.showCenter({
       members,
       stage: STAGES[this.centerStage],
-      lost: this.centerLost ?? [],
       pcCount: this.pcBox.length,
       hasJourney: !!journey?.team
     });

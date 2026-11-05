@@ -284,6 +284,10 @@ export class ProfileTracker {
     if (teamSize >= CONFIG.team.maxSize) p.stats.fullTeams++;
     if (victory && (stats?.faints ?? 0) === 0) p.stats.flawlessClears = (p.stats.flawlessClears ?? 0) + 1;
 
+    // o progresso da tentativa fica, vencendo ou não (0.17): a derrota só não
+    // libera a próxima fase — para passar, às vezes é preciso fortalecer a equipe
+    if (journey) campaign.journey = journey;
+
     if (victory) {
       p.stats.stagesCleared++;
       p.stats.bossesDefeated++;
@@ -292,8 +296,6 @@ export class ProfileTracker {
       const reward = (stage.reward?.shards ?? CONFIG.shards.perStageClear)
                      + (firstTime ? CONFIG.shards.firstClearBonus : 0);
       this.addShards(reward);
-      // a equipe e a build seguem para a próxima fase da jornada
-      if (journey) campaign.journey = journey;
       if (!campaign.clearedStages.includes(stage.id)) campaign.clearedStages.push(stage.id);
       const badge = stage.leader?.badge;
       if (badge && !campaign.badges.includes(badge)) {

@@ -406,7 +406,9 @@ console.log('\n[captura, espadinha e troca]');
         `${Math.round(run.stats.damageDealt - before)} de dano`);
   check('a espadinha vai junto no save', run.team.serialize().members.every((m) => m.attack === false));
 
-  // a troca põe quem entra no slot escolhido
+  // a troca põe quem entra no slot escolhido (antes, todos de pé: 20 s sem atacar
+  // no meio da horda às vezes desmaiavam a reserva inteira e o teste não tinha quem trocar)
+  for (const member of run.team.members) { member.fainted = false; member.hp = maxHpFor(member); }
   run.team.add('pidgey', 18);
   run.team.add('rattata', 18);
   run.team.selectedSlot = 1;
@@ -507,17 +509,16 @@ console.log('\n[ajuste por inicial]');
   late.bossTuning = undefined;
   const plain = ace();
   late.bossTuning = keep;
-  // o líder acompanha a equipe (0.14): acima do nível de sempre, cresce junto
+  // o líder não acompanha mais a equipe (0.17): upar tem de valer
   const liftRun = new Run('gym_6_saffron', { starter: 'charmander' });
   const at = (level) => {
     liftRun.team.members.forEach((m) => { m.level = level; });
     return liftRun.spawner.spawnAt('sabrina_alakazam', 0, 0);
   };
-  const usual = at(late.leaderLevel), below = at(30), above = at(120);
-  check('o líder acompanha a equipe acima do nível de sempre (e só acima)',
-        Math.abs(below.maxHp - usual.maxHp) < 1e-6 && above.maxHp > usual.maxHp * 1.5
-        && Math.abs(above.attackMult / usual.attackMult - above.maxHp / usual.maxHp) < 1e-9,
-        `vida ×${(above.maxHp / usual.maxHp).toFixed(2)} com a equipe no 120`);
+  const low = at(30), high = at(120);
+  check('o líder tem a mesma força com a equipe no nível 30 ou no 120 (upar vale)',
+        Math.abs(low.maxHp - high.maxHp) < 1e-6 && low.attackMult === high.attackMult,
+        `${Math.round(low.maxHp)} de vida nos dois`);
   check('nas últimas fases o líder tem mais vida e golpes mais fortes',
         Math.abs(strong.maxHp / plain.maxHp - keep.hp) < 1e-9 && strong.attackMult === keep.damage && plain.attackMult === 1,
         `vida ×${keep.hp}, dano ×${keep.damage}`);

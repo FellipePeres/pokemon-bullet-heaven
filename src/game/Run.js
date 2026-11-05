@@ -67,7 +67,6 @@ export class Run {
     this.stats = { kills: 0, captures: 0, damageDealt: 0, faints: 0, ballsDropped: 0 };
     // Pokémon mandados para o PC nesta partida (vão para o PC da jornada se a fase for vencida)
     this.pc = [...(options.pc ?? [])];
-    this.captured = [];   // nomes dos capturados nesta tentativa
     // buffs dos 2º golpes na equipe: Tailwind (treinador mais rápido) e Reflect (menos dano)
     this.buffs = { tailwind: 0, reflect: 0 };
 
