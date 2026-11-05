@@ -261,6 +261,15 @@ const ROTEIROS = {
     { wait: 700 }, { shot: 'itens-chao' },
     { run: "game.run.pickups.find((x) => x.kind === 'magnet').x = game.run.player.x" }, { wait: 260 }, { shot: 'itens-ima', raw: true }
   ],
+  // o Modo Livre (0.20): o botão na vitória e a partida sem fim, com o botão do Centro no canto
+  livre: [
+    { open: 'index.html' }, { wait: 500 },
+    { run: START_RUN }, { wait: 1200 },
+    { run: "document.getElementById('toast-container').style.display = 'none'; game.run.state = 'victory'" }, { wait: 900 },
+    { shot: 'livre-1-vitoria', raw: true },
+    { run: 'game.startEndless()' }, { wait: 1500 },
+    { run: "game.run.spawner.endless.since -= 240" }, { wait: 2500 }, { shot: 'livre-2-partida', raw: true }
+  ],
   // os espaços de jornada (0.19): o título com "Jornada" e a tela dos espaços
   jornadas: [
     { open: 'index.html' }, { wait: 500 },

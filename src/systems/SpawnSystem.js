@@ -59,9 +59,57 @@ export class SpawnSystem {
     };
   }
 
+  /**
+   * O Modo Livre (0.20): a fase continua sem fim depois da vitória. As ondas da
+   * segunda metade da fase se repetem, sem o líder; um elite da fase a cada
+   * minuto; e tudo fica mais forte com o tempo (`endlessFactor`).
+   */
+  startEndless() {
+    this.endless = { since: this.run.time, eliteTimer: CONFIG.endless.eliteEvery };
+    this.waveTimers = this.stage.waves.map((w) => w.interval * Math.random());
+  }
+
+  /** Minutos no Modo Livre. */
+  get endlessMinutes() {
+    return this.endless ? (this.run.time - this.endless.since) / 60 : 0;
+  }
+
+  /** Quanto a vida e o dano dos inimigos cresceram no Modo Livre (×1 no começo). */
+  get endlessFactor() {
+    return this.endless ? Math.pow(CONFIG.endless.growthPerMinute, this.endlessMinutes) : 1;
+  }
+
+  _updateEndless(dt) {
+    const run = this.run;
+    const { loopFrom, densityPerMinute, densityMax, eliteEvery } = CONFIG.endless;
+    const start = this.stage.duration * loopFrom;
+    const span = this.stage.duration - start;
+    const t = start + ((run.time - this.endless.since) % span);
+    const density = Math.min(densityMax, 1 + densityPerMinute * this.endlessMinutes);
+
+    this.stage.waves.forEach((wave, i) => {
+      if (t < wave.from || t > wave.to) return;
+      this.waveTimers[i] -= dt;
+      if (this.waveTimers[i] > 0) return;
+      this.waveTimers[i] = wave.interval / (CONFIG.enemies.spawnMult * density);
+      if (run.enemies.length >= wave.maxAlive * CONFIG.enemies.spawnMult * density) return;
+      for (let n = 0; n < wave.batch; n++) this.spawn(weightedPick(wave.enemies).id, null, pickLevel(wave.level));
+    });
+
+    const elites = this.stage.elites ?? [];
+    this.endless.eliteTimer -= dt;
+    if (elites.length && this.endless.eliteTimer <= 0) {
+      this.endless.eliteTimer = eliteEvery;
+      const elite = elites[Math.floor(Math.random() * elites.length)];
+      this.spawn(elite.id, null, elite.level ?? null);
+      bus.emit(EVENTS.TOAST, { text: 'Um Pokémon poderoso apareceu!', icon: 'boss' });
+    }
+  }
+
   update(dt) {
     const run = this.run;
     const t = run.time;
+    if (this.endless) { this._updateEndless(dt); return; }
 
     // ---- ondas normais ----
     this.stage.waves.forEach((wave, i) => {
@@ -212,7 +260,8 @@ export class SpawnSystem {
     // valer, porque a derrota guarda o progresso e a próxima fase só abre vencendo
     // a força da fase (0.17): vida e dano de tudo nela, o líder inclusive — a
     // alavanca da campanha que pede equipe mais forte (stage.difficulty)
-    const force = this.stage.difficulty ?? 1;
+    // no Modo Livre, tudo cresce com o tempo (0.20)
+    const force = (this.stage.difficulty ?? 1) * this.endlessFactor;
     let scaling = { hp: tilt * lead.hp * force, speed: 1, damage: tilt * lead.damage * force };
     if (!isBoss) {
       const ramp = this.scaling;

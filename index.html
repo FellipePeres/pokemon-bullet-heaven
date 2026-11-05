@@ -196,6 +196,7 @@
         <div class="hud-chip stats-chip">
           <span id="kill-count">0</span>
           <span id="ball-count">0</span>
+          <button id="btn-endless-center" class="hud-center-btn hidden" title="Sai do Modo Livre: guarda o que a equipe ganhou e cura no Centro Pokémon">Voltar para o Centro Pokémon</button>
           <button id="btn-pause" class="icon-btn" title="Pausar (ESC)">❚❚</button>
           <button id="btn-hud-options" class="icon-btn" title="Opções e volume"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M19.4 13a7.6 7.6 0 0 0 0-2l2.1-1.6-2-3.4-2.5 1a7.7 7.7 0 0 0-1.7-1L15 3.3h-4l-.4 2.7a7.7 7.7 0 0 0-1.7 1l-2.5-1-2 3.4L6.5 11a7.6 7.6 0 0 0 0 2l-2.1 1.6 2 3.4 2.5-1a7.7 7.7 0 0 0 1.7 1l.4 2.7h4l.4-2.7a7.7 7.7 0 0 0 1.7-1l2.5 1 2-3.4zM13 15.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z" transform="translate(-1 0)"/></svg></button>
         </div>
@@ -296,6 +297,9 @@
         <div class="menu-column" id="result-victory">
           <button id="btn-result-save" class="menu-btn"><span class="btn-text">Salvar Jogo (.json)</span></button>
           <button id="btn-result-menu" class="menu-btn primary"><span class="btn-text">Continuar Jornada</span></button>
+          <button id="btn-result-endless" class="menu-btn">
+            <span class="btn-text">Modo Livre<small class="btn-sub">A fase sem fim: XP reduzido, inimigos cada vez mais fortes</small></span>
+          </button>
         </div>
         <!-- derrota: o Centro Pokémon (cura e tenta de novo) ou a jornada do zero -->
         <div class="menu-column hidden" id="result-defeat">

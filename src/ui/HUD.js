@@ -34,6 +34,8 @@ export class HUD {
 
   _bindStaticButtons() {
     el('btn-pause').onclick = () => this.game.togglePause();
+    el('btn-endless-center').onclick = () => this.game.leaveEndless();
+    el('btn-result-endless').onclick = () => this.game.startEndless();
     // a engrenagem na partida: pausa e abre as Opções (o volume) por cima
     el('btn-hud-options').onclick = () => {
       if (this.game.run?.state === 'running') this.game.togglePause();
@@ -59,8 +61,15 @@ export class HUD {
   update(run) {
     el('stage-name').textContent = run.stage.name;
     el('segment-name').textContent = run.segmentName;
-    el('timer').textContent = run.boss ? '⚔' : formatTime(run.timeToBoss);
-    el('objective').textContent = run.objective;
+    if (run.endless) {
+      // Modo Livre: o tempo nele e o quanto os inimigos já cresceram
+      el('timer').textContent = `∞ ${formatTime(run.spawner.endlessMinutes * 60)}`;
+      el('objective').textContent = `MODO LIVRE · INIMIGOS ×${run.spawner.endlessFactor.toFixed(1)}`;
+    } else {
+      el('timer').textContent = run.boss ? '⚔' : formatTime(run.timeToBoss);
+      el('objective').textContent = run.objective;
+    }
+    el('btn-endless-center').classList.toggle('hidden', !run.endless);
     el('kill-count').textContent = run.stats.kills;
     el('ball-count').textContent = run.stats.captures;
 

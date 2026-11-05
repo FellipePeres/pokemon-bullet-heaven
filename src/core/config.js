@@ -146,6 +146,18 @@ export const CONFIG = {
    * O dano por acerto é `damageRatio` do golpe principal; as curas dele param em
    * `healPerSecond` da vida máxima do Pokémon por segundo.
    */
+  // MODO LIVRE (0.20, pedido do Fellipe: "estilo Endless Mode daquela fase, com XP
+  // reduzido; os inimigos vão ganhando gradativamente mais status até que fique
+  // quase impossível"). Padrão até o Fellipe decidir.
+  endless: {
+    xpMult: 0.5,             // metade do XP
+    growthPerMinute: 1.2,    // vida e dano dos inimigos ×1,2 por minuto, composto (5 min ×2,5; 10 min ×6,2)
+    densityPerMinute: 0.08,  // +8% de inimigos por minuto...
+    densityMax: 2,           // ...até o dobro
+    eliteEvery: 60,          // um elite da fase a cada minuto
+    loopFrom: 0.5            // as ondas repetem a segunda metade da fase (a mais forte)
+  },
+
   bonusMove: { chancePrimary: 0.02, chanceSecondary: 0.01, damageRatio: 0.6, healPerSecond: 0.02 },
 
   capture: {

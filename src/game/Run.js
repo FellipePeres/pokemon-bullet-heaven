@@ -637,7 +637,7 @@ export class Run {
       bus.emit(EVENTS.STAGE_FAILED, { stage: this.stage });
       return;
     }
-    if (this.spawner.leaderDefeated) {
+    if (this.spawner.leaderDefeated && !this.endless) {
       this.state = 'victory';
       bus.emit(EVENTS.STAGE_CLEARED, { stage: this.stage });
       return;
@@ -661,6 +661,30 @@ export class Run {
       this.levelUpMember = ready;
       this.state = 'levelup';
     }
+  }
+
+  /**
+   * Entra no Modo Livre (0.20) depois da vitória: a equipe volta curada e a fase
+   * continua sem fim (SpawnSystem.startEndless). O que a equipe ganhar fica.
+   */
+  startEndless() {
+    const bonus = this.playerStats.pokemonHpBonus;
+    for (const member of this.team.members) {
+      member.fainted = false;
+      member.hp = maxHpFor(member, bonus);
+    }
+    for (const p of this.projectiles) if (p.hostile) p.dead = true;
+    // quem desmaiou saiu de campo: as vagas vazias voltam a ser ocupadas
+    const active = this.team.active;
+    for (let i = 0; i < active.length; i++) {
+      if (active[i]) continue;
+      active[i] = this.team.members.find((m) => !active.includes(m)) ?? null;
+    }
+    this.syncCompanions();
+    this.endless = true;
+    this.objective = 'MODO LIVRE';
+    this.spawner.startEndless();
+    this.state = 'running';
   }
 
   /** Nome do trecho atual da jornada. */

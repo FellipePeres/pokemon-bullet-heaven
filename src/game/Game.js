@@ -96,6 +96,7 @@ export class Game {
       this.autosaveTimer += dt;
       if (this.autosaveTimer > 15) {
         this.autosaveTimer = 0;
+        if (this.run.endless && this.run.state === 'running') this.campaign.journey = this._journeyFrom(this.run);
         this.autosave();
       }
     }
@@ -142,7 +143,9 @@ export class Game {
         this.endRun(true);
         break;
       case 'defeat':
-        this.endRun(false);
+        // no Modo Livre, cair é só o fim dele: o que a equipe ganhou fica
+        if (this.run.endless) this.leaveEndless();
+        else this.endRun(false);
         break;
     }
   }
@@ -404,17 +407,19 @@ export class Game {
    */
   _journeyFrom(run) {
     const bestLevel = run.team.members.reduce((max, m) => Math.max(max, m.level), 0);
+    // no Modo Livre o PC de antes já recebeu o da vitória: a base é a guardada na entrada
+    const basePc = run.endless ? (this.endlessBasePc ?? []) : (this.campaign.journey?.pc ?? []);
     return {
       team: run.team.serialize(), upgrades: { ...run.upgrades }, level: bestLevel,
-      pc: [...(this.campaign.journey?.pc ?? []), ...run.pc]
+      pc: [...basePc, ...run.pc]
     };
   }
 
   quitToMenu() {
-    // abandonar no meio também guarda o que a equipe ganhou (como uma derrota),
-    // mas não conta nas métricas da fase
+    // abandonar no meio (ou sair do Modo Livre) também guarda o que a equipe
+    // ganhou, como uma derrota, mas não conta nas métricas da fase
     const run = this.run;
-    if (run && !this.runEnded && run.team?.members.length) {
+    if (run && (!this.runEnded || run.endless) && run.team?.members.length) {
       this.campaign.journey = this._journeyFrom(run);
       this.autosave();
     }
@@ -683,6 +688,43 @@ export class Game {
       const next = this._nextStage();
       if (next) toast(`Próxima etapa liberada: ${next.name}`, '🗺️');
     }
+  }
+
+  /* ============================ Modo Livre (0.20) ============================ */
+
+  /**
+   * Da tela de vitória: a fase continua sem fim, com XP reduzido e inimigos cada
+   * vez mais fortes (CONFIG.endless). A vitória já foi registrada; o PC que veio
+   * com ela já está na jornada, então o da partida recomeça vazio.
+   */
+  startEndless() {
+    const run = this.run;
+    if (!run || run.state !== 'victory' || run.endless) return;
+    this.endlessBasePc = [...(this.campaign.journey?.pc ?? [])];
+    run.pc = [];
+    run.startEndless();
+    this.hud.hideResult();
+    this.hud.signature = '';
+    toast('Modo Livre: os inimigos ficam mais fortes a cada minuto. O que a equipe ganhar fica.', 'boss');
+  }
+
+  /**
+   * Sai do Modo Livre (o botão do canto ou a equipe toda caída): guarda o que a
+   * equipe ganhou e abre o Centro Pokémon, que cura e leva de volta à fase ou ao mapa.
+   */
+  leaveEndless() {
+    const run = this.run;
+    if (!run?.endless || this.centerOpen) return;
+    this.campaign.journey = this._journeyFrom(run);
+    this.autosave();
+    run.state = 'ended';
+    this.hud.hideLevelUp();
+    this.hud.hideCapture();
+    this.hud.hidePause();
+    this.centerStage = run.stage.id;
+    this.centerOpen = true;
+    this.music.jingle('mus_heal');
+    this._showCenter();
   }
 
   /* ======================= derrota: as duas saídas ======================= */

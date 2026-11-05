@@ -316,6 +316,20 @@ check('vitória registra a insígnia do líder',
       game.campaign.badges.includes('Insígnia Pedra') && game.profile.stats.badges === 1);
 check('vitória rende Shards', game.profile.shards > 0, `${game.profile.shards} Shards`);
 
+// ---- Modo Livre (0.20): da vitória, a fase sem fim; o botão do canto volta ao Centro ----
+check('a vitória oferece o Modo Livre', !registry.get('btn-result-endless').classes.has('hidden'));
+game.run.team.members[0].fainted = true;
+registry.get('btn-result-endless').click();
+check('o Modo Livre continua a fase, com a equipe curada e o botão do Centro no canto',
+      game.run?.endless && game.run.state === 'running' && registry.get('result-overlay').classes.has('hidden') &&
+      game.run.team.members.every((m) => !m.fainted) && (game.hud.update(game.run), !registry.get('btn-endless-center').classes.has('hidden')));
+game.run.team.members[0].level = 17;
+registry.get('btn-endless-center').click();
+check('"Voltar para o Centro Pokémon" guarda o que a equipe ganhou e abre o Centro',
+      game.centerOpen && !registry.get('center-overlay').classes.has('hidden') &&
+      game.campaign.journey.team.members[0].level === 17 && game.campaign.clearedStages.includes('gym_1_pewter'));
+registry.get('btn-center-map').click();
+
 // conquistas: concluídas ficam para coletar, não entram sozinhas
 const claimable = game.tracker.claimableAchievements;
 check('conquistas concluídas ficam disponíveis para coletar', claimable.length > 0,

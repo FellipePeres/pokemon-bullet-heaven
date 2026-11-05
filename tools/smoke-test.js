@@ -797,6 +797,50 @@ console.log('\n[encontros de lendário]');
   for (const [id, enc] of Object.entries(keep)) Object.assign(LEGENDARY_ENCOUNTERS[id], enc);
 }
 
+// ---------------------------------------------- 5.13d Modo Livre (0.20)
+console.log('\n[Modo Livre]');
+{
+  const run = new Run('gym_1_pewter', { starter: 'charmander' });
+  run.team.add('pidgey', 20);
+  const [lead] = run.team.members;
+  lead.level = 30;
+  // depois do líder: vitória
+  run.time = run.stage.duration + 1;
+  Object.assign(run.spawner, { bossSpawned: true, bossQueue: [], boss: { dead: true } });
+  run.state = 'victory';
+  lead.fainted = true;
+  lead.hp = 0;
+  run.team.active[0] = null;
+  run.startEndless();
+  const bonus = run.playerStats.pokemonHpBonus;
+  check('o Modo Livre começa com a equipe curada e de volta ao campo',
+        run.state === 'running' && run.endless && run.team.members.every((m) => !m.fainted && m.hp === maxHpFor(m, bonus))
+        && run.team.active.includes(lead));
+  // XP pela metade
+  const before = run.team.members.map((m) => m.xp);
+  run.progression.addXp(10);
+  const gained = run.team.members.reduce((sum, m, i) => sum + (m.xp - before[i]), 0);
+  check('o XP no Modo Livre é reduzido', Math.abs(gained - 10 * run.playerStats.xpGain * CONFIG.endless.xpMult) < 1e-6,
+        `${gained.toFixed(1)} de 10`);
+  // 3 minutos: a fase não termina, os inimigos vêm e ficam mais fortes
+  const wild = run.stage.waves[0].enemies[0].id;
+  const hpAt = () => run.spawner.spawnAt(wild, 0, 0).maxHp;
+  const hpStart = hpAt();
+  CONFIG.debug.godMode = true;
+  let victories = 0;
+  for (let i = 0; i < 180 * 60; i++) {
+    run.update(1 / 60, { x: Math.sin(i / 90), y: Math.cos(i / 70) });
+    if (run.state === 'victory') victories++;
+    if (run.state !== 'running') { run.state = 'running'; run.levelUpMember = null; run.pendingBall = false; run.evolutionQueue.length = 0; run.unlockQueue.length = 0; }
+  }
+  CONFIG.debug.godMode = false;
+  const factor = run.spawner.endlessFactor;
+  check('no Modo Livre a fase não termina e os inimigos continuam vindo', victories === 0 && run.stats.kills > 20,
+        `${run.stats.kills} abates em 3 min`);
+  check('...e ficam mais fortes a cada minuto', Math.abs(factor - Math.pow(CONFIG.endless.growthPerMinute, 3)) < 0.01 &&
+        Math.abs(hpAt() / hpStart - factor) < 0.01, `×${factor.toFixed(2)} em 3 min`);
+}
+
 // ---------------------------------------------- 5.14 métricas da fase (o Estojo de Insígnias)
 console.log('\n[métricas da fase]');
 {
