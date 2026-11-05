@@ -260,6 +260,16 @@ const ROTEIROS = {
     { wait: 700 }, { shot: 'itens-chao' },
     { run: "game.run.pickups.find((x) => x.kind === 'magnet').x = game.run.player.x" }, { wait: 260 }, { shot: 'itens-ima', raw: true }
   ],
+  // o tamanho em campo (fieldScale): as aves lendárias, sem inimigos nem golpes
+  aves: [
+    { open: 'index.html' }, { wait: 500 },
+    { run: START_RUN }, { wait: 800 },
+    { run: "document.getElementById('toast-container').style.display = 'none'; const r = game.run; r.spawner.update = () => {};" +
+           "['articuno', 'zapdos', 'moltres'].forEach((id) => r.captureSystem.capture(id)); r.enemies.length = 0;" +
+           "r.team.active = [r.team.members[1], r.team.members[2], r.team.members[3]]; r.syncCompanions();" +
+           "r.team.members.forEach((m) => { m.attack = false; }); game.hud.signature = ''" },
+    { wait: 2500 }, { shot: 'aves', raw: true }
+  ],
   // diagnóstico do Modo Livre: o HUD da equipe acompanha a vida, o XP e a troca?
   livrediag: [
     { open: 'index.html' }, { wait: 500 },

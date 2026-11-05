@@ -924,6 +924,7 @@ export const POKEMON = {
     id: 'articuno', dex: 144, name: 'Articuno', types: ['ice', 'flying'],
     abilities: ['sheer_cold'], moveLine: ['sheer_cold'], role: 'Lendário · gelo em área', rarity: 'legendary',
     power: 2.45, hp: 310,
+    fieldScale: 1.8,   // a animação vem num quadro de 172x171 (asas abertas): sem isso, ficava miúdo (43% do quadro)
     description: 'Lendário: o frio absoluto que congela a horda inteira.'
   },
   zapdos: {
@@ -936,6 +937,7 @@ export const POKEMON = {
     id: 'moltres', dex: 146, name: 'Moltres', types: ['fire', 'flying'],
     abilities: ['sacred_fire'], moveLine: ['sacred_fire'], role: 'Lendário · penas de fogo', rarity: 'legendary',
     power: 2.45, hp: 285,
+    fieldScale: 1.5,   // quadro de 217x181, o mesmo caso do Articuno
     description: 'Lendário: chamas sagradas que iluminam o céu.'
   },
   dratini: {

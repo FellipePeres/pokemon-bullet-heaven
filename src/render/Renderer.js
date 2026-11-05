@@ -406,7 +406,7 @@ export class Renderer {
         const blinking = actor.invulnTimer > 0 && Math.floor(actor.invulnTimer * 20) % 2 === 0;
         drawPokemon(ctx, actor.data.dex, actor.x, actor.y + bob, 46, {
           facing: actor.facing, types: actor.data.types, flash: actor.hitFlash, time: run.time + actor.animPhase,
-          shiny: !!actor.member?.shiny,
+          shiny: !!actor.member?.shiny, fieldScale: actor.data.fieldScale ?? 1,
           alpha: spawning ? actor.spawnTime / 0.35 : blinking ? 0.55 : 1
         });
         if (spawning) this._drawSendOut(ctx, actor);
