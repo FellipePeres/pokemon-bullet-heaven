@@ -820,7 +820,7 @@ export const STAGES = {
 
     capturePool: 'phase9',
     ballChance: 1,
-    maxBalls: 0,
+    maxBalls: 1,   // 0.18: uma, para o lendário (era 0)
     reward: { shards: 800 }
   }
 };

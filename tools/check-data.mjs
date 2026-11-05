@@ -8,7 +8,7 @@
 import { POKEMON } from '../src/data/pokemon.js';
 import { ABILITIES } from '../src/data/abilities.js';
 import { BONUS_MOVES } from '../src/data/bonusMoves.js';
-import { LEGENDARY_MOVES, LEGENDARY_KITS } from '../src/data/legendaries.js';
+import { LEGENDARY_MOVES, LEGENDARY_KITS, LEGENDARY_ENCOUNTERS } from '../src/data/legendaries.js';
 import { UPGRADES } from '../src/data/upgrades.js';
 import { ENEMIES } from '../src/data/enemies.js';
 import { STAGES } from '../src/data/stages.js';
@@ -65,6 +65,17 @@ badKits.length || sharedSignature.length || legendaryNoKit.length
   ? fail(`lendários: kit quebrado (${badKits.map(([id]) => id).join(', ')}), golpe exclusivo usado por outro ` +
          `(${sharedSignature.map((p) => p.id).join(', ')}), lendário sem kit (${legendaryNoKit.map((p) => p.id).join(', ')})`)
   : ok(`${Object.keys(LEGENDARY_KITS).length} lendários com golpe exclusivo, melhorias e 2º golpe de saída`);
+
+// onde eles aparecem (0.18): só pelo sorteio próprio, em fases que existem, e todos têm onde aparecer
+const encounterStages = Object.keys(LEGENDARY_ENCOUNTERS);
+const badEncounter = encounterStages.filter((id) => !STAGES[id] || !(STAGES[id].maxBalls > 0) ||
+  LEGENDARY_ENCOUNTERS[id].pool.some((p) => !LEGENDARY_KITS[p]));
+const inPools = Object.values(CAPTURE_POOLS).flatMap((pool) => Object.keys(pool.species)).filter((id) => LEGENDARY_KITS[id]);
+const nowhere = Object.keys(LEGENDARY_KITS).filter((id) => !encounterStages.some((s) => LEGENDARY_ENCOUNTERS[s].pool.includes(id)));
+badEncounter.length || inPools.length || nowhere.length
+  ? fail(`encontros de lendário: fase inválida ou sem Poké Ball (${badEncounter.join(', ')}), lendário na tabela comum ` +
+         `(${inPools.join(', ')}), lendário sem onde aparecer (${nowhere.join(', ')})`)
+  : ok(`lendários aparecem em ${encounterStages.length} fases, pelo sorteio próprio`);
 
 const brokenLine = species.filter((p) => (p.moveLine ?? []).some((id) => !ABILITIES[id]));
 brokenLine.length

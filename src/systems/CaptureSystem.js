@@ -1,10 +1,10 @@
 import { getPokemon } from '../data/pokemon.js';
 import { poolEntries } from '../data/capturePools.js';
 import { CONFIG } from '../core/config.js';
-import { weightedPickMany } from '../core/utils.js';
+import { weightedPick, weightedPickMany } from '../core/utils.js';
 import { bus, EVENTS } from '../core/events.js';
 import { TeamSystem } from './TeamSystem.js';
-import { isLegendary } from '../data/legendaries.js';
+import { isLegendary, LEGENDARY_ENCOUNTERS, LEGENDARY_WEIGHT } from '../data/legendaries.js';
 
 /**
  * Captura: independente do combate.
@@ -33,7 +33,30 @@ export class CaptureSystem {
       .filter((entry) => entry.pokemon.id !== own && !this.run.team.has(entry.pokemon.id));
 
     if (!pool.length) return [];
-    return weightedPickMany(pool, count).map((entry) => roll(entry.pokemon));
+    const picks = weightedPickMany(pool, count).map((entry) => entry.pokemon);
+    const legendary = this.rollLegendary();
+    // o lendário toma o lugar da última opção (ou entra, se a tabela deu menos)
+    if (legendary && picks.length < count) picks.push(legendary);
+    else if (legendary) picks[picks.length - 1] = legendary;
+    return picks.map(roll);
+  }
+
+  /**
+   * O sorteio do lendário (0.18, data/legendaries.js): só nas fases da tabela,
+   * com a chance dela; um de cada por jornada (fora quem já está na equipe, no PC
+   * da partida ou no do lobby) e no máximo uma vez por tentativa.
+   */
+  rollLegendary() {
+    const encounter = LEGENDARY_ENCOUNTERS[this.run.stage.id];
+    if (!encounter || Math.random() >= encounter.chance) return null;
+    const owned = (id) => this.run.team.has(id) || this.run.pc.some((m) => m.pokemonId === id)
+      || this.run.ownedElsewhere?.has(id) || this.run.legendariesOffered?.has(id);
+    const options = encounter.pool.filter((id) => !owned(id))
+      .map((id) => ({ id, weight: LEGENDARY_WEIGHT[id] ?? 1 }));
+    if (!options.length) return null;
+    const id = weightedPick(options).id;
+    this.run.legendariesOffered?.add(id);
+    return getPokemon(id);
   }
 
   /**

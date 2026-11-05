@@ -90,5 +90,37 @@ export const LEGENDARY_KITS = {
   mew: { move: 'metronome', bonusMove: 'psyshock', upgrades: { damage: 2, cooldown: 1, count: 1 } }
 };
 
+/**
+ * ONDE OS LENDÁRIOS APARECEM (0.18, pedido do Fellipe: "desde a fase 7, com
+ * porcentagem baixa que vai escalando até a fase do campeão; só pode aparecer 1
+ * de cada lendário na mesma run"). Padrão até o Fellipe decidir.
+ *
+ * Eles não estão nas tabelas de captura: cada Poké Ball destas fases faz um
+ * sorteio à parte (systems/CaptureSystem.js). Com a `chance` da fase, uma das
+ * opções vira um lendário, escolhido entre os de `pool` pelo peso
+ * (LEGENDARY_WEIGHT). Não aparece:
+ *   - um lendário que já está na equipe ou no PC da jornada (um de cada);
+ *   - de novo, na mesma tentativa, um que já apareceu nela (mesmo recusado).
+ *
+ * Medido com o bot: ~1,6 Poké Ball por tentativa nas Fases 7 e 8, ~0,9 em cada
+ * sala da Liga. Quem passa cada fase em ~1,5 tentativa vê algum lendário em
+ * ~45% das jornadas (cada ave ~15–20%, Mewtwo ~3–4%, Mew ~1–2%).
+ */
+const BIRDS = ['articuno', 'zapdos', 'moltres'];
+const ALL = [...BIRDS, 'mewtwo', 'mew'];
+
+export const LEGENDARY_ENCOUNTERS = {
+  gym_7_cinnabar: { chance: 0.02, pool: BIRDS },
+  gym_8_viridian: { chance: 0.03, pool: BIRDS },
+  e4_lorelei: { chance: 0.04, pool: ALL },
+  e4_bruno: { chance: 0.05, pool: ALL },
+  e4_agatha: { chance: 0.06, pool: ALL },
+  e4_lance: { chance: 0.07, pool: ALL },
+  champion: { chance: 0.10, pool: ALL }
+};
+
+/** Entre os lendários sorteados: as aves comuns, Mewtwo e Mew raros. */
+export const LEGENDARY_WEIGHT = { articuno: 1, zapdos: 1, moltres: 1, mewtwo: 0.35, mew: 0.15 };
+
 export const isLegendary = (pokemonId) => !!LEGENDARY_KITS[pokemonId];
 export const isSignatureMove = (abilityId) => !!LEGENDARY_MOVES[abilityId];

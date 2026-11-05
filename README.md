@@ -128,7 +128,9 @@ Perder devolve você ao início da fase com a equipe como estava ao entrar nela.
   20% sozinho, sem abrir tela.
 - **Lendários**: Articuno, Zapdos, Moltres, Mewtwo e Mew têm um golpe exclusivo
   (Sheer Cold, Zap Cannon, Sacred Fire, Psystrike e Metronome) e já chegam com
-  melhorias e o Golpe Desperto.
+  melhorias e o Golpe Desperto. Raros na Poké Ball: as aves a partir da Fase 7,
+  Mewtwo e Mew na Liga, com a chance crescendo até o Campeão; um de cada por
+  jornada.
 - **Shiny**: raro (1%), na captura e no inicial — o card da Poké Ball brilha, e o
   Pokémon fica com as cores raras no campo, no PC e na Pokédex.
 - **Derrota sem perda**: o que a equipe ganhou na tentativa (níveis, melhorias,

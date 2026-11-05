@@ -257,6 +257,7 @@ export class Game {
     }
     // melhorias compradas com moedas valem em todas as fases
     options.trainerUpgrades = { ...this.profile.trainerUpgrades };
+    options.ownedElsewhere = (journey?.pc ?? []).map((m) => m.pokemonId);   // lendário: um de cada
     options.trainer = this.profile.trainer;
     options.campaignStarter = this.campaign.starter;
 

@@ -170,8 +170,9 @@ export const CAPTURE_POOLS = {
       magmar: 1, pinsir: 1, tauros: 1.5, gyarados: 1.5, lapras: 1.5, ditto: 1,
       vaporeon: 1, jolteon: 1, flareon: 1, porygon: 1,
       omastar: 0.75, kabutops: 0.75, aerodactyl: 0.75,
-      snorlax: 1.5, dragonair: 1, dragonite: 1,
-      articuno: 0.5, zapdos: 0.5, moltres: 0.5, mewtwo: 0.15, mew: 0.05
+      snorlax: 1.5, dragonair: 1, dragonite: 1
+      // os lendários saíram da tabela (0.18): têm sorteio próprio, da Fase 7 ao
+      // Campeão (LEGENDARY_ENCOUNTERS em data/legendaries.js)
     }
   }
 };

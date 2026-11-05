@@ -27,7 +27,7 @@ import { BONUS_MOVES, BONUS_BY_TYPE, isBonusMove } from '../src/data/bonusMoves.
 import { RETIRED_ABILITIES } from '../src/data/abilities.js';
 import { abilityFx } from '../src/data/fx.js';
 import { damageEnemy, bonusHeal } from '../src/systems/combat.js';
-import { LEGENDARY_KITS, LEGENDARY_MOVES } from '../src/data/legendaries.js';
+import { LEGENDARY_KITS, LEGENDARY_MOVES, LEGENDARY_ENCOUNTERS } from '../src/data/legendaries.js';
 
 let failures = 0;
 
@@ -747,6 +747,53 @@ console.log('\n[lendários e Golpe Desperto]');
         member.abilities.includes(run.unlockQueue[0].moveId), run.state);
   Object.assign(CONFIG.bonusMove, { chancePrimary: saved.chancePrimary, chanceSecondary: saved.chanceSecondary });
   CONFIG.progression.tmChance = saved.tm;
+}
+
+// ---------------------------------------------- 5.13c onde os lendários aparecem (0.18)
+console.log('\n[encontros de lendário]');
+{
+  const LEG = Object.keys(LEGENDARY_KITS);
+  const legendaryIn = (choices) => choices.filter((p) => LEG.includes(p.id)).map((p) => p.id);
+  const keep = JSON.parse(JSON.stringify(LEGENDARY_ENCOUNTERS));
+
+  // antes da Fase 7, nunca
+  const early = new Run('gym_6_saffron', { starter: 'charmander' });
+  let seen = 0;
+  for (let i = 0; i < 2000; i++) seen += legendaryIn(early.captureSystem.rollChoices()).length;
+  check('antes da Fase 7 nenhum lendário aparece', seen === 0, `${seen} em 2000 Poké Balls`);
+
+  // a chance da fase: ~2% na Fase 7, e só aves
+  const rate = new Run('gym_7_cinnabar', { starter: 'charmander' });
+  let hits = 0;
+  for (let i = 0; i < 4000; i++) {
+    rate.legendariesOffered.clear();
+    const found = legendaryIn(rate.captureSystem.rollChoices());
+    hits += found.length;
+    if (found.some((id) => id === 'mewtwo' || id === 'mew')) hits = -1e9;
+  }
+  const pct = hits / 4000;
+  check('na Fase 7 a chance é baixa (~2%) e só aparecem as aves', pct > 0.01 && pct < 0.03, `${(pct * 100).toFixed(2)}%`);
+
+  // um de cada: na mesma tentativa não repete, mesmo recusado; quem está no PC não volta
+  for (const enc of Object.values(LEGENDARY_ENCOUNTERS)) enc.chance = 1;
+  const run = new Run('gym_8_viridian', { starter: 'charmander', ownedElsewhere: ['zapdos'] });
+  const offered = [];
+  for (let i = 0; i < 6; i++) {
+    const choices = run.captureSystem.rollChoices();
+    offered.push(...legendaryIn(choices));
+    check(`Poké Ball ${i + 1}: continua com 4 opções`, choices.length === 4);
+  }
+  check('na mesma tentativa cada lendário aparece uma vez só', new Set(offered).size === offered.length, offered.join(', '));
+  check('um lendário que já está no PC da jornada não volta', !offered.includes('zapdos') && offered.length === 2,
+        offered.join(', '));
+  const liga = new Run('champion', { starter: 'charmander' });
+  liga.captureSystem.capture('mewtwo');
+  const ligaOffers = [];
+  for (let i = 0; i < 8; i++) ligaOffers.push(...legendaryIn(liga.captureSystem.rollChoices()));
+  check('quem está na equipe não volta; na Liga também vêm Mewtwo e Mew',
+        !ligaOffers.includes('mewtwo') && ligaOffers.includes('mew'), ligaOffers.join(', '));
+  check('o Campeão tem uma Poké Ball (para o lendário)', liga.stage.maxBalls === 1);
+  for (const [id, enc] of Object.entries(keep)) Object.assign(LEGENDARY_ENCOUNTERS[id], enc);
 }
 
 // ---------------------------------------------- 5.14 métricas da fase (o Estojo de Insígnias)
