@@ -20,7 +20,7 @@ import { BadgeCase } from './badgeCase.js';
 import { JourneyScreen } from './journeys.js';
 
 const SCREENS = ['screen-title', 'screen-journeys', 'screen-trainer', 'screen-starter', 'screen-campaign'];
-const MODALS = ['modal-pokedex', 'modal-achievements', 'modal-team', 'modal-trainer', 'modal-options', 'modal-help', 'modal-pc', 'modal-badges'];
+const MODALS = ['modal-pokedex', 'modal-achievements', 'modal-team', 'modal-options', 'modal-help', 'modal-pc', 'modal-badges'];
 
 /**
  * Telas fora da partida.
@@ -118,7 +118,6 @@ export class Menus {
       'modal-pokedex': () => this.buildPokedex(),
       'modal-achievements': () => this.buildAchievements(),
       'modal-team': () => this.buildTeamDetail(),
-      'modal-trainer': () => this.buildTrainer(),
       'modal-options': () => this.buildOptions(),
       'modal-pc': () => this.pcScreen.open(),
       'modal-badges': () => this.badgeCase.open(options)
@@ -356,48 +355,6 @@ export class Menus {
       node.appendChild(body);
 
       node.appendChild(create('div', 'node-state', `${Math.round(member.hp)}/${maxHpFor(member)} HP`));
-      list.appendChild(node);
-    }
-  }
-
-  /* ==================== melhorias do treinador ==================== */
-
-  buildTrainer() {
-    const list = clear(el('trainer-list'));
-    const shards = this.game.profile.shards ?? 0;
-    el('trainer-coins').innerHTML = `${iconHTML('shards', 18)} <b>${shards}</b> Shards`;
-
-    for (const entry of this.game.trainerShop()) {
-      const { upgrade, level, cost, maxed, affordable } = entry;
-      const node = create('div', `shop-card${maxed ? ' maxed' : ''}${!maxed && !affordable ? ' locked' : ''}`);
-
-      const pips = Array.from({ length: upgrade.levels }, (_, i) =>
-        `<span class="pip${i < level ? ' on' : ''}"></span>`).join('');
-
-      node.innerHTML = `
-        <div class="shop-icon">${iconHTML(upgrade.icon, 34)}</div>
-        <div class="shop-body">
-          <div class="shop-title">
-            <h4>${upgrade.name}</h4>
-            <span class="shop-level">${level}/${upgrade.levels}</span>
-          </div>
-          <p>${upgrade.description}</p>
-          <div class="pips">${pips}</div>
-        </div>
-      `;
-
-      const btn = create('button', `buy-btn${maxed ? ' maxed' : ''}`);
-      btn.innerHTML = maxed
-        ? '<span>MÁXIMO</span>'
-        : `<span>comprar</span><b>${iconHTML('shards', 15)} ${cost}</b>`;
-      btn.disabled = maxed || !affordable;
-      btn.onclick = () => {
-        if (this.game.buyTrainerUpgrade(upgrade.id)) {
-          this.buildTrainer();
-          this.refreshTitle();
-        }
-      };
-      node.appendChild(btn);
       list.appendChild(node);
     }
   }

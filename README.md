@@ -87,12 +87,12 @@ pausa e oferece três Pokémon sorteados pela tabela de chances daquela fase. Ca
 fase tem um teto de bolas e alguns momentos garantidos, para a jornada não depender
 de sorte.
 
-**Shards.** A moeda do jogo, ganha ao concluir fases e ao **coletar conquistas**.
-Gasta na aba do Treinador em melhorias **permanentes**, que valem em todas as
-partidas: velocidade, raio de coleta, sorte de Poké Ball, vida da equipe, XP e mais.
+**Shards.** Ganhos ao concluir fases e ao **coletar conquistas**. (A loja de
+melhorias do treinador saiu na 0.21.)
 
 **A jornada continua.** Equipe, níveis e build passam de uma fase para a seguinte.
-Perder devolve você ao início da fase com a equipe como estava ao entrar nela.
+Perder não tira nada: o que a equipe ganhou na tentativa fica, só a próxima fase
+não abre até você vencer.
 
 ## Conteúdo atual
 
@@ -139,7 +139,7 @@ Perder devolve você ao início da fase com a equipe como estava ao entrar nela.
 - **Jornadas**: até 3 ao mesmo tempo, cada uma com o seu treinador, inicial,
   insígnias e equipe. No título, **Jornada** mostra os espaços (Jogar, Apagar ou
   começar outra) e **Nova jornada** abre uma sem apagar as outras. A Pokédex, as
-  conquistas, os Shards e as melhorias do treinador valem para todas.
+  conquistas e os Shards valem para todas.
 - **Derrota sem perda**: o que a equipe ganhou na tentativa (níveis, melhorias,
   evoluções e capturas) fica; só a próxima fase não abre. No Centro Pokémon a
   equipe é curada e você tenta de novo, ou rejoga fases anteriores para upar. O

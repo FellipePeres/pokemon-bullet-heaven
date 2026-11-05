@@ -29,9 +29,6 @@
     <button class="rail-btn" data-modal="modal-team" title="Equipe">
       <span class="ui-icon rail-icon"><img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png" alt="" /></span><span class="rail-label">Equipe</span>
     </button>
-    <button class="rail-btn" data-modal="modal-trainer" title="Treinador">
-      <span class="ui-icon rail-icon"><img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/coin-case.png" alt="" /></span><span class="rail-label">Treinador</span>
-    </button>
     <button class="rail-btn" data-modal="modal-options" title="Opções">
       <span class="ui-icon rail-icon"><img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/escape-rope.png" alt="" /></span><span class="rail-label">Opções</span>
     </button>
@@ -56,7 +53,6 @@
     <div class="title-corner">
       <button class="corner-btn" data-modal="modal-pokedex" title="Pokédex"><img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/town-map.png" alt="" /><span class="corner-label">Pokédex</span></button>
       <button class="corner-btn" data-modal="modal-achievements" title="Conquistas"><img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/star-piece.png" alt="" /><span class="corner-label">Conquistas</span></button>
-      <button class="corner-btn" data-modal="modal-trainer" title="Melhorias do treinador"><img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/coin-case.png" alt="" /><span class="corner-label">Treinador</span></button>
       <button class="corner-btn gear" data-modal="modal-options" title="Opções">
         <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path fill="currentColor" d="M19.4 13a7.6 7.6 0 0 0 0-2l2.1-1.6-2-3.4-2.5 1a7.7 7.7 0 0 0-1.7-1L15 3.3h-4l-.4 2.7a7.7 7.7 0 0 0-1.7 1l-2.5-1-2 3.4L6.5 11a7.6 7.6 0 0 0 0 2l-2.1 1.6 2 3.4 2.5-1a7.7 7.7 0 0 0 1.7 1l.4 2.7h4l.4-2.7a7.7 7.7 0 0 0 1.7-1l2.5 1 2-3.4zM13 15.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z" transform="translate(-1 0)"/></svg>
         <span class="corner-label">Opções</span>
@@ -117,7 +113,7 @@
   <section id="screen-journeys" class="screen hidden">
     <header class="screen-head">
       <h2 class="screen-title">Jornadas</h2>
-      <p class="subtitle">Cada jornada tem o seu treinador, inicial, insígnias e equipe. A Pokédex, as conquistas, os Shards e as melhorias do treinador valem para todas.</p>
+      <p class="subtitle">Cada jornada tem o seu treinador, inicial, insígnias e equipe. A Pokédex, as conquistas e os Shards valem para todas.</p>
     </header>
     <div id="journey-slots" class="journey-grid"></div>
     <button class="menu-btn ghost back" data-back="screen-title">Voltar</button>
@@ -154,7 +150,6 @@
         <button class="bar-btn" data-modal="modal-pokedex" title="Pokédex"><span class="bar-icon" data-icon="pokedex"></span><span class="bar-label">Pokédex</span></button>
         <button class="bar-btn" id="bar-achievements" data-modal="modal-achievements" title="Conquistas"><span class="bar-icon" data-icon="achievements"></span><span class="bar-label">Conquistas</span></button>
         <button class="bar-btn" data-modal="modal-team" title="Equipe"><span class="bar-icon" data-icon="team"></span><span class="bar-label">Equipe</span></button>
-        <button class="bar-btn" data-modal="modal-trainer" title="Treinador"><span class="bar-icon" data-icon="trainer"></span><span class="bar-label">Treinador</span></button>
         <button class="bar-btn" data-modal="modal-options" title="Opções e volume"><span class="bar-icon" data-icon="options"></span><span class="bar-label">Opções</span></button>
         <button class="bar-btn" data-modal="modal-help" title="Como jogar"><span class="bar-icon" data-icon="help"></span><span class="bar-label">Ajuda</span></button>
         <span class="bar-sep" aria-hidden="true"></span>
@@ -311,7 +306,7 @@
           </button>
         </div>
         <div class="menu-column hidden" id="result-confirm">
-          <p class="confirm-text">Recomeçar do zero apaga as insígnias, a equipe e o PC desta jornada. A Pokédex, as conquistas, os Shards e as melhorias do treinador continuam.</p>
+          <p class="confirm-text">Recomeçar do zero apaga as insígnias, a equipe e o PC desta jornada. A Pokédex, as conquistas e os Shards continuam.</p>
           <button id="btn-restart-yes" class="menu-btn danger"><span class="btn-text">Sim, recomeçar do zero</span></button>
           <button id="btn-restart-no" class="menu-btn"><span class="btn-text">Voltar</span></button>
         </div>
@@ -376,26 +371,6 @@
     </div>
   </div>
 
-  <div id="modal-trainer" class="modal hidden">
-    <div class="modal-card">
-      <header class="modal-head">
-        <h3><span class="ui-icon"><img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/coin-case.png" alt="" /></span>Melhorias do treinador</h3>
-        <span class="modal-sub" id="trainer-coins">0 Shards</span>
-        <button class="icon-btn close" data-close>✕</button>
-      </header>
-      <div class="modal-body">
-        <p class="subtitle small" style="margin-bottom:14px">
-          Shards vêm de concluir fases e de coletar conquistas. Estas melhorias são
-          permanentes e valem em todas as partidas — dentro da fase, o level up
-          melhora só o Pokémon.
-        </p>
-        <div id="trainer-list" class="node-list"></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- O PC do lobby: troque Pokémon entre a equipe e o PC entre uma fase e outra -->
-  <!-- O PC: a tela de armazenamento do FireRed, trazida do Pokemon All (ui/pcScreen.js) -->
   <div id="modal-pc" class="modal pc-modal hidden">
     <div class="pc-stage">
       <div id="pc-screen" class="pc-screen"></div>

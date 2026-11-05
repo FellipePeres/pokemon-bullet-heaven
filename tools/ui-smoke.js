@@ -92,7 +92,7 @@ for (const id of ids) registry.set(id, new StubElement('div', id));
 registry.get('game-canvas').getContext = () => stubCtx();
 
 const selectorMatches = {
-  '[data-modal]': ['modal-pokedex', 'modal-achievements', 'modal-team', 'modal-trainer', 'modal-options', 'modal-help']
+  '[data-modal]': ['modal-pokedex', 'modal-achievements', 'modal-team', 'modal-options', 'modal-help']
     .map((m) => { const e = new StubElement('button'); e.dataset.modal = m; return e; }),
   '[data-close]': [new StubElement('button')],
   '[data-back]': [(() => { const e = new StubElement('button'); e.dataset.back = 'screen-title'; return e; })()]
@@ -136,7 +136,7 @@ check('jogo inicia no menu principal', !registry.get('screen-title').classes.has
 check('barra lateral visível no menu', !registry.get('side-rail').classes.has('hidden'));
 
 // ---- janelas da barra lateral ----
-for (const id of ['modal-pokedex', 'modal-achievements', 'modal-team', 'modal-trainer', 'modal-options', 'modal-help']) {
+for (const id of ['modal-pokedex', 'modal-achievements', 'modal-team', 'modal-options', 'modal-help']) {
   game.menus.showModal(id);
   check(`janela ${id.replace('modal-', '')} abre`, !registry.get(id).classes.has('hidden'));
   game.menus.closeModal();
@@ -352,19 +352,14 @@ if (claimable.length) {
   game.profile.stats[achievement.stat] = value;
 }
 
-// loja do treinador
-game.menus.showModal('modal-trainer');
-const shop = game.trainerShop();
-check('loja do treinador lista as melhorias', shop.length >= 5, `${shop.length} melhorias`);
-const affordable = shop.find((e) => e.affordable);
-if (affordable) {
-  const before = game.profile.shards;
-  check('comprar melhoria desconta os Shards',
-        game.buyTrainerUpgrade(affordable.upgrade.id) &&
-        game.profile.shards === before - affordable.cost &&
-        game.profile.trainerUpgrades[affordable.upgrade.id] === 1);
-}
-game.menus.closeModal();
+// a loja do treinador saiu (0.21): nem a janela nem os botões existem, e um save
+// antigo com melhorias compradas carrega sem elas
+check('a aba de melhorias do treinador não existe mais',
+      typeof game.trainerShop === 'undefined' && typeof game.buyTrainerUpgrade === 'undefined'
+      && !readFileSync(join(root, 'index.html'), 'utf8').includes('modal-trainer'));
+const oldSave = normalizeProfile({ trainerUpgrades: { meta_damage: 3 }, achievements: { tiers: { shop: 2, hunter: 1 } } });
+check('save antigo: as melhorias compradas e a conquista da loja somem; as outras ficam',
+      !('trainerUpgrades' in oldSave) && !oldSave.achievements.tiers.shop && oldSave.achievements.tiers.hunter === 1);
 check('vitória guarda a equipe da jornada', !!game.campaign.journey?.team?.members?.length);
 
 // ---- o PC (0.12): a tela do FireRed, pegar e soltar ----

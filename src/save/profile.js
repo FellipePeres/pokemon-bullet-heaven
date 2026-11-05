@@ -33,9 +33,8 @@ export function createProfile() {
       unlocked: [],
       claimed: []
     },
-    /** Shards e melhorias permanentes do treinador (ver data/trainerUpgrades.js). */
+    /** Shards: vêm das fases e das conquistas. */
     shards: 0,
-    trainerUpgrades: {},
     stats: {
       runsPlayed: 0,
       totalKills: 0,
@@ -58,7 +57,6 @@ export function createProfile() {
       flawlessClears: 0,
       shardsEarned: 0,
       champions: 0,
-      trainerUpgradesBought: 0,
       shinyCaught: 0
     },
     // equipes campeãs (Hall da Fama): { date, trainer, region, team: [{ pokemonId, level }] }
@@ -71,8 +69,7 @@ export function createProfile() {
     // campos de cima (`trainer`, `region`, `regions`; a partida em andamento é o
     // `run` do save), e todo o resto do jogo continua lendo dali. Cada espaço
     // guarda a sua em `data` enquanto está guardado (null enquanto é a ativa).
-    // Pokédex, conquistas, Shards, melhorias do treinador e Hall da Fama são do
-    // jogador e valem para todas.
+    // Pokédex, conquistas, Shards e Hall da Fama são do jogador e valem para todas.
     journeys: [],          // [{ id, createdAt, updatedAt, data: { trainer, region, regions } | null, pendingRun }]
     activeJourney: null    // o id do espaço que está nos campos de cima
   };
@@ -157,12 +154,18 @@ function normalizeJourneys(loaded, regions) {
   return { journeys, activeJourney };
 }
 
+/** Os degraus guardados, só das conquistas que ainda existem. */
+function knownAchievements(record = {}) {
+  return Object.fromEntries(Object.entries(record ?? {}).filter(([id]) => ACHIEVEMENTS.some((a) => a.id === id)));
+}
+
 /** Garante que um perfil carregado tenha todos os campos atuais. */
 export function normalizeProfile(loaded) {
   const base = createProfile();
   if (!loaded || typeof loaded !== 'object') return base;
 
-  const { campaign: legacy, ...rest } = loaded;
+  // `trainerUpgrades` era a loja do treinador (saiu na 0.21): fica fora do save
+  const { campaign: legacy, trainerUpgrades: _shop, ...rest } = loaded;
   const regions = normalizeRegions(loaded.regions, legacy);
   const stats = { ...base.stats, ...(loaded.stats ?? {}) };
   stats.badges = countBadges({ regions });
@@ -174,10 +177,10 @@ export function normalizeProfile(loaded) {
     achievements: {
       ...base.achievements,
       ...(loaded.achievements ?? {}),
-      tiers: { ...(loaded.achievements?.tiers ?? {}) },
-      notified: { ...(loaded.achievements?.notified ?? {}) }
+      // só as conquistas que existem (a 'shop' saiu com a loja na 0.21)
+      tiers: knownAchievements(loaded.achievements?.tiers),
+      notified: knownAchievements(loaded.achievements?.notified)
     },
-    trainerUpgrades: { ...base.trainerUpgrades, ...(loaded.trainerUpgrades ?? {}) },
     // saves antigos guardavam "coins"; vira shards sem perder nada
     shards: loaded.shards ?? loaded.coins ?? base.shards,
     stats,
@@ -290,7 +293,6 @@ export class ProfileTracker {
   refreshDerivedStats() {
     const p = this.profile;
     p.stats.champions = p.hallOfFame?.length ?? 0;
-    p.stats.trainerUpgradesBought = Object.values(p.trainerUpgrades ?? {}).reduce((sum, v) => sum + (v ?? 0), 0);
     this.refreshDexCount();
   }
 

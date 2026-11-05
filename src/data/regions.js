@@ -6,8 +6,8 @@ import { KANTO_DEX } from './kanto.js';
  * ginásio em ginásio e os modelos de treinador dela.
  *
  * O progresso (fases, insígnias e a equipe da jornada) fica guardado por
- * região no perfil, em `profile.regions[id]`. Shards, Pokédex, conquistas e
- * melhorias do treinador são do jogador e valem em todas.
+ * região no perfil, em `profile.regions[id]`. Shards, Pokédex e conquistas são
+ * do jogador e valem em todas.
  *
  * Para criar uma região: uma entrada aqui, as fases dela em stages.js, as
  * tabelas de captura em capturePools.js e os modelos em trainers.js.

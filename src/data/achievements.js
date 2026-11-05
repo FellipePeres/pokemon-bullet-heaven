@@ -81,10 +81,8 @@ export const ACHIEVEMENTS = [
   /* ---- Shards ---- */
   { id: 'shards', name: 'Fortuna', icon: 'shards', stat: 'shardsEarned',
     description: (g) => `Ganhe ${n(g)} Shards no total.`,
-    tiers: tiers([500, 2000, 5000, 15000, 40000], [50, 150, 300, 600, 1000]) },
-  { id: 'shop', name: 'Cliente Fiel', icon: 'trainer', stat: 'trainerUpgradesBought',
-    description: (g) => `Compre ${n(g)} melhoria(s) do treinador.`,
-    tiers: tiers([1, 5, 15, 30], [60, 150, 300, 500]) }
+    tiers: tiers([500, 2000, 5000, 15000, 40000], [50, 150, 300, 600, 1000]) }
+  // 'shop' (Cliente Fiel, comprar melhorias do treinador) saiu com a loja na 0.21
 ];
 
 export const getAchievement = (id) => ACHIEVEMENTS.find((a) => a.id === id);

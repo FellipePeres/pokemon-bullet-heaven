@@ -25,7 +25,6 @@ import { getRegion, DEFAULT_REGION } from '../data/regions.js';
 import { TRAINER_LOOKS, getTrainerLook } from '../data/trainers.js';
 import { POKEMON, getPokemon } from '../data/pokemon.js';
 import { ENEMIES } from '../data/enemies.js';
-import { TRAINER_UPGRADES, getTrainerUpgrade, nextCost } from '../data/trainerUpgrades.js';
 import { MusicPlayer } from '../audio/music.js';
 import { swapWithPC, moveMon, normalizePC, fixDuplicateUids } from '../systems/pc.js';
 
@@ -360,8 +359,6 @@ export class Game {
     } else {
       options = { starter: this.campaign.starter, starterShiny: this.campaign.starterShiny };
     }
-    // melhorias compradas com moedas valem em todas as fases
-    options.trainerUpgrades = { ...this.profile.trainerUpgrades };
     options.ownedElsewhere = (journey?.pc ?? []).map((m) => m.pokemonId);   // lendário: um de cada
     options.trainer = this.profile.trainer;
     options.campaignStarter = this.campaign.starter;
@@ -783,23 +780,6 @@ export class Game {
     return null;
   }
 
-  /* ====================== melhorias do treinador ====================== */
-
-  /** Lista as melhorias com nível atual e custo do próximo nível. */
-  trainerShop() {
-    return TRAINER_UPGRADES.map((up) => {
-      const level = this.profile.trainerUpgrades[up.id] ?? 0;
-      const cost = nextCost(up, level);
-      return {
-        upgrade: up,
-        level,
-        cost,
-        maxed: cost === null,
-        affordable: cost !== null && this.profile.shards >= cost
-      };
-    });
-  }
-
   /* ================================= PC ================================= */
 
   /** O PC da jornada (Pokémon guardados fora da equipe), cada um na sua casa. */
@@ -833,22 +813,6 @@ export class Game {
       toast(`+${amount} Shards coletados!`, 'shards');
     }
     return amount;
-  }
-
-  /** Compra um nível de melhoria do treinador. */
-  buyTrainerUpgrade(upgradeId) {
-    const up = getTrainerUpgrade(upgradeId);
-    if (!up) return false;
-    const level = this.profile.trainerUpgrades[up.id] ?? 0;
-    const cost = nextCost(up, level);
-    if (cost === null) { toast('Essa melhoria já está no máximo.', 'levelUp'); return false; }
-    if (this.profile.shards < cost) { toast('Shards insuficientes.', 'shards'); return false; }
-
-    this.profile.shards -= cost;
-    this.profile.trainerUpgrades[up.id] = level + 1;
-    this.autosave();
-    toast(`${up.name} — nível ${level + 1}!`, up.icon);
-    return true;
   }
 
   /* ============================== save ============================== */

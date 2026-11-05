@@ -4,8 +4,7 @@ import { nextMoveFor, tmNumber } from '../data/tms.js';
 import { getAbility } from '../data/abilities.js';
 import { tmIconForType } from '../render/icons.js';
 import { getPokemon } from '../data/pokemon.js';
-import { getTrainerUpgrade } from '../data/trainerUpgrades.js';
-import { applyModifiers, weightedPickMany } from '../core/utils.js';
+import { weightedPickMany } from '../core/utils.js';
 import { bus, EVENTS } from '../core/events.js';
 import { maxHpFor, xpToNextLevel } from './stats.js';
 import { transferUpgrades } from './moves.js';
@@ -32,8 +31,8 @@ const HEAL_FALLBACK = {
  *   1/10 da vida (CONFIG.progression.levelUpHeal); evoluir cura tudo.
  * - A tela de melhoria aparece a cada `upgradeEveryLevels` níveis.
  * - Ao atingir o nível de evolução, o Pokémon evolui (níveis fiéis aos jogos).
- * - As melhorias de partida são só do Pokémon. Bônus globais vêm das moedas
- *   gastas nas melhorias do treinador (data/trainerUpgrades.js).
+ * - As melhorias de partida são só do Pokémon (não há bônus globais desde a
+ *   0.21, quando a loja do treinador saiu).
  */
 export class ProgressionSystem {
   constructor(run) {
@@ -193,9 +192,9 @@ export class ProgressionSystem {
     return true;
   }
 
-  /** Stats da equipe = base do CONFIG + melhorias do treinador (moedas). */
+  /** Stats da equipe: as do CONFIG (as melhorias do treinador saíram na 0.21). */
   computePlayerStats() {
-    const base = {
+    return {
       speed: CONFIG.trainer.speed,
       pickupRadius: CONFIG.trainer.pickupRadius,
       pokemonHpBonus: 0,
@@ -206,18 +205,6 @@ export class ProgressionSystem {
       damageMult: 1,
       cooldownMult: 1
     };
-
-    const mods = {};
-    for (const [upId, level] of Object.entries(this.run.trainerUpgrades ?? {})) {
-      const up = getTrainerUpgrade(upId);
-      if (!up || !level) continue;
-      for (const [key, mod] of Object.entries(up.modifiers)) {
-        if (!mods[key]) mods[key] = { add: 0, mult: 0 };
-        mods[key].add += (mod.add || 0) * level;
-        mods[key].mult += (mod.mult || 0) * level;
-      }
-    }
-    return applyModifiers(base, mods);
   }
 
   /** Quantas vezes este upgrade já foi escolhido por este Pokémon. */

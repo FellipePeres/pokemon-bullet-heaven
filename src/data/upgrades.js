@@ -2,8 +2,7 @@
  * UPGRADES DE PARTIDA
  *
  * Tudo aqui melhora APENAS o Pokémon que escolheu (dano, projéteis, área,
- * recarga, efeitos...). Bônus globais do treinador não moram mais aqui:
- * eles são comprados com moedas em data/trainerUpgrades.js.
+ * recarga, efeitos...). Não há bônus globais (a loja do treinador saiu na 0.21).
  *
  * Campos:
  *   id, name, description, icon (chave de render/icons.js)

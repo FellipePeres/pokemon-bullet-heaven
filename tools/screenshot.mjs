@@ -229,7 +229,6 @@ const ROTEIROS = {
     { wait: 1200 }, { shot: 'tela-04-jornada' },
     { run: "game.menus.showModal('modal-options')" }, { wait: 500 }, { shot: 'tela-05-opcoes' },
     { run: "game.menus.closeModal(); game.menus.showModal('modal-pokedex')" }, { wait: 800 }, { shot: 'tela-06-pokedex' },
-    { run: "game.menus.closeModal(); game.menus.showModal('modal-trainer')" }, { wait: 500 }, { shot: 'tela-07-treinador-loja' },
     { run: "game.menus.closeModal(); game.menus.showModal('modal-achievements')" }, { wait: 500 }, { shot: 'tela-07b-conquistas' },
     { run: "game.menus.closeModal(); game.menus.showModal('modal-help')" }, { wait: 500 }, { shot: 'tela-07c-ajuda' },
     { run: "game.menus.closeModal(); game.startStage('gym_3_vermilion')" }, { wait: 1500 }, { shot: 'tela-08-partida', raw: true },

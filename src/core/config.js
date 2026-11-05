@@ -3,7 +3,7 @@
  * Nada de número mágico espalhado pelo gameplay: se precisar ajustar, ajuste aqui.
  */
 export const CONFIG = {
-  version: '0.20.1',
+  version: '0.21.0',
 
   canvas: { width: 1280, height: 720 },
 
@@ -176,7 +176,7 @@ export const CONFIG = {
     potionChance: 0.04       // chance de um selvagem comum deixar uma poção
   },
 
-  /** SHARDS: a moeda do jogo, gasta nas melhorias permanentes do treinador. */
+  /** SHARDS: vêm de vencer fases e coletar conquistas (a loja do treinador saiu na 0.21). */
   shards: {
     perStageClear: 120,     // ao vencer uma fase
     firstClearBonus: 180,   // bônus na primeira vez que conclui aquela fase

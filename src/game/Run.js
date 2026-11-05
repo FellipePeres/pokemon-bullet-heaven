@@ -53,9 +53,8 @@ export class Run {
     this.signatures = [];      // golpes exclusivos dos lendários (systems/signatureMoves.js)
 
     // ---- progressão ----
-    // Melhorias de habilidade ficam em cada Pokémon; os bônus globais vêm das
-    // melhorias do treinador compradas com moedas (progresso permanente).
-    this.trainerUpgrades = { ...(options.trainerUpgrades ?? {}) };
+    // Melhorias de habilidade ficam em cada Pokémon. (As melhorias do treinador,
+    // compradas com Shards, saíram na 0.21.)
     this.upgrades = {};                        // mantido para compatibilidade de save
     this.segment = segmentAt(this.stage, 0);
     this.world.scene = sceneOf(this.segment, this.world);
@@ -708,7 +707,6 @@ export class Run {
     return {
       stageId: this.stage.id,
       time: Math.round(this.time),
-      trainerUpgrades: { ...this.trainerUpgrades },
       team: this.team.serialize(),
       pc: this.pc,
       stats: { ...this.stats }

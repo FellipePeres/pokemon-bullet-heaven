@@ -5,7 +5,7 @@
 > decisão foi tomada e o que falta fazer. O `README.md` é o manual de uso;
 > este aqui é o contexto de desenvolvimento.
 
-**Versão atual:** `0.20.1` · **Última atualização:** 2026-11-05
+**Versão atual:** `0.21.0` · **Última atualização:** 2026-11-05
 **Stack:** HTML + CSS + JavaScript puro (ES Modules). Sem backend, sem build, sem dependências.
 **Repositório:** https://github.com/FellipePeres/pokemon-bullet-heaven (público)
 **Jogo no ar:** https://fellipeperes.github.io/pokemon-bullet-heaven/
@@ -111,7 +111,6 @@ src/
     pokemon.js        as 151 espécies: tipos, hp, power, evolução, moveLine
     abilities.js      52 golpes (no máximo 4 por tipo) + 3 golpes dos líderes
     upgrades.js       217 upgrades de partida, gerados a partir das habilidades
-    trainerUpgrades.js 9 melhorias permanentes compradas com Shards
     tms.js            linha de golpes: qual o próximo golpe de cada Pokémon
     capturePools.js   chances de captura por fase (as 9 tabelas do design)
     enemies.js        159 inimigos: selvagens, elites e Pokémon dos líderes
@@ -141,7 +140,7 @@ src/
     stats.js          vida máxima, XP por nível, multiplicador de dano por nível
   game/
     Run.js            uma partida: estado, loop, colisões, condições de fim
-    Game.js           orquestra tudo: perfil, telas, loop principal, save, loja
+    Game.js           orquestra tudo: perfil, telas, loop principal, save
   render/
     Renderer.js       canvas: chão, atores, efeitos, barra do chefe, treinador
     assets.js         carrega as folhas do catálogo e desenha quadros em escala inteira
@@ -152,7 +151,7 @@ src/
     icons.js          ícones de item por chave semântica
   ui/
     HUD.js            HUD da partida e overlays (nível, captura, evolução, pausa)
-    Menus.js          menu, mapa, modais (Pokédex, conquistas, equipe, loja, opções)
+    Menus.js          menu, mapa, modais (Pokédex, conquistas, equipe, opções)
     pcScreen.js       a tela do PC (a do FireRed, portada do Pokemon All): caixas, equipe, pegar e soltar
     lobby.js          o lobby: o Town Map de Kanto, a fase escolhida, a equipe e a barra do topo
     badgeCase.js      o Estojo de Insígnias: o Cartão de Treinador e as métricas de cada fase
@@ -282,11 +281,18 @@ confirmar com ele**.
 - Pokémon **ativo** que sobe pausa a partida na hora. Pokémon da **reserva**
   acumula e o jogador gasta quando quiser pelo botão ▲ no card.
 
-### Melhorias: duas camadas separadas
-| Camada | Onde | Escopo |
-|---|---|---|
-| Partida | Level up do Pokémon | **Só aquele Pokémon** (dano, projéteis, área, recarga, efeitos). Fica em `member.upgrades`. |
-| Permanente | Shards na aba Treinador | Toda a equipe, todas as fases. Fica em `profile.trainerUpgrades`. |
+### Melhorias: só as do Pokémon (desde a 0.21)
+- **Level up do Pokémon**: só aquele Pokémon (dano, projéteis, área, recarga,
+  efeitos). Fica em `member.upgrades`.
+- A segunda camada, a **loja de melhorias do treinador** (bônus permanentes para a
+  equipe toda, comprados com Shards: `data/trainerUpgrades.js`,
+  `profile.trainerUpgrades`), **saiu na 0.21** a pedido do Fellipe ("vamos
+  remover essa aba de melhorias"). Os botões Treinador (título, lobby e a barra
+  lateral), a janela, os bônus e a conquista "Cliente Fiel" saíram; um save com
+  melhorias compradas carrega sem elas (`normalizeProfile` descarta o campo e os
+  degraus de conquistas que não existem mais). O balanceamento já era medido sem
+  elas (o bot nunca comprava). A Pokédex e as conquistas valem para todas as
+  jornadas.
 
 Nunca voltar bônus globais para o pool de level up — foi pedido explícito.
 
@@ -482,7 +488,7 @@ Nunca voltar bônus globais para o pool de level up — foi pedido explícito.
   ícones do PC (a bolinha marca os 3 em campo); clicar abre o PC.
 - **Barra do topo** com tudo: o treinador, o estojo em miniatura, Shards e
   Pokédex, os ícones (Pokédex, Conquistas com o aviso de "para coletar", Equipe,
-  Treinador, Opções, Ajuda) e PC, Hall, Salvar e Menu escritos. A lateral de
+  Opções, Ajuda; o Treinador saiu na 0.21) e PC, Hall, Salvar e Menu escritos. A lateral de
   ícones e a engrenagem do canto saem desta tela.
 - **Estojo de Insígnias** (`ui/badgeCase.js`): o Cartão de Treinador azul do
   FireRed (do Pokemon All) com as 8 insígnias nas casas dele, a Liga embaixo e,
@@ -603,7 +609,8 @@ Nunca voltar bônus globais para o pool de level up — foi pedido explícito.
 ### Shards (moeda)
 - Vêm de concluir fases (automático: 120 + 180 na primeira vez) e de
   **coletar conquistas** — a conquista concluída fica com botão "coletar" na aba.
-- Gastos nas melhorias permanentes do treinador.
+- Eram gastos na loja de melhorias do treinador, que saiu na 0.21 (o que fazer
+  com eles fica para o Fellipe decidir).
 - Saves antigos com `coins` migram para `shards` sozinhos.
 
 ---
@@ -823,7 +830,6 @@ botão Continuar). Estrutura:
   "profile": {
     "trainer": "leaf",                               // null = ainda não escolheu
     "shards": 620,
-    "trainerUpgrades": { "meta_speed": 2 },
     "pokedex": { "caught": [4, 5, 25] },            // só capturados/evoluídos
     "achievements": { "tiers": { "catcher": 2 }, "notified": { "catcher": 3 } },  // degraus coletados (0.11)
     "stats": { "totalKills": 0, "badges": 1, "...": 0 },
@@ -836,7 +842,7 @@ botão Continuar). Estrutura:
       }
     }
   },
-  "run": { "stageId": "...", "time": 95, "team": {}, "pc": [], "trainerUpgrades": {}, "stats": {} }
+  "run": { "stageId": "...", "time": 95, "team": {}, "pc": [], "stats": {} }
 }
 ```
 
@@ -1007,6 +1013,7 @@ tipo, som e o polimento de troca e captura.
 | 18 | lobby mais bonito e único (planejado junto: o Town Map, o estojo com as métricas, tudo na barra do topo); o 2º golpe no lugar do bônus de ataque; shiny só na captura e do jogador; publicar o lobby | 0.13: `ui/lobby.js`, `ui/badgeCase.js`, `systems/stageStats.js`, `data/regionMap.js`, mapa e cartão por script; D11 reescrita (publicada com a Poção e os líderes). 0.13.1: shiny (1% por opção da Poké Ball), com sprites shiny no campo, nos cards e no PC, ✦ na Pokédex e a conquista Brilho Raro |
 | 19 | o inicial também shiny (1%) e publicar; refinar os 3 2º golpes por tipo (aprovados com ajustes: Whirlpool longe, curas com teto, 2%/1% pelos tipos, nome oficial, 60% do dano); tremor só nos golpes dos líderes; o nível passando de 100 (o número saía do selo) e os líderes fáceis demais | 0.13.2: inicial shiny. 0.14: `data/bonusMoves.js` (51 golpes) e o motor deles; o líder acompanha a equipe (`leaderLevel`, `bossLift`); tremor só dos líderes; selo do nível que cresce com o número |
 | 20 | fases levemente mais rápidas: de 3:30 para 2:45 | 0.15: a linha do tempo das 13 fases comprimida (×165/210; levas ×√f mais densas, XP ×1/√f); a equipe chega ao líder no mesmo nível (medido) |
+| 27 | remover a aba de melhorias do treinador; conquistas e Pokédex valem para todas as jornadas | 0.21: a loja saiu inteira (botões, janela, bônus, `data/trainerUpgrades.js`, a conquista "Cliente Fiel"); saves antigos carregam sem ela |
 | 26 | "tá tudo meio bugado": capturar trocando um ativo deixava ele no mapa; barras de vida vazias com o Pokémon ativo; trocas quebradas; o botão do Modo Livre direto para o mapa da jornada | 0.20.1: ids de Pokémon únicos entre sessões (`uniqueId`) e conserto dos saves com ids repetidos; o Modo Livre em si estava certo (conferido no Chrome); "Voltar para o Centro Pokémon" vai direto ao mapa |
 | 25 | Modo Livre: depois da vitória, a fase sem fim com XP reduzido, inimigos cada vez mais fortes até ficar quase impossível, e o botão "Voltar para o Centro Pokémon" no canto | 0.20: `Game.startEndless/leaveEndless`, `Run.startEndless`, `SpawnSystem` com as ondas da segunda metade em laço, um elite por minuto e ×1,2 por minuto; XP ×0,4; testes e roteiro de screenshot "livre" |
 | 24 | no título, "Jornada" no lugar de "Continuar", com os espaços das jornadas: fazer mais de uma, com novos Pokémon, e voltar para a outra | 0.19: 3 espaços de jornada (`ui/journeys.js`, `Game.openJourney/newJourney/deleteJourney`); cada uma com treinador, inicial, insígnias, equipe, PC e partida; Pokédex, conquistas, Shards e melhorias valem para todas; save antigo vira a jornada 1 |
