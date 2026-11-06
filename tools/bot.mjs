@@ -18,11 +18,16 @@ const UPGRADE_VALUE = {
   arc: 2, spin: 2, pulse: 2, push: 1
 };
 
-/** Gasta um nível pendente na melhor escolha: TM, senão a que mais dá dano. */
+/**
+ * Gasta um nível pendente na melhor escolha: TM; senão uma da chave do Golpe
+ * Desperto (0.28: quem joga vai atrás dela, o card vem marcado); senão a que
+ * mais dá dano.
+ */
 export function spendLevel(run, member) {
   const choices = run.progression.rollChoices(member);
   if (!choices.length) throw new Error('Level up sem opções!');
-  const value = (c) => (c.scope === 'tm' ? 100 : UPGRADE_VALUE[c.id.split('_').pop()] ?? 1) + Math.random() * 0.5;
+  const value = (c) => (c.scope === 'tm' ? 100 : run.progression.isAwakeningPart(c, member) ? 50
+    : UPGRADE_VALUE[c.id.split('_').pop()] ?? 1) + Math.random() * 0.5;
   const pick = choices.reduce((best, c) => (value(c) > value(best) ? c : best));
   run.progression.applyUpgrade(pick.id, member);
   member.pendingLevels = Math.max(0, member.pendingLevels - 1);

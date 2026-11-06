@@ -5,6 +5,7 @@ import { typeColor, typeName } from '../data/types.js';
 import { CONFIG } from '../core/config.js';
 import { BOX_SIZE, boxCount, monAt, normalizePC, previewMove } from '../systems/pc.js';
 import { isBonusMove } from '../data/bonusMoves.js';
+import { awakeningProgress } from '../data/awakening.js';
 
 /**
  * O PC — o "Pokémon Storage System" do FireRed, trazido do Pokemon All
@@ -247,6 +248,11 @@ export class PCScreen {
     if (move) info.appendChild(create('p', 'pc-data__line', move.name));
     const second = mon.abilities?.find(isBonusMove);   // o 2º golpe (raro)
     if (second) info.appendChild(create('p', 'pc-data__line pc-data__bonus', `+ ${getAbility(second).name}`));
+    else {
+      // a chave do Golpe Desperto (0.28): quanto falta
+      const { have, need } = awakeningProgress(mon);
+      if (need) info.appendChild(create('p', 'pc-data__line pc-data__bonus', `✦ Desperto ${have}/${need}`));
+    }
     const team = this.journey?.team;
     const where = mon.slot !== undefined ? 'No PC'
       : team?.active?.includes(mon.uid) ? 'Em campo' : 'Na reserva';

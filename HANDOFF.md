@@ -5,7 +5,7 @@
 > decisão foi tomada e o que falta fazer. O `README.md` é o manual de uso;
 > este aqui é o contexto de desenvolvimento.
 
-**Versão atual:** `0.27.0` · **Última atualização:** 2026-11-05
+**Versão atual:** `0.28.0` · **Última atualização:** 2026-11-06
 **Stack:** HTML + CSS + JavaScript puro (ES Modules). Sem backend, sem build, sem dependências.
 **Repositório:** https://github.com/FellipePeres/pokemon-bullet-heaven (público)
 **Jogo no ar:** https://fellipeperes.github.io/pokemon-bullet-heaven/
@@ -41,6 +41,9 @@ npm run smoke:ui             # interface: DOM simulado a partir do index.html re
 npm run screens -- <roteiro> --out <pasta>   # screenshots no Chrome sem janela
 npm run assets               # regera os sprites a partir do Pokemon All (Python + Pillow)
 npm run balance -- --runs 12 # joga a campanha com o bot: tentativas até passar cada fase, níveis e lutas
+npm run balance -- --runs 48 --jobs 12          # o mesmo, em 12 processos (0.28; a máquina tem 12 núcleos)
+npm run balance -- --load equipes.json --from gym_6_saffron --until gym_6_saffron --set gym_6_saffron.difficulty=0.8
+                                                # testa um valor sem editar stages.js (vários --set valem)
 ```
 
 Os testes são a rede de segurança do projeto — **rode sempre que mexer em
@@ -281,6 +284,13 @@ confirmar com ele**.
   por fase para ~20, que foi a reclamação do Fellipe.
 - Pokémon **ativo** que sobe pausa a partida na hora. Pokémon da **reserva**
   acumula e o jogador gasta quando quiser pelo botão ▲ no card.
+- **A curva depois do nível 20 ficou mais íngreme** (0.28, "a escala de ganho de
+  nível tá muito alta"; o Brock fica como está): `xpLateExponent` de 2,2 para 3,4.
+  Até o 20 (a Fase 1) nada muda. O bot chegava ao Campeão no ~115 e agora chega no
+  ~73 (o ace dele é 63), mais perto do FireRed. Menos níveis é menos vida e dano
+  para a equipe; a `difficulty` de cada fase foi recalibrada por cima disso (ver a
+  seção 5). As evoluções por nível vêm mais tarde na jornada (Charizard no fim da
+  fase do Surge ou na da Erika).
 
 ### Melhorias: só as do Pokémon (desde a 0.21)
 - **Level up do Pokémon**: só aquele Pokémon (dano, projéteis, área, recarga,
@@ -305,11 +315,32 @@ Nunca voltar bônus globais para o pool de level up — foi pedido explícito.
   que anuncia o golpe; clicar segue a partida (`run.unlockQueue`, estado
   `'unlock'`, `Game.openUnlock`, `HUD.showUnlock`). É a única tela que o Pokémon
   com todas as melhorias ainda abre.
-- **Com todas as melhorias, cada nível pode ensinar um 2º golpe** (`data/bonusMoves.js`,
-  a D11 do PLANEJAMENTO, aprovada golpe a golpe pelo Fellipe): 2% de um dos 3 do
-  tipo principal; se não sair, 1% de um dos 3 do secundário
-  (`CONFIG.bonusMove`). Um por Pokémon, para sempre; ele mantém o golpe dele e
-  usa os dois. O 2º golpe entra em `member.abilities` (o mesmo lugar do golpe
+- **A chave do Golpe Desperto** (0.28, ideia do Fellipe: "o golpe desperto pode
+  ser desbloqueado se você aprimorar totalmente certas melhorias — o Gyarados
+  seria velocidade, penetração e dano; o Gloom, área, intervalo entre os danos e
+  cooldown"). Cada golpe tem **3 melhorias que formam a chave**
+  (`data/awakening.js`: `AWAKENING_KEYS` por golpe, `AWAKENING_BY_BEHAVIOR` para o
+  resto); com as 3 no máximo, o 2º golpe vem **na hora, sem sorteio**
+  (`ProgressionSystem.maybeLearnBonusMove`, chamado ao aplicar a melhoria, ao
+  trocar de golpe, ao subir de nível e no `trainToLevel`). A chave é do golpe, não
+  da espécie, porque as melhorias são do golpe (o Gyarados usa Hydro Pump, o Gloom
+  usa Toxic); trocar de golpe transfere as melhorias, então o progresso quase
+  sempre vem junto. Todas somam 11 a 13 melhorias (33 a 39 níveis no mínimo; o
+  `check-data` confere). Padrão até o Fellipe decidir golpe a golpe.
+  - **Na tela de nível**, a melhoria da chave vem com moldura dourada, o selo
+    "✦ GOLPE DESPERTO" e o aviso "Maximize para despertar um golpe novo · chave
+    4/12" (pedido do Fellipe); na janela da equipe, o progresso de cada parte; no
+    PC, "✦ Desperto 4/12". Roteiro `despertar` no `screenshot.mjs`.
+  - O golpe é um dos 3 do tipo principal ou, em quem tem dois tipos, um dos 3 do
+    secundário em 1/3 das vezes (`CONFIG.bonusMove.secondaryShare`, a proporção
+    dos antigos 2% e 1%). Um por Pokémon, para sempre; ele mantém o golpe dele e
+    usa os dois.
+  - **Quem chega tarde** (`trainToLevel`) recebe primeiro as melhorias da chave:
+    um Gyarados capturado no nível 45 já chega desperto (sem a tela). Saves de
+    antes da 0.28 com a chave completa despertam ao carregar.
+  - O bot (`tools/bot.mjs`) escolhe TM, depois a chave, depois dano.
+  - Até a 0.27: com **todas** as melhorias (~18, nível ~54), 2% por nível do tipo
+    principal e 1% do secundário. O 2º golpe entra em `member.abilities` (o mesmo lugar do golpe
   extra dos iniciais), então o save, o PC e a troca já o levam.
 - 51 golpes (3 por tipo, 17 tipos — Sombrio não tem Pokémon nas 151), com o nome
   oficial e a descrição em português. **Dano por acerto: 60% do golpe principal
@@ -698,7 +729,7 @@ Valores em `src/core/config.js` (o que não estiver lá está em `/data`):
 |---|---|
 | Pokémon ativos / equipe | 3 / 6 |
 | Cooldown de troca | 6s |
-| Curva de XP por Pokémon | 12 × 1,15^nível até o nível 20; depois cresce como (nível/20)^2,2 |
+| Curva de XP por Pokémon | 12 × 1,15^nível até o nível 20; depois cresce como (nível/20)^3,4 (0.28; era ^2,2) |
 | Melhoria a cada | 3 níveis |
 | Chance de TM no level up | 4% (o golpe melhora mais pela evolução) |
 | Vida por nível / dano por nível | +6 HP / +7% |
@@ -715,6 +746,38 @@ Valores em `src/core/config.js` (o que não estiver lá está em `/data`):
 | Duração das fases | 2:45 até o líder em todas (~3:15 com a luta), desde a 0.15 (3:30 na 0.11) |
 | Opções por Poké Ball | 4 (tabelas acumuladas; os outros iniciais raros da Fase 3 em diante) |
 | Selvagens por nível (Fase 3+) | vida ×1,075 e dano ×1,035 por nível acima do 5; XP +8% por nível |
+
+**Dificuldade medida na 0.28** (curva de XP nova, chave do Golpe Desperto e
+`difficulty` recalibrada; `npm run balance -- --runs 60 --jobs 12`, o bot mirando a
+chave). "0.27" é a mesma medida antes da mudança (18 jornadas). Pedido do Fellipe:
+o Brock como está, todas as outras mais duras, menos níveis.
+
+| Etapa | `difficulty` (0.27 → 0.28) | Tentativas 0.27 | Tentativas 0.28 | Entrada (`recommendedLevel`) | Ao vencer 0.27 → 0.28 |
+|---|---|---|---|---|---|
+| Fase 1 (Brock) | 1 (igual) | 1,3 | 1,7 ¹ | — | 21 → 20 |
+| Fase 2 (Misty) | 1,08 → 1,25 | 1,1 | 2,0 | 25 | 29 → 29 |
+| Fase 3 (Lt. Surge) | 1,4 (igual) | 1,1 | 2,1 | 33 | 39 → 38 |
+| Fase 4 (Erika) | 1 (igual) | 1,1 | 2,1 | 40 | 47 → 44 |
+| Fase 5 (Koga) | 1 → 0,85 | 2,3 | 2,7 | 46 | 58 → 49 |
+| Fase 6 (Sabrina) | 1 → 0,82 | 4,5 | 4,1–5,1 ² | 50 | 66 → 53 |
+| Fase 7 (Blaine) | 1 → 0,82 | 2,4 | 3,2 | 55 | 74 → 58 |
+| Fase 8 (Giovanni) | 1 → 0,8 | 4,0 | 4,5 | 60 | 84 → 62 |
+| Lorelei | 1,05 → 0,8 | 3,5 | 3,1–4,7 | 64 | 92 → 66 |
+| Bruno | 1,12 → 0,97 | 3,7 | 3,5–6,3 ² | 66 | 99 → 68 |
+| Agatha | 1,05 → 0,95 | 2,2 | 4,4–5,6 | 70 | 104 → 71 |
+| Lance | 1,15 → 0,88 | 3,7 | 4,1–5,5 | 72 | 112 → 74 |
+| Campeão | 1,25 → 1,08 | 5,0 | 4,3–5,8 ² | 74 | 115 → 74 |
+
+¹ A Fase 1 não mudou (a curva só muda do nível 20 em diante); a diferença é a
+variação do bot, que agora também prefere as melhorias da chave às de dano.
+² Faixas: medições diferentes do mesmo valor (ou de vizinhos: Sabrina 0,8–0,83,
+Bruno 0,95–0,98, Campeão 1,05–1,1). Na Liga a resposta é muito íngreme — 10% de
+força dobra as tentativas — e poucas jornadas chegam lá, então o valor ficou no
+meio da faixa. `difficulty` abaixo de 1 não é fase fácil: a equipe chega de 10 a
+40 níveis abaixo da 0.27. A medida final é o Fellipe jogando.
+
+Como foi calibrado: as fases em ordem, cada uma a partir das equipes que venceram
+a anterior (`--save` / `--load`), testando 3 valores em paralelo com `--set`.
 
 **Dificuldade medida na 0.17** (a derrota guarda o progresso; o bot repete a fase,
 levando o que ganhou, até vencer — teto de 10 tentativas; 15 jornadas do zero,
@@ -1088,6 +1151,7 @@ tipo, som e o polimento de troca e captura.
 | 18 | lobby mais bonito e único (planejado junto: o Town Map, o estojo com as métricas, tudo na barra do topo); o 2º golpe no lugar do bônus de ataque; shiny só na captura e do jogador; publicar o lobby | 0.13: `ui/lobby.js`, `ui/badgeCase.js`, `systems/stageStats.js`, `data/regionMap.js`, mapa e cartão por script; D11 reescrita (publicada com a Poção e os líderes). 0.13.1: shiny (1% por opção da Poké Ball), com sprites shiny no campo, nos cards e no PC, ✦ na Pokédex e a conquista Brilho Raro |
 | 19 | o inicial também shiny (1%) e publicar; refinar os 3 2º golpes por tipo (aprovados com ajustes: Whirlpool longe, curas com teto, 2%/1% pelos tipos, nome oficial, 60% do dano); tremor só nos golpes dos líderes; o nível passando de 100 (o número saía do selo) e os líderes fáceis demais | 0.13.2: inicial shiny. 0.14: `data/bonusMoves.js` (51 golpes) e o motor deles; o líder acompanha a equipe (`leaderLevel`, `bossLift`); tremor só dos líderes; selo do nível que cresce com o número |
 | 20 | fases levemente mais rápidas: de 3:30 para 2:45 | 0.15: a linha do tempo das 13 fases comprimida (×165/210; levas ×√f mais densas, XP ×1/√f); a equipe chega ao líder no mesmo nível (medido) |
+| 35 | manter a fase do Brock como está e dificultar todas as outras; a escala de ganho de nível muito alta; o Golpe Desperto por chave: maximizar certas melhorias (Gyarados: velocidade, penetração e dano; Gloom: área, intervalo entre os danos e cooldown), com a melhoria da chave marcada na tela de nível ("maximize para despertar") | 0.28: `xpLateExponent` 2,2 → 3,4 (o bot chega ao Campeão no ~74, era ~115; o Brock igual); `stage.difficulty` recalibrada fase a fase, todas mais duras que na 0.27 em tentativas do bot (ver seção 5); `data/awakening.js`: 3 melhorias por golpe que despertam o 2º golpe na hora, selo dourado na tela de nível, progresso na equipe e no PC, quem chega tarde treina a chave primeiro; `balance.mjs --jobs` (paralelo) e `--set` (testar um valor) |
 | 34 | Modo Livre no Campeão também | 0.27: depois do Hall da Fama, a tela de vitória de sempre, com o Modo Livre |
 | 33 | o Gengar não recebia o Golpe Desperto; capturado no nível alto vem sem melhorias e fica ruim | 0.26: sem bug no Golpe Desperto (precisava de 18 melhorias = 54 níveis); `trainToLevel`: quem chega tarde vem com 1 melhoria a cada 3 níveis, automáticas (opção 1, escolhida pelo Fellipe) |
 | 32 | a partida continuar rodando com a aba em segundo plano; a luta com o líder começar sozinha depois de 7 s, com a contagem pequena; mostrar os Shards na tela | 0.25: relógio num Worker + passos de 50 ms (`_frame`), contagem na apresentação (`leaderIntroSeconds`), "◆ Shards" no HUD |

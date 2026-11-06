@@ -126,9 +126,12 @@ não abre até você vencer.
 - **Lobby no Town Map de Kanto**: cada fase na cidade do ginásio, o treinador
   andando pelo mapa, a fase escolhida ao lado e o **Estojo de Insígnias** (o Cartão
   de Treinador do FireRed) com as métricas de cada fase.
-- **Golpe Desperto**: com todas as melhorias, cada nível tem uma chance pequena de
-  ensinar um golpe a mais do tipo do Pokémon (51 ao todo: Flame Wheel, Whirlpool,
-  Draco Meteor...), que ele usa junto do dele. Até lá, cada nível de melhoria cura
+- **Golpe Desperto**: cada golpe tem uma **chave** de 3 melhorias (o Hydro Pump do
+  Gyarados: Velocidade, Perfuração e Potência; o Toxic do Gloom: Amplitude,
+  Intensidade e Reflexo). Elas aparecem com o selo dourado na tela de nível; com
+  as 3 no máximo, o Pokémon desperta na hora um golpe a mais do tipo dele (51 ao
+  todo: Flame Wheel, Whirlpool, Draco Meteor...), que usa junto do dele. As outras
+  melhorias continuam valendo; com todas no máximo, cada nível de melhoria cura
   20% sozinho, sem abrir tela.
 - **Lendários**: Articuno, Zapdos, Moltres, Mewtwo e Mew têm um golpe exclusivo
   (Sheer Cold, Zap Cannon, Sacred Fire, Psystrike e Metronome) e já chegam com

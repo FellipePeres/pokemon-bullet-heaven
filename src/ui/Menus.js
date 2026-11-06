@@ -15,6 +15,7 @@ import { maxHpFor } from '../systems/stats.js';
 import { TitleMenu } from './titleMenu.js';
 import { PCScreen } from './pcScreen.js';
 import { isBonusMove, BONUS_MOVE_LABEL } from '../data/bonusMoves.js';
+import { awakeningKeyOf, awakeningPartName } from '../data/awakening.js';
 import { Lobby } from './lobby.js';
 import { BadgeCase } from './badgeCase.js';
 import { JourneyScreen } from './journeys.js';
@@ -352,7 +353,8 @@ export class Menus {
         <p>${data.role} · ${data.types.map(typeName).join(' / ')}</p>
         <div class="node-meta">${moves}</div>
         <div class="node-meta">${upgrades} melhoria(s)${extras.length ? ` · extra: ${extras.join(', ')}` : ''}</div>
-        ${second ? `<div class="node-meta bonus-move" title="${getAbility(second).description}">✦ ${BONUS_MOVE_LABEL}: ${getAbility(second).name}</div>` : ''}
+        ${second ? `<div class="node-meta bonus-move" title="${getAbility(second).description}">✦ ${BONUS_MOVE_LABEL}: ${getAbility(second).name}</div>`
+          : awakeningKeyOf(member).length ? `<div class="node-meta awaken-key">✦ ${BONUS_MOVE_LABEL}: ${awakeningKeyOf(member).map((p) => `${awakeningPartName(p.up)} ${p.stacks}/${p.max}`).join(' · ')}</div>` : ''}
       `;
       node.appendChild(body);
 

@@ -11,6 +11,7 @@ import { BONUS_MOVES } from '../src/data/bonusMoves.js';
 import { LEGENDARY_MOVES, LEGENDARY_KITS, LEGENDARY_ENCOUNTERS } from '../src/data/legendaries.js';
 import { MART_ITEMS, getMartItem, itemEvolutions } from '../src/data/items.js';
 import { UPGRADES } from '../src/data/upgrades.js';
+import { AWAKENING_KEYS, awakeningSuffixes } from '../src/data/awakening.js';
 import { ENEMIES } from '../src/data/enemies.js';
 import { STAGES } from '../src/data/stages.js';
 import { nextMoveFor } from '../src/data/tms.js';
@@ -64,6 +65,20 @@ const noLine = species.filter((p) => !p.moveLine || p.moveLine.length !== lineSi
 noLine.length
   ? fail(`espécies sem a linha de golpes certa: ${noLine.map((p) => p.id).join(', ')}`)
   : ok('todas as espécies têm linha de 3 golpes (os lendários, o exclusivo)');
+
+// a chave do Golpe Desperto (0.28): todo golpe jogável tem 3 melhorias diferentes que existem,
+// de 11 a 13 no total; a lista só cita golpes que existem
+const playableMoves = Object.values(ABILITIES).filter((a) => !a.hostile);
+const badKeys = playableMoves.filter((a) => {
+  const suffixes = awakeningSuffixes(a);
+  const ups = suffixes.map((s) => UPGRADES[`${a.id}_${s}`]);
+  const total = ups.reduce((sum, up) => sum + (up?.maxStacks ?? 0), 0);
+  return suffixes.length !== 3 || new Set(suffixes).size !== 3 || ups.some((up) => !up) || total < 11 || total > 13;
+});
+const strayKeys = Object.keys(AWAKENING_KEYS).filter((id) => !ABILITIES[id] || ABILITIES[id].hostile);
+badKeys.length || strayKeys.length
+  ? fail(`chave do Golpe Desperto quebrada: ${badKeys.map((a) => a.id).join(', ')} ${strayKeys.join(', ')}`)
+  : ok(`${playableMoves.length} golpes com a chave do Golpe Desperto (3 melhorias, 11 a 13 no total)`);
 
 // os lendários: golpe exclusivo, de um Pokémon só, com kit que aponta para melhorias e 2º golpe que existem
 const badKits = Object.entries(LEGENDARY_KITS).filter(([id, kit]) =>

@@ -9,6 +9,7 @@ import { bus, EVENTS } from '../core/events.js';
 import { maxHpFor, xpToNextLevel } from './stats.js';
 import { transferUpgrades } from './moves.js';
 import { BONUS_BY_TYPE, isBonusMove } from '../data/bonusMoves.js';
+import { awakeningKeyOf } from '../data/awakening.js';
 import { FloatingText } from '../entities/effects.js';
 
 /** A ordem das melhorias aplicadas sozinhas em quem chega tarde (`trainToLevel`). */
@@ -133,25 +134,46 @@ export class ProgressionSystem {
   }
 
   /**
-   * O 2º golpe (0.14, data/bonusMoves.js): com todas as melhorias, cada nível tem
-   * uma chance baixa de ensinar um golpe a mais — 2% de um dos 3 do tipo
-   * principal; se não sair, 1% de um dos 3 do secundário. Um por Pokémon, para
-   * sempre; ele mantém o golpe de antes e usa os dois.
+   * A chave do Golpe Desperto (0.28, data/awakening.js): as 3 melhorias do golpe
+   * principal que, no máximo, despertam o 2º golpe. Cada parte: a melhoria, quantas
+   * o Pokémon tem e o máximo.
    */
-  maybeLearnBonusMove(member) {
+  awakeningKey(member) {
+    return awakeningKeyOf(member);
+  }
+
+  /** A chave completa (as 3 no máximo)? */
+  isAwakened(member) {
+    const key = this.awakeningKey(member);
+    return key.length > 0 && key.every((part) => part.stacks >= part.max);
+  }
+
+  /** Esta melhoria faz parte da chave do Golpe Desperto deste Pokémon (e ainda falta)? */
+  isAwakeningPart(up, member) {
+    if (!up || member?.abilities?.some(isBonusMove)) return false;
+    return this.awakeningKey(member).some((part) => part.up.id === up.id && part.stacks < part.max);
+  }
+
+  /**
+   * O 2º golpe (0.14, data/bonusMoves.js). Desde a 0.28 ele vem na hora em que a
+   * chave do golpe fica completa (antes: com todas as melhorias, 2% por nível). É
+   * um dos 3 do tipo principal ou, em quem tem dois tipos, um dos 3 do secundário
+   * (`CONFIG.bonusMove.secondaryShare` das vezes). Um por Pokémon, para sempre;
+   * ele mantém o golpe de antes e usa os dois. `announce: false` aprende sem a
+   * tela (fora da partida, ao montar a equipe).
+   */
+  maybeLearnBonusMove(member, { announce = true } = {}) {
     if (member.abilities.some(isBonusMove)) return null;
-    if (!this.isMaxed(member)) return null;
+    if (!this.isAwakened(member)) return null;
     const [primary, secondary] = getPokemon(member.pokemonId).types;
-    const { chancePrimary, chanceSecondary } = CONFIG.bonusMove;
-    const type = Math.random() < chancePrimary ? primary
-      : secondary && Math.random() < chanceSecondary ? secondary : null;
-    const options = BONUS_BY_TYPE[type];
+    const useSecondary = secondary && BONUS_BY_TYPE[secondary]?.length && Math.random() < CONFIG.bonusMove.secondaryShare;
+    const options = BONUS_BY_TYPE[useSecondary ? secondary : primary] ?? BONUS_BY_TYPE[secondary];
     if (!options?.length) return null;
     const moveId = options[Math.floor(Math.random() * options.length)];
     member.abilities.push(moveId);
-    this.run.rebuildCompanionAbilities();
-    // a única tela que o Pokémon com todas as melhorias ainda abre (0.16): o anúncio
-    this.run.unlockQueue.push({ member, moveId });
+    this.run.rebuildCompanionAbilities?.();
+    // o anúncio (0.16): uma tela só, depois das de melhoria
+    if (announce) this.run.unlockQueue?.push({ member, moveId });
     return moveId;
   }
 
@@ -160,9 +182,10 @@ export class ProgressionSystem {
    * alto, ele vem sem melhorias e fica ruim"). Cada Pokémon tem pelo menos as
    * melhorias que teria subindo do nível 1 — uma a cada `upgradeEveryLevels`
    * níveis —, menos as que ainda estão guardadas no ▲. As que faltam são aplicadas
-   * sozinhas, na ordem de AUTO_TRAIN_ORDER (dano primeiro). Vale para captura,
-   * presente e para quem já estava na jornada (ao carregar a equipe). Devolve
-   * quantas foram aplicadas.
+   * sozinhas: primeiro as da chave do Golpe Desperto (0.28), depois na ordem de
+   * AUTO_TRAIN_ORDER (dano primeiro). Vale para captura, presente e para quem já
+   * estava na jornada (ao carregar a equipe). Se a chave fechar, ele já chega com
+   * o Golpe Desperto. Devolve quantas foram aplicadas.
    */
   trainToLevel(member) {
     const owned = Object.values(member.upgrades ?? {}).reduce((sum, n) => sum + n, 0);
@@ -172,6 +195,7 @@ export class ProgressionSystem {
       const pool = Object.values(UPGRADES).filter((up) => this.isAvailable(up, member));
       if (!pool.length) break;
       const rank = (up) => {
+        if (this.isAwakeningPart(up, member)) return -1;
         const i = AUTO_TRAIN_ORDER.findIndex((suffix) => up.id.endsWith(`_${suffix}`));
         return i === -1 ? AUTO_TRAIN_ORDER.length : i;
       };
@@ -180,6 +204,8 @@ export class ProgressionSystem {
       if (up.grantsAbility && !member.abilities.includes(up.grantsAbility)) member.abilities.push(up.grantsAbility);
       applied++;
     }
+    // quem já tem a chave (de agora ou de um save de antes da 0.28) desperta sem tela
+    this.maybeLearnBonusMove(member, { announce: false });
     return applied;
   }
 
@@ -314,6 +340,7 @@ export class ProgressionSystem {
     member.abilities[0] = newAbility;
     member.upgrades = transferUpgrades(member.upgrades, oldAbility, newAbility);
     this.run.rebuildCompanionAbilities(member);
+    this.maybeLearnBonusMove(member);   // a chave do golpe novo pode já estar completa
 
     const ability = getAbility(newAbility);
     bus.emit(EVENTS.TOAST, {
@@ -348,6 +375,8 @@ export class ProgressionSystem {
       run.rebuildCompanionAbilities();
     }
 
+    // a melhoria que fecha a chave desperta o 2º golpe (0.28)
+    this.maybeLearnBonusMove(member);
     run.refreshStats();
     bus.emit(EVENTS.UPGRADE_TAKEN, { upgrade: up, member });
   }

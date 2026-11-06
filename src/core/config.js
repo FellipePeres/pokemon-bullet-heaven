@@ -3,7 +3,7 @@
  * Nada de número mágico espalhado pelo gameplay: se precisar ajustar, ajuste aqui.
  */
 export const CONFIG = {
-  version: '0.27.0',
+  version: '0.28.0',
 
   canvas: { width: 1280, height: 720 },
 
@@ -103,9 +103,12 @@ export const CONFIG = {
      * Até o nível `xpKnee` a curva é exponencial (o começo, calibrado nas fases
      * 1 e 2); depois cresce como potência do nível. Só exponencial, chegar ao
      * nível 60 da Elite Four exigiria ~305 mil XP por Pokémon.
+     * 0.28 ("a escala de ganho de nível tá muito alta"; o Brock fica como está):
+     * o expoente foi de 2,2 para 3,4. Até o nível 20 (a Fase 1) nada muda; o bot,
+     * que chegava ao Campeão no ~115, chega no ~74 (o ace dele é 63).
      */
     xpKnee: 20,
-    xpLateExponent: 2.2
+    xpLateExponent: 3.4
   },
 
   /**
@@ -140,12 +143,6 @@ export const CONFIG = {
     xpPerLevel: 0.08
   },
 
-  /**
-   * O 2º golpe (0.14, data/bonusMoves.js): com todas as melhorias, cada nível tem
-   * essa chance de ensinar um golpe do tipo principal; senão, a do secundário.
-   * O dano por acerto é `damageRatio` do golpe principal; as curas dele param em
-   * `healPerSecond` da vida máxima do Pokémon por segundo.
-   */
   // a apresentação do líder começa a luta sozinha depois disso, se ninguém clicar
   // em Lutar (0.25, pedido do Fellipe; a contagem aparece embaixo, pequena)
   leaderIntroSeconds: 7,
@@ -163,7 +160,15 @@ export const CONFIG = {
     loopFrom: 0.5            // as ondas repetem a segunda metade da fase (a mais forte)
   },
 
-  bonusMove: { chancePrimary: 0.02, chanceSecondary: 0.01, damageRatio: 0.6, healPerSecond: 0.02 },
+  /**
+   * O 2º golpe, o Golpe Desperto (0.14, data/bonusMoves.js). Desde a 0.28 vem na
+   * hora em que a chave do golpe fica completa (data/awakening.js; antes era 2%
+   * por nível com todas as melhorias, e 1% do tipo secundário). Em quem tem dois
+   * tipos, `secondaryShare` das vezes ele vem do secundário (a mesma proporção de
+   * antes, 1 para 2). O dano por acerto é `damageRatio` do golpe principal; as
+   * curas dele param em `healPerSecond` da vida máxima do Pokémon por segundo.
+   */
+  bonusMove: { secondaryShare: 1 / 3, damageRatio: 0.6, healPerSecond: 0.02 },
 
   capture: {
     choices: 4,              // opções por Poké Ball (0.11: eram 3)

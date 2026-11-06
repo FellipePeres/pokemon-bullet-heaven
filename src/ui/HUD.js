@@ -8,6 +8,7 @@ import { CONFIG } from '../core/config.js';
 import { iconHTML, tmIconForType } from '../render/icons.js';
 import { getAbility } from '../data/abilities.js';
 import { BONUS_MOVE_LABEL } from '../data/bonusMoves.js';
+import { awakeningProgress } from '../data/awakening.js';
 import { assetUrl } from '../render/assets.js';
 import { bus, EVENTS } from '../core/events.js';
 
@@ -274,16 +275,22 @@ export class HUD {
       (member.pendingLevels > 1 ? ` · ${member.pendingLevels} melhorias pendentes` : '');
 
     const row = clear(el('upgrade-choices'));
+    const progression = this.game.run.progression;
+    // a chave do Golpe Desperto (0.28): quanto falta das 3 melhorias que despertam o golpe
+    const { have: keyHave, need: keyNeed } = awakeningProgress(member);
     choices.forEach((up) => {
-      const stacks = this.game.run.progression.stacksOf(up, member);
-      const variant = up.rarity === 'evolution' ? ' evolution' : up.scope === 'tm' ? ' tm' : '';
+      const stacks = progression.stacksOf(up, member);
+      const awaken = progression.isAwakeningPart(up, member);
+      const variant = up.rarity === 'evolution' ? ' evolution' : up.scope === 'tm' ? ' tm' : awaken ? ' awaken' : '';
       const card = create('div', `card${variant}`);
       card.innerHTML = `
+        ${awaken ? `<span class="card-badge awaken">✦ ${BONUS_MOVE_LABEL.toUpperCase()}</span>` : ''}
         <div class="card-icon">${iconHTML(up.icon ?? 'levelUp', 44)}</div>
         <h3>${up.name}</h3>
         <p>${up.description}</p>
         ${up.scope === 'tm' ? '' : up.maxStacks ? `<div class="stack-info">${stacks}/${up.maxStacks}</div>` : ''}
         ${up.scope === 'tm' ? '<div class="chip">TROCA O GOLPE BASE · MANTÉM AS MELHORIAS</div>' : ''}
+        ${awaken ? `<div class="chip awaken">Maximize para despertar um golpe novo · chave ${keyHave}/${keyNeed}</div>` : ''}
       `;
       card.onclick = () => onPick(up.id);
       row.appendChild(card);

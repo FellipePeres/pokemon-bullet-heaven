@@ -519,8 +519,11 @@ console.log('\n[ajuste por inicial]');
   check('o líder tem a mesma força com a equipe no nível 30 ou no 120 (upar vale)',
         Math.abs(low.maxHp - high.maxHp) < 1e-6 && low.attackMult === high.attackMult,
         `${Math.round(low.maxHp)} de vida nos dois`);
+  // (o attackMult também leva a força da fase, stage.difficulty)
+  const force = late.difficulty ?? 1;
   check('nas últimas fases o líder tem mais vida e golpes mais fortes',
-        Math.abs(strong.maxHp / plain.maxHp - keep.hp) < 1e-9 && strong.attackMult === keep.damage && plain.attackMult === 1,
+        Math.abs(strong.maxHp / plain.maxHp - keep.hp) < 1e-9 && Math.abs(strong.attackMult - keep.damage * force) < 1e-9 &&
+        Math.abs(plain.attackMult - force) < 1e-9,
         `vida ×${keep.hp}, dano ×${keep.damage}`);
 }
 
@@ -562,34 +565,52 @@ console.log('\n[2º golpe]');
   const clash = Object.keys(BONUS_MOVES).filter((id) => ABILITIES[id] || RETIRED_ABILITIES[id] || !abilityFx(id));
   check('cada um com visual e sem repetir o id de um golpe (atual ou que saiu)', clash.length === 0, clash.join(', '));
 
-  // aprender: só com todas as melhorias; 2% do principal, 1% do secundário; um só
+  // aprender (0.28): na hora em que a chave do golpe (data/awakening.js) fica completa; um só
   const run = new Run('gym_1_pewter', { starter: 'charmander' });
   run.spawner.update = () => {};
   const member = run.team.members[0];
   member.pokemonId = 'charizard';
   member.level = 50;
-  const maxOut = () => {
-    for (let pass = 0; pass < 6; pass++) {
-      for (const up of Object.values(UPGRADES)) if (up.abilityId === member.abilities[0]) member.upgrades[up.id] = up.maxStacks;
-    }
-  };
   const saved = { ...CONFIG.bonusMove };
-  CONFIG.bonusMove.chancePrimary = 1;
+  CONFIG.bonusMove.secondaryShare = 0;
+  const key = run.progression.awakeningKey(member);
+  check('a chave do golpe tem 3 melhorias', key.length === 3, key.map((p) => p.up.id).join(', '));
+  const keyIds = new Set(key.map((p) => p.up.id));
+  // tudo no máximo, menos a última parte da chave (que fica a 1 do fim)
+  for (const up of Object.values(UPGRADES)) if (up.abilityId === member.abilities[0] && !up.grantsAbility) member.upgrades[up.id] = up.maxStacks;
+  const last = key.at(-1).up;
+  member.upgrades[last.id] = last.maxStacks - 1;
   run.progression.addXpTo(member, run.progression.xpToNext(member.level) + 1);
-  check('sem todas as melhorias, o 2º golpe não vem', !member.abilities.some(isBonusMove));
-  maxOut();
-  run.progression.addXpTo(member, run.progression.xpToNext(member.level) + 1);
+  check('sem a chave completa, o Golpe Desperto não vem (mesmo com as outras no máximo)', !member.abilities.some(isBonusMove));
+  const other = Object.values(UPGRADES).find((up) => up.abilityId === member.abilities[0] && !keyIds.has(up.id));
+  check('as da chave aparecem marcadas na tela de melhoria; as outras não',
+        run.progression.isAwakeningPart(last, member) && !run.progression.isAwakeningPart(other, member));
+  run.progression.applyUpgrade(last.id, member);
   const learned = member.abilities.find(isBonusMove);
-  check('com todas as melhorias, aprende um 2º golpe do tipo principal', BONUS_MOVES[learned]?.type === 'fire', learned);
+  check('a melhoria que fecha a chave desperta o golpe na hora (do tipo principal)', BONUS_MOVES[learned]?.type === 'fire', learned);
+  check('...e o anúncio entra na fila', run.unlockQueue.length === 1 && run.unlockQueue[0].moveId === learned);
+  run.unlockQueue.length = 0;
   run.progression.addXpTo(member, run.progression.xpToNext(member.level) + 1);
   check('um só por Pokémon', member.abilities.filter(isBonusMove).length === 1);
+  check('com o golpe desperto, nada mais aparece marcado', !run.progression.isAwakeningPart(last, member));
   member.abilities = member.abilities.filter((id) => !isBonusMove(id));
-  CONFIG.bonusMove.chancePrimary = 0;
-  CONFIG.bonusMove.chanceSecondary = 1;
-  run.progression.addXpTo(member, run.progression.xpToNext(member.level) + 1);
-  check('o tipo secundário também ensina (com a chance dele)',
+  CONFIG.bonusMove.secondaryShare = 1;
+  run.progression.maybeLearnBonusMove(member);
+  check('o tipo secundário também ensina (secondaryShare)',
         BONUS_MOVES[member.abilities.find(isBonusMove)]?.type === 'flying', member.abilities.join(', '));
   Object.assign(CONFIG.bonusMove, saved);
+  run.unlockQueue.length = 0;
+
+  // quem chega tarde vem treinado pela chave primeiro: no nível 45 (15 melhorias) já desperta
+  const late = run.team.createMember('gyarados', 45);
+  check('capturado no nível alto, chega com a chave feita e o Golpe Desperto',
+        late.abilities.some(isBonusMove) && run.progression.isAwakened(late),
+        `${late.abilities.join(' + ')} ${JSON.stringify(late.upgrades)}`);
+  check('...sem abrir o anúncio fora de hora', run.unlockQueue.length === 0);
+  // o exemplo do Fellipe: Gyarados (Hydro Pump) = Velocidade, Perfuração e Potência; Gloom (Toxic) = Amplitude, Intensidade e Reflexo
+  const suffixes = (mon) => run.progression.awakeningKey({ abilities: getPokemon(mon).abilities, upgrades: {} }).map((p) => p.up.id.split('_').pop()).sort().join(',');
+  check('as chaves dos exemplos: Gyarados e Gloom', suffixes('gyarados') === 'damage,pierce,speed' && suffixes('gloom') === 'area,cooldown,tick',
+        `${suffixes('gyarados')} / ${suffixes('gloom')}`);
 
   // o dano por acerto: 60% do golpe principal (vezes o ajuste da frequência)
   const companion = run.companions.find((c) => c.member === member);
@@ -720,10 +741,10 @@ console.log('\n[lendários e Golpe Desperto]');
   for (let pass = 0; pass < 6; pass++) {
     for (const up of Object.values(UPGRADES)) if (up.abilityId === member.abilities[0] || member.abilities.includes(up.abilityId)) member.upgrades[up.id] = up.maxStacks;
   }
-  const saved = { ...CONFIG.bonusMove, tm: CONFIG.progression.tmChance };
-  CONFIG.bonusMove.chancePrimary = 0;
-  CONFIG.bonusMove.chanceSecondary = 0;
+  const saved = { tm: CONFIG.progression.tmChance };
   CONFIG.progression.tmChance = 0;
+  // com tudo no máximo a chave também está: um Golpe Desperto já aprendido deixa a cura sozinha à prova
+  member.abilities.push(BONUS_BY_TYPE[getPokemon(member.pokemonId).types[0]][0]);
   const bonus = run.playerStats.pokemonHpBonus;
   member.level = 41;   // o próximo (42) é nível de melhoria
   member.hp = 10;
@@ -741,12 +762,11 @@ console.log('\n[lendários e Golpe Desperto]');
   check('níveis guardados de quem já tem tudo viram cura', member.pendingLevels === 0 && member.hp > 10 && run.state === 'running');
 
   // o Golpe Desperto abre o anúncio (uma tela só)
-  CONFIG.bonusMove.chancePrimary = 1;
+  member.abilities = member.abilities.filter((id) => !isBonusMove(id));
   run.progression.addXpTo(member, run.progression.xpToNext(member.level) + 1);
   run._checkState();
   check('aprender o Golpe Desperto abre o anúncio', run.state === 'unlock' && run.unlockQueue.length === 1 &&
         member.abilities.includes(run.unlockQueue[0].moveId), run.state);
-  Object.assign(CONFIG.bonusMove, { chancePrimary: saved.chancePrimary, chanceSecondary: saved.chanceSecondary });
   CONFIG.progression.tmChance = saved.tm;
 }
 

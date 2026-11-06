@@ -2202,6 +2202,14 @@ button { font: inherit; color: inherit; }
   50% { box-shadow: inset 0 0 0 3px #fff2a8, 0 0 30px rgba(248, 208, 48, .8); }
 }
 
+/* 0.28: a melhoria que faz parte da chave do Golpe Desperto (data/awakening.js):
+   moldura dourada parada (o brilho pulsando é só do anúncio), o selo e o aviso */
+.card.awaken { padding-top: 26px; box-shadow: inset 0 0 0 3px var(--gba-gold), 0 0 10px rgba(248, 208, 48, .35); }
+.card-badge.awaken { background: #c08a00; }
+.card .chip.awaken { color: #7a4a00; background: #fff2b8; border-color: #e0b030; }
+/* o progresso da chave na janela da equipe */
+.node-meta.awaken-key { color: #8a6a20; }
+
 /* o card de captura de um lendário (0.16) */
 .card.legendary { box-shadow: inset 0 0 0 3px #b98cff, 0 0 16px rgba(185, 140, 255, .55); }
 .card-badge.legendary { background: #7d4bd6; }

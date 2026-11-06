@@ -387,6 +387,19 @@ const ROTEIROS = {
            "game.hud.showCapture(['mewtwo', 'articuno', 'pidgey', 'mew'].map((id) => ({ ...getPokemon(id), shiny: id === 'mew' })), () => {}); })" },
     { wait: 900 }, { shot: 'lendario-7-captura', raw: true }
   ],
+  // a chave do Golpe Desperto (0.28): as melhorias dela marcadas na tela de nível e o
+  // progresso na janela da equipe (Water Gun: Potência, Perfuração e Reflexo)
+  despertar: [
+    { open: 'index.html' }, { wait: 500 },
+    { run: "game.newGame(); game.chooseTrainer('red'); game.chooseStarter('squirtle');" +
+           "game.campaign.clearedStages.push('gym_1_pewter'); game.startStage('gym_2_cerulean');" +
+           "const m = game.run.team.members[0]; m.level = 30; m.upgrades = { water_gun_damage: 3, water_gun_pierce: 1, water_gun_count: 2 };" +
+           "import('./src/data/upgrades.js').then(({ UPGRADES }) => { game.run.levelUpMember = m; m.pendingLevels = 1; game.run.state = 'levelup';" +
+           "game.hud.showLevelUp(m, [UPGRADES.water_gun_damage, UPGRADES.water_gun_count, UPGRADES.water_gun_pierce], () => {}); })" },
+    { wait: 1200 }, { shot: 'despertar-1-nivel', raw: true },
+    { run: "game.hud.hideLevelUp(); game.run.state = 'running'; game.campaign.journey = { ...(game.campaign.journey ?? {}), team: game.run.team.serialize() }; game.menus.showModal('modal-team')" },
+    { wait: 900 }, { shot: 'despertar-2-equipe' }
+  ],
   // o líder entra e, antes de cada golpe, aparece o aviso no chão
   chefe: [
     { open: 'index.html' }, { wait: 500 },

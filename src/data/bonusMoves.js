@@ -1,11 +1,12 @@
 /**
  * O 2º GOLPE (D11 do PLANEJAMENTO, aprovado pelo Fellipe na 0.13; feito na 0.14).
  *
- * Quando um Pokémon já tem todas as melhorias, cada nível que ele sobe tem uma
- * chance baixa de ensinar um golpe a mais: 2% do tipo principal, 1% do
- * secundário (CONFIG.bonusMove). Cada tipo tem 3 opções e ele recebe uma, ao
- * acaso; um por Pokémon, para sempre. Ele mantém o golpe de antes e passa a
- * usar os dois.
+ * Quando um Pokémon completa a chave do golpe dele (as 3 melhorias de
+ * data/awakening.js no máximo; 0.28), ele desperta um golpe a mais: do tipo
+ * principal ou, em 1/3 das vezes, do secundário (CONFIG.bonusMove). Até a 0.27
+ * era preciso ter todas as melhorias e contar com 2% por nível. Cada tipo tem 3
+ * opções e ele recebe uma, ao acaso; um por Pokémon, para sempre. Ele mantém o
+ * golpe de antes e passa a usar os dois.
  *
  * Os ids não podem repetir os de abilities.js nem os golpes que saíram
  * (RETIRED_ABILITIES): saves antigos ainda podem trazê-los.
