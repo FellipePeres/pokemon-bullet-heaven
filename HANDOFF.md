@@ -5,7 +5,7 @@
 > decisão foi tomada e o que falta fazer. O `README.md` é o manual de uso;
 > este aqui é o contexto de desenvolvimento.
 
-**Versão atual:** `0.26.0` · **Última atualização:** 2026-11-05
+**Versão atual:** `0.27.0` · **Última atualização:** 2026-11-05
 **Stack:** HTML + CSS + JavaScript puro (ES Modules). Sem backend, sem build, sem dependências.
 **Repositório:** https://github.com/FellipePeres/pokemon-bullet-heaven (público)
 **Jogo no ar:** https://fellipeperes.github.io/pokemon-bullet-heaven/
@@ -469,8 +469,9 @@ Nunca voltar bônus globais para o pool de level up — foi pedido explícito.
   direito, ao lado do contador de inimigos e da configuração, um botão Voltar para
   o Centro Pokémon"; e "os inimigos vão ganhando gradativamente mais status até
   que fique quase impossível".
-- **Na tela de vitória** (menos a do Campeão, que vai para o Hall da Fama),
-  **Modo Livre** (`Game.startEndless`): a equipe volta curada e a fase continua
+- **Na tela de vitória** de todas as fases, **Modo Livre** (`Game.startEndless`);
+  no Campeão, ela vem depois do Hall da Fama (0.27, "deve existir modo livre no
+  campeão também"; antes o Hall da Fama ia direto para o mapa): a equipe volta curada e a fase continua
   sem fim (`Run.startEndless`, `SpawnSystem.startEndless`). As ondas da segunda
   metade da fase se repetem, sem o líder, e um elite da fase aparece a cada
   minuto. A vitória já ficou registrada; `_checkState` não dá outra.
@@ -1087,6 +1088,7 @@ tipo, som e o polimento de troca e captura.
 | 18 | lobby mais bonito e único (planejado junto: o Town Map, o estojo com as métricas, tudo na barra do topo); o 2º golpe no lugar do bônus de ataque; shiny só na captura e do jogador; publicar o lobby | 0.13: `ui/lobby.js`, `ui/badgeCase.js`, `systems/stageStats.js`, `data/regionMap.js`, mapa e cartão por script; D11 reescrita (publicada com a Poção e os líderes). 0.13.1: shiny (1% por opção da Poké Ball), com sprites shiny no campo, nos cards e no PC, ✦ na Pokédex e a conquista Brilho Raro |
 | 19 | o inicial também shiny (1%) e publicar; refinar os 3 2º golpes por tipo (aprovados com ajustes: Whirlpool longe, curas com teto, 2%/1% pelos tipos, nome oficial, 60% do dano); tremor só nos golpes dos líderes; o nível passando de 100 (o número saía do selo) e os líderes fáceis demais | 0.13.2: inicial shiny. 0.14: `data/bonusMoves.js` (51 golpes) e o motor deles; o líder acompanha a equipe (`leaderLevel`, `bossLift`); tremor só dos líderes; selo do nível que cresce com o número |
 | 20 | fases levemente mais rápidas: de 3:30 para 2:45 | 0.15: a linha do tempo das 13 fases comprimida (×165/210; levas ×√f mais densas, XP ×1/√f); a equipe chega ao líder no mesmo nível (medido) |
+| 34 | Modo Livre no Campeão também | 0.27: depois do Hall da Fama, a tela de vitória de sempre, com o Modo Livre |
 | 33 | o Gengar não recebia o Golpe Desperto; capturado no nível alto vem sem melhorias e fica ruim | 0.26: sem bug no Golpe Desperto (precisava de 18 melhorias = 54 níveis); `trainToLevel`: quem chega tarde vem com 1 melhoria a cada 3 níveis, automáticas (opção 1, escolhida pelo Fellipe) |
 | 32 | a partida continuar rodando com a aba em segundo plano; a luta com o líder começar sozinha depois de 7 s, com a contagem pequena; mostrar os Shards na tela | 0.25: relógio num Worker + passos de 50 ms (`_frame`), contagem na apresentação (`leaderIntroSeconds`), "◆ Shards" no HUD |
 | 31 | tela de jornadas com os níveis encavalados; continuar a jornada sempre no mapa, mesmo saindo no meio da fase | 0.23.1: equipe do card em 3 por linha e o nome completo da fase; 0.24: `_foldPendingRun` (a partida do meio entra na jornada), sem retomar no meio da fase |

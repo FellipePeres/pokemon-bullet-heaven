@@ -432,8 +432,10 @@ check('vencer o Campeão abre o Hall da Fama com a equipe',
       registry.get('hall-team').children.length === game.profile.hallOfFame[0].team.length,
       `${registry.get('hall-team').children.length} Pokémon`);
 registry.get('hall-close').click();
-check('fechar o Hall da Fama volta para a jornada',
-      registry.get('hall-overlay').classes.has('hidden') && !registry.get('screen-campaign').classes.has('hidden'));
+check('fechar o Hall da Fama mostra a tela de vitória (com o Modo Livre, 0.27)',
+      registry.get('hall-overlay').classes.has('hidden') && !registry.get('result-overlay').classes.has('hidden'));
+registry.get('btn-result-menu').click();
+check('e de lá "Continuar Jornada" volta para o mapa', !registry.get('screen-campaign').classes.has('hidden'));
 check('o mapa mostra o botão do Hall da Fama', !registry.get('btn-hall').classes.has('hidden'));
 
 const save = game.buildSaveData();
@@ -507,6 +509,24 @@ check('depois da escolha, o Continuar segue para a jornada',
   check(`sem clicar em Lutar, a luta começa sozinha depois de ${CONFIG.leaderIntroSeconds} s`,
         !game.introOpen && game.run.state === 'running' && registry.get('leader-overlay').classes.has('hidden'));
   game.quitToMenu();
+}
+
+// ---- o Campeão também tem Modo Livre (0.27): depois do Hall da Fama, a tela de vitória ----
+{
+  const keep = [...game.campaign.clearedStages];
+  game.campaign.clearedStages.push(...game.region.campaign.filter((e) => e.stage && e.stage !== 'champion').map((e) => e.stage));
+  game.startStage('champion');
+  game.run.state = 'victory';
+  game._handleRunState();
+  check('vencer o Campeão abre o Hall da Fama', game.hallOpen && !registry.get('hall-overlay').classes.has('hidden'));
+  registry.get('hall-close').click();
+  check('...e depois a tela de vitória, com o Modo Livre',
+        !game.hallOpen && !registry.get('result-overlay').classes.has('hidden') && !registry.get('btn-result-endless').classes.has('hidden'));
+  registry.get('btn-result-endless').click();
+  check('o Modo Livre do Campeão funciona', game.run?.endless && game.run.state === 'running' && game.run.stage.id === 'champion');
+  game.quitToMenu();
+  game.profile.hallOfFame.pop();   // o teste não deixa uma equipe campeã a mais
+  game.campaign.clearedStages.splice(0, game.campaign.clearedStages.length, ...keep, 'champion');
 }
 
 // ---- continuar sempre vai para o mapa (0.24): a partida que ficou no meio entra na jornada ----

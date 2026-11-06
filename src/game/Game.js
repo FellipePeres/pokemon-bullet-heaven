@@ -755,7 +755,8 @@ export class Game {
     this.hud.hideLevelUp();
     this.hud.hideCapture();
     if (champion) {
-      this.showHallOfFame(this.profile.hallOfFame.at(-1), () => this.quitToMenu());
+      // depois do Hall da Fama, a tela de vitória de sempre — com o Modo Livre (0.27)
+      this.showHallOfFame(this.profile.hallOfFame.at(-1), () => this.hud.showResult({ victory, run }));
       return;
     }
     this.hud.showResult({ victory, run });
