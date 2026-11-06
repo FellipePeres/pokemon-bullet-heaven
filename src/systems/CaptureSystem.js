@@ -76,7 +76,7 @@ export class CaptureSystem {
   /** Adiciona à equipe (quando ainda há espaço). */
   capture(pokemonId, { shiny = false } = {}) {
     const member = this.run.team.add(pokemonId, this.newMemberLevel(pokemonId), { shiny });
-    if (member) this._registerCapture(pokemonId, false, shiny);
+    if (member) this._registerCapture(pokemonId, false, shiny, member);
     return member;
   }
 
@@ -86,7 +86,7 @@ export class CaptureSystem {
     const member = this.run.team.replaceMember(oldUid, pokemonId, this.newMemberLevel(pokemonId), { shiny });
     if (!member) return null;
     if (leaving) this._deposit(leaving);
-    this._registerCapture(pokemonId, false, shiny);
+    this._registerCapture(pokemonId, false, shiny, member);
     return member;
   }
 
@@ -94,7 +94,7 @@ export class CaptureSystem {
   captureToPC(pokemonId, { shiny = false } = {}) {
     const member = this.run.team.createMember(pokemonId, this.newMemberLevel(pokemonId), { shiny });
     this._deposit(member);
-    this._registerCapture(pokemonId, true, shiny);
+    this._registerCapture(pokemonId, true, shiny, member);
     return member;
   }
 
@@ -103,11 +103,14 @@ export class CaptureSystem {
     this.run.pc.push(TeamSystem.serializeMember({ ...member, fainted: false }));
   }
 
-  _registerCapture(pokemonId, toPC = false, shiny = false) {
+  _registerCapture(pokemonId, toPC = false, shiny = false, member = null) {
     const data = getPokemon(pokemonId);
     this.run.stats.captures++;
     bus.emit(EVENTS.POKEMON_CAPTURED, { pokemonId, dex: data.dex, name: data.name, shiny });
     const name = shiny ? `✦ ${data.name} shiny` : data.name;
-    bus.emit(EVENTS.TOAST, { text: toPC ? `${name} foi para o PC!` : `${name} entrou para a equipe!`, icon: 'ball' });
+    // quem chega tarde vem treinado (0.26): o aviso diz com quantas melhorias
+    const trained = Object.values(member?.upgrades ?? {}).reduce((sum, n) => sum + n, 0);
+    const extra = trained ? ` com ${trained} melhoria${trained > 1 ? 's' : ''}` : '';
+    bus.emit(EVENTS.TOAST, { text: toPC ? `${name} foi para o PC${extra}!` : `${name} entrou para a equipe${extra}!`, icon: 'ball' });
   }
 }

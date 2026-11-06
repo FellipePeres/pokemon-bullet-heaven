@@ -11,6 +11,9 @@ import { transferUpgrades } from './moves.js';
 import { BONUS_BY_TYPE, isBonusMove } from '../data/bonusMoves.js';
 import { FloatingText } from '../entities/effects.js';
 
+/** A ordem das melhorias aplicadas sozinhas em quem chega tarde (`trainToLevel`). */
+const AUTO_TRAIN_ORDER = ['damage', 'cooldown', 'count', 'chains', 'area', 'pierce', 'tick', 'arc', 'speed', 'duration'];
+
 /** Opção usada quando não há mais upgrades disponíveis para aquele Pokémon. */
 const HEAL_FALLBACK = {
   id: '__heal',
@@ -150,6 +153,34 @@ export class ProgressionSystem {
     // a única tela que o Pokémon com todas as melhorias ainda abre (0.16): o anúncio
     this.run.unlockQueue.push({ member, moveId });
     return moveId;
+  }
+
+  /**
+   * Quem chega tarde vem treinado (0.26, pedido do Fellipe: "capturado no nível
+   * alto, ele vem sem melhorias e fica ruim"). Cada Pokémon tem pelo menos as
+   * melhorias que teria subindo do nível 1 — uma a cada `upgradeEveryLevels`
+   * níveis —, menos as que ainda estão guardadas no ▲. As que faltam são aplicadas
+   * sozinhas, na ordem de AUTO_TRAIN_ORDER (dano primeiro). Vale para captura,
+   * presente e para quem já estava na jornada (ao carregar a equipe). Devolve
+   * quantas foram aplicadas.
+   */
+  trainToLevel(member) {
+    const owned = Object.values(member.upgrades ?? {}).reduce((sum, n) => sum + n, 0);
+    let owed = Math.floor(member.level / CONFIG.progression.upgradeEveryLevels) - (member.pendingLevels ?? 0) - owned;
+    let applied = 0;
+    while (owed-- > 0) {
+      const pool = Object.values(UPGRADES).filter((up) => this.isAvailable(up, member));
+      if (!pool.length) break;
+      const rank = (up) => {
+        const i = AUTO_TRAIN_ORDER.findIndex((suffix) => up.id.endsWith(`_${suffix}`));
+        return i === -1 ? AUTO_TRAIN_ORDER.length : i;
+      };
+      const up = pool.reduce((best, u) => (rank(u) < rank(best) ? u : best));
+      member.upgrades[up.id] = (member.upgrades[up.id] ?? 0) + 1;
+      if (up.grantsAbility && !member.abilities.includes(up.grantsAbility)) member.abilities.push(up.grantsAbility);
+      applied++;
+    }
+    return applied;
   }
 
   /** Já tem todas as melhorias do golpe (só resta a Poção)? */

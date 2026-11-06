@@ -47,6 +47,7 @@ export class TeamSystem {
       upgrades: {}            // upgrades de habilidade são por Pokémon
     };
     applyLegendaryKit(member);   // lendário: golpe exclusivo, melhorias e 2º golpe já de saída
+    this.run.progression?.trainToLevel(member);   // quem chega tarde vem treinado (0.26)
     member.hp = maxHpFor(member, this.run.playerStats?.pokemonHpBonus ?? 0);
     return member;
   }
@@ -196,6 +197,7 @@ export class TeamSystem {
         upgrades: { ...(m.upgrades ?? {}) }
       };
       migrateMember(member);   // golpes e melhorias de saves de versões antigas
+      this.run.progression?.trainToLevel(member);   // quem chegou tarde e ficou sem melhorias (0.26)
       // ao começar uma fase nova a equipe chega descansada
       if (healAll) {
         member.fainted = false;

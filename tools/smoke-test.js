@@ -214,7 +214,7 @@ console.log('\n[habilidades — cada comportamento precisa causar dano]');
   const legacyRun = new Run('gym_1_pewter', { team: { members: [
     { uid: 'a', pokemonId: 'charmander', level: 12, abilities: ['ember', 'fire_ring'],
       upgrades: { ember_damage: 2, ember_fire_ring: 1, fire_ring_damage: 2 } },
-    { uid: 'b', pokemonId: 'ponyta', level: 20, abilities: ['flame_wheel'], upgrades: { flame_wheel_damage: 3 } }
+    { uid: 'b', pokemonId: 'ponyta', level: 9, abilities: ['flame_wheel'], upgrades: { flame_wheel_damage: 3 } }
   ], active: ['a', 'b'] } });
   const [oldChar, oldPony] = legacyRun.team.members;
   check('save antigo: o golpe extra do inicial vira o novo, com as melhorias',
@@ -694,7 +694,7 @@ console.log('\n[lendários e Golpe Desperto]');
   const mew = run.captureSystem.capture('mew');
   const kit = LEGENDARY_KITS.mew;
   check('o lendário chega com o golpe exclusivo', mew.abilities[0] === 'metronome' && LEGENDARY_MOVES.metronome.exclusive === 'mew');
-  check('...com as melhorias do kit', Object.entries(kit.upgrades).every(([suffix, n]) => mew.upgrades[`metronome_${suffix}`] === n),
+  check('...com as melhorias do kit (no mínimo)', Object.entries(kit.upgrades).every(([suffix, n]) => mew.upgrades[`metronome_${suffix}`] >= n),
         JSON.stringify(mew.upgrades));
   check('...com o 2º golpe já aprendido', mew.abilities.includes(kit.bonusMove), mew.abilities.join(', '));
   check('...e no nível da equipe (os outros entram 3 abaixo)', mew.level === 40, `nível ${mew.level}`);
@@ -796,6 +796,27 @@ console.log('\n[encontros de lendário]');
         !ligaOffers.includes('mewtwo') && ligaOffers.includes('mew'), ligaOffers.join(', '));
   check('o Campeão tem uma Poké Ball (para o lendário)', liga.stage.maxBalls === 1);
   for (const [id, enc] of Object.entries(keep)) Object.assign(LEGENDARY_ENCOUNTERS[id], enc);
+}
+
+// ---------------------------------------------- 5.13g quem chega tarde vem treinado (0.26)
+console.log('\n[quem chega tarde vem treinado]');
+{
+  const run = new Run('gym_1_pewter', { starter: 'charmander' });
+  run.team.members[0].level = 60;
+  const total = (m) => Object.values(m.upgrades).reduce((a, b) => a + b, 0);
+  const gengar = run.captureSystem.capture('gengar');
+  check('capturado no nível alto chega com as melhorias do nível (1 a cada 3), até completar',
+        gengar.level === 57 && total(gengar) === 18 && run.progression.isMaxed(gengar), `nível ${gengar.level}, ${total(gengar)} melhorias`);
+  const low = run.team.createMember('pidgey', 9);
+  check('...e o dano vem primeiro', low.upgrades[`${low.abilities[0]}_damage`] === 3 && total(low) === 3, JSON.stringify(low.upgrades));
+  // quem já estava na jornada sem melhorias é completado ao carregar a equipe; o ▲ guardado conta
+  const saved = { members: [
+    { uid: 'g', pokemonId: 'gengar', level: 139, xp: 0, hp: 0, abilities: ['shadow_ball'], upgrades: {} },
+    { uid: 'p', pokemonId: 'pidgey', level: 12, xp: 0, hp: 0, abilities: ['gust'], upgrades: { gust_damage: 1 }, pendingLevels: 2 }
+  ], active: ['g', 'p'] };
+  const [oldGengar, pidgey] = new Run('gym_1_pewter', { team: saved }).team.members;
+  check('quem já estava na jornada sem melhorias é completado ao carregar', total(oldGengar) === 18, `${total(oldGengar)}`);
+  check('...e os níveis guardados no ▲ não são dados de novo', total(pidgey) === 2, JSON.stringify(pidgey.upgrades));
 }
 
 // ---------------------------------------------- 5.13f evolução por item (0.23)
