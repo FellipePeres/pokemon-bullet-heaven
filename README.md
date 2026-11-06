@@ -87,8 +87,12 @@ pausa e oferece três Pokémon sorteados pela tabela de chances daquela fase. Ca
 fase tem um teto de bolas e alguns momentos garantidos, para a jornada não depender
 de sorte.
 
-**Shards.** Ganhos ao concluir fases e ao **coletar conquistas**. (A loja de
-melhorias do treinador saiu na 0.21.)
+**Shards.** Vêm dos chefes (10 por Pokémon de líder, 5 por chefe simples, mesmo
+numa derrota), da **primeira** vitória de cada fase e das conquistas. Gaste no
+**Poké Mart**, na barra do lobby: Novo Sorteio (300) e Reviver (600) vão para a
+mochila; a TM (1.500) ensina o próximo golpe na hora; as pedras e o Cabo de Troca
+(2.500) são a única forma de evoluir quem evolui por item (Pikachu, Eevee,
+Kadabra, Gloom...).
 
 **A jornada continua.** Equipe, níveis e build passam de uma fase para a seguinte.
 Perder não tira nada: o que a equipe ganhou na tentativa fica, só a próxima fase

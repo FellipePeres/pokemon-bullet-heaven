@@ -260,6 +260,21 @@ const ROTEIROS = {
     { wait: 700 }, { shot: 'itens-chao' },
     { run: "game.run.pickups.find((x) => x.kind === 'magnet').x = game.run.player.x" }, { wait: 260 }, { shot: 'itens-ima', raw: true }
   ],
+  // o Poké Mart (0.23): a loja, a escolha do Pokémon, o Novo Sorteio e o Reviver
+  mart: [
+    { open: 'index.html' }, { wait: 500 },
+    { run: "game.newGame(); game.chooseTrainer('red'); game.chooseStarter('charmander'); game.campaign.clearedStages.push('gym_1_pewter');" +
+           "game.campaign.journey = { team: { members: [{ uid: 'a', pokemonId: 'charmeleon', level: 22, xp: 0, hp: 50, abilities: ['ember'], upgrades: {} }, { uid: 'b', pokemonId: 'pikachu', level: 20, xp: 0, hp: 40, abilities: ['thunder_shock'], upgrades: {} }], active: ['a', 'b'] }," +
+           " pc: [{ uid: 'c', pokemonId: 'eevee', level: 18, xp: 0, hp: 40, abilities: ['quick_attack'], upgrades: {}, slot: 0 }] };" +
+           "game.profile.shards = 5200; game.profile.bag = { reroll: 2, revive: 1 }; game.openCampaign(); document.getElementById('toast-container').style.display = 'none'" },
+    { wait: 900 }, { shot: 'mart-1-lobby' },
+    { run: "game.menus.showModal('modal-mart')" }, { wait: 700 }, { shot: 'mart-2-loja' },
+    { run: "const card = [...document.querySelectorAll('#mart-list .mart-card')][3]; card.querySelector('.buy-btn').click(); card.scrollIntoView()" }, { wait: 500 }, { shot: 'mart-3-pedra' },
+    { run: "game.menus.closeModal(); game.startStage('gym_1_pewter')" }, { wait: 1500 },
+    { run: "const r = game.run; const m = r.team.members[1]; m.fainted = true; m.hp = 0; r.team.handleFaint(m); game.hud.signature = ''" }, { wait: 600 },
+    { shot: 'mart-4-reviver', raw: true },
+    { run: "game.run.pendingBall = true" }, { wait: 900 }, { shot: 'mart-5-sorteio', raw: true }
+  ],
   // o tamanho em campo (fieldScale): as aves lendárias, sem inimigos nem golpes
   aves: [
     { open: 'index.html' }, { wait: 500 },

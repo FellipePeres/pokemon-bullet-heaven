@@ -95,10 +95,9 @@ export class ProgressionSystem {
   checkEvolution(member) {
     const data = getPokemon(member.pokemonId);
     const evo = data?.evolution;
-    if (!evo || member.level < evo.level) return null;
-    // Eevee: sem pedras como item, a evolução é sorteada entre as opções
-    const options = [evo.to, ...(evo.alternatives ?? [])];
-    const next = getPokemon(options[Math.floor(Math.random() * options.length)]);
+    // quem evolui por pedra ou troca só evolui com o item, no Poké Mart (0.23)
+    if (!evo || evo.method || member.level < evo.level) return null;
+    const next = getPokemon(evo.to);
     if (!next) return null;
 
     const from = data;

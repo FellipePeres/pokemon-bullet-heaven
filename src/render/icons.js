@@ -35,6 +35,14 @@ const ITEM = {
   levelUp:      { item: 'rare-candy',   emoji: '⭐' },
   evolution:    { item: 'moon-stone',   emoji: '🌀' },
   tm:           { item: 'tm-normal',    emoji: '💿' },
+  mart:         { item: 'poke-doll',    emoji: '🏪' },
+  reroll:       { item: 'premier-ball', emoji: '🎲' },
+  fireStone:    { item: 'fire-stone',   emoji: '🔥' },
+  waterStone:   { item: 'water-stone',  emoji: '💧' },
+  thunderStone: { item: 'thunder-stone', emoji: '⚡' },
+  leafStone:    { item: 'leaf-stone',   emoji: '🍃' },
+  moonStone:    { item: 'moon-stone',   emoji: '🌙' },
+  linkCable:    { item: 'linking-cord', emoji: '🔗' },
 
   /* melhorias de habilidade */
   damage:       { item: 'x-attack',     emoji: '💥' },

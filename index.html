@@ -154,6 +154,7 @@
         <button class="bar-btn" data-modal="modal-help" title="Como jogar"><span class="bar-icon" data-icon="help"></span><span class="bar-label">Ajuda</span></button>
         <span class="bar-sep" aria-hidden="true"></span>
         <button id="btn-pc" class="bar-btn strong" data-modal="modal-pc" title="PC"><span class="bar-icon" data-icon="pc"></span><span class="bar-text">PC</span></button>
+        <button id="btn-mart" class="bar-btn strong" data-modal="modal-mart" title="Poké Mart: gaste os Shards"><span class="bar-icon" data-icon="mart"></span><span class="bar-text">Poké Mart</span></button>
         <button id="btn-hall" class="bar-btn strong hidden" title="Hall da Fama"><span class="bar-icon" data-icon="badge"></span><span class="bar-text">Hall</span></button>
         <button id="btn-save-campaign" class="bar-btn strong" title="Salvar o jogo num arquivo (.json)"><span class="bar-icon" data-icon="save"></span><span class="bar-text">Salvar</span></button>
         <button class="bar-btn strong" data-back="screen-title" title="Menu principal"><span class="bar-icon" data-icon="menu"></span><span class="bar-text">Menu</span></button>
@@ -238,7 +239,10 @@
         <!-- 0.12: os testes mostraram jogadores deixando de capturar com medo de perder alguém -->
         <p id="capture-note" class="capture-note hidden"></p>
         <div id="capture-choices" class="card-row"></div>
-        <button id="capture-skip" class="menu-btn ghost slim">Ignorar</button>
+        <div class="capture-actions">
+          <button id="capture-reroll" class="menu-btn slim hidden" title="Usa um Novo Sorteio da mochila">Novo Sorteio</button>
+          <button id="capture-skip" class="menu-btn ghost slim">Ignorar</button>
+        </div>
       </div>
     </div>
 
@@ -367,6 +371,24 @@
       </header>
       <div class="modal-body">
         <div id="team-detail" class="node-list"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- o Poké Mart (0.23): os Shards viram itens -->
+  <div id="modal-mart" class="modal hidden">
+    <div class="modal-card">
+      <header class="modal-head">
+        <h3><span class="bar-icon" data-icon="mart"></span>Poké Mart</h3>
+        <span class="modal-sub" id="mart-shards">0 Shards</span>
+        <button class="icon-btn close" data-close>✕</button>
+      </header>
+      <div class="modal-body">
+        <p class="subtitle small" style="margin-bottom:14px">
+          Shards vêm dos chefes (10 por Pokémon de líder, 5 por chefe simples), da primeira vitória de cada fase e
+          das conquistas. Pedras e o Cabo de Troca são a única forma de evoluir quem evolui por item.
+        </p>
+        <div id="mart-list" class="node-list"></div>
       </div>
     </div>
   </div>

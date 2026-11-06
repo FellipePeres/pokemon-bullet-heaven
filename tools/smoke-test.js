@@ -539,13 +539,14 @@ console.log('\n[shiny]');
   check('os selvagens nunca são shiny; o inicial só se a jornada sorteou',
         !run.team.members[0].shiny && !run.spawner.spawnAt('rattata', 0, 0, 5).shiny
         && new Run('gym_1_pewter', { starter: 'charmander', starterShiny: true }).team.members[0].shiny === true);
-  const member = run.captureSystem.capture('pikachu', { shiny: true });
+  // (0.23: o Pikachu evolui por pedra; o exemplo é o Rattata, que evolui por nível)
+  const member = run.captureSystem.capture('rattata', { shiny: true });
   check('quem é capturado shiny entra shiny e o save guarda', member.shiny && run.team.serialize().members.at(-1).shiny === true);
   const restored = new Run('gym_1_pewter', { team: run.team.serialize() });
-  check('carregar o save mantém o shiny', restored.team.members.find((m) => m.pokemonId === 'pikachu')?.shiny === true);
-  member.level = 29;
-  run.progression.addXpTo(member, run.progression.xpToNext(29) + 1);
-  check('evoluir mantém o shiny', member.pokemonId === 'raichu' && member.shiny,
+  check('carregar o save mantém o shiny', restored.team.members.find((m) => m.pokemonId === 'rattata')?.shiny === true);
+  member.level = 19;
+  run.progression.addXpTo(member, run.progression.xpToNext(19) + 1);
+  check('evoluir mantém o shiny', member.pokemonId === 'raticate' && member.shiny,
         `${member.pokemonId}, shiny: ${member.shiny}`);
   run.captureSystem.captureToPC('pidgey', { shiny: true });
   check('mandado direto para o PC, continua shiny', run.pc.at(-1).shiny === true);
@@ -795,6 +796,34 @@ console.log('\n[encontros de lendário]');
         !ligaOffers.includes('mewtwo') && ligaOffers.includes('mew'), ligaOffers.join(', '));
   check('o Campeão tem uma Poké Ball (para o lendário)', liga.stage.maxBalls === 1);
   for (const [id, enc] of Object.entries(keep)) Object.assign(LEGENDARY_ENCOUNTERS[id], enc);
+}
+
+// ---------------------------------------------- 5.13f evolução por item (0.23)
+console.log('\n[evolução por item]');
+{
+  const { evolveMember, learnNextMove } = await import('../src/systems/moves.js');
+  const run = new Run('gym_1_pewter', { starter: 'charmander' });
+  run.spawner.update = () => {};
+  const pikachu = run.team.add('pikachu', 40);
+  const pidgey = run.team.add('pidgey', 17);
+  run.progression.addXpTo(pikachu, run.progression.xpToNext(40) + 1);
+  run.progression.addXpTo(pidgey, run.progression.xpToNext(17) + 1);
+  check('quem evolui por pedra não evolui mais por nível', pikachu.pokemonId === 'pikachu', `${pikachu.pokemonId} no nível ${pikachu.level}`);
+  check('quem evolui por nível continua evoluindo', pidgey.pokemonId === 'pidgeotto');
+  // a pedra do Poké Mart: a Eevee escolhe pela pedra, e o golpe acompanha
+  const eevee = { pokemonId: 'eevee', level: 30, abilities: ['quick_attack'], upgrades: { quick_attack_damage: 2 } };
+  const result = evolveMember(eevee, 'jolteon');
+  check('a pedra evolui na hora (Eevee + Pedra do Trovão = Jolteon), levando as melhorias',
+        result?.to.id === 'jolteon' && eevee.pokemonId === 'jolteon' && POKEMON.jolteon.moveLine.includes(eevee.abilities[0])
+        && Object.values(eevee.upgrades).reduce((a, b) => a + b, 0) >= 2, `${eevee.abilities[0]} ${JSON.stringify(eevee.upgrades)}`);
+  const kadabra = { pokemonId: 'kadabra', level: 36, abilities: ['psybeam'], upgrades: {} };
+  evolveMember(kadabra, 'alakazam');
+  check('o Cabo de Troca evolui quem evolui por troca', kadabra.pokemonId === 'alakazam');
+  const charm = { pokemonId: 'charmander', level: 10, abilities: ['ember'], upgrades: { ember_damage: 3 } };
+  check('a TM ensina o próximo golpe da linha, com as melhorias',
+        learnNextMove(charm) === 'flamethrower' && charm.upgrades.flamethrower_damage === 3);
+  const top = { pokemonId: 'charizard', level: 50, abilities: ['fire_blast'], upgrades: {} };
+  check('no fim da linha a TM não ensina nada', learnNextMove(top) === null);
 }
 
 // ---------------------------------------------- 5.13e ids dos Pokémon (0.20.1)

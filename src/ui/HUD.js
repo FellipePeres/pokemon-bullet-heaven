@@ -54,6 +54,7 @@ export class HUD {
     el('btn-center-go').onclick = () => this.game.leaveCenter();
     el('btn-center-map').onclick = () => this.game.quitToMenu();
     el('capture-skip').onclick = () => this.game.resolveCapture();
+    el('capture-reroll').onclick = () => this.game.rerollCapture();
   }
 
   /* ========================= atualização por frame ========================= */
@@ -88,7 +89,8 @@ export class HUD {
       team.members.map((m) => `${m.uid}:${m.fainted ? 'f' : 'a'}:${m.pendingLevels > 0 ? 'p' : '-'}:${m.attack === false ? 'x' : 'o'}`).join(','),
       team.active.map((m) => (m ? m.uid : '-')).join(','),
       team.selectedSlot,
-      team.swapReady ? 1 : 0
+      team.swapReady ? 1 : 0,
+      this.game.profile?.bag?.revive ?? 0
     ].join('|');
   }
 
@@ -191,6 +193,14 @@ export class HUD {
     if (member.fainted) {
       node.classList.add('fainted');
       node.title = `${data.name} desmaiou e só volta na próxima fase.`;
+      // o Reviver da mochila (Poké Mart, 0.23): clicar traz de volta com metade da vida
+      const revives = this.game.profile?.bag?.revive ?? 0;
+      if (revives > 0) {
+        node.classList.add('revivable');
+        node.title = `${data.name} desmaiou — clique para usar um Reviver (${revives} na mochila).`;
+        node.appendChild(create('span', 'revive-tag', `✚ Reviver<br>×${revives}`));
+        node.onpointerdown = () => this.game.useRevive(member.uid);
+      }
     } else if (!run.team.swapReady) {
       node.classList.add('disabled');
       node.title = 'Troca em recarga';
@@ -371,6 +381,10 @@ export class HUD {
   /* ============================== CAPTURA ============================== */
 
   showCapture(choices, onPick, subtitle = 'Escolha um Pokémon para a sua equipe', { teamSize = 0, maxSize = 6 } = {}) {
+    const rerolls = this.game.profile?.bag?.reroll ?? 0;
+    const reroll = el('capture-reroll');
+    reroll.classList.toggle('hidden', !rerolls || !!this.game.run?.pendingGift);
+    reroll.textContent = `Novo Sorteio (${rerolls})`;
     const row = clear(el('capture-choices'));
     row.classList.remove('compact');
     el('capture-subtitle').textContent = subtitle;

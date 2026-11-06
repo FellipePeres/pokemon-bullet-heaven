@@ -9,6 +9,7 @@ import { POKEMON } from '../src/data/pokemon.js';
 import { ABILITIES } from '../src/data/abilities.js';
 import { BONUS_MOVES } from '../src/data/bonusMoves.js';
 import { LEGENDARY_MOVES, LEGENDARY_KITS, LEGENDARY_ENCOUNTERS } from '../src/data/legendaries.js';
+import { MART_ITEMS, getMartItem, itemEvolutions } from '../src/data/items.js';
 import { UPGRADES } from '../src/data/upgrades.js';
 import { ENEMIES } from '../src/data/enemies.js';
 import { STAGES } from '../src/data/stages.js';
@@ -49,6 +50,16 @@ brokenEnemyAbility.length
 
 // a linha de 3 golpes; o lendário tem só o golpe exclusivo dele (0.16)
 const lineSize = (p) => (LEGENDARY_KITS[p.id] ? 1 : 3);
+// evolução por item (0.23): pedra ou troca só pelo Poké Mart; o item existe na loja,
+// a espécie de destino existe, e quem evolui por item não tem nível de evolução
+const itemEvo = species.filter((p) => p.evolution?.method);
+const badItemEvo = itemEvo.filter((p) => p.evolution.level != null || !Object.keys(itemEvolutions(p.id)).length ||
+  Object.entries(itemEvolutions(p.id)).some(([item, to]) => getMartItem(item)?.kind !== 'evolution' || !POKEMON[to]));
+const unusedItems = MART_ITEMS.filter((i) => i.kind === 'evolution' && !species.some((p) => itemEvolutions(p.id)[i.id]));
+badItemEvo.length || unusedItems.length
+  ? fail(`evolução por item quebrada: ${badItemEvo.map((p) => p.id).join(', ')} / itens sem uso: ${unusedItems.map((i) => i.id).join(', ')}`)
+  : ok(`${itemEvo.length} espécies evoluem por pedra ou troca, todas com o item no Poké Mart`);
+
 const noLine = species.filter((p) => !p.moveLine || p.moveLine.length !== lineSize(p));
 noLine.length
   ? fail(`espécies sem a linha de golpes certa: ${noLine.map((p) => p.id).join(', ')}`)

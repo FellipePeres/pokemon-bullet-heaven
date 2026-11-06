@@ -35,6 +35,8 @@ export function createProfile() {
     },
     /** Shards: vêm das fases e das conquistas. */
     shards: 0,
+    // a mochila do Poké Mart (0.23): itens comprados que se usam depois
+    bag: { reroll: 0, revive: 0 },
     stats: {
       runsPlayed: 0,
       totalKills: 0,
@@ -181,6 +183,7 @@ export function normalizeProfile(loaded) {
       tiers: knownAchievements(loaded.achievements?.tiers),
       notified: knownAchievements(loaded.achievements?.notified)
     },
+    bag: { ...base.bag, ...(loaded.bag ?? {}) },
     // saves antigos guardavam "coins"; vira shards sem perder nada
     shards: loaded.shards ?? loaded.coins ?? base.shards,
     stats,

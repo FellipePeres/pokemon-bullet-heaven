@@ -27,6 +27,11 @@ import { POKEMON, getPokemon } from '../data/pokemon.js';
 import { ENEMIES } from '../data/enemies.js';
 import { MusicPlayer } from '../audio/music.js';
 import { swapWithPC, moveMon, normalizePC, fixDuplicateUids } from '../systems/pc.js';
+import { getMartItem, itemEvolutions } from '../data/items.js';
+import { evolveMember, learnNextMove } from '../systems/moves.js';
+import { nextMoveFor } from '../data/tms.js';
+import { getAbility } from '../data/abilities.js';
+import { maxHpFor } from '../systems/stats.js';
 
 /**
  * GAME — junta tudo: perfil, telas, partida e loop principal.
@@ -350,6 +355,7 @@ export class Game {
     // 2) jornada acumulada (equipe e build das fases já vencidas)
     // 3) começo do zero, apenas com o inicial
     const journey = this.campaign.journey;
+    this.pendingRun = null;   // a partida salva, se havia, é esta (ou foi deixada para trás)
     let options;
     if (snapshot) {
       options = { team: snapshot.team, pc: snapshot.pc };
@@ -813,6 +819,95 @@ export class Game {
       toast(`+${amount} Shards coletados!`, 'shards');
     }
     return amount;
+  }
+
+  /* ============================== Poké Mart (0.23) ============================== */
+
+  /** Os Pokémon da jornada (equipe e PC) que podem receber um item da loja. */
+  martTargets(itemId) {
+    const item = getMartItem(itemId);
+    const journey = this.campaign.journey;
+    if (!item || !journey) return [];
+    const mons = [
+      ...(journey.team?.members ?? []).map((member) => ({ member, where: 'Equipe' })),
+      ...(journey.pc ?? []).map((member) => ({ member, where: 'PC' }))
+    ];
+    if (item.kind === 'tm') {
+      return mons.map((m) => ({ ...m, result: nextMoveFor(m.member.pokemonId, m.member.abilities?.[0]) }))
+        .filter((m) => m.result)
+        .map((m) => ({ ...m, label: `${getAbility(m.member.abilities[0])?.name} → ${getAbility(m.result)?.name}` }));
+    }
+    if (item.kind === 'evolution') {
+      return mons.map((m) => ({ ...m, result: itemEvolutions(m.member.pokemonId)[itemId] }))
+        .filter((m) => m.result)
+        .map((m) => ({ ...m, label: `evolui para ${getPokemon(m.result).name}` }));
+    }
+    return [];
+  }
+
+  /**
+   * Compra um item. Os da mochila (Reviver, Novo Sorteio) vão para `profile.bag`;
+   * a TM e os de evolução são usados na hora, no Pokémon escolhido (`targetUid`).
+   */
+  buyMartItem(itemId, targetUid = null) {
+    const item = getMartItem(itemId);
+    if (!item) return false;
+    if ((this.profile.shards ?? 0) < item.price) { toast('Shards insuficientes.', 'shards'); return false; }
+
+    if (item.kind === 'bag') {
+      this.profile.bag[item.id] = (this.profile.bag[item.id] ?? 0) + 1;
+      toast(`${item.name} foi para a mochila (${this.profile.bag[item.id]}).`, item.icon);
+    } else {
+      const target = this.martTargets(itemId).find((t) => t.member.uid === targetUid);
+      if (!target) return false;
+      const name = getPokemon(target.member.pokemonId).name;
+      if (item.kind === 'tm') {
+        const learned = learnNextMove(target.member);
+        if (!learned) return false;
+        toast(`${name} aprendeu ${getAbility(learned).name}!`, 'tm');
+      } else {
+        const result = evolveMember(target.member, target.result);
+        if (!result) return false;
+        this.tracker.registerCaught(result.to.dex);
+        bus.emit(EVENTS.POKEMON_EVOLVED, { member: target.member, from: result.from.id, to: result.to.id, dex: result.to.dex });
+        toast(`${name} evoluiu para ${result.to.name}!`, 'evolution');
+      }
+    }
+    this.profile.shards -= item.price;
+    this.tracker.checkAchievements();
+    this.autosave();
+    return true;
+  }
+
+  /** O Reviver, na fase: o Pokémon desmaiado volta com metade da vida (e entra em campo se houver vaga). */
+  useRevive(memberUid) {
+    const run = this.run;
+    if (!run || run.state !== 'running' || (this.profile.bag.revive ?? 0) <= 0) return false;
+    const member = run.team.members.find((m) => m.uid === memberUid && m.fainted);
+    if (!member) return false;
+    member.fainted = false;
+    member.hp = Math.round(maxHpFor(member, run.playerStats.pokemonHpBonus) * 0.5);
+    const free = run.team.active.indexOf(null);
+    if (free !== -1) run.team.active[free] = member;
+    run.syncCompanions();
+    this.profile.bag.revive--;
+    this.hud.signature = '';
+    toast(`${getPokemon(member.pokemonId).name} voltou com o Reviver! (${this.profile.bag.revive} na mochila)`, 'revive');
+    this.autosave();
+    return true;
+  }
+
+  /** O Novo Sorteio, na tela da Poké Ball: as 4 opções são sorteadas de novo. */
+  rerollCapture() {
+    const run = this.run;
+    if (!run || !this.captureOpen || run.pendingGift || (this.profile.bag.reroll ?? 0) <= 0) return false;
+    const choices = run.captureSystem.rollChoices();
+    if (!choices.length) return false;
+    this.profile.bag.reroll--;
+    this.hud.showCapture(choices, (pokemonId, shiny) => this.pickCapture(pokemonId, shiny), undefined,
+      { teamSize: run.team.members.length, maxSize: CONFIG.team.maxSize });
+    this.autosave();
+    return true;
   }
 
   /* ============================== save ============================== */

@@ -18,9 +18,10 @@ import { isBonusMove, BONUS_MOVE_LABEL } from '../data/bonusMoves.js';
 import { Lobby } from './lobby.js';
 import { BadgeCase } from './badgeCase.js';
 import { JourneyScreen } from './journeys.js';
+import { MART_ITEMS, evolvedBy } from '../data/items.js';
 
 const SCREENS = ['screen-title', 'screen-journeys', 'screen-trainer', 'screen-starter', 'screen-campaign'];
-const MODALS = ['modal-pokedex', 'modal-achievements', 'modal-team', 'modal-options', 'modal-help', 'modal-pc', 'modal-badges'];
+const MODALS = ['modal-pokedex', 'modal-achievements', 'modal-team', 'modal-mart', 'modal-options', 'modal-help', 'modal-pc', 'modal-badges'];
 
 /**
  * Telas fora da partida.
@@ -118,6 +119,7 @@ export class Menus {
       'modal-pokedex': () => this.buildPokedex(),
       'modal-achievements': () => this.buildAchievements(),
       'modal-team': () => this.buildTeamDetail(),
+      'modal-mart': () => this.buildMart(),
       'modal-options': () => this.buildOptions(),
       'modal-pc': () => this.pcScreen.open(),
       'modal-badges': () => this.badgeCase.open(options)
@@ -357,6 +359,69 @@ export class Menus {
       node.appendChild(create('div', 'node-state', `${Math.round(member.hp)}/${maxHpFor(member)} HP`));
       list.appendChild(node);
     }
+  }
+
+  /* ============================== Poké Mart (0.23) ============================== */
+
+  /**
+   * A loja: cada item com o preço; os da mochila mostram quantos você tem. A TM
+   * e os de evolução abrem, no próprio card, a lista de quem pode receber
+   * (equipe e PC) — escolher compra e usa na hora.
+   */
+  buildMart() {
+    const game = this.game;
+    const list = clear(el('mart-list'));
+    const shards = game.profile.shards ?? 0;
+    el('mart-shards').innerHTML = `${iconHTML('shards', 18)} <b>${shards.toLocaleString('pt-BR')}</b> Shards`;
+
+    for (const item of MART_ITEMS) {
+      const card = create('div', 'shop-card mart-card');
+      const evolves = item.kind === 'evolution'
+        ? `Evolui agora: ${evolvedBy(item.id).map((p) => p.name).join(', ')}.` : item.description;
+      const owned = item.kind === 'bag' ? ` · na mochila: <b>${game.profile.bag?.[item.id] ?? 0}</b>` : '';
+      card.innerHTML = `
+        <div class="shop-icon">${iconHTML(item.icon, 34)}</div>
+        <div class="shop-body">
+          <div class="shop-title"><h4>${item.name}</h4><span class="shop-level">${iconHTML('shards', 14)} ${item.price.toLocaleString('pt-BR')}</span></div>
+          <p>${evolves}${owned}</p>
+        </div>
+      `;
+      const targets = item.kind === 'bag' ? null : game.martTargets(item.id);
+      const btn = create('button', 'buy-btn');
+      const affordable = shards >= item.price;
+      btn.innerHTML = `<span>${item.kind === 'bag' ? 'comprar' : 'escolher'}</span>`;
+      btn.disabled = !affordable || (targets && !targets.length);
+      btn.title = !affordable ? 'Shards insuficientes'
+        : targets && !targets.length ? 'Nenhum Pokémon da jornada pode receber este item' : '';
+      btn.onclick = () => {
+        if (item.kind === 'bag') { if (game.buyMartItem(item.id)) this.buildMart(); return; }
+        this._martPicker(card, item, targets);
+      };
+      card.appendChild(btn);
+      list.appendChild(card);
+    }
+  }
+
+  /** A lista de quem pode receber a TM ou o item de evolução, dentro do card. */
+  _martPicker(card, item, targets) {
+    card.querySelector('.mart-picker')?.remove();
+    const picker = create('div', 'mart-picker');
+    for (const target of targets) {
+      const data = getPokemon(target.member.pokemonId);
+      const row = create('button', 'mart-target');
+      row.type = 'button';
+      row.innerHTML = `<span class="team-icon" style="background-image:url(assets/pokemon/gen3/icons/${data.dex}.png)"></span>` +
+        `<b>${data.name}</b> <span>Nv.${target.member.level} · ${target.where} · ${target.label}</span>`;
+      row.onclick = () => {
+        if (this.game.buyMartItem(item.id, target.member.uid)) { this.buildMart(); this.lobby.render(); }
+      };
+      picker.appendChild(row);
+    }
+    const cancel = create('button', 'menu-btn ghost slim', 'Cancelar');
+    cancel.type = 'button';
+    cancel.onclick = () => picker.remove();
+    picker.appendChild(cancel);
+    card.appendChild(picker);
   }
 
   /* ============================== opções ============================== */

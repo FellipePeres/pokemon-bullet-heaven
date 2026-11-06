@@ -98,19 +98,19 @@ export const POKEMON = {
     id: 'growlithe', dex: 58, name: 'Growlithe', types: ['fire'],
     abilities: ['ember'], moveLine: ['ember', 'flamethrower', 'fire_blast'], role: 'Dano direto', rarity: 'uncommon', power: 1.1, hp: 125,
     description: 'Companheiro leal: fogo constante e boa resistência.',
-    evolution: { to: 'arcanine', level: 36, method: 'stone', item: 'Pedra do Fogo' }
+    evolution: { to: 'arcanine', method: 'stone', item: 'fire_stone' }
   },
   staryu: {
     id: 'staryu', dex: 120, name: 'Staryu', types: ['water'],
     abilities: ['water_gun'], moveLine: ['water_gun',  'water_pulse',  'ice_beam'], role: 'Desaceleração', rarity: 'uncommon', power: 1.05, hp: 105,
     description: 'Jatos rápidos que seguram quem chega perto.',
-    evolution: { to: 'starmie', level: 30, method: 'stone', item: 'Pedra da Água' }
+    evolution: { to: 'starmie', method: 'stone', item: 'water_stone' }
   },
   pikachu: {
     id: 'pikachu', dex: 25, name: 'Pikachu', types: ['electric'],
     abilities: ['thunder_shock'], moveLine: ['thunder_shock', 'thunderbolt', 'thunder'], role: 'Dano em corrente', rarity: 'rare', power: 1, hp: 95,
     description: 'Raios que saltam entre inimigos — quanto mais horda, melhor.',
-    evolution: { to: 'raichu', level: 30, method: 'stone', item: 'Pedra do Trovão' }
+    evolution: { to: 'raichu', method: 'stone', item: 'thunder_stone' }
   },
   abra: {
     id: 'abra', dex: 63, name: 'Abra', types: ['psychic'],
@@ -219,7 +219,7 @@ export const POKEMON = {
     id: 'nidorina', dex: 30, name: 'Nidorina', types: ['poison'],
     abilities: ['poison_fang'], moveLine: ['poison_sting', 'poison_fang', 'sludge_bomb'], role: 'Dano contínuo', rarity: 'evolved', power: 1.35, hp: 152,
     description: 'Veneno mais forte e mais vida.',
-    evolution: { to: 'nidoqueen', level: 36, method: 'stone', item: 'Pedra da Lua' }
+    evolution: { to: 'nidoqueen', method: 'stone', item: 'moon_stone' }
   },
   nidoqueen: {
     id: 'nidoqueen', dex: 31, name: 'Nidoqueen', types: ['poison', 'ground'],
@@ -241,7 +241,7 @@ export const POKEMON = {
     id: 'jigglypuff', dex: 39, name: 'Jigglypuff', types: ['fairy'],
     abilities: ['quick_attack'], moveLine: ['quick_attack',  'disarming_voice',  'hyper_voice'], role: 'Controle', rarity: 'common', power: 0.9, hp: 140,
     description: 'Canção que deixa a horda inteira lenta.',
-    evolution: { to: 'wigglytuff', level: 30, method: 'stone', item: 'Pedra da Lua' }
+    evolution: { to: 'wigglytuff', method: 'stone', item: 'moon_stone' }
   },
   wigglytuff: {
     id: 'wigglytuff', dex: 40, name: 'Wigglytuff', types: ['fairy'],
@@ -252,7 +252,7 @@ export const POKEMON = {
     id: 'clefairy', dex: 35, name: 'Clefairy', types: ['fairy'],
     abilities: ['quick_attack'], moveLine: ['quick_attack', 'disarming_voice', 'hyper_voice'], role: 'Investida rápida', rarity: 'uncommon', power: 1, hp: 120,
     description: 'Pequena, teimosa e surpreendentemente forte.',
-    evolution: { to: 'clefable', level: 30, method: 'stone', item: 'Pedra da Lua' }
+    evolution: { to: 'clefable', method: 'stone', item: 'moon_stone' }
   },
   clefable: {
     id: 'clefable', dex: 36, name: 'Clefable', types: ['fairy'],
@@ -329,7 +329,7 @@ export const POKEMON = {
     abilities: ['poison_fang'], moveLine: ['poison_sting', 'poison_fang', 'sludge_bomb'], role: 'Dano contínuo', rarity: 'evolved',
     power: 1.4, hp: 145,
     description: 'Ferrões mais rápidos e veneno mais forte.',
-    evolution: { to: 'nidoking', level: 36, method: 'stone', item: 'Pedra da Lua' }
+    evolution: { to: 'nidoking', method: 'stone', item: 'moon_stone' }
   },
   nidoking: {
     id: 'nidoking', dex: 34, name: 'Nidoking', types: ['poison', 'ground'],
@@ -342,7 +342,7 @@ export const POKEMON = {
     abilities: ['toxic'], moveLine: ['mega_drain',  'toxic',  'solar_beam'], role: 'Aura tóxica', rarity: 'evolved',
     power: 1.35, hp: 150,
     description: 'A nuvem tóxica fica bem maior.',
-    evolution: { to: 'vileplume', level: 32, method: 'stone', item: 'Pedra das Folhas' }
+    evolution: { to: 'vileplume', method: 'stone', item: 'leaf_stone' }
   },
   vileplume: {
     id: 'vileplume', dex: 45, name: 'Vileplume', types: ['grass', 'poison'],
@@ -355,7 +355,7 @@ export const POKEMON = {
     abilities: ['water_pulse'], moveLine: ['water_gun',  'water_pulse',  'hydro_pump'], role: 'Desaceleração', rarity: 'evolved',
     power: 1.35, hp: 160,
     description: 'Mais bolhas e desaceleração mais pesada.',
-    evolution: { to: 'poliwrath', level: 36, method: 'stone', item: 'Pedra da Água' }
+    evolution: { to: 'poliwrath', method: 'stone', item: 'water_stone' }
   },
   poliwrath: {
     id: 'poliwrath', dex: 62, name: 'Poliwrath', types: ['water', 'fighting'],
@@ -368,7 +368,7 @@ export const POKEMON = {
     abilities: ['razor_leaf'], moveLine: ['vine_whip',  'razor_leaf',  'solar_beam'], role: 'Zona de chão', rarity: 'evolved',
     power: 1.4, hp: 135,
     description: 'Campos de vinha maiores e mais duradouros.',
-    evolution: { to: 'victreebel', level: 32, method: 'stone', item: 'Pedra das Folhas' }
+    evolution: { to: 'victreebel', method: 'stone', item: 'leaf_stone' }
   },
   victreebel: {
     id: 'victreebel', dex: 71, name: 'Victreebel', types: ['grass', 'poison'],
@@ -381,7 +381,7 @@ export const POKEMON = {
     abilities: ['rock_slide'], moveLine: ['rock_throw', 'rock_slide', 'earthquake'], role: 'Dano em área', rarity: 'evolved',
     power: 1.4, hp: 220,
     description: 'Pedras maiores, explosões maiores.',
-    evolution: { to: 'golem', level: 36, method: 'trade' }
+    evolution: { to: 'golem', method: 'trade', item: 'link_cable' }
   },
   golem: {
     id: 'golem', dex: 76, name: 'Golem', types: ['rock', 'ground'],
@@ -400,7 +400,7 @@ export const POKEMON = {
     abilities: ['seismic_toss'], moveLine: ['karate_chop', 'seismic_toss', 'cross_chop'], role: 'Dano alto corpo a corpo', rarity: 'evolved',
     power: 1.45, hp: 190,
     description: 'Golpes que atravessam qualquer defesa.',
-    evolution: { to: 'machamp', level: 40, method: 'trade' }
+    evolution: { to: 'machamp', method: 'trade', item: 'link_cable' }
   },
   machamp: {
     id: 'machamp', dex: 68, name: 'Machamp', types: ['fighting'],
@@ -419,7 +419,7 @@ export const POKEMON = {
     abilities: ['psybeam'], moveLine: ['confusion', 'psybeam', 'psychic_wave'], role: 'Perseguição', rarity: 'evolved',
     power: 1.5, hp: 100,
     description: 'Ondas psíquicas mais rápidas e precisas.',
-    evolution: { to: 'alakazam', level: 36, method: 'trade' }
+    evolution: { to: 'alakazam', method: 'trade', item: 'link_cable' }
   },
   alakazam: {
     id: 'alakazam', dex: 65, name: 'Alakazam', types: ['psychic'],
@@ -448,7 +448,7 @@ export const POKEMON = {
     abilities: ['ember'], moveLine: ['ember', 'fire_spin', 'fire_blast'], role: 'Defesa giratória', rarity: 'common',
     power: 1.0, hp: 120,
     description: 'Brasas que queimam aos poucos; evolui com a Pedra do Fogo.',
-    evolution: { to: 'ninetales', level: 32, method: 'stone', item: 'Pedra do Fogo' }
+    evolution: { to: 'ninetales', method: 'stone', item: 'fire_stone' }
   },
   ninetales: {
     id: 'ninetales', dex: 38, name: 'Ninetales', types: ['fire'],
@@ -610,7 +610,7 @@ export const POKEMON = {
     abilities: ['water_gun'], moveLine: ['water_gun', 'ice_beam', 'blizzard'], role: 'Dano à distância', rarity: 'common',
     power: 1.0, hp: 125,
     description: 'Concha dura e jatos que viram gelo; evolui com a Pedra da Água.',
-    evolution: { to: 'cloyster', level: 32, method: 'stone', item: 'Pedra da Água' }
+    evolution: { to: 'cloyster', method: 'stone', item: 'water_stone' }
   },
   cloyster: {
     id: 'cloyster', dex: 91, name: 'Cloyster', types: ['water', 'ice'],
@@ -630,7 +630,7 @@ export const POKEMON = {
     abilities: ['night_shade'], moveLine: ['lick', 'night_shade', 'shadow_ball'], role: 'Raio em cadeia', rarity: 'evolved',
     power: 1.47, hp: 130,
     description: 'Sombras que saltam entre os inimigos; evolui por troca.',
-    evolution: { to: 'gengar', level: 38, method: 'trade' }
+    evolution: { to: 'gengar', method: 'trade', item: 'link_cable' }
   },
   gengar: {
     id: 'gengar', dex: 94, name: 'Gengar', types: ['ghost', 'poison'],
@@ -688,7 +688,7 @@ export const POKEMON = {
     abilities: ['confusion'], moveLine: ['confusion', 'razor_leaf', 'solar_beam'], role: 'Dano à distância', rarity: 'common',
     power: 1.0, hp: 165,
     description: 'Ovos psíquicos que viram folhas cortantes; evolui com a Pedra das Folhas.',
-    evolution: { to: 'exeggutor', level: 32, method: 'stone', item: 'Pedra das Folhas' }
+    evolution: { to: 'exeggutor', method: 'stone', item: 'leaf_stone' }
   },
   exeggutor: {
     id: 'exeggutor', dex: 103, name: 'Exeggutor', types: ['grass', 'psychic'],
@@ -855,8 +855,8 @@ export const POKEMON = {
     id: 'eevee', dex: 133, name: 'Eevee', types: ['normal'],
     abilities: ['quick_attack'], moveLine: ['quick_attack', 'hyper_fang', 'hyper_beam'], role: 'Corpo a corpo', rarity: 'common',
     power: 1.0, hp: 150,
-    description: 'Instável: evolui para Vaporeon, Jolteon ou Flareon.',
-    evolution: { to: 'vaporeon', level: 30, method: 'stone', item: 'Pedra da Água/Trovão/Fogo', alternatives: ['jolteon', 'flareon'] }
+    description: 'Instável: evolui para Vaporeon, Jolteon ou Flareon, com a Pedra da Água, do Trovão ou do Fogo.',
+    evolution: { to: 'vaporeon', method: 'stone', by: { water_stone: 'vaporeon', thunder_stone: 'jolteon', fire_stone: 'flareon' } }
   },
   vaporeon: {
     id: 'vaporeon', dex: 134, name: 'Vaporeon', types: ['water'],

@@ -447,6 +447,40 @@ game.chooseTrainer('red');
 check('depois da escolha, o Continuar segue para a jornada',
       game.profile.trainer === 'red' && !registry.get('screen-campaign').classes.has('hidden'));
 
+// ---- o Poké Mart (0.23) ----
+{
+  const journey = game.campaign.journey;
+  journey.pc = [...(journey.pc ?? []), { uid: 'mart-eevee', pokemonId: 'eevee', level: 30, xp: 0, hp: 50, abilities: ['quick_attack'], upgrades: {} }];
+  game.profile.shards = 0;
+  game.menus.showModal('modal-mart');
+  check('o Poké Mart abre com os itens', !registry.get('modal-mart').classes.has('hidden') && registry.get('mart-list').children.length === 9);
+  check('sem Shards, não compra', game.buyMartItem('revive') === false && (game.profile.bag.revive ?? 0) === 0);
+  game.profile.shards = 10000;
+  check('comprar o Reviver vai para a mochila e desconta 600', game.buyMartItem('revive') && game.profile.bag.revive === 1 && game.profile.shards === 9400);
+  game.buyMartItem('reroll');
+  const targets = game.martTargets('thunder_stone');
+  check('a Pedra do Trovão mostra quem pode evoluir (a Eevee do PC vira Jolteon)', targets.some((t) => t.member.uid === 'mart-eevee' && t.result === 'jolteon'));
+  check('usar a pedra evolui na hora e desconta 2.500',
+        game.buyMartItem('thunder_stone', 'mart-eevee') && journey.pc.find((m) => m.uid === 'mart-eevee').pokemonId === 'jolteon' && game.profile.shards === 9100 - 2500);
+  check('a pedra sem ninguém que evolua com ela não vende', game.buyMartItem('leaf_stone', 'mart-eevee') === false);
+  game.menus.closeModal();
+
+  // o Reviver na fase e o Novo Sorteio na Poké Ball
+  game.startStage('gym_1_pewter');
+  game.run.team.add('pidgey', 5);
+  const down = game.run.team.members[1];
+  down.fainted = true; down.hp = 0; game.run.team.handleFaint(down);
+  check('o Reviver traz de volta quem desmaiou, com metade da vida', game.useRevive(down.uid) && !down.fainted && down.hp > 0
+        && game.profile.bag.revive === 0);
+  game.run.pendingBall = true;
+  game.run.state = 'capture';
+  game._handleRunState();
+  check('na Poké Ball aparece o Novo Sorteio da mochila', !registry.get('capture-reroll').classes.has('hidden'));
+  check('o Novo Sorteio sorteia de novo e gasta da mochila', game.rerollCapture() && game.profile.bag.reroll === 0);
+  game.resolveCapture();
+  game.quitToMenu();
+}
+
 // ---- rejogar uma fase já vencida não paga a recompensa de novo (0.22) ----
 {
   const before = game.profile.shards;

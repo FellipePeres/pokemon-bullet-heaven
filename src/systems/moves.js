@@ -3,6 +3,7 @@ import { UPGRADES, RENAMED_UPGRADES } from '../data/upgrades.js';
 import { getPokemon } from '../data/pokemon.js';
 import { isBonusMove } from '../data/bonusMoves.js';
 import { LEGENDARY_KITS } from '../data/legendaries.js';
+import { nextMoveFor } from '../data/tms.js';
 
 /**
  * Leva as melhorias de um golpe para outro. Cada upgrade do antigo vira o
@@ -58,6 +59,44 @@ export function migrateMember(member) {
     })
     .filter((id, i, list) => list.indexOf(id) === i);   // sem golpe repetido
   return applyLegendaryKit(member);
+}
+
+/**
+ * Evolui um Pokémon guardado (da equipe da jornada ou do PC), fora da partida: o
+ * Poké Mart (0.23, pedra ou Cabo de Troca). As mesmas regras da evolução por
+ * nível (ProgressionSystem.checkEvolution): o golpe que não existe na linha nova
+ * vira o da mesma posição nela, e o golpe do estágio novo entra se estiver à
+ * frente; as melhorias vão junto. Devolve { from, to }.
+ */
+export function evolveMember(member, toId) {
+  const from = getPokemon(member.pokemonId);
+  const next = getPokemon(toId);
+  if (!from || !next) return null;
+  member.pokemonId = next.id;
+  const current = member.abilities[0];
+  const line = next.moveLine ?? [];
+  if (line.length && !line.includes(current)) {
+    const tier = Math.max(0, from.moveLine?.indexOf(current) ?? 0);
+    const replacement = line[Math.min(tier, line.length - 1)];
+    member.upgrades = transferUpgrades(member.upgrades, current, replacement);
+    member.abilities[0] = replacement;
+  }
+  const stageMove = next.abilities?.[0];
+  if (stageMove && line.indexOf(stageMove) > line.indexOf(member.abilities[0])) {
+    member.upgrades = transferUpgrades(member.upgrades, member.abilities[0], stageMove);
+    member.abilities[0] = stageMove;
+  }
+  return { from, to: next };
+}
+
+/** A TM do Poké Mart (0.23): o próximo golpe da linha, com as melhorias. Devolve o golpe novo (ou null). */
+export function learnNextMove(member) {
+  const current = member.abilities[0];
+  const next = nextMoveFor(member.pokemonId, current);
+  if (!next) return null;
+  member.upgrades = transferUpgrades(member.upgrades, current, next);
+  member.abilities[0] = next;
+  return next;
 }
 
 /**

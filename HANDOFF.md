@@ -5,7 +5,7 @@
 > decisão foi tomada e o que falta fazer. O `README.md` é o manual de uso;
 > este aqui é o contexto de desenvolvimento.
 
-**Versão atual:** `0.22.0` · **Última atualização:** 2026-11-05
+**Versão atual:** `0.23.0` · **Última atualização:** 2026-11-05
 **Stack:** HTML + CSS + JavaScript puro (ES Modules). Sem backend, sem build, sem dependências.
 **Repositório:** https://github.com/FellipePeres/pokemon-bullet-heaven (público)
 **Jogo no ar:** https://fellipeperes.github.io/pokemon-bullet-heaven/
@@ -110,6 +110,7 @@ src/
   data/               ⭐ CONTEÚDO (só dados, sem lógica)
     pokemon.js        as 151 espécies: tipos, hp, power, evolução, moveLine
     abilities.js      52 golpes (no máximo 4 por tipo) + 3 golpes dos líderes
+    items.js          o Poké Mart (0.23): itens, preços e quem evolui com cada item
     upgrades.js       217 upgrades de partida, gerados a partir das habilidades
     tms.js            linha de golpes: qual o próximo golpe de cada Pokémon
     capturePools.js   chances de captura por fase (as 9 tabelas do design)
@@ -380,11 +381,35 @@ Nunca voltar bônus globais para o pool de level up — foi pedido explícito.
   ×0,07 para ×0,085, +20%, mas o teto corta: a média foi de 1,50 para 1,62), Liga
   e Campeão ~0,9–1,0 (teto 1). Uma jornada passando tudo de primeira dá ~17.
 
+### Poké Mart (0.23)
+- Pedido do Fellipe: os Shards compram itens "bem caros, para prender o jogador a
+  jogar para comprar as coisas"; Rare Candy e Creche foram cortados. Fica na barra
+  do lobby (**Poké Mart**, janela `modal-mart`; dados em `data/items.js`, regras
+  em `Game.martTargets/buyMartItem`).
+- **Itens e preços:** Novo Sorteio **300** e Reviver **600** (vão para a mochila,
+  `profile.bag`, do jogador como os Shards); TM **1.500** (ensina agora o próximo
+  golpe da linha, com as melhorias: `learnNextMove`); as 5 pedras e o Cabo de
+  Troca **2.500** cada (evoluem agora: `evolveMember`, as mesmas regras de golpe da
+  evolução por nível). A TM e os de evolução abrem, no card, a lista de quem da
+  jornada (equipe ou PC) pode receber; sem ninguém, o botão fica apagado.
+- **Na fase:** o Reviver aparece no card de quem desmaiou ("✚ Reviver", pulsando):
+  clicar traz de volta com metade da vida, e ele entra em campo se houver vaga
+  (`Game.useRevive`). O Novo Sorteio aparece na tela da Poké Ball (não nos
+  presentes) e sorteia de novo as 4 opções (`Game.rerollCapture`).
+- **Quem evolui por pedra ou troca não evolui mais por nível** (pedido do Fellipe):
+  `evolution.method` ('stone'/'trade') + `item` (o id do Mart), e a Eevee com
+  `by: { water_stone: 'vaporeon', thunder_stone: 'jolteon', fire_stone: 'flareon' }`
+  — ela escolhe pela pedra (antes era sorteio no nível 30). São 18 espécies; o
+  `check-data` confere que todas têm o item na loja.
+- **Bug antigo corrigido junto:** a partida salva no meio (`pendingRun`) não era
+  descartada ao ser retomada; abandonando depois, ela podia voltar por cima do
+  progresso. Agora o `startStage` a consome.
+
 ### Evolução
 - **Por nível, fiel aos jogos**: Charmander→Charmeleon 16→Charizard 36,
   Bulbasaur 16/32, Squirtle 16/36, Pidgey 18/36, Magikarp→Gyarados 20, etc.
-- Onde a evolução real depende de pedra ou troca, usamos um nível equivalente e
-  marcamos `method: 'stone' | 'trade'` + `item`, para virar item de verdade depois.
+- Onde a evolução real depende de pedra ou troca, **desde a 0.23 só o item do
+  Poké Mart evolui** (antes usávamos um nível equivalente).
 - Evoluir **mantém** as melhorias, **cura toda a vida** (0.11.3; antes mantinha a
   proporção) e **melhora o
   golpe** (0.8, pedido do Fellipe): se a espécie nova começa num golpe mais adiante
@@ -1035,6 +1060,7 @@ tipo, som e o polimento de troca e captura.
 | 18 | lobby mais bonito e único (planejado junto: o Town Map, o estojo com as métricas, tudo na barra do topo); o 2º golpe no lugar do bônus de ataque; shiny só na captura e do jogador; publicar o lobby | 0.13: `ui/lobby.js`, `ui/badgeCase.js`, `systems/stageStats.js`, `data/regionMap.js`, mapa e cartão por script; D11 reescrita (publicada com a Poção e os líderes). 0.13.1: shiny (1% por opção da Poké Ball), com sprites shiny no campo, nos cards e no PC, ✦ na Pokédex e a conquista Brilho Raro |
 | 19 | o inicial também shiny (1%) e publicar; refinar os 3 2º golpes por tipo (aprovados com ajustes: Whirlpool longe, curas com teto, 2%/1% pelos tipos, nome oficial, 60% do dano); tremor só nos golpes dos líderes; o nível passando de 100 (o número saía do selo) e os líderes fáceis demais | 0.13.2: inicial shiny. 0.14: `data/bonusMoves.js` (51 golpes) e o motor deles; o líder acompanha a equipe (`leaderLevel`, `bossLift`); tremor só dos líderes; selo do nível que cresce com o número |
 | 20 | fases levemente mais rápidas: de 3:30 para 2:45 | 0.15: a linha do tempo das 13 fases comprimida (×165/210; levas ×√f mais densas, XP ×1/√f); a equipe chega ao líder no mesmo nível (medido) |
+| 30 | Poké Mart: tirar Rare Candy e Creche, o resto nos preços caros; quem evolui por item ou troca não evolui mais por nível | 0.23: `data/items.js`, a janela no lobby, a mochila (Reviver na fase, Novo Sorteio na Poké Ball), TM e evolução na hora pela equipe ou PC; 18 espécies só por item; o `pendingRun` consumido ao retomar |
 | 29 | Modo Livre com Poké Ball (1 a cada 3 min); Shards: a fase paga uma vez só, Pokémon de líder 10, chefe simples 5, no Modo Livre só os chefes simples; base para os preços do Poké Mart | 0.22: `CONFIG.shards.leaderPokemon/elite`, `CONFIG.endless.ballEvery`, recompensa só na primeira vitória; "+N Shards" no campo e no resultado |
 | 28 | o Articuno em campo muito pequeno | 0.21.1: `fieldScale` por espécie (Articuno ×1,8, Moltres ×1,5) |
 | 27 | remover a aba de melhorias do treinador; conquistas e Pokédex valem para todas as jornadas | 0.21: a loja saiu inteira (botões, janela, bônus, `data/trainerUpgrades.js`, a conquista "Cliente Fiel"); saves antigos carregam sem ela |
