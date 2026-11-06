@@ -345,7 +345,7 @@ const ROTEIROS = {
     { run: "game.newGame(); game.chooseTrainer('red'); game.chooseStarter('charmander');" +
            "game.campaign.clearedStages.push('gym_1_pewter', 'gym_2_cerulean', 'gym_3_vermilion');" +
            "game.campaign.badges.push('Insígnia Pedra', 'Insígnia Cascata', 'Insígnia Trovão');" +
-           "game.campaign.journey = { team: { members: ['charmeleon', 'pidgeotto', 'pikachu', 'geodude'].map((id, i) => ({ uid: 'm' + i, pokemonId: id, level: 30 + i, xp: 0, hp: 50, abilities: [], upgrades: {} })), active: ['m0', 'm1', 'm2'] }, pc: [] };" +
+           "game.campaign.journey = { team: { members: ['venusaur', 'clefable', 'golbat', 'gengar', 'aerodactyl', 'pidgeot'].map((id, i) => ({ uid: 'm' + i, pokemonId: id, level: 127 + i * 3, xp: 0, hp: 50, abilities: [], upgrades: {} })), active: ['m0', 'm1', 'm2'] }, pc: [] };" +
            "game.newJourney(); game.chooseTrainer('leaf'); game.chooseStarter('squirtle'); game.campaign.clearedStages.push('gym_1_pewter'); game.campaign.badges.push('Insígnia Pedra');" +
            "game.quitToMenu(); game.menus.show('screen-title')" },
     { wait: 900 }, { shot: 'jornadas-1-titulo' },

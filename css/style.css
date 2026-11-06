@@ -2229,8 +2229,9 @@ button { font: inherit; color: inherit; }
 .journey-badges { display: flex; gap: 3px; padding: 4px 0; border-top: 3px dotted var(--gba-shade); }
 .journey-badges img { width: 18px; height: 18px; image-rendering: pixelated; filter: grayscale(1) brightness(.45); opacity: .6; }
 .journey-badges img.got { filter: none; opacity: 1; }
-.journey-team { display: flex; gap: 4px; flex-wrap: wrap; min-height: 44px; }
-.journey-mon { display: flex; flex-direction: column; align-items: center; width: 40px; }
+/* 3 por linha: o nível de três dígitos ("Nv.127") não cabia em 40 px e encavalava */
+.journey-team { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px 4px; min-height: 44px; }
+.journey-mon { display: flex; flex-direction: column; align-items: center; min-width: 0; }
 .journey-next { margin: 0; font-size: 15px; line-height: 1.3; }
 .journey-run { margin: 0; font-size: 14px; color: #b8740a; }
 .journey-date { margin: 0; font-size: 13px; color: var(--gba-ink-soft); }

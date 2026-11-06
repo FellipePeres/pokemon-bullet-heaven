@@ -84,7 +84,7 @@ export class JourneyScreen {
       : `Próxima: ${next ? next.name : stages[0].name}`));
     if (journey.pendingRun) {
       const stage = STAGES[journey.pendingRun.stageId];
-      card.appendChild(create('p', 'journey-run', `Partida em andamento: ${stage ? stage.name.split(' — ')[0] : 'fase'}`));
+      card.appendChild(create('p', 'journey-run', `Partida em andamento: ${stage ? stage.name : 'fase'}`));
     }
     if (journey.updatedAt) {
       card.appendChild(create('p', 'journey-date', `Jogada em ${new Date(journey.updatedAt).toLocaleDateString('pt-BR')}`));
