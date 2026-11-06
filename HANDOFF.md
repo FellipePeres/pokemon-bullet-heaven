@@ -5,7 +5,7 @@
 > decisão foi tomada e o que falta fazer. O `README.md` é o manual de uso;
 > este aqui é o contexto de desenvolvimento.
 
-**Versão atual:** `0.28.0` · **Última atualização:** 2026-11-06
+**Versão atual:** `0.28.1` · **Última atualização:** 2026-11-06
 **Stack:** HTML + CSS + JavaScript puro (ES Modules). Sem backend, sem build, sem dependências.
 **Repositório:** https://github.com/FellipePeres/pokemon-bullet-heaven (público)
 **Jogo no ar:** https://fellipeperes.github.io/pokemon-bullet-heaven/
@@ -327,10 +327,11 @@ Nunca voltar bônus globais para o pool de level up — foi pedido explícito.
   usa Toxic); trocar de golpe transfere as melhorias, então o progresso quase
   sempre vem junto. Todas somam 11 a 13 melhorias (33 a 39 níveis no mínimo; o
   `check-data` confere). Padrão até o Fellipe decidir golpe a golpe.
-  - **Na tela de nível**, a melhoria da chave vem com moldura dourada, o selo
-    "✦ GOLPE DESPERTO" e o aviso "Maximize para despertar um golpe novo · chave
-    4/12" (pedido do Fellipe); na janela da equipe, o progresso de cada parte; no
-    PC, "✦ Desperto 4/12". Roteiro `despertar` no `screenshot.mjs`.
+  - **Na tela de nível**, a melhoria da chave vem com moldura dourada e o aviso
+    "Maximize para despertar um golpe novo · chave 4/12" embaixo (pedido do
+    Fellipe; o selo "✦ GOLPE DESPERTO" no canto saiu na 0.28.1, também a pedido
+    dele); na janela da equipe, o progresso de cada parte; no PC, "✦ Desperto
+    4/12". Roteiro `despertar` no `screenshot.mjs`.
   - O golpe é um dos 3 do tipo principal ou, em quem tem dois tipos, um dos 3 do
     secundário em 1/3 das vezes (`CONFIG.bonusMove.secondaryShare`, a proporção
     dos antigos 2% e 1%). Um por Pokémon, para sempre; ele mantém o golpe dele e
@@ -1152,6 +1153,7 @@ tipo, som e o polimento de troca e captura.
 | 19 | o inicial também shiny (1%) e publicar; refinar os 3 2º golpes por tipo (aprovados com ajustes: Whirlpool longe, curas com teto, 2%/1% pelos tipos, nome oficial, 60% do dano); tremor só nos golpes dos líderes; o nível passando de 100 (o número saía do selo) e os líderes fáceis demais | 0.13.2: inicial shiny. 0.14: `data/bonusMoves.js` (51 golpes) e o motor deles; o líder acompanha a equipe (`leaderLevel`, `bossLift`); tremor só dos líderes; selo do nível que cresce com o número |
 | 20 | fases levemente mais rápidas: de 3:30 para 2:45 | 0.15: a linha do tempo das 13 fases comprimida (×165/210; levas ×√f mais densas, XP ×1/√f); a equipe chega ao líder no mesmo nível (medido) |
 | 35 | manter a fase do Brock como está e dificultar todas as outras; a escala de ganho de nível muito alta; o Golpe Desperto por chave: maximizar certas melhorias (Gyarados: velocidade, penetração e dano; Gloom: área, intervalo entre os danos e cooldown), com a melhoria da chave marcada na tela de nível ("maximize para despertar") | 0.28: `xpLateExponent` 2,2 → 3,4 (o bot chega ao Campeão no ~74, era ~115; o Brock igual); `stage.difficulty` recalibrada fase a fase, todas mais duras que na 0.27 em tentativas do bot (ver seção 5); `data/awakening.js`: 3 melhorias por golpe que despertam o 2º golpe na hora, selo dourado na tela de nível, progresso na equipe e no PC, quem chega tarde treina a chave primeiro; `balance.mjs --jobs` (paralelo) e `--set` (testar um valor) |
+| 36 | tirar a tag "Golpe Desperto" das melhorias, deixar só o aviso de maximizar embaixo | 0.28.1: sem o selo no canto da carta; ficam a moldura dourada e o aviso |
 | 34 | Modo Livre no Campeão também | 0.27: depois do Hall da Fama, a tela de vitória de sempre, com o Modo Livre |
 | 33 | o Gengar não recebia o Golpe Desperto; capturado no nível alto vem sem melhorias e fica ruim | 0.26: sem bug no Golpe Desperto (precisava de 18 melhorias = 54 níveis); `trainToLevel`: quem chega tarde vem com 1 melhoria a cada 3 níveis, automáticas (opção 1, escolhida pelo Fellipe) |
 | 32 | a partida continuar rodando com a aba em segundo plano; a luta com o líder começar sozinha depois de 7 s, com a contagem pequena; mostrar os Shards na tela | 0.25: relógio num Worker + passos de 50 ms (`_frame`), contagem na apresentação (`leaderIntroSeconds`), "◆ Shards" no HUD |

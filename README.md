@@ -128,7 +128,8 @@ não abre até você vencer.
   de Treinador do FireRed) com as métricas de cada fase.
 - **Golpe Desperto**: cada golpe tem uma **chave** de 3 melhorias (o Hydro Pump do
   Gyarados: Velocidade, Perfuração e Potência; o Toxic do Gloom: Amplitude,
-  Intensidade e Reflexo). Elas aparecem com o selo dourado na tela de nível; com
+  Intensidade e Reflexo). Elas aparecem em dourado na tela de nível, com o aviso
+  "maximize para despertar"; com
   as 3 no máximo, o Pokémon desperta na hora um golpe a mais do tipo dele (51 ao
   todo: Flame Wheel, Whirlpool, Draco Meteor...), que usa junto do dele. As outras
   melhorias continuam valendo; com todas no máximo, cada nível de melhoria cura

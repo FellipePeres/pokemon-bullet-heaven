@@ -284,7 +284,6 @@ export class HUD {
       const variant = up.rarity === 'evolution' ? ' evolution' : up.scope === 'tm' ? ' tm' : awaken ? ' awaken' : '';
       const card = create('div', `card${variant}`);
       card.innerHTML = `
-        ${awaken ? `<span class="card-badge awaken">✦ ${BONUS_MOVE_LABEL.toUpperCase()}</span>` : ''}
         <div class="card-icon">${iconHTML(up.icon ?? 'levelUp', 44)}</div>
         <h3>${up.name}</h3>
         <p>${up.description}</p>
