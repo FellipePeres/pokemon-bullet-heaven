@@ -46,6 +46,7 @@ export class Game {
     const local = SaveManager.loadLocal();
     this.profile = local ? normalizeProfile(local.profile) : createProfile();
     this.pendingRun = local?.run ?? null;
+    this._foldPendingRun();   // a partida que ficou no meio entra na jornada (0.24)
     this.tracker = new ProfileTracker(this.profile);
 
     // ---- infraestrutura ----
@@ -282,6 +283,7 @@ export class Game {
     this.pendingRun = slot.pendingRun ?? null;
     slot.data = null;
     slot.pendingRun = null;
+    this._foldPendingRun();   // a partida que ficou no meio desta jornada entra nela (0.24)
     this.profile.stats.badges = countBadges(this.profile);
   }
 
@@ -329,16 +331,35 @@ export class Game {
     this.autosave();
   }
 
+  /**
+   * Continuar a jornada é sempre ir para o mapa (0.24, pedido do Fellipe: "mesmo
+   * que tenha saído no meio da fase"). A partida que ficou no meio já entrou na
+   * jornada (`_foldPendingRun`), como um abandono: nada do que a equipe ganhou se perde.
+   */
   continueGame() {
     // saves de antes da escolha de treinador perguntam uma vez
     if (!this.profile.trainer) { this.askTrainer(() => this.continueGame()); return; }
-    if (this.pendingRun) {
-      const snapshot = this.pendingRun;
-      toast('Retomando a fase com sua equipe e build salvas.', '💾');
-      this.startStage(snapshot.stageId, snapshot);
-      return;
-    }
+    this._foldPendingRun();
     if (this.campaign.starter) this.openCampaign();
+  }
+
+  /**
+   * A partida que ficou no meio (o navegador fechou durante a fase, ou um save
+   * feito na pausa) entra na jornada: a equipe dela e o PC que ela juntou, como
+   * um abandono — e o jogador volta ao mapa, não à fase (0.24).
+   */
+  _foldPendingRun() {
+    const snapshot = this.pendingRun;
+    this.pendingRun = null;
+    const members = snapshot?.team?.members;
+    if (!members?.length || !this.campaign.starter) return;
+    const journey = this.campaign.journey;
+    this.campaign.journey = {
+      ...(journey ?? {}),
+      team: snapshot.team,
+      level: Math.max(...members.map((m) => m.level ?? 1)),
+      pc: [...(journey?.pc ?? []), ...(snapshot.pc ?? [])]
+    };
   }
 
   /** Inicia uma fase. `snapshot` restaura equipe/upgrades de um save. */
@@ -425,6 +446,7 @@ export class Game {
     const run = this.run;
     if (run && (!this.runEnded || run.endless) && run.team?.members.length) {
       this.campaign.journey = this._journeyFrom(run);
+      this.pendingRun = null;
       this.autosave();
     }
     this.run = null;
@@ -922,7 +944,8 @@ export class Game {
     const data = this.buildSaveData();
     SaveManager.download(data);
     SaveManager.saveLocal(data);
-    this.pendingRun = data.run;
+    // (até a 0.23 a foto da partida ficava em `pendingRun` e podia voltar por cima
+    // do progresso; a partida viva continua sendo a fonte)
     toast('Jogo salvo! Confira sua pasta de downloads.', '💾');
   }
 
@@ -939,7 +962,8 @@ export class Game {
       this.tracker.setProfile(this.profile);
       this.pendingRun = data.run;
       this.run = null;
-      SaveManager.saveLocal(data);
+      this._foldPendingRun();   // a partida do save entra na jornada; o jogador vai ao mapa (0.24)
+      this.autosave();
 
       toast(`Save carregado (${data.savedAt ? new Date(data.savedAt).toLocaleString('pt-BR') : 'sem data'}).`, '📂');
 

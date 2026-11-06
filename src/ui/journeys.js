@@ -13,7 +13,7 @@ import { CONFIG } from '../core/config.js';
  * podendo fazer mais de uma com novos Pokémon, e voltar para a outra").
  *
  * Um card por jornada começada (treinador, inicial, insígnias, equipe, a
- * próxima fase, a partida em andamento e quando foi jogada), com Jogar e Apagar
+ * próxima fase e quando foi jogada), com Jogar (sempre para o mapa, 0.24) e Apagar
  * (que confirma no próprio card); os espaços livres têm Nova jornada. As regras
  * ficam no Game (`listJourneys`, `openJourney`, `newJourney`, `deleteJourney`).
  */
@@ -82,10 +82,6 @@ export class JourneyScreen {
     const champion = cleared.includes(stages.at(-1)?.id);
     card.appendChild(create('p', 'journey-next', champion && !next ? `Campeã de ${region.name}!`
       : `Próxima: ${next ? next.name : stages[0].name}`));
-    if (journey.pendingRun) {
-      const stage = STAGES[journey.pendingRun.stageId];
-      card.appendChild(create('p', 'journey-run', `Partida em andamento: ${stage ? stage.name : 'fase'}`));
-    }
     if (journey.updatedAt) {
       card.appendChild(create('p', 'journey-date', `Jogada em ${new Date(journey.updatedAt).toLocaleDateString('pt-BR')}`));
     }
@@ -103,7 +99,8 @@ export class JourneyScreen {
       no.onclick = () => { this.confirming = null; this.render(); };
       actions.append(yes, no);
     } else {
-      const play = create('button', 'menu-btn primary', journey.pendingRun ? 'Continuar' : 'Jogar');
+      // sempre para o mapa da jornada (0.24): a partida que ficou no meio já entrou nela
+      const play = create('button', 'menu-btn primary', 'Jogar');
       play.type = 'button';
       play.onclick = () => this.game.openJourney(journey.id);
       const remove = create('button', 'menu-btn ghost slim journey-delete', 'Apagar');

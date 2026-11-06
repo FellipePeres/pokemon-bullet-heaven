@@ -481,6 +481,22 @@ check('depois da escolha, o Continuar segue para a jornada',
   game.quitToMenu();
 }
 
+// ---- continuar sempre vai para o mapa (0.24): a partida que ficou no meio entra na jornada ----
+{
+  game.startStage('gym_1_pewter');
+  game.run.team.members[0].level = 44;
+  game.run.pc.push({ ...game.run.team.members[0], uid: 'meio-pc', pokemonId: 'oddish', level: 12 });
+  const snapshot = game.run.serialize();
+  game.run = null;                        // o navegador fechou no meio da fase
+  game.pendingRun = snapshot;
+  game.menus.show('screen-title');
+  game.continueGame();
+  check('continuar com uma partida que ficou no meio vai para o mapa, não para a fase',
+        !game.run && !registry.get('screen-campaign').classes.has('hidden') && game.pendingRun === null);
+  check('...e o que a equipe ganhou nela entrou na jornada (nível e PC)',
+        game.campaign.journey.team.members[0].level === 44 && game.campaign.journey.pc.some((m) => m.uid === 'meio-pc'));
+}
+
 // ---- rejogar uma fase já vencida não paga a recompensa de novo (0.22) ----
 {
   const before = game.profile.shards;
