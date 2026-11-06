@@ -5,7 +5,7 @@
 > decisão foi tomada e o que falta fazer. O `README.md` é o manual de uso;
 > este aqui é o contexto de desenvolvimento.
 
-**Versão atual:** `0.24.0` · **Última atualização:** 2026-11-05
+**Versão atual:** `0.25.0` · **Última atualização:** 2026-11-05
 **Stack:** HTML + CSS + JavaScript puro (ES Modules). Sem backend, sem build, sem dependências.
 **Repositório:** https://github.com/FellipePeres/pokemon-bullet-heaven (público)
 **Jogo no ar:** https://fellipeperes.github.io/pokemon-bullet-heaven/
@@ -620,6 +620,19 @@ Nunca voltar bônus globais para o pool de level up — foi pedido explícito.
   - a meta (padrão até o Fellipe decidir) é medida em tentativas do bot até
     passar: ~1,5 nas Fases 1 e 2, ~2 na 3 a 5, mais nas seguintes e ~4–5 na Liga,
     onde o Fellipe achava tudo fácil. O bot joga pior que ele.
+- **A partida não congela em outra aba** (0.25, pedido do Fellipe): o navegador
+  para o `requestAnimationFrame` de abas escondidas e desacelera os timers delas,
+  então um **Worker** manda um toque a cada 100 ms e, com a aba escondida, o
+  `Game._frame` anda a partida por ele (sem desenhar). O tempo passado vira passos
+  de no máximo 50 ms (até 60 s por toque, `MAX_CATCH_UP`), então a partida anda no
+  tempo certo mesmo com os toques espaçados. O teclado solta as teclas ao perder o
+  foco (`input.js`), então o treinador fica parado. As telas que pedem escolha
+  (melhoria, captura, evolução) continuam esperando o jogador.
+- **A luta com o líder começa sozinha** (0.25): a apresentação mostra "A luta
+  começa em 7s" embaixo do Lutar! (`CONFIG.leaderIntroSeconds`), e sem clique a
+  luta começa no fim da contagem.
+- **Os Shards no canto da partida** (0.25): "◆" ao lado de "⚔" (inimigos) e "◓"
+  (capturas), atualizado na hora em que um chefe cai.
 - **Tremor de tela só nos golpes dos líderes** (0.14, pedido do Fellipe): saiu o
   dos golpes do jogador (Earthquake, explosões), do Ímã, da fúria e da queda do
   líder.
@@ -1067,6 +1080,7 @@ tipo, som e o polimento de troca e captura.
 | 18 | lobby mais bonito e único (planejado junto: o Town Map, o estojo com as métricas, tudo na barra do topo); o 2º golpe no lugar do bônus de ataque; shiny só na captura e do jogador; publicar o lobby | 0.13: `ui/lobby.js`, `ui/badgeCase.js`, `systems/stageStats.js`, `data/regionMap.js`, mapa e cartão por script; D11 reescrita (publicada com a Poção e os líderes). 0.13.1: shiny (1% por opção da Poké Ball), com sprites shiny no campo, nos cards e no PC, ✦ na Pokédex e a conquista Brilho Raro |
 | 19 | o inicial também shiny (1%) e publicar; refinar os 3 2º golpes por tipo (aprovados com ajustes: Whirlpool longe, curas com teto, 2%/1% pelos tipos, nome oficial, 60% do dano); tremor só nos golpes dos líderes; o nível passando de 100 (o número saía do selo) e os líderes fáceis demais | 0.13.2: inicial shiny. 0.14: `data/bonusMoves.js` (51 golpes) e o motor deles; o líder acompanha a equipe (`leaderLevel`, `bossLift`); tremor só dos líderes; selo do nível que cresce com o número |
 | 20 | fases levemente mais rápidas: de 3:30 para 2:45 | 0.15: a linha do tempo das 13 fases comprimida (×165/210; levas ×√f mais densas, XP ×1/√f); a equipe chega ao líder no mesmo nível (medido) |
+| 32 | a partida continuar rodando com a aba em segundo plano; a luta com o líder começar sozinha depois de 7 s, com a contagem pequena; mostrar os Shards na tela | 0.25: relógio num Worker + passos de 50 ms (`_frame`), contagem na apresentação (`leaderIntroSeconds`), "◆ Shards" no HUD |
 | 31 | tela de jornadas com os níveis encavalados; continuar a jornada sempre no mapa, mesmo saindo no meio da fase | 0.23.1: equipe do card em 3 por linha e o nome completo da fase; 0.24: `_foldPendingRun` (a partida do meio entra na jornada), sem retomar no meio da fase |
 | 30 | Poké Mart: tirar Rare Candy e Creche, o resto nos preços caros; quem evolui por item ou troca não evolui mais por nível | 0.23: `data/items.js`, a janela no lobby, a mochila (Reviver na fase, Novo Sorteio na Poké Ball), TM e evolução na hora pela equipe ou PC; 18 espécies só por item; o `pendingRun` consumido ao retomar |
 | 29 | Modo Livre com Poké Ball (1 a cada 3 min); Shards: a fase paga uma vez só, Pokémon de líder 10, chefe simples 5, no Modo Livre só os chefes simples; base para os preços do Poké Mart | 0.22: `CONFIG.shards.leaderPokemon/elite`, `CONFIG.endless.ballEvery`, recompensa só na primeira vitória; "+N Shards" no campo e no resultado |

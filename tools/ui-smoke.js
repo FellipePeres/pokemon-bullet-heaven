@@ -272,6 +272,8 @@ game._handleRunState();
 check('o líder chega com a apresentação (retrato e fala)',
       game.run.state === 'intro' && !registry.get('leader-overlay').classes.has('hidden') &&
       registry.get('leader-quote').textContent === game.run.stage.leader.quote);
+check('a apresentação mostra a contagem para a luta começar sozinha',
+      registry.get('leader-countdown').textContent === `A luta começa em ${CONFIG.leaderIntroSeconds}s`);
 game.closeLeaderIntro();
 check('"Lutar!" fecha a apresentação e a partida volta',
       game.run.state === 'running' && registry.get('leader-overlay').classes.has('hidden'));
@@ -478,6 +480,32 @@ check('depois da escolha, o Continuar segue para a jornada',
   check('na Poké Ball aparece o Novo Sorteio da mochila', !registry.get('capture-reroll').classes.has('hidden'));
   check('o Novo Sorteio sorteia de novo e gasta da mochila', game.rerollCapture() && game.profile.bag.reroll === 0);
   game.resolveCapture();
+  game.quitToMenu();
+}
+
+// ---- 0.25: a partida anda com toques espaçados (aba escondida), a luta começa sozinha e os Shards no canto ----
+{
+  game.startStage('gym_1_pewter');
+  game.run.spawner.update = () => {};
+  game.lastTime = 1000;
+  game._frame(1000);
+  const t0 = game.run.time;
+  game._frame(4000);                       // um toque só, 3 s depois (o relógio da aba escondida)
+  check('um toque espaçado avança a partida o tempo todo que passou, em passos pequenos',
+        Math.abs(game.run.time - t0 - 3) < 0.01, `${(game.run.time - t0).toFixed(2)} s`);
+  game.hud.update(game.run);
+  check('os Shards aparecem no canto da partida',
+        registry.get('shard-count').textContent === (game.profile.shards ?? 0).toLocaleString('pt-BR'), registry.get('shard-count').textContent);
+  // a apresentação do líder: sem clicar em Lutar, a luta começa sozinha
+  game.run.pendingIntro = game.run.stage.leader;
+  game.run.state = 'intro';
+  game._handleRunState();
+  game._frame(4000 + 3000);
+  check('3 s depois a apresentação continua, contando', game.introOpen && registry.get('leader-countdown').textContent === 'A luta começa em 4s',
+        registry.get('leader-countdown').textContent);
+  game._frame(4000 + 3000 + 4500);
+  check(`sem clicar em Lutar, a luta começa sozinha depois de ${CONFIG.leaderIntroSeconds} s`,
+        !game.introOpen && game.run.state === 'running' && registry.get('leader-overlay').classes.has('hidden'));
   game.quitToMenu();
 }
 

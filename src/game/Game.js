@@ -38,6 +38,9 @@ import { maxHpFor } from '../systems/stats.js';
  * É o único lugar que conhece todos os módulos; cada sistema continua
  * sabendo apenas do seu próprio assunto.
  */
+/** O máximo de tempo que um toque do relógio recupera (a aba escondida pode ficar sem toques). */
+const MAX_CATCH_UP = 60;
+
 export class Game {
   constructor(canvas) {
     loadOptions();   // preferências do menu Opções, guardadas no navegador
@@ -82,32 +85,76 @@ export class Game {
 
     this.menus.show('screen-title');
     requestAnimationFrame((ts) => this.loop(ts));
+    this._backgroundClock();
   }
 
   /* ============================ loop principal ============================ */
 
   loop(ts) {
-    const dt = this.lastTime ? Math.min(0.05, (ts - this.lastTime) / 1000) : 0;
-    this.lastTime = ts;
+    this._frame(ts);
+    requestAnimationFrame((next) => this.loop(next));
+  }
+
+  /**
+   * Um passo do jogo. Com a aba visível, quem chama é o requestAnimationFrame;
+   * escondida ou minimizada, o relógio do Worker (`_backgroundClock`), porque o
+   * navegador para o requestAnimationFrame e desacelera os timers dessas abas
+   * (0.25, pedido do Fellipe: a partida não congela em outra aba). O tempo que
+   * passou vira passos de no máximo 50 ms, então a partida anda no tempo certo
+   * mesmo com os toques espaçados; escondida, ela não desenha.
+   */
+  _frame(now) {
+    let elapsed = this.lastTime ? Math.min(MAX_CATCH_UP, (now - this.lastTime) / 1000) : 0;
+    this.lastTime = now;
+    if (elapsed < 0) elapsed = 0;
+    const hidden = typeof document !== 'undefined' && !!document.hidden;
     this.input.poll();   // controle (os botões chegam em handleAction)
 
     if (this.run) {
-      this.run.update(dt, this.input.getMoveVector());
-      this._handleRunState();
-      this.renderer.render(this.run);
-      this.hud.update(this.run);
+      do {
+        const dt = Math.min(0.05, elapsed);
+        elapsed -= dt;
+        this.run.update(dt, this.input.getMoveVector());
+        this._handleRunState();
+        if (this.introOpen) {
+          this.introCountdown -= dt;
+          if (this.introCountdown <= 0) this.closeLeaderIntro();
+          else if (!hidden) this.hud.setLeaderCountdown(this.introCountdown);
+        }
 
-      // autosave periódico (só conveniência local)
-      this.autosaveTimer += dt;
-      if (this.autosaveTimer > 15) {
-        this.autosaveTimer = 0;
-        if (this.run.endless && this.run.state === 'running') this.campaign.journey = this._journeyFrom(this.run);
-        this.autosave();
+        // autosave periódico (só conveniência local)
+        this.autosaveTimer += dt;
+        if (this.autosaveTimer > 15) {
+          this.autosaveTimer = 0;
+          if (this.run.endless && this.run.state === 'running') this.campaign.journey = this._journeyFrom(this.run);
+          this.autosave();
+        }
+      } while (elapsed > 0 && this.run);
+      if (this.run && !hidden) {
+        this.renderer.render(this.run);
+        this.hud.update(this.run);
       }
     }
 
     this._updateMusic();
-    requestAnimationFrame((next) => this.loop(next));
+  }
+
+  /**
+   * O relógio da aba escondida: um Worker manda um toque a cada 100 ms (os timers
+   * de um Worker não são desacelerados como os da página). Com a aba visível, o
+   * toque é ignorado — quem anda é o requestAnimationFrame. Sem Worker (os testes
+   * em Node), a aba escondida pausa como antes.
+   */
+  _backgroundClock() {
+    if (typeof Worker === 'undefined' || typeof Blob === 'undefined' || typeof document === 'undefined') return;
+    try {
+      const source = 'setInterval(() => postMessage(0), 100);';
+      const worker = new Worker(URL.createObjectURL(new Blob([source], { type: 'text/javascript' })));
+      worker.onmessage = () => { if (document.hidden) this._frame(performance.now()); };
+      this.clockWorker = worker;
+    } catch {
+      /* sem Worker: a partida pausa com a aba escondida, como até a 0.24 */
+    }
   }
 
   /**
@@ -599,7 +646,10 @@ export class Game {
   /** O líder chega: a partida pausa na apresentação dele até o jogador lutar. */
   openLeaderIntro() {
     this.introOpen = true;
+    // sem clique em Lutar, a luta começa sozinha (0.25): a contagem anda no `_frame`
+    this.introCountdown = CONFIG.leaderIntroSeconds;
     this.hud.showLeaderIntro(this.run.pendingIntro, () => this.closeLeaderIntro());
+    this.hud.setLeaderCountdown(this.introCountdown);
   }
 
   closeLeaderIntro() {

@@ -73,6 +73,7 @@ export class HUD {
     el('btn-endless-center').classList.toggle('hidden', !run.endless);
     el('kill-count').textContent = run.stats.kills;
     el('ball-count').textContent = run.stats.captures;
+    el('shard-count').textContent = (this.game.profile?.shards ?? 0).toLocaleString('pt-BR');
 
     const cooldown = run.playerStats.swapCooldown;
     const ratio = cooldown > 0 ? 1 - run.team.swapTimer / cooldown : 1;
@@ -355,6 +356,11 @@ export class HUD {
   }
 
   hideLeaderIntro() { hide(el('leader-overlay')); }
+
+  /** A contagem da apresentação do líder: a luta começa sozinha no fim (0.25). */
+  setLeaderCountdown(seconds) {
+    el('leader-countdown').textContent = `A luta começa em ${Math.max(0, Math.ceil(seconds - 1e-6))}s`;   // (somar passos de 0,05 s não dá exato)
+  }
 
   /* ============================ HALL DA FAMA ============================ */
 

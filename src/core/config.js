@@ -3,7 +3,7 @@
  * Nada de número mágico espalhado pelo gameplay: se precisar ajustar, ajuste aqui.
  */
 export const CONFIG = {
-  version: '0.24.0',
+  version: '0.25.0',
 
   canvas: { width: 1280, height: 720 },
 
@@ -146,6 +146,10 @@ export const CONFIG = {
    * O dano por acerto é `damageRatio` do golpe principal; as curas dele param em
    * `healPerSecond` da vida máxima do Pokémon por segundo.
    */
+  // a apresentação do líder começa a luta sozinha depois disso, se ninguém clicar
+  // em Lutar (0.25, pedido do Fellipe; a contagem aparece embaixo, pequena)
+  leaderIntroSeconds: 7,
+
   // MODO LIVRE (0.20, pedido do Fellipe: "estilo Endless Mode daquela fase, com XP
   // reduzido; os inimigos vão ganhando gradativamente mais status até que fique
   // quase impossível"). Padrão até o Fellipe decidir.
