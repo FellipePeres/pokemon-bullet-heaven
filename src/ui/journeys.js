@@ -64,6 +64,8 @@ export class JourneyScreen {
       ? progress.journey.team.members
       : [{ pokemonId: progress.starter, level: 1, shiny: !!progress.starterShiny }];
     const team = create('div', 'journey-team');
+    // desde a 0.29 o inicial vem do Prof. Carvalho, na vila: a jornada pode existir sem ele
+    if (!progress.starter) team.appendChild(create('span', 'journey-date', 'Ainda sem Pokémon: o Prof. Carvalho espera no laboratório.'));
     for (const member of members.slice(0, 6)) {
       const data = getPokemon(member.pokemonId);
       if (!data) continue;

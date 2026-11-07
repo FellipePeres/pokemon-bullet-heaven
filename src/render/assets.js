@@ -1,4 +1,23 @@
 import { ASSET_MANIFEST } from '../data/assetManifest.js';
+import { HUB_MAPS, HUB_SPRITES, HUB_DECOR } from '../data/hubMaps.js';
+
+/**
+ * O catálogo inteiro: o do extract.py e o da vila (tools/assets/hub.py). Cada
+ * mapa da vila entra como uma folha de um quadro só: `hub/<mapa>` (o chão) e
+ * `hub/<mapa>-top` (o que cobre os personagens).
+ */
+const MANIFEST = { ...ASSET_MANIFEST, ...HUB_SPRITES };
+for (const [id, map] of Object.entries(HUB_MAPS)) {
+  const size = { frameWidth: map.width * 16, frameHeight: map.height * 16, frames: 1 };
+  MANIFEST[`hub/${id}`] = { src: map.src, ...size };
+  MANIFEST[`hub/${id}-top`] = { src: map.top, ...size };
+}
+// os móveis do quarto decorável: `hub/decor/<id>` e `hub/decor/<id>-top`
+for (const [id, piece] of Object.entries(HUB_DECOR)) {
+  const size = { frameWidth: piece.width * 16, frameHeight: piece.height * 16, frames: 1 };
+  MANIFEST[`hub/decor/${id}`] = { src: piece.src, ...size };
+  MANIFEST[`hub/decor/${id}-top`] = { src: piece.top, ...size };
+}
 
 /**
  * ASSETS LOCAIS — as folhas geradas por tools/assets/extract.py.
@@ -11,7 +30,7 @@ import { ASSET_MANIFEST } from '../data/assetManifest.js';
 const cache = new Map();
 
 function load(key) {
-  const def = ASSET_MANIFEST[key];
+  const def = MANIFEST[key];
   const entry = { def, img: null, ready: false };
   cache.set(key, entry);
   if (!def || typeof Image === 'undefined') return entry;
@@ -29,7 +48,7 @@ export function getSheet(key) {
 
 /** Caminho do arquivo, para <img> e CSS da interface. */
 export function assetUrl(key) {
-  return ASSET_MANIFEST[key]?.src ?? null;
+  return MANIFEST[key]?.src ?? null;
 }
 
 /** Começa a carregar uma lista de folhas. */

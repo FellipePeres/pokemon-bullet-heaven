@@ -353,8 +353,13 @@ class Tileset:
 
 
 def snake(name):
-    """gTileset_PalletTown -> pallet_town (o nome da pasta no decomp)."""
-    return re.sub(r'(?<!^)(?=[A-Z])', '_', name.replace('gTileset_', '')).lower()
+    """gTileset_PalletTown -> pallet_town (o nome da pasta no decomp).
+
+    O número também ganha o seu sublinhado: gTileset_GenericBuilding1 ->
+    generic_building_1 (é assim que a pasta se chama).
+    """
+    name = re.sub(r'(?<!^)(?=[A-Z])', '_', name.replace('gTileset_', '')).lower()
+    return re.sub(r'([a-z])(\d)', r'\1_\2', name)
 
 
 def extract_scenes(decomp, manifest):

@@ -2292,3 +2292,151 @@ button { font: inherit; color: inherit; }
 
 /* a contagem da apresentação do líder (0.25): pequena, embaixo do Lutar! */
 .leader-countdown { margin: 6px 0 0; font-size: 13px; text-align: center; color: rgba(255, 255, 255, .75); }
+
+/* ================================ A VILA ================================
+   O lobby jogável (0.29, PLANEJAMENTO-LOBBY.md): o mapa em grade do FireRed
+   num canvas do tamanho da tela, em escala inteira e sem suavizar
+   (render/HubRenderer.js), com a barra do topo e a caixa de texto do jogo por
+   cima (ui/hubHud.js). O cenário dos menus e a lateral saem: a vila é o fundo. */
+#app[data-screen="screen-hub"] #side-rail,
+#app[data-screen="screen-hub"] .gear-float,
+#app[data-screen="screen-hub"] #menu-bg,
+#app[data-screen="screen-hub"] #menu-scrim { display: none; }
+
+.screen.hub { justify-content: flex-start; gap: 0; padding: 0; background: #000; }
+.hub-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
+  cursor: pointer;
+  touch-action: none;
+}
+.hub-bar { position: relative; z-index: 2; width: calc(100% - 28px); max-width: 1440px; margin: 12px auto 0; }
+/* o Mapa da jornada é o botão principal da vila */
+.hub-map-btn { color: var(--gba-gold-ink); background: var(--gba-gold); border-color: #b8902e; }
+.hub-map-btn .bar-icon { color: var(--gba-gold-ink); }
+.hub-map-btn:hover, .hub-map-btn:focus-visible { background: #ffe79c; border-color: #8a6a1c; }
+.hub-map-btn.locked { color: var(--gba-ink-soft); background: var(--gba-button); border-color: var(--gba-shade); filter: grayscale(.7); }
+
+/* a placa com o nome do lugar, ao chegar (como a do FireRed, no canto) */
+.hub-place {
+  position: absolute;
+  z-index: 2;
+  top: 104px;
+  left: 22px;
+  padding: 2px 12px;
+  font-family: var(--font-pixel);
+  font-size: 19px;
+  font-weight: 600;
+  color: var(--gba-ink);
+  border: 16px solid transparent;
+  border-image: url(../assets/ui/window-frame-button.png) 16 fill stretch;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, .5));
+  animation: hub-place-in .25s steps(4);
+  pointer-events: none;
+}
+@keyframes hub-place-in { from { transform: translateY(-14px); opacity: 0; } }
+
+/* a caixa de texto do FireRed, embaixo, com a plaquinha de quem fala */
+.hub-dialog {
+  position: absolute;
+  z-index: 3;
+  left: 50%;
+  bottom: 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: min(980px, calc(100% - 32px));
+  transform: translateX(-50%);
+}
+.hub-dialog-name {
+  position: relative;
+  z-index: 1;
+  margin: 0 0 -10px 22px;
+  padding: 2px 12px;
+  font-family: var(--font-pixel);
+  font-size: 16px;
+  font-weight: 700;
+  color: #fff;
+  background: var(--gba-night);
+  border: 2px solid var(--gba-frame);
+  border-radius: 3px;
+}
+.hub-dialog-box { position: relative; width: 100%; min-height: 112px; cursor: pointer; }
+.hub-dialog-box p { margin: 0; padding-right: 22px; }
+/* a setinha que pisca quando a página acabou */
+.hub-dialog-next {
+  position: absolute;
+  right: 4px;
+  bottom: 2px;
+  width: 0;
+  height: 0;
+  border-left: 7px solid transparent;
+  border-right: 7px solid transparent;
+  border-top: 10px solid var(--poke-red);
+  opacity: 0;
+}
+.hub-dialog-next.on { opacity: 1; animation: hub-next .7s steps(2) infinite; }
+@keyframes hub-next { 50% { transform: translateY(4px); } }
+/* o SIM/NÃO, no canto de cima da caixa, como no jogo */
+.hub-choices {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% - 8px);
+  display: flex;
+  flex-direction: column;
+  min-width: 120px;
+  padding: 0 4px;
+}
+.hub-choice {
+  position: relative;
+  padding: 0 0 0 26px;
+  font: inherit;
+  text-align: left;
+  color: var(--gba-ink);
+  background: none;
+  border: 0;
+  text-shadow: inherit;
+  cursor: pointer;
+}
+.hub-choice.pick::before { content: '▶'; position: absolute; left: 4px; font-size: .8em; line-height: 1.9; }
+
+.hub-hint {
+  position: absolute;
+  z-index: 2;
+  left: 18px;
+  bottom: 12px;
+  margin: 0;
+  font-family: var(--font-pixel);
+  font-size: 14px;
+  color: #dfe6f2;
+  text-shadow: 2px 2px 0 rgba(0, 0, 0, .85);
+  pointer-events: none;
+}
+.hub-hint kbd {
+  display: inline-block;
+  min-width: 20px;
+  margin: 0 1px;
+  padding: 0 4px;
+  font-family: var(--font-pixel);
+  font-size: 12px;
+  font-weight: 700;
+  text-align: center;
+  color: var(--gba-ink);
+  background: var(--gba-button);
+  border: 2px solid var(--gba-frame);
+  border-radius: 3px;
+}
+.hub-dialog:not(.hidden) ~ .hub-hint { display: none; }
+@media (max-width: 900px) {
+  .hub-hint { display: none; }
+  .hub-place { top: 150px; }
+}
+
+/* a loja de Pokédolls: o móvel montado com os tiles e o boneco, em pixels inteiros */
+.decor-card .shop-icon { display: grid; place-items: center; min-width: 84px; min-height: 68px; }
+.decor-stack { position: relative; display: block; }
+.decor-stack img { position: absolute; inset: 0; image-rendering: pixelated; }
+.decor-doll { display: block; background-repeat: no-repeat; background-position: 0 0; image-rendering: pixelated; }

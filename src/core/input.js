@@ -31,6 +31,9 @@ export class Input {
     if (e.code === 'Escape') this._action('pause');
     else if (e.code === 'Tab') { e.preventDefault(); this._action('cycleSlot'); }
     else if (/^Digit[1-6]$/.test(e.code)) this._action('team:' + (Number(e.code.slice(5)) - 1));
+    // A e B do FireRed, para a vila (0.29): falar/avançar e cancelar; o jogo só usa fora da partida
+    else if (e.code === 'Enter' || e.code === 'Space' || e.code === 'KeyZ') this._action('confirm');
+    else if (e.code === 'KeyX' || e.code === 'Backspace') this._action('cancel');
 
     if (MOVE_KEYS[e.code] || e.code === 'Space') e.preventDefault();
   }
@@ -81,6 +84,11 @@ export class Input {
     const len = Math.hypot(x, y);
     if (len > 0) return { x: x / len, y: y / len };
     return { ...this.padMove };
+  }
+
+  /** Correr na vila: Shift ou X segurado, ou o B do controle (como no FireRed). */
+  isRunHeld() {
+    return this.keys.has('ShiftLeft') || this.keys.has('ShiftRight') || this.keys.has('KeyX') || this.padPressed.has('b');
   }
 
   clear() {

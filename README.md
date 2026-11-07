@@ -31,6 +31,15 @@ A ideia é simples: *"estou fazendo uma jornada Pokémon enquanto construo uma b
 de Bullet Heaven"*. Você começa fraco, com um único inicial, e termina a fase com
 uma equipe de seis, evoluída, com golpes melhorados e sinergias que você escolheu.
 
+**Entre uma fase e outra, a vila.** A jornada começa no seu quarto, numa mini-vila
+feita com os tiles do FireRed, onde você anda em grade, como no jogo. Lá o
+**Prof. Carvalho** conta por que as rotas estão tomadas por hordas e te dá o
+**primeiro Pokémon**. Até falar com ele, as saídas da vila ficam fechadas. No
+**Centro Pokémon**, a enfermeira cuida do PC e um vendedor tem o Poké Mart. A **loja de
+Pokédolls** vende bonecos e móveis para decorar o seu quarto, e os moradores têm
+o que contar. A saída sul abre o mapa da jornada; o mato alto a oeste e a lagoa
+guardam modos que ainda estão por vir.
+
 ## Como jogar
 
 | Ação | Tecla |
@@ -43,6 +52,16 @@ uma equipe de seis, evoluída, com golpes melhorados e sinergias que você escol
 | Gastar os níveis acumulados de um Pokémon | botão `▲` no card |
 | Pausar / fechar janela | `ESC` |
 | Controle (gamepad) | analógico ou direcional anda · LB/RB escolhem o slot · X/Y/B põem a reserva em campo · Start pausa · nas telas, direcional e A |
+
+Na vila:
+
+| Ação | Tecla |
+|---|---|
+| Andar (um tile por passo; tocar só vira) | setas ou `WASD`, ou clique onde quer ir |
+| Correr | segure `Shift` (ou `X`) |
+| Falar, ler, entrar, avançar o texto | `Enter`, `Espaço` ou `Z`, ou clique na pessoa |
+| Responder NÃO / voltar | `X` ou `Backspace` |
+| Controle (gamepad) | direcional anda · A fala · B segurado corre · Start abre o mapa da jornada |
 
 Os ataques são automáticos. O que você controla é **onde estar**, **quem está em
 campo** e **quais melhorias escolher**.
@@ -106,6 +125,10 @@ não abre até você vencer.
   seu inicial, como no jogo.
 - **Treinador à sua escolha**: Red ou Leaf, com os sprites de andar e correr do FireRed
   e o Prof. Carvalho fazendo a pergunta.
+- **A Vila da Jornada** (0.29): o lobby jogável, montado com os mapas do FireRed. São 7
+  interiores (a sua casa e o quarto, o laboratório do Carvalho, o Centro Pokémon com
+  dois balcões, a loja de Pokédolls, a cabana e a casa do velho sábio), 17 moradores e
+  Pokémon com falas que mudam com a jornada, e um quarto que você decora com 10 enfeites.
 - **Os 151 Pokémon de Kanto jogáveis**, cada um com linha de 3 golpes e linha
   evolutiva. Alguns chegam como presente, como no FireRed (Farfetch'd, Lickitung e
   o prêmio do Dojo de Saffron: Hitmonlee ou Hitmonchan).
@@ -203,11 +226,11 @@ src/
   data/           CONTEÚDO do jogo      ⭐ só dados, sem lógica
   entities/       treinador, Pokémon, inimigos, projéteis, áreas, itens
   systems/        comportamento genérico (combate, habilidades, spawn, equipe...)
-  game/           Run (uma partida) e Game (orquestração)
+  game/           Run (uma partida), Hub (a vila) e Game (orquestração)
   render/         canvas, sprites e ícones
   ui/             HUD, menus e modais
   save/           arquivo .json e progresso permanente
-tools/            testes automatizados
+tools/            testes automatizados e os extratores de assets (assets/)
 ```
 
 A regra do projeto: **`/data` é conteúdo, `/systems` é comportamento**. Adicionar

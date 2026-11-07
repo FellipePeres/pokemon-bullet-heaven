@@ -148,25 +148,158 @@ check('Pokédex lista as 151 espécies', registry.get('pokedex-grid').children.l
 check('conquistas listadas sem quebrar', registry.get('achievements-list').children.length > 5,
       `${registry.get('achievements-list').children.length} conquistas`);
 
-// ---- nova jornada ----
+// ---- nova jornada: o treinador, e a vila (0.29) ----
 game.newGame();
 check('nova jornada começa pela escolha de treinador', !registry.get('screen-trainer').classes.has('hidden'));
 check('tela de treinador oferece menino e menina', registry.get('trainer-choices').children.length === 2,
       `${registry.get('trainer-choices').children.length} modelos`);
 game.chooseTrainer('leaf');
-check('escolher o treinador grava no perfil e segue para o inicial',
-      game.profile.trainer === 'leaf' && !registry.get('screen-starter').classes.has('hidden'));
-check('tela de iniciais montada com 3 opções', registry.get('starter-choices').children.length === 3);
 
+const hub = game.hub;
+const STEP = { up: { x: 0, y: -1 }, down: { x: 0, y: 1 }, left: { x: -1, y: 0 }, right: { x: 1, y: 0 } };
+const busy = () => hub.fade || hub.player.moving || hub.path?.length || hub.pending;
+// deixa a vila andar até parar (passo, caminho do clique, troca de lugar)
+const settle = () => { for (let i = 0; i < 900 && busy(); i++) hub.update(1 / 60); };
+// segura uma direção até o passo começar (ou abrir uma conversa, ou trocar de lugar) e solta
+const press = (dir) => {
+  for (let i = 0; i < 30 && !hub.player.moving && !hub.fade && !hub.dialog; i++) hub.update(1 / 60, STEP[dir]);
+  settle();
+};
+const goTo = (x, y) => { hub.clickTile(x, y); settle(); return hub.player.x === x && hub.player.y === y; };
+const dialogText = () => (hub.dialog ? hub.dialog.pages.join(' ') : '');
+const closeDialog = () => { for (let i = 0; i < 40 && hub.dialog; i++) hub.confirm(); };
+const hubVisible = () => !registry.get('screen-hub').classes.has('hidden');
+
+check('escolher o treinador leva à vila: o jogador acorda no quarto, ainda sem Pokémon',
+      game.profile.trainer === 'leaf' && hubVisible() && hub.mapId === 'casa_2f' && !game.campaign.starter);
+game.hubRenderer.render(hub);
+game.hubHud.update(hub);
+check('a barra da vila mostra o treinador e o Mapa da jornada travado',
+      registry.get('hub-title').textContent.startsWith('Leaf') && registry.get('hub-btn-map').classes.has('locked'));
+game.hubOpenMap();
+check('sem o inicial, o Mapa da jornada não abre', hubVisible() && registry.get('screen-campaign').classes.has('hidden'));
+
+// andar em grade, como no FireRed
+press('down');
+check('um toque para baixo anda exatamente um tile', hub.player.x === 5 && hub.player.y === 6, `${hub.player.x},${hub.player.y}`);
+press('left'); press('left'); press('left');
+check('a cama bloqueia o caminho', hub.player.x === 3 && hub.player.y === 6 && hub.player.dir === 'left', `${hub.player.x},${hub.player.y}`);
+hub.confirm();
+for (let i = 0; i < 10 && !hub._onAsk(); i++) hub.confirm();
+check('o A de frente para a cama pergunta se quer salvar', hub._onAsk() && dialogText().includes('salvar'));
+hub.cancel();
+check('NÃO fecha a conversa', !hub.dialog);
+check('a escada leva ao térreo', goTo(10, 3) && (press('up'), hub.mapId === 'casa_1f'));
+hub.clickTile(8, 4);
+settle();
+check('clicar na mãe anda até ela e conversa: o Carvalho está no laboratório',
+      hub.dialog?.name === 'Mãe' && dialogText().includes('laboratório'));
+closeDialog();
+check('o tapete da saída leva para a vila, na frente de casa',
+      goTo(4, 8) && (press('down'), hub.mapId === 'vila' && hub.player.x === 6 && hub.player.y === 17));
+
+// as saídas travadas até o inicial (seção 4 do planejamento)
+goTo(17, 27);
+press('down');
+check('sem o inicial, a saída sul fica travada: o rapaz avisa',
+      hub.dialog?.name === 'Rapaz' && dialogText().includes('Carvalho') && hubVisible() && registry.get('screen-campaign').classes.has('hidden'));
+closeDialog();
+settle();
+check('...e o jogador volta um passo', hub.player.y === 26);
+goTo(0, 21);
+press('left');
+check('o mato alto a oeste também fica travado: o senhor avisa', hub.dialog?.name === 'Senhor');
+closeDialog();
+settle();
+
+// o laboratório: o Carvalho conta a mini-história e dá o inicial
+goTo(26, 7);
+press('up');
+check('a porta do laboratório leva para dentro', hub.mapId === 'lab' && hub.player.x === 6 && hub.player.y === 12);
+check('as três Poké Balls estão na mesa', hub.decor.filter((d) => d.sprite === 'item_ball').length === 3);
+hub.clickTile(6, 3);
+settle();
+check('o Carvalho conta a mini-história das hordas', hub.dialog?.name === 'Prof. Carvalho' && dialogText().includes('hordas'));
+closeDialog();
+check('...e abre a escolha do inicial com 3 opções',
+      !registry.get('screen-starter').classes.has('hidden') && registry.get('starter-choices').children.length === 3);
+game.cancelStarter();
+check('o Voltar da escolha devolve ao laboratório, com o Carvalho esperando', hubVisible() && dialogText().includes('Pense com calma'));
+closeDialog();
+hub.clickTile(6, 3);
+settle();
+closeDialog();
 game.chooseStarter('charmander');
-check('mapa da jornada aparece após escolher o inicial',
-      !registry.get('screen-campaign').classes.has('hidden'));
+check('escolhido o inicial, o Carvalho fecha a mini-história e libera as saídas',
+      hubVisible() && dialogText().includes('Charmander') && dialogText().includes('saídas'));
+closeDialog();
+check('a bola do inicial escolhido some da mesa', hub.decor.filter((d) => d.sprite === 'item_ball').length === 2);
+check('Pokédex registra o inicial escolhido', game.profile.pokedex.caught.includes(4));
+game.hubHud.render();
+check('com o inicial, o Mapa da jornada destrava', !registry.get('hub-btn-map').classes.has('locked'));
+
+// o Centro Pokémon: a enfermeira abre o PC, o vendedor abre o Poké Mart (falando por cima do balcão)
+goTo(6, 12); press('down');
+goTo(17, 9); press('up');
+check('a porta do Centro Pokémon leva para dentro', hub.mapId === 'centro' && hub.player.x === 2 && hub.player.y === 9);
+hub.clickTile(4, 3);
+settle();
+check('fala-se com a enfermeira por cima do balcão (e ela não cura)', hub.dialog?.name === 'Enfermeira' && dialogText().includes('caixas'));
+closeDialog();
+check('...e ela abre o PC', game.menus.openModal === 'modal-pc');
+game.menus.closeModal();
+hub.clickTile(12, 3);
+settle();
+closeDialog();
+check('o vendedor do outro balcão abre o Poké Mart', game.menus.openModal === 'modal-mart');
+game.menus.closeModal();
+goTo(2, 9); press('down');
+check('o tapete do Centro devolve à porta dele', hub.mapId === 'vila' && hub.player.x === 17 && hub.player.y === 9);
+// a loja de Pokédolls e o quarto decorável (seção 6 do planejamento)
+goTo(23, 21);
+press('up');
+check('a entrada aberta da loja de Pokédolls leva para dentro', hub.mapId === 'pokedoll');
+hub.clickTile(3, 9);
+settle();
+closeDialog();
+check('a vendedora abre o catálogo de enfeites para o quarto',
+      game.menus.openModal === 'modal-decor' && registry.get('decor-list').children.length === 10);
+game.profile.shards = 1000;
+check('comprar a Mesa com PC desconta os Shards', game.buyDecor('pc_mesa') && game.profile.shards === 700 && game.profile.decor.pc_mesa === 1);
+check('a mesma mesa não se compra duas vezes', game.buyDecor('pc_mesa') === false);
+game.buyDecor('planta'); game.buyDecor('planta'); game.buyDecor('doll_pikachu');
+check('as plantas somam até quatro lugares', game.profile.decor.planta === 2);
+check('o Lapras gigante fica travado até o Campeão', game.buyDecor('lapras') === false && !game.profile.decor.lapras);
+game.menus.closeModal();
+hub.enter('bedroom');
+const roomDecor = hub.decor.filter((d) => d.item);
+check('o que foi comprado aparece no quarto (a mesa, as duas plantas e o boneco)', roomDecor.length === 4,
+      roomDecor.map((d) => d.item.id).join(', '));
+check('o boneco ocupa o tile dele', !hub.walkable(9, 5));
+goTo(1, 2);
+hub.player.dir = 'up';
+hub.interact();
+closeDialog();
+check('a mesa com PC do quarto abre o PC', game.menus.openModal === 'modal-pc');
+game.menus.closeModal();
+game.profile.shards = 0;
+hub.enter({ map: 'vila', x: 1, y: 21, dir: 'left' });
+goTo(0, 21);
+press('left');
+check('com o inicial, o mato alto avisa que o modo Endless vem em breve', dialogText().includes('Endless'));
+closeDialog();
+
+// a saída sul abre o mapa da jornada (clicar nela anda até lá e sai)
+goTo(17, 27);
+check('clicar na saída sul anda até ela e abre o mapa da jornada', !registry.get('screen-campaign').classes.has('hidden'));
 const mapNodes = () => registry.get('lobby-map').children.filter((c) => c.classes.has('map-node'));
 check('o lobby mostra o Town Map com uma marca por cidade (8 ginásios e a Liga)', mapNodes().length === 9,
       `${mapNodes().length} marcas`);
 check('ao entrar, a próxima fase já vem escolhida no painel',
       game.menus.lobby.selected === 'gym_1_pewter' && mapNodes().filter((c) => c.classes.has('next')).length === 1);
-check('Pokédex registra o inicial escolhido', game.profile.pokedex.caught.includes(4));
+registry.get('btn-village').click();
+check('o botão Vila volta do mapa para a vila, um passo para dentro da saída',
+      hubVisible() && hub.mapId === 'vila' && hub.player.x === 17 && hub.player.y === 26);
 
 // ---- partida ----
 game.startStage('gym_1_pewter');
@@ -304,7 +437,8 @@ check('do Centro Pokémon a fase recomeça com a equipe curada',
 
 game.run.team.members[0].level = 11;
 game.quitToMenu();
-check('voltar ao mapa funciona', !registry.get('screen-campaign').classes.has('hidden'));
+check('sair da partida leva à vila, na frente de casa',
+      hubVisible() && hub.mapId === 'vila' && hub.player.x === 6 && hub.player.y === 17);
 check('abandonar no meio também guarda o progresso', game.campaign.journey.team.members[0].level === 11);
 
 // ---- vitória e save ----
@@ -341,8 +475,8 @@ check('o Modo Livre continua a fase, com a equipe curada e o botão do Centro no
       game.run.team.members.every((m) => !m.fainted) && (game.hud.update(game.run), !registry.get('btn-endless-center').classes.has('hidden')));
 game.run.team.members[0].level = 17;
 registry.get('btn-endless-center').click();
-check('"Voltar para o Centro Pokémon" guarda o que a equipe ganhou e vai direto ao mapa da jornada',
-      !game.run && !registry.get('screen-campaign').classes.has('hidden') &&
+check('"Voltar para o Centro Pokémon" guarda o que a equipe ganhou e volta para a vila',
+      !game.run && hubVisible() &&
       game.campaign.journey.team.members[0].level === 17 && game.campaign.clearedStages.includes('gym_1_pewter'));
 
 // conquistas: concluídas ficam para coletar, não entram sozinhas
@@ -407,6 +541,7 @@ game.menus.closeModal();
 check('fechar o PC desliga o teclado dele', !pcs.isOpen && registry.get('modal-pc').classes.has('hidden'));
 
 game.quitToMenu();
+game.openCampaign();
 check('Fase 2 desbloqueia após a Fase 1',
       mapNodes().filter((c) => c.classes.has('done')).length === 1 && game.menus.lobby.selected === 'gym_2_cerulean');
 const pewterStats = game.campaign.stageStats.gym_1_pewter;
@@ -435,7 +570,8 @@ registry.get('hall-close').click();
 check('fechar o Hall da Fama mostra a tela de vitória (com o Modo Livre, 0.27)',
       registry.get('hall-overlay').classes.has('hidden') && !registry.get('result-overlay').classes.has('hidden'));
 registry.get('btn-result-menu').click();
-check('e de lá "Continuar Jornada" volta para o mapa', !registry.get('screen-campaign').classes.has('hidden'));
+check('e de lá "Continuar Jornada" volta para a vila', hubVisible());
+game.openCampaign();
 check('o mapa mostra o botão do Hall da Fama', !registry.get('btn-hall').classes.has('hidden'));
 
 const save = game.buildSaveData();
@@ -448,8 +584,8 @@ game.pendingRun = null;
 game.continueGame();
 check('save sem treinador pede a escolha ao continuar', !registry.get('screen-trainer').classes.has('hidden'));
 game.chooseTrainer('red');
-check('depois da escolha, o Continuar segue para a jornada',
-      game.profile.trainer === 'red' && !registry.get('screen-campaign').classes.has('hidden'));
+check('depois da escolha, o Continuar segue para a jornada (na vila)',
+      game.profile.trainer === 'red' && hubVisible());
 
 // ---- o Poké Mart (0.23) ----
 {
@@ -539,8 +675,8 @@ check('depois da escolha, o Continuar segue para a jornada',
   game.pendingRun = snapshot;
   game.menus.show('screen-title');
   game.continueGame();
-  check('continuar com uma partida que ficou no meio vai para o mapa, não para a fase',
-        !game.run && !registry.get('screen-campaign').classes.has('hidden') && game.pendingRun === null);
+  check('continuar com uma partida que ficou no meio vai para a vila, não para a fase',
+        !game.run && hubVisible() && game.pendingRun === null);
   check('...e o que a equipe ganhou nela entrou na jornada (nível e PC)',
         game.campaign.journey.team.members[0].level === 44 && game.campaign.journey.pc.some((m) => m.uid === 'meio-pc'));
 }
@@ -563,9 +699,8 @@ game.run.state = 'defeat';
 game._handleRunState();
 registry.get('btn-result-center').click();
 registry.get('btn-center-map').click();
-check('do Centro Pokémon dá para ir ao mapa da jornada',
-      !game.centerOpen && !game.run && registry.get('center-overlay').classes.has('hidden') &&
-      !registry.get('screen-campaign').classes.has('hidden'));
+check('do Centro Pokémon dá para voltar para a vila',
+      !game.centerOpen && !game.run && registry.get('center-overlay').classes.has('hidden') && hubVisible());
 
 // ---- derrota → recomeçar a jornada do zero ----
 const dexBefore = game.profile.pokedex.caught.length;
@@ -593,6 +728,7 @@ CONFIG.capture.shinyChance = 1;
 game.chooseTrainer('red');
 game.chooseStarter('bulbasaur');
 CONFIG.capture.shinyChance = starterChance;
+game.openCampaign();
 check('o inicial sorteado shiny fica marcado na jornada, na Pokédex e na equipe do lobby',
       game.campaign.starterShiny === true && game.profile.pokedex.shiny.includes(1)
       && registry.get('campaign-team').children.some((c) => c.children?.some((k) => k.classes?.has('team-shiny'))));
@@ -621,6 +757,8 @@ game.quitToMenu();
   check('a jornada nova começa pela escolha de treinador, do zero',
         !registry.get('screen-trainer').classes.has('hidden') && !game.campaign.starter && game.profile.activeJourney !== first);
   game.chooseTrainer('leaf');
+  check('a jornada nova já conta assim que o treinador é escolhido (o inicial vem depois, na vila)',
+        game.listJourneys().length === 2 && !game.campaign.starter && game.hub.mapId === 'casa_2f');
   game.chooseStarter('charmander');
   check('...com o inicial dela e as fases dela', game.campaign.starter === 'charmander' && game.campaign.clearedStages.length === 0
         && game.profile.trainer === 'leaf');
@@ -632,7 +770,7 @@ game.quitToMenu();
   check('voltar para a outra jornada traz tudo dela de volta',
         game.campaign.starter === 'bulbasaur' && game.campaign.clearedStages.includes('gym_1_pewter') &&
         game.campaign.journey.team.members[0].level === 30 && game.profile.trainer === 'red' &&
-        !registry.get('screen-campaign').classes.has('hidden'));
+        hubVisible() && game.hub.mapId === 'vila');
   const second = game.listJourneys().find((j) => !j.active);
   check('e a segunda continua guardada', second?.progress.starter === 'charmander' && second.trainer === 'leaf');
 

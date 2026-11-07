@@ -6,8 +6,8 @@
  * Uso:
  *   node tools/screenshot.mjs <roteiro> [--out pasta] [--size 1280x720]
  *
- * Roteiros: vitrine, treinador, jornada, opcoes, partida, golpes, estresse,
- * chefe, cenario e outros (ver ROTEIROS abaixo).
+ * Roteiros: vitrine, treinador, vila, jornada, opcoes, partida, golpes,
+ * estresse, chefe, cenario e outros (ver ROTEIROS abaixo).
  * Sem --out, as imagens vão para a pasta temporária do sistema (pbh-screens).
  * Para usar outro navegador: variável de ambiente CHROME_PATH.
  *
@@ -37,8 +37,31 @@ const ROTEIROS = {
   ],
   jornada: [
     { open: 'index.html' }, { wait: 500 },
-    { run: "game.newGame(); game.chooseTrainer('leaf'); game.chooseStarter('charmander')" },
+    { run: "game.newGame(); game.chooseTrainer('leaf'); game.chooseStarter('charmander'); game.openCampaign()" },
     { wait: 1200 }, { shot: 'jornada' }
+  ],
+  // a vila (0.29, PLANEJAMENTO-LOBBY.md): o quarto, a mãe, a vila, a saída travada,
+  // o Carvalho, a escolha do inicial, o Centro remodelado, a loja de Pokédolls e o sábio
+  vila: [
+    { open: 'index.html' }, { wait: 500 },
+    { run: "game.newGame(); game.chooseTrainer('leaf')" }, { wait: 1800 }, { shot: 'vila-01-quarto' },
+    { run: "game.hub.enter({ map: 'casa_1f', x: 7, y: 4, dir: 'right' }); game.hub.interact()" }, { wait: 2200 }, { shot: 'vila-02-mae' },
+    { run: "game.hub.dialog = null; game.hub.enter('home')" }, { wait: 1200 }, { shot: 'vila-03-vila' },
+    { hold: ['KeyD'] }, { wait: 1100 }, { hold: [] }, { wait: 400 }, { shot: 'vila-04-andou' },
+    { run: "game.hub.enter({ map: 'vila', x: 17, y: 26, dir: 'down' })" }, { wait: 300 },
+    { hold: ['KeyS'] }, { wait: 700 }, { hold: [] }, { wait: 2600 }, { shot: 'vila-05-saida-travada' },
+    { run: "game.hub.dialog = null; game.hub.enter({ map: 'lab', x: 6, y: 4, dir: 'up' }); game.hub.interact()" }, { wait: 1800 }, { shot: 'vila-06-carvalho' },
+    { run: "game.hub.dialog = null; game.hub.awaitStarter = true; game.openStarterChoice()" }, { wait: 1200 }, { shot: 'vila-07-escolha' },
+    { run: "game.chooseStarter('charmander')" }, { wait: 1500 }, { shot: 'vila-08-depois-da-escolha' },
+    { run: "game.hub.dialog = null; game.hub.enter({ map: 'centro', x: 12, y: 5, dir: 'up' }); game.hub.interact()" }, { wait: 1500 }, { shot: 'vila-09-centro' },
+    { run: "game.hub.dialog = null; game.hub.enter({ map: 'pokedoll', x: 8, y: 7, dir: 'up' })" }, { wait: 1200 }, { shot: 'vila-10-pokedoll' },
+    { run: "game.hub.enter({ map: 'casa_sabio', x: 3, y: 6, dir: 'up' }); game.hub.interact()" }, { wait: 2500 }, { shot: 'vila-11-sabio' },
+    { run: "game.hub.dialog = null; game.hub.enter({ map: 'vila', x: 28, y: 10, dir: 'up' }); game.hub.interact()" }, { wait: 2500 }, { shot: 'vila-12-lagoa' },
+    { run: "game.hub.dialog = null; game.profile.shards = 5000; game.hub.enter({ map: 'pokedoll', x: 3, y: 7, dir: 'down' }); game.menus.showModal('modal-decor')" },
+    { wait: 1200 }, { shot: 'vila-13-catalogo' },
+    { run: "['pc_mesa', 'estante', 'tapete', 'planta', 'planta', 'planta', 'doll_pikachu', 'doll_clefairy', 'doll_jigglypuff', 'doll_meowth', 'doll_pidgey'].forEach((id) => game.buyDecor(id));" +
+           "game.menus.closeModal(); game.hub.enter({ map: 'casa_2f', x: 5, y: 6, dir: 'down' }); document.getElementById('toast-container').innerHTML = ''" },
+    { wait: 1500 }, { shot: 'vila-14-quarto-decorado' }
   ],
   opcoes: [
     { open: 'index.html' }, { wait: 500 },
@@ -224,7 +247,8 @@ const ROTEIROS = {
   telas: [
     { open: 'index.html' }, { wait: 1200 }, { shot: 'tela-01-titulo' },
     { run: 'game.newGame()' }, { wait: 900 }, { shot: 'tela-02-treinador' },
-    { run: "game.chooseTrainer('leaf')" }, { wait: 900 }, { shot: 'tela-03-inicial' },
+    { run: "game.chooseTrainer('leaf')" }, { wait: 1200 }, { shot: 'tela-03-vila' },
+    { run: 'game.openStarterChoice()' }, { wait: 900 }, { shot: 'tela-03b-inicial' },
     { run: "game.chooseStarter('bulbasaur'); ['gym_1_pewter', 'gym_2_cerulean'].forEach((s) => game.campaign.clearedStages.push(s)); game.openCampaign()" },
     { wait: 1200 }, { shot: 'tela-04-jornada' },
     { run: "game.menus.showModal('modal-options')" }, { wait: 500 }, { shot: 'tela-05-opcoes' },

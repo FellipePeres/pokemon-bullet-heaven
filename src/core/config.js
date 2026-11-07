@@ -3,7 +3,7 @@
  * Nada de número mágico espalhado pelo gameplay: se precisar ajustar, ajuste aqui.
  */
 export const CONFIG = {
-  version: '0.28.1',
+  version: '0.29.0',
 
   canvas: { width: 1280, height: 720 },
 
@@ -45,6 +45,21 @@ export const CONFIG = {
      * andar é 120 px/s e correr 240: a velocidade do jogo (195) já é de corrida.
      */
     animation: { stride: 32, runAt: 180 }
+  },
+
+  /**
+   * A vila (o lobby jogável, 0.29; PLANEJAMENTO-LOBBY.md): andar em grade,
+   * como no FireRed. Lá, andar leva 16 quadros por tile e correr, 8.
+   */
+  hub: {
+    walkTime: 16 / 60,
+    runTime: 8 / 60,
+    turnDelay: 0.09,       // tocar numa direção nova só vira; segurar mais do que isso anda
+    fadeSeconds: 0.22,     // o escurecer ao entrar e sair de um lugar
+    textSpeed: 55,         // letras por segundo na caixa de texto
+    bannerSeconds: 2.4,    // a placa com o nome do lugar, ao chegar
+    lookEvery: [2, 5],     // quem olha em volta vira a cada 2 a 5 s
+    view: { tilesWide: 20, tilesHigh: 12 }   // o mínimo que a tela mostra abaixo da barra (a escala fica inteira)
   },
 
   team: {

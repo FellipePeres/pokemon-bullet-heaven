@@ -23,6 +23,10 @@ import { FX, ABILITY_FX, BOSS_WAVE_FX, STATUS_FX } from '../src/data/fx.js';
 import { SCENES, stageScenes } from '../src/data/scenery.js';
 import { SCENE_TILES } from '../src/data/sceneManifest.js';
 import { buildSceneGrid, TILE } from '../src/systems/terrain.js';
+import { HUB } from '../src/data/hub.js';
+import { HUB_MAPS, HUB_SPRITES, HUB_DECOR } from '../src/data/hubMaps.js';
+import { DIALOGUE } from '../src/data/dialogue.js';
+import { DECOR, decorMax } from '../src/data/decor.js';
 import { existsSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -216,6 +220,115 @@ badSegments.length ? fail(`trechos com cenário inexistente: ${badSegments.join(
   : missingTiles.length ? fail(`metatiles fora da tira: ${missingTiles.join(' · ')}`)
   : crowded.length ? fail(`cenários com obstáculo demais (mais de 45% bloqueado): ${crowded.join(', ')}`)
   : ok(`${Object.keys(SCENES).length} cenários do FireRed (${usedScenes.size} usados nas fases), todas as metatiles extraídas`);
+
+// a vila (0.29): mapas gerados, portas, saídas, pessoas, objetos e falas
+{
+  const issues = [];
+  const KNOWN_WHEN = new Set(['starter', 'starterIs', 'shiny', 'badges', 'champion', 'dex', 'veteran', 'dive', 'locked', 'once']);
+  const KNOWN_ACTIONS = new Set(['starter', 'pc', 'mart', 'save', 'campaign', 'pokedoll', 'badges', 'aquatic']);
+  const floor = (mapId, x, y) => {
+    const map = HUB_MAPS[mapId];
+    return !!map && x >= 0 && y >= 0 && x < map.width && y < map.height && map.walk[y][x] === '.';
+  };
+  const inside = (mapId, x, y) => { const m = HUB_MAPS[mapId]; return !!m && x >= 0 && y >= 0 && x < m.width && y < m.height; };
+  const talkKeys = new Set();
+
+  for (const [name, spot] of Object.entries(HUB.spawn)) {
+    if (!floor(spot.map, spot.x, spot.y)) issues.push(`spawn ${name} fora do chão (${spot.map} ${spot.x},${spot.y})`);
+  }
+  for (const [mapId, place] of Object.entries(HUB.maps)) {
+    const map = HUB_MAPS[mapId];
+    if (!map) { issues.push(`${mapId}: sem mapa gerado — rode tools/assets/hub.py`); continue; }
+    for (const file of [map.src, map.top]) if (!existsSync(join(root, file))) issues.push(`${mapId}: falta ${file}`);
+    if (map.walk.length !== map.height || map.walk.some((row) => row.length !== map.width)) issues.push(`${mapId}: colisão com tamanho errado`);
+
+    for (const w of place.warps ?? []) {
+      const at = `${mapId} ${w.x},${w.y}`;
+      if (!HUB.maps[w.to]) { issues.push(`${at}: porta para um lugar que não existe (${w.to})`); continue; }
+      if (!floor(w.to, w.tx, w.ty)) issues.push(`${at}: chega fora do chão em ${w.to} ${w.tx},${w.ty}`);
+      // a porta bloqueia (anda-se contra ela); a escada, a entrada aberta e o tapete são chão
+      if (w.on === 'push' ? floor(mapId, w.x, w.y) : !floor(mapId, w.x, w.y)) issues.push(`${at}: '${w.on}' no tile errado`);
+      if (!['push', 'step', 'mat'].includes(w.on)) issues.push(`${at}: tipo de porta desconhecido (${w.on})`);
+    }
+    for (const exit of place.exits ?? []) {
+      for (const [x, y] of exit.cells) if (!floor(mapId, x, y)) issues.push(`${mapId}: saída fora do chão em ${x},${y}`);
+      if (exit.guard && !(place.npcs ?? []).some((n) => n.id === exit.guard)) issues.push(`${mapId}: a saída tem um guarda que não existe (${exit.guard})`);
+      if (!['campaign', 'endless'].includes(exit.action)) issues.push(`${mapId}: saída com ação desconhecida (${exit.action})`);
+    }
+    const taken = new Set();
+    for (const npc of place.npcs ?? []) {
+      if (!floor(mapId, npc.x, npc.y)) issues.push(`${mapId}: ${npc.id} em cima de parede (${npc.x},${npc.y})`);
+      if (taken.has(`${npc.x},${npc.y}`)) issues.push(`${mapId}: duas pessoas no tile ${npc.x},${npc.y}`);
+      taken.add(`${npc.x},${npc.y}`);
+      if (!HUB_SPRITES[`npc/${npc.sprite}`]) issues.push(`${mapId}: ${npc.id} sem sprite (${npc.sprite})`);
+      talkKeys.add(npc.talk);
+    }
+    for (const thing of place.things ?? []) {
+      for (const [x, y] of thing.cells) if (!inside(mapId, x, y)) issues.push(`${mapId}: objeto fora do mapa em ${x},${y}`);
+      talkKeys.add(thing.talk);
+    }
+    for (const d of place.decor ?? []) {
+      if (!HUB_SPRITES[`npc/${d.sprite}`]) issues.push(`${mapId}: decoração sem sprite (${d.sprite})`);
+      if (!inside(mapId, d.x, d.y)) issues.push(`${mapId}: decoração fora do mapa em ${d.x},${d.y}`);
+    }
+  }
+  // o quarto decorável (data/decor.js): cada enfeite no chão, sem se sobrepor, e com
+  // tudo comprado o quarto ainda tem caminho da cama até a escada
+  const room = HUB.room;
+  const blocked = new Set();
+  for (const item of DECOR) {
+    talkKeys.add(item.talk);
+    if (item.piece && !HUB_DECOR[item.piece]) { issues.push(`enfeite ${item.id}: peça que não existe (${item.piece})`); continue; }
+    if (item.sprite && !HUB_SPRITES[`npc/${item.sprite}`]) issues.push(`enfeite ${item.id}: sem sprite (${item.sprite})`);
+    const spots = item.slots ?? [item.at];
+    if (spots.length !== decorMax(item)) issues.push(`enfeite ${item.id}: lugares e máximo não batem`);
+    for (const [x, y] of spots) {
+      const cells = item.piece ? HUB_DECOR[item.piece].solid.map(([sx, sy]) => [x + sx, y + sy]) : [[x, y]];
+      const size = item.piece ? [HUB_DECOR[item.piece].width, HUB_DECOR[item.piece].height] : [1, 1];
+      if (!inside(room, x, y) || !inside(room, x + size[0] - 1, y + size[1] - 1)) issues.push(`enfeite ${item.id}: fora do quarto em ${x},${y}`);
+      for (const [cx, cy] of cells) {
+        if (blocked.has(`${cx},${cy}`)) issues.push(`enfeite ${item.id}: em cima de outro em ${cx},${cy}`);
+        blocked.add(`${cx},${cy}`);
+        // boneco no chão (o móvel pode bloquear a parede, como a mesa do PC)
+        if (!item.piece && !floor(room, cx, cy)) issues.push(`enfeite ${item.id}: em cima de parede em ${cx},${cy}`);
+      }
+    }
+  }
+  {
+    const start = HUB.spawn.bedroom;
+    const stairs = (HUB.maps[room].warps ?? []).find((w) => w.on === 'step');
+    const seen = new Set([`${start.x},${start.y}`]);
+    const queue = [[start.x, start.y]];
+    while (queue.length) {
+      const [x, y] = queue.shift();
+      for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+        const k = `${x + dx},${y + dy}`;
+        if (seen.has(k) || blocked.has(k) || !floor(room, x + dx, y + dy)) continue;
+        seen.add(k);
+        queue.push([x + dx, y + dy]);
+      }
+    }
+    if (blocked.has(`${start.x},${start.y}`)) issues.push('o quarto: um enfeite em cima de onde o jogador acorda');
+    if (stairs && !seen.has(`${stairs.x},${stairs.y}`)) issues.push('o quarto: com tudo comprado, a escada fica sem caminho');
+  }
+
+  for (const key of talkKeys) if (!DIALOGUE[key]) issues.push(`fala que não existe: ${key}`);
+  for (const [key, entry] of Object.entries(DIALOGUE)) {
+    if (!entry.lines?.length) { issues.push(`${key}: sem falas`); continue; }
+    if (entry.lines.at(-1).when) issues.push(`${key}: a última fala tem condição (alguém pode ficar sem resposta)`);
+    for (const line of entry.lines) {
+      for (const cond of Object.keys(line.when ?? {})) if (!KNOWN_WHEN.has(cond)) issues.push(`${key}: condição desconhecida (${cond})`);
+      for (const action of [line.then, line.ask?.yes].filter(Boolean)) if (!KNOWN_ACTIONS.has(action)) issues.push(`${key}: ação desconhecida (${action})`);
+      if (!line.say?.length) issues.push(`${key}: fala sem páginas`);
+    }
+  }
+  for (const [key, sheet] of Object.entries(HUB_SPRITES)) if (!existsSync(join(root, sheet.src))) issues.push(`falta a folha ${key}`);
+
+  const npcCount = Object.values(HUB.maps).reduce((n, place) => n + (place.npcs?.length ?? 0), 0);
+  issues.length
+    ? fail(`vila: ${issues.join(' · ')}`)
+    : ok(`a vila: ${Object.keys(HUB.maps).length} lugares, ${npcCount} pessoas e Pokémon, ${Object.keys(DIALOGUE).length} falas e ${DECOR.length} enfeites para o quarto, tudo no lugar`);
+}
 
 // pools de captura: mostra quanto de cada fase já está implementado
 // desde a 0.11 cada fase acumula as anteriores (metade do peso) e, da Fase 3 em diante, os iniciais

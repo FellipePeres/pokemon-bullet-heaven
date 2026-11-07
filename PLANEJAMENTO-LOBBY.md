@@ -8,9 +8,12 @@
 > O **mapa da jornada** (o Town Map de hoje, `ui/lobby.js`) continua existindo,
 > aberto pela saída sul da vila ou pelo HUD.
 >
-> **Status:** o desenho da vila foi aprovado (seção 3). As decisões que ainda
-> faltam estão na seção 13. Onde o texto diz "padrão", é a escolha recomendada
-> até o Fellipe decidir.
+> **Status:** a vila está no jogo desde a **0.29.0** (2026-11-07): as etapas L-1 a
+> L-5 (andar, entrar, falar e começar, os serviços e o quarto decorável). Faltam
+> a L-6 (o golpe Dive e a TM Dive), a L-7 (sons e capricho), o modo Endless e o
+> modo aquático. As decisões que ainda faltam estão na seção 13. Onde o texto
+> diz "padrão", é a escolha recomendada até o Fellipe decidir (e é o que está no
+> jogo).
 >
 > **Maquete:** a vila, os interiores e o quarto foram montados com metatiles e
 > sprites do decomp, sem nenhuma arte nova, na página "Vila da Jornada"
@@ -202,8 +205,9 @@ decide os valores):
 Padrão: cada móvel tem **um lugar fixo** no quarto (comprar já põe no lugar),
 sem editor livre. Mover peças à vontade fica para depois, se fizer falta.
 
-Save: uma lista `decor` (na jornada ou no perfil; ver seção 13), com padrão
-vazio para os saves antigos.
+Save: `profile.decor` (quantos de cada enfeite estão no quarto). Padrão no
+jogo: a decoração é **do jogador**, o mesmo quarto em todas as jornadas, como os
+Shards e a Pokédex (ver seção 13).
 
 ---
 
@@ -486,10 +490,12 @@ tools/assets/hub.py     monta os mapas da vila a partir do decomp
   2x.
 - **Música:** o tema do lobby que já existe (`lobby-theme.ogg`), ou o de Pallet,
   se for extraído.
-- **Save:** novos campos na jornada (`introSeen`, a posição na vila, as falas já
-  vistas, `aquaticSeen`, o recorde do Endless) e a decoração do quarto, com
-  padrão para saves antigos (`normalizeProfile`). O critério de "jornada
-  começada" muda (seção 4).
+- **Save:** na jornada, `regions.<id>.hub.flags` (as falas de "uma vez só" já
+  vistas); no perfil, `profile.decor`. A posição na vila não é guardada: a
+  jornada abre na frente de casa. A mini-história não precisa de flag própria,
+  porque ela é a conversa do Carvalho enquanto não há inicial. Depois virão
+  `aquaticSeen` e o recorde do Endless. O critério de "jornada começada" mudou
+  (seção 4).
 - **Testes:** o `smoke:ui` ganha o caminho título → nova jornada → quarto → saída
   travada → Carvalho → inicial → saída sul → mapa → partida → vila. Testes de
   unidade para as travas, para a escolha da fala certa e para a TM Dive (quem
@@ -499,6 +505,10 @@ tools/assets/hub.py     monta os mapas da vila a partir do decomp
   NPC interage.
 
 ### Etapas sugeridas
+
+Feitas na 0.29.0: **L-1 a L-5**. O que ficou diferente do esboço: os dados das
+falas ficaram em `data/dialogue.js`, o catálogo em `data/decor.js`, e os móveis do
+quarto também saem do `tools/assets/hub.py` (peças soltas, com a colisão de origem).
 
 1. **L-1 — Andar:** a vila como imagem, colisão, movimento em grade, câmera, a
    saída sul abrindo o mapa e o fluxo título → jornada → vila → mapa → partida →
@@ -531,12 +541,12 @@ projeto.
 1. **A TM Dive troca o Golpe Desperto** (a leitura deste plano) ou o golpe
    principal? E a troca é para sempre?
 2. **O nome da vila.**
-3. **A escolha do inicial:** a tela de cards aberta pelo Carvalho (padrão) ou
-   pegar a Poké Ball na mesa?
-4. **Casas de NPC:** dá para entrar em todas (padrão) ou só em algumas?
+3. **A escolha do inicial:** a tela de cards aberta pelo Carvalho (padrão, no
+   jogo) ou pegar a Poké Ball na mesa?
+4. **Casas de NPC:** dá para entrar em todas (padrão, no jogo) ou só em algumas?
 5. **A decoração do quarto** vale por jornada (cada espaço tem o seu quarto) ou é
-   do perfil (o mesmo quarto em todas as jornadas)?
-6. **Móveis em lugar fixo** (padrão) ou o jogador escolhe onde pôr?
+   do perfil (padrão, no jogo: o mesmo quarto em todas as jornadas)?
+6. **Móveis em lugar fixo** (padrão, no jogo) ou o jogador escolhe onde pôr?
 7. **O rival:** ganha uma casa na vila (por exemplo a cabana), ou só aparece em
    momentos marcados?
 8. **A cama:** é o único jeito de salvar, ou o menu START também salva?

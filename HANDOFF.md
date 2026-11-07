@@ -5,7 +5,7 @@
 > decisão foi tomada e o que falta fazer. O `README.md` é o manual de uso;
 > este aqui é o contexto de desenvolvimento.
 
-**Versão atual:** `0.28.1` · **Última atualização:** 2026-11-06
+**Versão atual:** `0.29.0` · **Última atualização:** 2026-11-07
 **Stack:** HTML + CSS + JavaScript puro (ES Modules). Sem backend, sem build, sem dependências.
 **Repositório:** https://github.com/FellipePeres/pokemon-bullet-heaven (público)
 **Jogo no ar:** https://fellipeperes.github.io/pokemon-bullet-heaven/
@@ -40,6 +40,7 @@ npm run smoke:ui             # interface: DOM simulado a partir do index.html re
 
 npm run screens -- <roteiro> --out <pasta>   # screenshots no Chrome sem janela
 npm run assets               # regera os sprites a partir do Pokemon All (Python + Pillow)
+python tools/assets/hub.py   # regera os mapas da vila (0.29) a partir do mesmo decomp
 npm run balance -- --runs 12 # joga a campanha com o bot: tentativas até passar cada fase, níveis e lutas
 npm run balance -- --runs 48 --jobs 12          # o mesmo, em 12 processos (0.28; a máquina tem 12 núcleos)
 npm run balance -- --load equipes.json --from gym_6_saffron --until gym_6_saffron --set gym_6_saffron.difficulty=0.8
@@ -60,7 +61,7 @@ padrão 10, é o teto; quem não passa "para ali"), o nível médio da equipe ao
 vencer, a duração da luta, desmaios e pico de inimigos.
 
 **Conferência visual (desde a 0.5).** `tools/screenshot.mjs` abre o jogo no Chrome
-(ou Edge) sem janela, executa um roteiro (`vitrine`, `treinador`, `jornada`,
+(ou Edge) sem janela, executa um roteiro (`vitrine`, `treinador`, `vila`, `jornada`,
 `partida`), salva PNGs e lista os erros de JavaScript da página. Sai com código 1
 se a página tiver erro. A `vitrine.html` desenha os assets com o mesmo código da
 partida: poses, andar e correr, as 8 direções, a proporção com os Pokémon e os
@@ -126,6 +127,10 @@ src/
     assetManifest.js  GERADO pelo extrator: tamanho e quadros de cada folha
     sceneManifest.js  GERADO pelo extrator: metatiles de cada cenário e o mapa dos salões
     musicTracks.js    GERADO por render_music.py: onde começa e acaba o loop de cada música
+    hub.js            a vila (0.29): portas, saídas, pessoas, objetos e a decoração fixa de cada lugar
+    hubMaps.js        GERADO por tools/assets/hub.py: os mapas da vila (camadas e colisão), as folhas e os móveis
+    dialogue.js       as falas da vila, com as condições (inicial, insígnias, Campeão, uma vez só)
+    decor.js          a loja de Pokédolls: os enfeites do quarto, o preço e o lugar de cada um
     types.js          tipos, cores e tabela de efetividade
     kanto.js          nomes da Pokédex 1-151
     achievements.js   12 conquistas e suas recompensas em Shards
@@ -144,11 +149,13 @@ src/
     stats.js          vida máxima, XP por nível, multiplicador de dano por nível
   game/
     Run.js            uma partida: estado, loop, colisões, condições de fim
+    Hub.js            a vila (0.29): andar em grade, portas, saídas, conversas e o clique
     Game.js           orquestra tudo: perfil, telas, loop principal, save
   render/
     Renderer.js       canvas: chão, atores, efeitos, barra do chefe, treinador
     assets.js         carrega as folhas do catálogo e desenha quadros em escala inteira
     trainer.js        qual quadro do treinador mostrar (passo pela distância andada)
+    HubRenderer.js    a vila: o chão, as pessoas, a camada de cima e o escurecer das portas
     fx.js             desenha os sprites de golpe
     scenery.js        pinta o chão da arena (o grid do terreno) num canvas por cenário
     sprites.js        sprites de Pokémon (estático/animado/artwork) e insígnias
@@ -157,7 +164,8 @@ src/
     HUD.js            HUD da partida e overlays (nível, captura, evolução, pausa)
     Menus.js          menu, mapa, modais (Pokédex, conquistas, equipe, opções)
     pcScreen.js       a tela do PC (a do FireRed, portada do Pokemon All): caixas, equipe, pegar e soltar
-    lobby.js          o lobby: o Town Map de Kanto, a fase escolhida, a equipe e a barra do topo
+    lobby.js          o mapa da jornada: o Town Map de Kanto, a fase escolhida, a equipe e a barra do topo
+    hubHud.js         a vila (0.29): a barra do topo, a caixa de texto do FireRed, o SIM/NÃO e a placa do lugar
     badgeCase.js      o Estojo de Insígnias: o Cartão de Treinador e as métricas de cada fase
     dom.js            helpers de DOM e toasts
     pad.js            o controle nas telas: foco nos alvos clicáveis da camada de cima
@@ -179,6 +187,7 @@ tools/
   assets/render_music.py  renderiza as músicas do FireRed (cópia do sintetizador do Pokemon All)
   assets/copy_pc_art.py   traz do Pokemon All a arte do PC, os sprites do FireRed e o Cartão de Treinador
   assets/extract_region_map.py  monta o Town Map de Kanto do decomp (o mapa do lobby)
+  assets/hub.py       monta a vila e os interiores com pedaços de mapas do FireRed (0.29)
 ```
 
 **Regra do projeto: `/data` é conteúdo, `/systems` é comportamento.**
@@ -200,7 +209,8 @@ confirmar com ele**.
   tela com o Prof. Carvalho, como no FireRed. Dá para trocar em Opções. Save
   antigo, sem treinador, pergunta uma vez ao continuar.
 - **O movimento é livre**, em qualquer ângulo, como sempre foi. **Nada de andar
-  por quadrados** como no FireRed: o FireRed entra só no visual. O sprite tem 4
+  por quadrados** como no FireRed: o FireRed entra só no visual. A exceção é a
+  vila (0.29), onde se anda em grade, como no FireRed, a pedido do Fellipe. O sprite tem 4
   poses; na diagonal, a pose atual continua se fizer parte do movimento, senão
   fica de lado (`facingDir` em `Player.js`).
 - O treinador **não tem vida nem nível**. Só guia a equipe.
@@ -535,7 +545,7 @@ Nunca voltar bônus globais para o pool de level up — foi pedido explícito.
   linha desde a 0.23.1), a próxima fase e quando foi jogada; **Jogar** e
   **Apagar**, que pergunta no próprio card.
 - **Continuar é sempre ir ao mapa** (0.24, "mesmo que tenha saído no meio da
-  fase"): a partida que ficou no meio (navegador fechado, save feito na pausa,
+  fase"; desde a 0.29, à vila, na frente de casa): a partida que ficou no meio (navegador fechado, save feito na pausa,
   outra jornada com partida guardada) entra na jornada como um abandono
   (`Game._foldPendingRun`, chamado ao abrir o jogo, ao carregar um save, ao trocar
   de jornada e no `continueGame`) — a equipe e o PC dela ficam — e o jogador cai
@@ -550,11 +560,66 @@ Nunca voltar bônus globais para o pool de level up — foi pedido explícito.
   `data` (e a partida em `pendingRun`) enquanto não é a ativa; `activeJourney` é
   o id da ativa. Trocar (`openJourney`) guarda a ativa no espaço dela
   (`_stashActive`) e põe a escolhida nos campos de cima (`_activate`). Um espaço
-  largado antes de escolher o inicial some sozinho. Save de antes da 0.19 vira o
+  largado antes de escolher o treinador some sozinho (até a 0.28: o inicial). Save de antes da 0.19 vira o
   espaço 1 (`normalizeJourneys`). `newGame` continua sendo "recomeçar a jornada
   ativa" (o da derrota).
 
+### A vila — o lobby jogável (0.29)
+- Pedido do Fellipe (PLANEJAMENTO-LOBBY.md): "uma mini vila, mais de uma casa, não
+  simplesmente um quadrado com as coisas em fileiradas"; um Centro Pokémon
+  remodelado, com a enfermeira no balcão do PC ("não serve necessariamente para
+  curar") e outro balcão com o Poké Mart; uma loja de Pokédolls; "nossa casa é onde
+  a gente spawna", com o quarto vazio decorável com itens compráveis; o Oak dá o
+  inicial e as saídas ficam travadas até lá.
+- **O fluxo**: Nova jornada → treinador → o jogador **acorda no quarto**
+  (`Game.openHub('bedroom')`). A mãe manda ao laboratório; o **Prof. Carvalho**
+  conta a mini-história e abre a tela de cards do inicial
+  (`Game.openStarterChoice`); o Voltar dela devolve ao laboratório
+  (`cancelStarter`). Escolhido o inicial, o Carvalho fecha a história
+  (`Hub.afterStarter`) e as saídas abrem. **Continuar, o fim da partida, o Modo
+  Livre e o Centro da derrota levam à vila, na frente de casa** (`openHub('home')`;
+  até a 0.28, ao mapa). O mapa da jornada abre pela saída sul, pelo botão "Mapa da
+  jornada" da barra (ou Start no controle) e tem um botão "Vila" de volta.
+- **Jornada começada = treinador escolhido** (era: inicial escolhido). Ela aparece
+  na tela de jornadas mesmo sem inicial (o card avisa que o Carvalho espera), não
+  some ao trocar de jornada (`_stashActive`) e a "Nova jornada" só reaproveita a
+  ativa se nem o treinador foi escolhido. `campaign.starter` vazio trava as duas
+  saídas (os guardas falam e o jogador volta um passo) e o botão do mapa.
+- **Andar em grade, como no FireRed** (a exceção à regra do movimento livre, que
+  continua valendo na partida): um passo é um tile (16 quadros andando, 8
+  correndo: `CONFIG.hub`); tocar numa direção nova só vira; Shift/X/B segurado
+  corre; Enter/Espaço/Z/A fala e avança o texto; X/Backspace/B é o NÃO; clique num
+  tile anda até ele pelo caminho mais curto (clique numa pessoa, placa ou porta
+  anda até o lado e age; numa saída, sai). A porta é um tile que bloqueia e leva
+  para dentro quando se anda contra ela; o tapete leva para fora com ↓ em cima
+  dele; a escada e a entrada aberta da loja levam ao pisar.
+- **Os mapas são do FireRed, montados** por `tools/assets/hub.py`: a vila (36x28) e
+  7 interiores, em duas camadas (o que cobre os personagens, como a beirada dos
+  telhados e a copa das árvores, vem do tipo de camada de cada metatile), com a
+  colisão do `map.bin` de origem (bit de colisão e elevação 1 = água). O
+  desenho é de `render/HubRenderer.js`: canvas do tamanho da tela, escala inteira
+  (`CONFIG.hub.view`), câmera presa ao mapa e só na área abaixo da barra.
+- **Os dados**: `data/hub.js` (portas, saídas, pessoas, objetos, decoração fixa),
+  `data/dialogue.js` (as falas, com condições: inicial, insígnias, Campeão,
+  Pokédex, "uma vez só" por jornada em `regions.<id>.hub.flags`) e `data/decor.js`
+  (a loja de Pokédolls). Falas e lugares são rascunho para o Fellipe ajustar; a do
+  pescador ("Às vezes fico imaginando o que tem lá embaixo...") é dele.
+- **Centro Pokémon**: a enfermeira e a máquina ao lado abrem o PC; o vendedor do
+  outro balcão abre o Poké Mart de sempre. Fala-se por cima do balcão (`counter`).
+- **O quarto decorável**: a vendedora da loja de Pokédolls abre o catálogo
+  (`modal-decor`): mesa com PC (abre o PC), estante (abre o Estojo), tapete com TV,
+  até 4 plantas, 5 bonecos e o Lapras gigante (só depois de um Hall da Fama). Cada
+  compra aparece no lugar fixo dela e bloqueia o tile. **A decoração é do jogador**
+  (`profile.decor`), o mesmo quarto em todas as jornadas (padrão até o Fellipe
+  decidir). A cama já vem no quarto e salva o jogo (o .json).
+- **Ainda em breve**: o mato alto a oeste (modo Endless) e a lagoa (o modo
+  aquático do Dive, com a TM Dive no Mart) só mostram o aviso. Ver as seções 7 e 8
+  do PLANEJAMENTO-LOBBY.md.
+
 ### O lobby (0.13)
+- Desde a 0.29 ele é o **mapa da jornada**, aberto da vila (a saída sul ou o botão
+  da barra), com um botão "Vila" de volta no lugar do "Menu" (o Menu principal
+  fica na barra da vila).
 - **O mapa da jornada é o Town Map de Kanto do FireRed** (`ui/lobby.js`, Etapa 9
   do PLANEJAMENTO), no lugar da lista de 13 cards: o mapa do decomp
   (`extract_region_map.py`, 192x144) em pixels inteiros; cada fase na cidade do
@@ -930,6 +995,7 @@ Procedência e como regerar: `assets/PROVENIENCIA.md`.
 | Moldura das janelas e dos botões | `assets/ui/window-frame.png` (3x, fatia 24) e `window-frame-button.png` (2x, fatia 16): a `text_window` do FireRed, copiadas do Pokemon All |
 | Fontes | `assets/fonts/`: Press Start 2P e Pixelify Sans (licença OFL), as do Pokemon All |
 | Fundo da tela de título | `assets/ui/title-background.webp`: arte do Fellipe (a clareira à noite cercada pela horda) |
+| A vila (0.29) | `assets/hub/<mapa>.png` e `-top.png` (o chão e o que cobre os personagens), `assets/hub/npc/<id>.png` (as pessoas e os bonecos), `assets/hub/decor/<id>.png` (os móveis do quarto); `src/data/hubMaps.js` diz o tamanho e a colisão de cada mapa. Gerados por `tools/assets/hub.py` |
 | Músicas | `assets/music/*.ogg`: 18 do FireRed, a vinheta de cura do Centro Pokémon (`tools/assets/render_music.py`) e o tema do lobby do Pokemon All; 7,5 MB ao todo, cada uma carregada quando toca |
 
 - Tudo é pixel art em **escala inteira, sem suavização** (`CONFIG.render.pixelScale`,
@@ -985,6 +1051,9 @@ botão Continuar). Estrutura:
 }
 ```
 
+Desde a 0.29: `profile.decor` (os enfeites do quarto, de todas as jornadas) e
+`regions.<id>.hub.flags` (as falas de "uma vez só" da vila já vistas nesta jornada).
+
 `normalizeProfile` faz merge com os padrões, então **campo novo não quebra save
 antigo**. Ao carregar uma partida salva, a fase recomeça com a equipe curada.
 
@@ -1029,6 +1098,12 @@ funciona desde a 0.7.
 ---
 
 ## 10. Próximos passos
+
+**A vila (0.29)**: as etapas que faltam estão em
+**[PLANEJAMENTO-LOBBY.md](PLANEJAMENTO-LOBBY.md)**: o golpe Dive e a TM Dive no
+Mart (só para Pokémon de Água com o Golpe Desperto), o modo Endless pelo mato alto,
+o modo aquático pela lagoa, sons e capricho, e as decisões em aberto (o nome da
+vila, entrar em todas as casas, o rival).
 
 O roteiro está em **[PLANEJAMENTO.md](PLANEJAMENTO.md)**, combinado em 2026-11-02:
 fundação de assets a partir do Pokemon All, escolha de treinador (Menino ou
@@ -1118,6 +1193,14 @@ tipo, som e o polimento de troca e captura.
   `Run.update` não roda fora de `running`. Todo estado novo precisa ser resolvido
   pelo `Game`, pelo bot (`tools/bot.mjs`) e pelo `SETTLE` do `screenshot.mjs`,
   senão a simulação congela.
+- **Porta do FireRed bloqueia (0.29):** no `map.bin`, a porta é um tile com
+  colisão; ela leva para dentro quando o jogador anda **contra** ela (`on: 'push'`
+  em `data/hub.js`). Já a entrada aberta da loja de Cerulean é chão (`'step'`). O
+  `check-data` confere qual é qual.
+- **A vila só anda com a tela dela aberta (0.29):** o `Game._frame` só chama
+  `hub.update` com `hubOpen`. Nos testes, `hub.update` direto continua andando com
+  a vila escondida; clicar numa saída já anda até lá e sai (não aperte a direção
+  depois, senão o jogador anda na vila escondida).
 - **Desempenho:** gradiente criado por projétil a cada quadro era o desenho mais
   caro; agora é sprite. Efeitos, acertos e partículas têm teto (`CONFIG.fx`).
   Medido na `vitrine.html?estresse` (Chrome sem janela): 60 FPS e ~2 ms por
@@ -1154,6 +1237,7 @@ tipo, som e o polimento de troca e captura.
 | 20 | fases levemente mais rápidas: de 3:30 para 2:45 | 0.15: a linha do tempo das 13 fases comprimida (×165/210; levas ×√f mais densas, XP ×1/√f); a equipe chega ao líder no mesmo nível (medido) |
 | 35 | manter a fase do Brock como está e dificultar todas as outras; a escala de ganho de nível muito alta; o Golpe Desperto por chave: maximizar certas melhorias (Gyarados: velocidade, penetração e dano; Gloom: área, intervalo entre os danos e cooldown), com a melhoria da chave marcada na tela de nível ("maximize para despertar") | 0.28: `xpLateExponent` 2,2 → 3,4 (o bot chega ao Campeão no ~74, era ~115; o Brock igual); `stage.difficulty` recalibrada fase a fase, todas mais duras que na 0.27 em tentativas do bot (ver seção 5); `data/awakening.js`: 3 melhorias por golpe que despertam o 2º golpe na hora, selo dourado na tela de nível, progresso na equipe e no PC, quem chega tarde treina a chave primeiro; `balance.mjs --jobs` (paralelo) e `--set` (testar um valor) |
 | 36 | tirar a tag "Golpe Desperto" das melhorias, deixar só o aviso de maximizar embaixo | 0.28.1: sem o selo no canto da carta; ficam a moldura dourada e o aviso |
+| 37 | no lugar da tela do mapa, um lobby jogável: uma mini-vila com casas de NPC espalhadas, andar em tiles como no FireRed, o Centro com o balcão do PC (sem curar) e o do Mart, uma loja de Pokédolls, o quarto vazio decorável, o Oak dando o inicial com as saídas travadas até lá, o mato alto a oeste para um modo Endless, a lagoa com o easter egg do Dive, falas para todos (a do pescador é dele) | 0.29: `game/Hub.js`, `render/HubRenderer.js`, `ui/hubHud.js`, `data/hub.js`, `data/dialogue.js`, `data/decor.js` e `tools/assets/hub.py` (os mapas montados do FireRed, em duas camadas e com a colisão de origem); jornada começada = treinador escolhido; partida, Continuar e Centro voltam à vila; o Endless e o modo aquático ficam "em breve" (PLANEJAMENTO-LOBBY.md) |
 | 34 | Modo Livre no Campeão também | 0.27: depois do Hall da Fama, a tela de vitória de sempre, com o Modo Livre |
 | 33 | o Gengar não recebia o Golpe Desperto; capturado no nível alto vem sem melhorias e fica ruim | 0.26: sem bug no Golpe Desperto (precisava de 18 melhorias = 54 níveis); `trainToLevel`: quem chega tarde vem com 1 melhoria a cada 3 níveis, automáticas (opção 1, escolhida pelo Fellipe) |
 | 32 | a partida continuar rodando com a aba em segundo plano; a luta com o líder começar sozinha depois de 7 s, com a contagem pequena; mostrar os Shards na tela | 0.25: relógio num Worker + passos de 50 ms (`_frame`), contagem na apresentação (`leaderIntroSeconds`), "◆ Shards" no HUD |

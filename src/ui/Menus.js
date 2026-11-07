@@ -20,9 +20,11 @@ import { Lobby } from './lobby.js';
 import { BadgeCase } from './badgeCase.js';
 import { JourneyScreen } from './journeys.js';
 import { MART_ITEMS, evolvedBy } from '../data/items.js';
+import { DECOR, decorMax } from '../data/decor.js';
+import { HUB_SPRITES, HUB_DECOR } from '../data/hubMaps.js';
 
-const SCREENS = ['screen-title', 'screen-journeys', 'screen-trainer', 'screen-starter', 'screen-campaign'];
-const MODALS = ['modal-pokedex', 'modal-achievements', 'modal-team', 'modal-mart', 'modal-options', 'modal-help', 'modal-pc', 'modal-badges'];
+const SCREENS = ['screen-title', 'screen-journeys', 'screen-trainer', 'screen-starter', 'screen-campaign', 'screen-hub'];
+const MODALS = ['modal-pokedex', 'modal-achievements', 'modal-team', 'modal-mart', 'modal-decor', 'modal-options', 'modal-help', 'modal-pc', 'modal-badges'];
 
 /**
  * Telas fora da partida.
@@ -48,6 +50,7 @@ export class Menus {
     el('btn-load-game').onclick = () => el('save-file-input').click();
     el('btn-save-campaign').onclick = () => this.game.saveToFile();
     el('btn-hall').onclick = () => this.game.showHallOfFame(this.game.profile.hallOfFame.at(-1));
+    el('btn-village').onclick = () => this.game.openHub();   // do mapa da jornada de volta para a vila (0.29)
     el('version-tag').textContent = `v${CONFIG.version}`;
 
     // atalhos da barra lateral
@@ -62,7 +65,8 @@ export class Menus {
       el(id).addEventListener('mousedown', (e) => { if (e.target === el(id)) this.closeModal(); });
     }
     document.querySelectorAll('[data-back]').forEach((btn) => {
-      btn.onclick = () => this.show(btn.dataset.back);
+      // o Voltar da escolha do inicial devolve o jogador ao laboratório (0.29)
+      btn.onclick = () => (btn.dataset.back === 'screen-hub' ? this.game.cancelStarter() : this.show(btn.dataset.back));
     });
 
     el('save-file-input').onchange = async (e) => {
@@ -81,6 +85,8 @@ export class Menus {
     if (screenId) show(el(screenId));
     // o CSS usa a tela atual (no título, a arte de fundo substitui a barra e o cenário)
     el('app').dataset.screen = screenId ?? '';
+    // a vila só anda e desenha enquanto está na tela (Game._frame)
+    this.game.hubOpen = screenId === 'screen-hub';
     if (screenId === 'screen-title') this.refreshTitle();
     if (screenId === 'screen-campaign') {
       // ao entrar no lobby, a próxima fase já vem escolhida; o mapa mede o espaço depois de aparecer
@@ -108,6 +114,7 @@ export class Menus {
 
   showGame() {
     el('app').dataset.screen = 'game';
+    this.game.hubOpen = false;
     for (const id of SCREENS) hide(el(id));
     hide(el('side-rail'));
     this.closeModal();
@@ -121,6 +128,7 @@ export class Menus {
       'modal-achievements': () => this.buildAchievements(),
       'modal-team': () => this.buildTeamDetail(),
       'modal-mart': () => this.buildMart(),
+      'modal-decor': () => this.buildDecor(),
       'modal-options': () => this.buildOptions(),
       'modal-pc': () => this.pcScreen.open(),
       'modal-badges': () => this.badgeCase.open(options)
@@ -134,8 +142,9 @@ export class Menus {
     if (this.openModal === 'modal-pc' || !el('modal-pc').classList.contains('hidden')) this.pcScreen.close();
     for (const id of MODALS) hide(el(id));
     this.openModal = null;
-    // o que a janela mudou (Shards, PC, conquistas) aparece na barra do lobby
+    // o que a janela mudou (Shards, PC, conquistas) aparece na barra do lobby e na da vila
     if (!el('screen-campaign').classList.contains('hidden')) this.lobby.render();
+    if (!el('screen-hub').classList.contains('hidden')) this.game.hubHud?.render();
   }
 
   /* ============================ menu principal ============================ */
@@ -402,6 +411,59 @@ export class Menus {
       card.appendChild(btn);
       list.appendChild(card);
     }
+  }
+
+  /* ========================= a loja de Pokédolls (0.29) ========================= */
+
+  /** Os enfeites do quarto: o móvel ou o boneco, o preço e quantos já estão lá. */
+  buildDecor() {
+    const game = this.game;
+    const list = clear(el('decor-list'));
+    const shards = game.profile.shards ?? 0;
+    el('decor-shards').innerHTML = `${iconHTML('shards', 18)} <b>${shards.toLocaleString('pt-BR')}</b> Shards`;
+    const champion = game.profile.hallOfFame.length > 0;
+
+    for (const item of DECOR) {
+      const owned = game.profile.decor?.[item.id] ?? 0;
+      const max = decorMax(item);
+      const card = create('div', 'shop-card mart-card decor-card');
+      card.innerHTML = `
+        <div class="shop-icon">${this._decorIcon(item)}</div>
+        <div class="shop-body">
+          <div class="shop-title"><h4>${item.name}</h4><span class="shop-level">${iconHTML('shards', 14)} ${item.price.toLocaleString('pt-BR')}</span></div>
+          <p>${item.about ?? 'Um boneco de pelúcia para o quarto.'}${max > 1 ? ` · no quarto: <b>${owned}/${max}</b>` : ''}</p>
+        </div>
+      `;
+      const full = owned >= max;
+      const locked = item.needs === 'champion' && !champion;
+      const btn = create('button', 'buy-btn');
+      btn.innerHTML = `<span>${full ? 'no quarto' : locked ? 'Campeão' : 'comprar'}</span>`;
+      btn.disabled = full || locked || shards < item.price;
+      btn.title = full ? 'Já está no seu quarto' : locked ? 'Só depois de vencer a Liga Pokémon'
+        : shards < item.price ? 'Shards insuficientes' : '';
+      btn.onclick = () => { if (game.buyDecor(item.id)) this.buildDecor(); };
+      card.appendChild(btn);
+      list.appendChild(card);
+    }
+  }
+
+  /**
+   * O desenho do enfeite em zoom inteiro (até 64 px): a peça montada do FireRed,
+   * com a camada de cima por cima (as folhas da planta), ou o primeiro quadro do boneco.
+   */
+  _decorIcon(item) {
+    if (item.piece) {
+      const piece = HUB_DECOR[item.piece];
+      const zoom = Math.max(1, Math.floor(64 / (Math.max(piece.width, piece.height) * 16)));
+      const size = `width:${piece.width * 16 * zoom}px;height:${piece.height * 16 * zoom}px`;
+      return `<span class="decor-stack" style="${size}"><img src="${piece.src}" alt="" style="${size}" />` +
+        `<img src="${piece.top}" alt="" style="${size}" /></span>`;
+    }
+    const sheet = HUB_SPRITES[`npc/${item.sprite}`];
+    const zoom = Math.max(1, Math.floor(64 / sheet.frameHeight));
+    return `<span class="decor-doll" style="background-image:url(${sheet.src});` +
+      `background-size:${sheet.frames * sheet.frameWidth * zoom}px ${sheet.frameHeight * zoom}px;` +
+      `width:${sheet.frameWidth * zoom}px;height:${sheet.frameHeight * zoom}px"></span>`;
   }
 
   /** A lista de quem pode receber a TM ou o item de evolução, dentro do card. */

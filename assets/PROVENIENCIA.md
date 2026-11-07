@@ -29,6 +29,34 @@ O catálogo das metatiles (qual ID do FireRed está em cada quadro, e o mapa dos
 salões, e quais metatiles bloqueiam o caminho pela colisão do mapa) sai em
 `src/data/sceneManifest.js`.
 
+## Gerados por `tools/assets/hub.py` (a vila, 0.29)
+
+Mesma fonte do extrator (o decomp no Pokemon All, só leitura). A vila e os
+interiores são **montados** com pedaços de mapas do FireRed: nada é desenhado à
+mão. Cada mapa sai em duas camadas, como no jogo: o chão (os 4 tiles de baixo de
+cada metatile, mais os de cima quando o tipo de camada é COVERED) e o que fica por
+cima dos personagens (os 4 de cima quando é NORMAL ou SPLIT, bits 29-30 de
+`metatile_attributes.bin`). A colisão vem do `map.bin` de origem (o bit de colisão
+e a elevação 1, que é a água).
+
+```bash
+python tools/assets/hub.py                           # procura ../Pokemon All
+```
+
+| Saída | Origem no decomp |
+|---|---|
+| `hub/vila.png` e `hub/vila-top.png` | recortes de `data/layouts/` PalletTown (casa, laboratório, lagoa, placas), ViridianCity (Centro Pokémon, árvores, a mata, o caminho de terra), FourIsland (cabana), FuchsiaCity (casa de tijolo), CeruleanCity (a loja de teto de vidro, flores) e Route1 (grama alta) |
+| `hub/casa_1f.png`, `hub/casa_2f.png` | PalletTown_PlayersHouse_1F e _2F (o quarto sem os móveis) |
+| `hub/centro.png` | IndigoPlateau_PokemonCenter_1F, com o balcão repetido para o Poké Mart |
+| `hub/pokedoll.png` | CeladonCity_DepartmentStore_4F, com a saída do 1F embaixo |
+| `hub/lab.png`, `hub/cabana.png`, `hub/casa_sabio.png` | PalletTown_ProfessorOaksLab, House1, FuchsiaCity_WardensHouse |
+| `hub/decor/<id>.png` (e `-top`) | os móveis do quarto: a mesa com PC, a estante e o tapete de PalletTown_PlayersHouse_2F; a planta de SaffronCity_CopycatsHouse_2F |
+| `hub/npc/<id>.png` | `graphics/object_events/pics/{people,pokemon,misc}/<nome>.png`, com a paleta do `paletteTag` de cada um (`src/data/object_events/object_event_graphics_info.h`): `npc_white`, `npc_pink`, `npc_green` ou `npc_blue` |
+
+O tamanho, a colisão de cada mapa, o catálogo das folhas e os móveis saem em
+`src/data/hubMaps.js`. As portas, as pessoas e as falas ficam em `src/data/hub.js`
+e `src/data/dialogue.js` (feitos à mão).
+
 ## Copiados do Pokemon All
 
 | Saída | Origem |

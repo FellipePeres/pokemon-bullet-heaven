@@ -128,7 +128,57 @@
       <p class="subtitle">Ele será o primeiro membro da sua equipe. Cada um joga de um jeito diferente.</p>
     </header>
     <div id="starter-choices" class="starter-grid"></div>
-    <button class="menu-btn ghost back" data-back="screen-title">Voltar</button>
+    <!-- a escolha vem do Prof. Carvalho, na vila: voltar é voltar para o laboratório -->
+    <button class="menu-btn ghost back" data-back="screen-hub">Voltar</button>
+  </section>
+
+  <!-- ============================================================
+       A VILA — o lobby jogável (0.29, PLANEJAMENTO-LOBBY.md)
+       ============================================================ -->
+  <!-- o mapa em grade do FireRed num canvas do tamanho da tela (render/HubRenderer.js),
+       a barra do topo e a caixa de texto por cima (ui/hubHud.js) -->
+  <section id="screen-hub" class="screen hidden hub">
+    <canvas id="hub-canvas" class="hub-canvas" aria-label="A vila"></canvas>
+
+    <header id="hub-bar" class="lobby-bar hub-bar">
+      <div class="lobby-who">
+        <img id="hub-trainer" class="lobby-avatar" alt="" />
+        <div class="lobby-who-text">
+          <b id="hub-title">Vila da Jornada</b>
+          <button id="hub-case" class="lobby-case" data-modal="modal-badges" title="Estojo de Insígnias"></button>
+        </div>
+      </div>
+      <div id="hub-stats" class="lobby-stats"></div>
+      <nav class="lobby-actions">
+        <button class="bar-btn" data-modal="modal-pokedex" title="Pokédex"><span class="bar-icon" data-icon="pokedex"></span><span class="bar-label">Pokédex</span></button>
+        <button class="bar-btn" id="hub-achievements" data-modal="modal-achievements" title="Conquistas"><span class="bar-icon" data-icon="achievements"></span><span class="bar-label">Conquistas</span></button>
+        <button class="bar-btn" data-modal="modal-team" title="Equipe"><span class="bar-icon" data-icon="team"></span><span class="bar-label">Equipe</span></button>
+        <button class="bar-btn" data-modal="modal-options" title="Opções e volume"><span class="bar-icon" data-icon="options"></span><span class="bar-label">Opções</span></button>
+        <button class="bar-btn" data-modal="modal-help" title="Como jogar"><span class="bar-icon" data-icon="help"></span><span class="bar-label">Ajuda</span></button>
+        <span class="bar-sep" aria-hidden="true"></span>
+        <button id="hub-btn-map" class="bar-btn strong hub-map-btn" title="Mapa da jornada"><span class="bar-icon" data-icon="stages"></span><span class="bar-text">Mapa da jornada</span></button>
+        <button id="hub-btn-save" class="bar-btn strong" title="Salvar o jogo num arquivo (.json)"><span class="bar-icon" data-icon="save"></span><span class="bar-text">Salvar</span></button>
+        <button class="bar-btn strong" data-back="screen-title" title="Menu principal"><span class="bar-icon" data-icon="menu"></span><span class="bar-text">Menu</span></button>
+      </nav>
+    </header>
+
+    <!-- a placa com o nome do lugar, ao chegar -->
+    <div id="hub-place" class="hub-place hidden"></div>
+
+    <!-- a caixa de texto do FireRed, com a plaquinha de quem fala e o SIM/NÃO -->
+    <div id="hub-dialog" class="hub-dialog hidden">
+      <span id="hub-dialog-name" class="hub-dialog-name hidden"></span>
+      <div id="hub-dialog-box" class="fr-window hub-dialog-box">
+        <p id="hub-dialog-text"></p>
+        <span id="hub-dialog-next" class="hub-dialog-next" aria-hidden="true"></span>
+      </div>
+      <div id="hub-dialog-choices" class="fr-window hub-choices hidden">
+        <button id="hub-choice-yes" class="hub-choice" type="button">SIM</button>
+        <button id="hub-choice-no" class="hub-choice" type="button">NÃO</button>
+      </div>
+    </div>
+
+    <p class="hub-hint"><kbd>↑</kbd><kbd>↓</kbd><kbd>←</kbd><kbd>→</kbd> andar <span class="dot">·</span> <kbd>Shift</kbd> correr <span class="dot">·</span> <kbd>Enter</kbd> falar <span class="dot">·</span> ou clique onde quer ir</p>
   </section>
 
   <!-- ============================================================
@@ -157,7 +207,8 @@
         <button id="btn-mart" class="bar-btn strong" data-modal="modal-mart" title="Poké Mart: gaste os Shards"><span class="bar-icon" data-icon="mart"></span><span class="bar-text">Poké Mart</span></button>
         <button id="btn-hall" class="bar-btn strong hidden" title="Hall da Fama"><span class="bar-icon" data-icon="badge"></span><span class="bar-text">Hall</span></button>
         <button id="btn-save-campaign" class="bar-btn strong" title="Salvar o jogo num arquivo (.json)"><span class="bar-icon" data-icon="save"></span><span class="bar-text">Salvar</span></button>
-        <button class="bar-btn strong" data-back="screen-title" title="Menu principal"><span class="bar-icon" data-icon="menu"></span><span class="bar-text">Menu</span></button>
+        <!-- desde a 0.29 o mapa é aberto da vila: o Menu principal fica na barra de lá -->
+        <button id="btn-village" class="bar-btn strong" title="Voltar para a vila"><span class="bar-icon" data-icon="menu"></span><span class="bar-text">Vila</span></button>
       </nav>
     </header>
 
@@ -193,7 +244,7 @@
           <span id="kill-count">0</span>
           <span id="ball-count">0</span>
           <span id="shard-count" title="Seus Shards (gaste no Poké Mart)">0</span>
-          <button id="btn-endless-center" class="hud-center-btn hidden" title="Sai do Modo Livre: guarda o que a equipe ganhou e volta ao mapa da jornada">Voltar para o Centro Pokémon</button>
+          <button id="btn-endless-center" class="hud-center-btn hidden" title="Sai do Modo Livre: guarda o que a equipe ganhou e volta para a vila">Voltar para o Centro Pokémon</button>
           <button id="btn-pause" class="icon-btn" title="Pausar (ESC)">❚❚</button>
           <button id="btn-hud-options" class="icon-btn" title="Opções e volume"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M19.4 13a7.6 7.6 0 0 0 0-2l2.1-1.6-2-3.4-2.5 1a7.7 7.7 0 0 0-1.7-1L15 3.3h-4l-.4 2.7a7.7 7.7 0 0 0-1.7 1l-2.5-1-2 3.4L6.5 11a7.6 7.6 0 0 0 0 2l-2.1 1.6 2 3.4 2.5-1a7.7 7.7 0 0 0 1.7 1l.4 2.7h4l.4-2.7a7.7 7.7 0 0 0 1.7-1l2.5 1 2-3.4zM13 15.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z" transform="translate(-1 0)"/></svg></button>
         </div>
@@ -329,7 +380,7 @@
         <div class="menu-column">
           <button id="btn-center-go" class="menu-btn primary"><span class="btn-text" id="center-go-label">Voltar para a fase</span></button>
           <button id="btn-center-pc" class="menu-btn" data-modal="modal-pc"><span class="btn-text">PC</span></button>
-          <button id="btn-center-map" class="menu-btn ghost"><span class="btn-text">Ir para o mapa da jornada</span></button>
+          <button id="btn-center-map" class="menu-btn ghost"><span class="btn-text">Voltar para a vila</span></button>
         </div>
       </div>
     </div>
@@ -378,6 +429,24 @@
   </div>
 
   <!-- o Poké Mart (0.23): os Shards viram itens -->
+  <!-- a loja de Pokédolls (0.29): enfeites para o quarto da vila (data/decor.js) -->
+  <div id="modal-decor" class="modal hidden">
+    <div class="modal-card">
+      <header class="modal-head">
+        <h3><span class="bar-icon" data-icon="mart"></span>Pokédoll</h3>
+        <span class="modal-sub" id="decor-shards">0 Shards</span>
+        <button class="icon-btn close" data-close>✕</button>
+      </header>
+      <div class="modal-body">
+        <p class="subtitle small" style="margin-bottom:14px">
+          Tudo o que você compra aqui aparece no seu quarto, no andar de cima de casa.
+          O quarto é seu em todas as jornadas, como os Shards e a Pokédex.
+        </p>
+        <div id="decor-list" class="node-list"></div>
+      </div>
+    </div>
+  </div>
+
   <div id="modal-mart" class="modal hidden">
     <div class="modal-card">
       <header class="modal-head">

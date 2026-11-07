@@ -12,6 +12,9 @@ import { SceneryCache } from '../render/scenery.js';
 import { stageScenes } from '../data/scenery.js';
 import { loadOptions } from '../save/options.js';
 import { PadNavigator } from '../ui/pad.js';
+import { Hub } from './Hub.js';
+import { HubRenderer } from '../render/HubRenderer.js';
+import { HubHUD } from '../ui/hubHud.js';
 
 /** X, Y e B põem em campo os da reserva (posições 4, 5 e 6 da equipe). */
 const RESERVE_BUTTONS = { x: 3, y: 4, b: 5 };
@@ -28,6 +31,7 @@ import { ENEMIES } from '../data/enemies.js';
 import { MusicPlayer } from '../audio/music.js';
 import { swapWithPC, moveMon, normalizePC, fixDuplicateUids } from '../systems/pc.js';
 import { getMartItem, itemEvolutions } from '../data/items.js';
+import { getDecor, decorMax } from '../data/decor.js';
 import { evolveMember, learnNextMove } from '../systems/moves.js';
 import { nextMoveFor } from '../data/tms.js';
 import { getAbility } from '../data/abilities.js';
@@ -60,6 +64,15 @@ export class Game {
     this.menus = new Menus(this);
     this.padNav = new PadNavigator();
     this.music = new MusicPlayer();
+
+    // a vila, o lobby jogável (0.29): a regra, o desenho e a interface
+    this.hubOpen = false;
+    this.hub = new Hub(this);
+    const hubCanvas = document.getElementById('hub-canvas');
+    this.hubRenderer = new HubRenderer(hubCanvas);
+    this.hubHud = new HubHUD(this);
+    hubCanvas?.addEventListener?.('pointerdown', (e) => this._hubClick(e));
+    if (typeof window !== 'undefined') window.addEventListener('resize', () => { if (this.hubOpen) this._resizeHub(); });
     this.hallOpen = false;
     this.centerOpen = false;   // o Centro Pokémon, depois de uma derrota
 
@@ -134,6 +147,19 @@ export class Game {
         this.renderer.render(this.run);
         this.hud.update(this.run);
       }
+    } else if (this.hubOpen) {
+      // a vila: com uma janela aberta (PC, Mart, Pokédex), o jogador fica parado
+      const move = this.menus.openModal ? { x: 0, y: 0 } : this.input.getMoveVector();
+      const running = this.input.isRunHeld();
+      do {
+        const dt = Math.min(0.05, elapsed);
+        elapsed -= dt;
+        this.hub.update(dt, move, running);
+      } while (elapsed > 0 && this.hubOpen);
+      if (!hidden) {
+        this.hubRenderer.render(this.hub);
+        this.hubHud.update(this.hub);
+      }
     }
 
     this._updateMusic();
@@ -164,7 +190,7 @@ export class Game {
    */
   _updateMusic() {
     const run = this.run;
-    let track = 'lobby-theme';
+    let track = this.hubOpen ? (this.hub.place?.music ?? 'lobby-theme') : 'lobby-theme';
     if (this.hallOpen) track = 'mus_hall_of_fame';
     else if (this.centerOpen) track = 'mus_poke_center';
     else if (run?.state === 'victory') track = 'mus_victory_gym_leader';
@@ -229,11 +255,9 @@ export class Game {
     this.profile.regions[this.profile.region] = createRegionProgress();
     this.profile.stats.badges = countBadges(this.profile);
     this.pendingRun = null;
-    // como no FireRed, a jornada começa dizendo quem é você
-    this.askTrainer(() => {
-      this.menus.buildStarters();
-      this.menus.show('screen-starter');
-    });
+    // como no FireRed, a jornada começa dizendo quem é você; depois, o jogador
+    // acorda no quarto e o Prof. Carvalho dá o inicial no laboratório (0.29)
+    this.askTrainer(() => this.openHub('bedroom'));
   }
 
   /** Abre a escolha de treinador; `then` segue o fluxo depois da escolha. */
@@ -262,10 +286,9 @@ export class Game {
     if (this.campaign.starterShiny) this.tracker.registerShiny(data.dex);
     this.tracker.checkAchievements();
     this.autosave();
-    toast(this.campaign.starterShiny
-      ? `✦ ${data.name} shiny! Que sorte — sua jornada começa agora.`
-      : `${data.name} escolhido! Sua jornada começa agora.`, this.campaign.starterShiny ? 'ball' : '🎒');
-    this.openCampaign();
+    // de volta ao laboratório: o Carvalho fecha a mini-história e as saídas abrem (0.29)
+    this.openHub();
+    this.hub.afterStarter();
   }
 
   openCampaign() {
@@ -274,7 +297,61 @@ export class Game {
   }
 
   canContinue() {
-    return !!this.pendingRun || !!this.campaign.starter;
+    return !!this.pendingRun || !!this.profile.trainer;
+  }
+
+  /* ============================ a vila (0.29) ============================ */
+
+  /**
+   * Abre a vila. `spawn` põe o jogador num lugar ('bedroom' na jornada nova,
+   * 'home' na frente de casa depois de uma partida); sem ele, a vila continua
+   * de onde estava (a volta do mapa ou da escolha do inicial).
+   */
+  openHub(spawn = null) {
+    if (spawn || !this.hub.map) this.hub.enter(spawn ?? 'home');
+    this.menus.show('screen-hub');
+    this._resizeHub();
+    this.hubHud.render();
+    this.input.clear();
+  }
+
+  /** O canvas da vila acompanha a janela; o mapa fica na área abaixo da barra do topo. */
+  _resizeHub() {
+    const bar = document.getElementById('hub-bar');
+    this.hubRenderer.resize(bar?.getBoundingClientRect?.().bottom ?? 0);
+  }
+
+  /** A escolha do inicial, aberta pelo Prof. Carvalho. */
+  openStarterChoice() {
+    this.menus.buildStarters();
+    this.menus.show('screen-starter');
+  }
+
+  /** O Voltar da escolha do inicial: de volta ao laboratório, sem escolher. */
+  cancelStarter() {
+    this.openHub();
+    this.hub.cancelStarter();
+  }
+
+  /** O botão Mapa da jornada (e o Start do controle): só depois do inicial. */
+  hubOpenMap() {
+    if (!this.campaign.starter) {
+      toast('Fale com o Prof. Carvalho primeiro: ele está no laboratório.', '🔒');
+      return;
+    }
+    this.openCampaign();
+  }
+
+  /** Clique no mapa da vila: anda até o tile (ou fala com quem está lá). */
+  _hubClick(event) {
+    if (!this.hubOpen || this.menus.openModal) return;
+    const canvas = this.hubRenderer.canvas;
+    const rect = canvas.getBoundingClientRect();
+    const tile = this.hubRenderer.tileAt(
+      (event.clientX - rect.left) * (canvas.width / rect.width),
+      (event.clientY - rect.top) * (canvas.height / rect.height)
+    );
+    this.hub.clickTile(tile.x, tile.y);
   }
 
   /* ======================= os espaços de jornada (0.19) ======================= */
@@ -295,7 +372,8 @@ export class Game {
         ? { trainer: this.profile.trainer, region: this.profile.region, regions: this.profile.regions }
         : slot.data;
       const progress = data?.regions?.[data.region];
-      if (!progress?.starter) return null;   // começada e largada antes do inicial
+      // começada é quem já escolheu o treinador: desde a 0.29 o inicial vem depois, na vila
+      if (!progress || !data?.trainer) return null;
       return {
         id: slot.id, active, trainer: data.trainer, region: data.region, progress,
         pendingRun: active ? this.pendingRun : slot.pendingRun, updatedAt: slot.updatedAt
@@ -307,8 +385,8 @@ export class Game {
   _stashActive() {
     const slot = this.activeSlot;
     if (!slot) return;
-    if (!this.campaign.starter) {
-      // nem escolheu o inicial: não há o que guardar, o espaço volta a ficar livre
+    if (!this.profile.trainer) {
+      // nem escolheu o treinador: não há o que guardar, o espaço volta a ficar livre
       this.profile.journeys.splice(this.profile.journeys.indexOf(slot), 1);
     } else {
       slot.data = JSON.parse(JSON.stringify({
@@ -348,8 +426,8 @@ export class Game {
 
   /** Começa uma jornada nova num espaço livre, sem mexer nas outras. */
   newJourney() {
-    // a ativa ainda nem começou (sem inicial): é ela mesma que recomeça
-    if (this.activeSlot && !this.campaign.starter) { this.newGame(); return; }
+    // a ativa ainda nem começou (sem treinador): é ela mesma que recomeça
+    if (this.activeSlot && !this.profile.trainer) { this.newGame(); return; }
     if (this.listJourneys().length >= CONFIG.save.maxJourneys) {
       toast(`Os ${CONFIG.save.maxJourneys} espaços de jornada estão ocupados: apague uma para começar outra.`, '🗂️');
       this.menus.showJourneys();
@@ -387,7 +465,7 @@ export class Game {
     // saves de antes da escolha de treinador perguntam uma vez
     if (!this.profile.trainer) { this.askTrainer(() => this.continueGame()); return; }
     this._foldPendingRun();
-    if (this.campaign.starter) this.openCampaign();
+    this.openHub('home');   // desde a 0.29, a jornada abre na vila, na frente de casa
   }
 
   /**
@@ -500,7 +578,8 @@ export class Game {
     this.runEnded = false;
     this.centerOpen = false;
     this.hud.hideAllOverlays();
-    if (this.campaign.starter) this.openCampaign();
+    // de volta para a vila, na frente de casa (0.29); de lá, o mapa está a um botão
+    if (this.profile.trainer) this.openHub('home');
     else this.menus.show('screen-title');
   }
 
@@ -508,9 +587,18 @@ export class Game {
 
   handleAction(action) {
     if (action.startsWith('pad:')) { this.handlePad(action.slice(4)); return; }
+    // o A e o B da vila (Enter/Espaço/Z e X/Backspace)
+    if (action === 'confirm' || action === 'cancel') {
+      if (this.hubOpen && !this.menus.openModal) {
+        if (action === 'confirm') this.hub.confirm();
+        else this.hub.cancel();
+      }
+      return;
+    }
     if (action === 'pause') {
-      // fora da partida, ESC fecha a janela aberta
+      // fora da partida, ESC fecha a janela aberta (e, na vila, a conversa)
       if (this.menus.openModal) { this.menus.closeModal(); return; }
+      if (this.hubOpen && this.hub.dialog) { this.hub.cancel(); return; }
       if (this.run && (this.run.state === 'running' || this.run.state === 'paused')) this.togglePause();
       return;
     }
@@ -542,6 +630,14 @@ export class Game {
       return;
     }
     if (button === 'start' && this.run?.state === 'paused') { this.togglePause(); return; }
+    // na vila: o A fala, o B cancela (segurado, corre), o Start abre o mapa; o direcional anda
+    if (this.hubOpen && !this.menus.openModal) {
+      if (button === 'a') this.hub.confirm();
+      else if (button === 'b') this.hub.cancel();
+      else if (button === 'start') this.hubOpenMap();
+      else if ((button === 'up' || button === 'down') && this.hub.dialog?.ask) this.hub.choose();
+      return;
+    }
     this.padNav.handle(button);
   }
 
@@ -952,6 +1048,28 @@ export class Game {
     return true;
   }
 
+  /**
+   * Compra um enfeite na loja de Pokédolls (0.29): ele já aparece no quarto
+   * (data/decor.js). O quarto é do jogador, para todas as jornadas.
+   */
+  buyDecor(id) {
+    const item = getDecor(id);
+    if (!item) return false;
+    this.profile.decor ??= {};
+    const owned = this.profile.decor[id] ?? 0;
+    if (owned >= decorMax(item)) return false;
+    if (item.needs === 'champion' && !this.profile.hallOfFame.length) {
+      toast('Esse é só para quem já venceu a Liga Pokémon.', '🔒');
+      return false;
+    }
+    if ((this.profile.shards ?? 0) < item.price) { toast('Shards insuficientes.', 'shards'); return false; }
+    this.profile.shards -= item.price;
+    this.profile.decor[id] = owned + 1;
+    this.autosave();
+    toast(`${item.name} já está no seu quarto!`, 'mart');
+    return true;
+  }
+
   /** O Reviver, na fase: o Pokémon desmaiado volta com metade da vida (e entra em campo se houver vaga). */
   useRevive(memberUid) {
     const run = this.run;
@@ -1018,10 +1136,7 @@ export class Game {
 
       toast(`Save carregado (${data.savedAt ? new Date(data.savedAt).toLocaleString('pt-BR') : 'sem data'}).`, '📂');
 
-      const resume = () => {
-        if (this.campaign.starter) this.openCampaign();
-        else { this.menus.buildStarters(); this.menus.show('screen-starter'); }
-      };
+      const resume = () => this.openHub('home');
       // saves de antes da escolha de treinador perguntam uma vez
       if (this.profile.trainer) resume();
       else this.askTrainer(resume);

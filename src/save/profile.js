@@ -37,6 +37,8 @@ export function createProfile() {
     shards: 0,
     // a mochila do Poké Mart (0.23): itens comprados que se usam depois
     bag: { reroll: 0, revive: 0 },
+    // o quarto decorável (0.29, data/decor.js): quantos de cada enfeite estão no quarto
+    decor: {},
     stats: {
       runsPlayed: 0,
       totalKills: 0,
@@ -96,7 +98,9 @@ export function createRegionProgress() {
     // É atualizada a cada fase concluída e serve de checkpoint em caso de derrota.
     journey: null,
     // métricas de cada fase, para o Estojo de Insígnias (0.13; systems/stageStats.js)
-    stageStats: {}
+    stageStats: {},
+    // a vila (0.29, game/Hub.js): as falas de "uma vez só" que já apareceram ({ flags: {} })
+    hub: null
   };
 }
 
