@@ -43,8 +43,8 @@ export const HUB = {
         { x: 26, y: 6, on: 'push', face: 'up', to: 'lab', tx: 6, ty: 12, dir: 'up' },
         { x: 5, y: 7, on: 'push', face: 'up', to: 'cabana', tx: 4, ty: 7, dir: 'up' },
         { x: 30, y: 17, on: 'push', face: 'up', to: 'casa_sabio', tx: 6, ty: 9, dir: 'up' },
-        { x: 22, y: 20, on: 'step', to: 'pokedoll', tx: 2, ty: 11, dir: 'up' },
-        { x: 23, y: 20, on: 'step', to: 'pokedoll', tx: 10, ty: 11, dir: 'up' }
+        { x: 22, y: 20, on: 'step', to: 'pokedoll', tx: 10, ty: 10, dir: 'up' },
+        { x: 23, y: 20, on: 'step', to: 'pokedoll', tx: 10, ty: 10, dir: 'up' }
       ],
       exits: [
         // a Rota 1: abre o mapa da jornada
@@ -115,9 +115,9 @@ export const HUB = {
 
     pokedoll: {
       name: 'Loja de Pokédolls',
+      // a entrada é um tapete só, embaixo à direita, com o caminho livre (0.30)
       warps: [
-        { x: 2, y: 11, on: 'mat', to: 'vila', tx: 22, ty: 21, dir: 'down' },
-        { x: 10, y: 11, on: 'mat', to: 'vila', tx: 23, ty: 21, dir: 'down' }
+        { x: 10, y: 10, on: 'mat', to: 'vila', tx: 23, ty: 21, dir: 'down' }
       ],
       npcs: [
         { id: 'vendedora', sprite: 'beauty', x: 3, y: 9, dir: 'up', counter: true, talk: 'vendedora' }
@@ -125,7 +125,7 @@ export const HUB = {
       things: [
         { cells: [...rect(5, 3, 3, 1), ...rect(9, 3, 3, 1), ...rect(5, 5, 3, 1), ...rect(9, 5, 3, 1)], talk: 'vitrine' },
         { cells: rect(1, 3, 2, 3), talk: 'prateleira' },
-        { cells: [[8, 4]], talk: 'lapras_gigante' }
+        { cells: [[3, 1]], talk: 'lapras_gigante' }
       ],
       decor: [
         { sprite: 'pikachu', x: 5, y: 3, oy: -7 }, { sprite: 'clefairy', x: 6, y: 3, oy: -7 },
@@ -133,7 +133,8 @@ export const HUB = {
         { sprite: 'pidgey', x: 10, y: 3, oy: -7 }, { sprite: 'pikachu', x: 11, y: 3, oy: -7 },
         { sprite: 'jigglypuff', x: 5, y: 5, oy: -7 }, { sprite: 'clefairy', x: 6, y: 5, oy: -7 },
         { sprite: 'pidgey', x: 10, y: 5, oy: -7 }, { sprite: 'meowth', x: 11, y: 5, oy: -7 },
-        { sprite: 'lapras_doll', x: 8, y: 4, solid: true }
+        // o Lapras gigante fica no canto de cima, longe do corredor das vitrines (0.30)
+        { sprite: 'lapras_doll', x: 3, y: 1, solid: true }
       ]
     },
 

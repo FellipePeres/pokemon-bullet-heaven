@@ -68,7 +68,7 @@ export class BadgeCase {
     const trainer = getTrainerLook(game.profile.trainer);
     card.appendChild(place(create('span', 'card-title', 'Cartão de Treinador'), { x: 136, y: 16, w: 88, h: 16 }));
     const lines = [
-      [trainer.name, ''],
+      [game.playerName, ''],
       ['Pokédex', String(game.tracker.dexProgress.caught)],
       ['Shards', (game.profile.shards ?? 0).toLocaleString('pt-BR')],
       ['Tempo', playTime(game.profile.stats.playTime)]

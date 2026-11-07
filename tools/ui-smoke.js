@@ -154,6 +154,11 @@ check('nova jornada começa pela escolha de treinador', !registry.get('screen-tr
 check('tela de treinador oferece menino e menina', registry.get('trainer-choices').children.length === 2,
       `${registry.get('trainer-choices').children.length} modelos`);
 game.chooseTrainer('leaf');
+check('depois de menino ou menina vem o nome do jogador (0.30), com o do modelo como sugestão',
+      !registry.get('screen-name').classes.has('hidden') && registry.get('name-input').placeholder === 'Leaf');
+game.chooseName('  Fel<lipe>  ');
+check('o nome escrito fica limpo (sem espaços nem HTML) e guardado na jornada',
+      game.profile.trainerName === 'Fellipe' && game.playerName === 'Fellipe');
 
 const hub = game.hub;
 const STEP = { up: { x: 0, y: -1 }, down: { x: 0, y: 1 }, left: { x: -1, y: 0 }, right: { x: 1, y: 0 } };
@@ -174,8 +179,8 @@ check('escolher o treinador leva à vila: o jogador acorda no quarto, ainda sem 
       game.profile.trainer === 'leaf' && hubVisible() && hub.mapId === 'casa_2f' && !game.campaign.starter);
 game.hubRenderer.render(hub);
 game.hubHud.update(hub);
-check('a barra da vila mostra o treinador e o Mapa da jornada travado',
-      registry.get('hub-title').textContent.startsWith('Leaf') && registry.get('hub-btn-map').classes.has('locked'));
+check('a barra da vila mostra o nome do jogador e o Mapa da jornada travado',
+      registry.get('hub-title').textContent === 'Fellipe · Kanto' && registry.get('hub-btn-map').classes.has('locked'));
 game.hubOpenMap();
 check('sem o inicial, o Mapa da jornada não abre', hubVisible() && registry.get('screen-campaign').classes.has('hidden'));
 
@@ -230,13 +235,14 @@ hub.clickTile(6, 3);
 settle();
 closeDialog();
 game.chooseStarter('charmander');
-check('escolhido o inicial, o Carvalho fecha a mini-história e libera as saídas',
-      hubVisible() && dialogText().includes('Charmander') && dialogText().includes('saídas'));
+check('escolhido o inicial, o Carvalho entrega o Mapa da Jornada (0.30)',
+      hubVisible() && dialogText().includes('Charmander') && dialogText().includes('Fellipe recebeu o MAPA DA JORNADA'));
 closeDialog();
 check('a bola do inicial escolhido some da mesa', hub.decor.filter((d) => d.sprite === 'item_ball').length === 2);
 check('Pokédex registra o inicial escolhido', game.profile.pokedex.caught.includes(4));
 game.hubHud.render();
-check('com o inicial, o Mapa da jornada destrava', !registry.get('hub-btn-map').classes.has('locked'));
+check('com o inicial, o Mapa da jornada destrava, com o aviso de novo',
+      !registry.get('hub-btn-map').classes.has('locked') && registry.get('hub-btn-map').classes.has('alert'));
 
 // o Centro Pokémon: a enfermeira abre o PC, o vendedor abre o Poké Mart (falando por cima do balcão)
 goTo(6, 12); press('down');
@@ -258,7 +264,9 @@ check('o tapete do Centro devolve à porta dele', hub.mapId === 'vila' && hub.pl
 // a loja de Pokédolls e o quarto decorável (seção 6 do planejamento)
 goTo(23, 21);
 press('up');
-check('a entrada aberta da loja de Pokédolls leva para dentro', hub.mapId === 'pokedoll');
+check('a entrada aberta da loja de Pokédolls leva para dentro', hub.mapId === 'pokedoll' && hub.player.x === 10 && hub.player.y === 10);
+check('a entrada da loja fica livre (sem os vasos) e o Lapras gigante saiu do corredor das vitrines (0.30)',
+      hub.walkable(10, 9) && hub.walkable(9, 10) && hub.walkable(8, 4) && !hub.walkable(3, 1));
 hub.clickTile(3, 9);
 settle();
 closeDialog();
@@ -297,9 +305,17 @@ check('o lobby mostra o Town Map com uma marca por cidade (8 ginásios e a Liga)
       `${mapNodes().length} marcas`);
 check('ao entrar, a próxima fase já vem escolhida no painel',
       game.menus.lobby.selected === 'gym_1_pewter' && mapNodes().filter((c) => c.classes.has('next')).length === 1);
+const { STAGE_CITY } = await import('../src/data/regionMap.js');
+check('no mapa, o rosto do treinador fica na fase atual (0.30)', game.menus.lobby.playerCity === STAGE_CITY.gym_1_pewter);
+game.menus.lobby.selected = 'gym_2_cerulean';
+game.menus.lobby.render();
+check('...e acompanha a fase escolhida no mapa', game.menus.lobby.playerCity === STAGE_CITY.gym_2_cerulean);
+game.menus.lobby.selected = 'gym_1_pewter';
+game.menus.lobby.render();
 registry.get('btn-village').click();
-check('o botão Vila volta do mapa para a vila, um passo para dentro da saída',
+check('"Voltar para a Vila" fecha o mapa e volta para onde o jogador estava',
       hubVisible() && hub.mapId === 'vila' && hub.player.x === 17 && hub.player.y === 26);
+check('depois de aberto uma vez, o aviso do botão do mapa some', !registry.get('hub-btn-map').classes.has('alert'));
 
 // ---- partida ----
 game.startStage('gym_1_pewter');
@@ -566,6 +582,7 @@ check('vencer o Campeão abre o Hall da Fama com a equipe',
       !registry.get('hall-overlay').classes.has('hidden') && game.profile.hallOfFame.length === 1 &&
       registry.get('hall-team').children.length === game.profile.hallOfFame[0].team.length,
       `${registry.get('hall-team').children.length} Pokémon`);
+check('o Hall da Fama guarda o nome do jogador', game.profile.hallOfFame[0].trainerName === 'Fellipe');
 registry.get('hall-close').click();
 check('fechar o Hall da Fama mostra a tela de vitória (com o Modo Livre, 0.27)',
       registry.get('hall-overlay').classes.has('hidden') && !registry.get('result-overlay').classes.has('hidden'));
@@ -584,8 +601,10 @@ game.pendingRun = null;
 game.continueGame();
 check('save sem treinador pede a escolha ao continuar', !registry.get('screen-trainer').classes.has('hidden'));
 game.chooseTrainer('red');
-check('depois da escolha, o Continuar segue para a jornada (na vila)',
-      game.profile.trainer === 'red' && hubVisible());
+check('...e depois pede o nome', !registry.get('screen-name').classes.has('hidden'));
+game.chooseName('');
+check('depois da escolha, o Continuar segue para a jornada (na vila); sem nome, fica o do modelo',
+      game.profile.trainer === 'red' && hubVisible() && game.playerName === 'Red');
 
 // ---- o Poké Mart (0.23) ----
 {
@@ -726,6 +745,7 @@ check('a jornada nova começa pela escolha de treinador', !registry.get('screen-
 const starterChance = CONFIG.capture.shinyChance;
 CONFIG.capture.shinyChance = 1;
 game.chooseTrainer('red');
+game.chooseName('Red');
 game.chooseStarter('bulbasaur');
 CONFIG.capture.shinyChance = starterChance;
 game.openCampaign();
@@ -757,6 +777,7 @@ game.quitToMenu();
   check('a jornada nova começa pela escolha de treinador, do zero',
         !registry.get('screen-trainer').classes.has('hidden') && !game.campaign.starter && game.profile.activeJourney !== first);
   game.chooseTrainer('leaf');
+  game.chooseName('Ana');
   check('a jornada nova já conta assim que o treinador é escolhido (o inicial vem depois, na vila)',
         game.listJourneys().length === 2 && !game.campaign.starter && game.hub.mapId === 'casa_2f');
   game.chooseStarter('charmander');
@@ -772,7 +793,8 @@ game.quitToMenu();
         game.campaign.journey.team.members[0].level === 30 && game.profile.trainer === 'red' &&
         hubVisible() && game.hub.mapId === 'vila');
   const second = game.listJourneys().find((j) => !j.active);
-  check('e a segunda continua guardada', second?.progress.starter === 'charmander' && second.trainer === 'leaf');
+  check('e a segunda continua guardada, com o nome dela', second?.progress.starter === 'charmander' && second.trainer === 'leaf'
+        && second.trainerName === 'Ana');
 
   // o save leva as duas, e carregar um save de antes da 0.19 cria o espaço 1
   const reloaded = normalizeProfile(JSON.parse(JSON.stringify(game.profile)));
@@ -783,7 +805,7 @@ game.quitToMenu();
         && legacy.regions.kanto.starter === 'squirtle');
 
   // o limite e o apagar
-  game.newJourney(); game.chooseTrainer('red'); game.chooseStarter('squirtle');
+  game.newJourney(); game.chooseTrainer('red'); game.chooseName('Bia'); game.chooseStarter('squirtle');
   game.newJourney();
   check(`com os ${CONFIG.save.maxJourneys} espaços ocupados, não abre outra (pede para apagar)`,
         game.listJourneys().length === CONFIG.save.maxJourneys && !registry.get('screen-journeys').classes.has('hidden'));

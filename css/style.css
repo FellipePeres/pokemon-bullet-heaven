@@ -1895,8 +1895,11 @@ button { font: inherit; color: inherit; }
 .lobby-main { display: flex; gap: 16px; flex: 1; min-height: 0; width: 100%; }
 .lobby-map-frame {
   position: relative;
-  display: grid;
-  place-items: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 26px;
   flex: 1;
   min-width: 0;
   border: 24px solid transparent;
@@ -2440,3 +2443,27 @@ button { font: inherit; color: inherit; }
 .decor-stack { position: relative; display: block; }
 .decor-stack img { position: absolute; inset: 0; image-rendering: pixelated; }
 .decor-doll { display: block; background-repeat: no-repeat; background-position: 0 0; image-rendering: pixelated; }
+
+/* o Voltar para a Vila, embaixo do mapa da jornada (0.30) */
+.lobby-map-foot { flex: none; display: flex; justify-content: center; }
+.village-btn { min-width: 260px; }
+
+/* ===================== O NOME DO JOGADOR (0.30) =====================
+   Depois de menino ou menina, o Prof. Carvalho pergunta o nome: o campo é a
+   própria caixa de texto do FireRed. */
+#screen-name { overflow-y: auto; }
+.name-form { display: flex; align-items: flex-end; gap: 18px; flex-wrap: wrap; justify-content: center; }
+.name-portrait { width: 128px; height: 128px; image-rendering: pixelated; filter: drop-shadow(0 6px 8px rgba(0, 0, 0, .5)); }
+.name-field { display: flex; flex-direction: column; gap: 6px; }
+.name-label { font-family: var(--font-pixel); font-size: 16px; color: #dfe6f2; text-shadow: 2px 2px 0 rgba(0, 0, 0, .8); }
+.name-input {
+  width: min(360px, 80vw);
+  margin: 0;
+  background: none;
+  outline: none;
+  text-transform: none;
+  caret-color: var(--poke-red);
+}
+.name-input::placeholder { color: var(--gba-ink-soft); opacity: .7; }
+.name-input:focus-visible { outline: none; }
+.name-hint { margin: 0; font-family: var(--font-pixel); font-size: 15px; color: #dfe6f2; text-shadow: 2px 2px 0 rgba(0, 0, 0, .8); }

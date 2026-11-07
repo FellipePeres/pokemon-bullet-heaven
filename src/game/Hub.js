@@ -4,7 +4,6 @@ import { HUB_MAPS, HUB_DECOR } from '../data/hubMaps.js';
 import { DECOR, decorMax } from '../data/decor.js';
 import { DIALOGUE } from '../data/dialogue.js';
 import { getPokemon } from '../data/pokemon.js';
-import { getTrainerLook } from '../data/trainers.js';
 import { STAGES } from '../data/stages.js';
 
 const DIRS = { up: [0, -1], down: [0, 1], left: [-1, 0], right: [1, 0] };
@@ -317,7 +316,7 @@ export class Hub {
 
   /** A: avança a conversa ou fala com quem está na frente. */
   confirm() {
-    if (this.fade) return;
+    if (this.fade || !this.map) return;
     if (this.dialog) { this._advance(); return; }
     if (this.player.moving) return;
     this.interact();
@@ -326,7 +325,7 @@ export class Hub {
   /** B: na pergunta, é o NÃO; na conversa, avança como o A. */
   cancel() {
     const d = this.dialog;
-    if (!d) return;
+    if (!d || !this.map) return;
     if (this._onAsk()) { d.ask.choice = 1; this._advance(); return; }
     this._advance();
   }
@@ -474,7 +473,7 @@ export class Hub {
       dive: members.some((m) => m.abilities?.includes('dive')),
       locked: !!extra.locked,
       item: extra.item ?? '',
-      player: getTrainerLook(game.profile.trainer).name,
+      player: game.playerName,
       pokemon: campaign.starter ? getPokemon(campaign.starter)?.name ?? '' : '',
       leader: leaderStage ? titleCase(leaderStage.leader.name) : ''
     };

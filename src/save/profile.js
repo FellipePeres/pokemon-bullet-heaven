@@ -16,7 +16,8 @@ import { bus, EVENTS } from '../core/events.js';
 export function createProfile() {
   return {
     createdAt: new Date().toISOString(),
-    trainerName: 'Treinador',
+    // o nome que o jogador escreveu (0.30); null = o do modelo (Red, Leaf). É da jornada ativa
+    trainerName: null,
     // modelo de treinador escolhido no começo (data/trainers.js); null = ainda não escolheu
     trainer: null,
     // Pokédex: só registra o que foi CAPTURADO. O que não foi aparece como silhueta.
@@ -151,6 +152,7 @@ function normalizeJourneys(loaded, regions) {
     ...slot,
     data: slot.data ? {
       trainer: slot.data.trainer ?? null,
+      trainerName: slot.data.trainerName ?? null,
       region: REGIONS[slot.data.region] ? slot.data.region : DEFAULT_REGION,
       regions: normalizeRegions(slot.data.regions)
     } : null,
@@ -190,6 +192,8 @@ export function normalizeProfile(loaded) {
     bag: { ...base.bag, ...(loaded.bag ?? {}) },
     // saves antigos guardavam "coins"; vira shards sem perder nada
     shards: loaded.shards ?? loaded.coins ?? base.shards,
+    // até a 0.29 o campo existia com "Treinador" e nunca era escolhido: vale o do modelo
+    trainerName: loaded.trainerName && loaded.trainerName !== 'Treinador' ? loaded.trainerName : null,
     stats,
     region: REGIONS[loaded.region] ? loaded.region : base.region,
     regions,

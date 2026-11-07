@@ -322,12 +322,20 @@ def build_centro(s):
 
 
 def build_pokedoll(s):
-    """A loja de Pokédolls: o 4º andar da loja de Celadon, com a saída do térreo embaixo."""
+    """
+    A loja de Pokédolls: o 4º andar da loja de Celadon. Os dois vasos da entrada
+    saem (0.30, pedido do Fellipe: bloqueavam quem entrava) e no lugar deles fica o
+    tapete da saída, que é do térreo da mesma loja (mesmo tileset, mesmo piso).
+    Embaixo, a parede do fim do térreo fecha a loja e o balcão da vendedora.
+    """
     s.stamp(0, 0, DS4, 0, 4, 13, 11)
-    s.stamp(0, 11, DS1, 0, 14, 13, 2)
+    s.fill(0, 11, 13, 1, DS1, 6, 15)     # a parede de baixo, lisa (sem os pedaços dos tapetes do térreo)
+    s.fill(9, 9, 2, 1, DS4, 11, 13)      # chão no lugar das folhas dos vasos
+    s.stamp(9, 10, DS4, 11, 14)          # chão no lugar de um vaso
+    s.stamp(10, 10, DS1, 2, 14, 1, 2)    # e o tapete da saída (ele desce até a parede) no lugar do outro
     s.block(0, 0, 13, 1)        # o corredor do elevador, que ficou de fora
     s.block(0, 1, 3, 1)
-    s.block(0, 10, 7, 1)        # fecha o balcão por baixo: a vendedora fica do lado de dentro
+    s.block(0, 11, 13, 1)       # a parede de baixo
 
 
 def build_lab(s):
@@ -350,7 +358,7 @@ MAPS = {
     'casa_1f':    (13, 10, build_casa_1f),
     'casa_2f':    (12, 9, build_casa_2f),
     'centro':     (16, 11, build_centro),
-    'pokedoll':   (13, 13, build_pokedoll),
+    'pokedoll':   (13, 12, build_pokedoll),
     'lab':        (13, 14, build_lab),
     'cabana':     (11, 9, build_cabana),
     'casa_sabio': (13, 11, build_casa_sabio),

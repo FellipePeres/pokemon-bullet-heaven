@@ -85,7 +85,7 @@ export const HUB_MAPS = {
     ]
   },
   pokedoll: {
-    src: 'assets/hub/pokedoll.png', top: 'assets/hub/pokedoll-top.png', width: 13, height: 13,
+    src: 'assets/hub/pokedoll.png', top: 'assets/hub/pokedoll-top.png', width: 13, height: 12,
     walk: [
       '#############',
       '###.......###',
@@ -97,8 +97,7 @@ export const HUB_MAPS = {
       '.............',
       '########.....',
       '.......#.....',
-      '########.##..',
-      '.............',
+      '.......#.....',
       '#############'
     ]
   },

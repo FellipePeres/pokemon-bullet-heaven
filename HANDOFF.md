@@ -5,7 +5,7 @@
 > decisão foi tomada e o que falta fazer. O `README.md` é o manual de uso;
 > este aqui é o contexto de desenvolvimento.
 
-**Versão atual:** `0.29.0` · **Última atualização:** 2026-11-07
+**Versão atual:** `0.30.0` · **Última atualização:** 2026-11-07
 **Stack:** HTML + CSS + JavaScript puro (ES Modules). Sem backend, sem build, sem dependências.
 **Repositório:** https://github.com/FellipePeres/pokemon-bullet-heaven (público)
 **Jogo no ar:** https://fellipeperes.github.io/pokemon-bullet-heaven/
@@ -208,6 +208,16 @@ confirmar com ele**.
 - O jogador **escolhe menino (Red) ou menina (Leaf)** no começo da jornada, numa
   tela com o Prof. Carvalho, como no FireRed. Dá para trocar em Opções. Save
   antigo, sem treinador, pergunta uma vez ao continuar.
+- **O nome é do jogador** (0.30, "substituir Red ou Leaf como personagens é meio
+  ultrapassado"): depois de menino ou menina, o Carvalho pergunta o nome
+  (`screen-name`, `Game.chooseName`). Até 12 letras, limpo por
+  `cleanTrainerName` (só letras, números, espaço, ponto, hífen e apóstrofo: ele
+  vai para a interface por innerHTML em alguns lugares); em branco, fica o do
+  modelo (`trainerName` em `data/trainers.js`). Os cards da escolha mostram só
+  Menino e Menina. O nome é da jornada (`profile.trainerName`, guardado no espaço
+  com o treinador) e aparece na barra da vila, nas falas (`{player}`), no card da
+  jornada, no Cartão de Treinador e no Hall da Fama. Saves antigos ficam com Red
+  ou Leaf.
 - **O movimento é livre**, em qualquer ângulo, como sempre foi. **Nada de andar
   por quadrados** como no FireRed: o FireRed entra só no visual. A exceção é a
   vila (0.29), onde se anda em grade, como no FireRed, a pedido do Fellipe. O sprite tem 4
@@ -575,8 +585,10 @@ Nunca voltar bônus globais para o pool de level up — foi pedido explícito.
   (`Game.openHub('bedroom')`). A mãe manda ao laboratório; o **Prof. Carvalho**
   conta a mini-história e abre a tela de cards do inicial
   (`Game.openStarterChoice`); o Voltar dela devolve ao laboratório
-  (`cancelStarter`). Escolhido o inicial, o Carvalho fecha a história
-  (`Hub.afterStarter`) e as saídas abrem. **Continuar, o fim da partida, o Modo
+  (`cancelStarter`). Escolhido o inicial, o Carvalho entrega o **Mapa da
+  Jornada** (0.30: "leve aqui o mapa, vai ser útil para você saber o caminho") e
+  as saídas abrem. O botão do mapa, na vila, fica com o aviso até a primeira vez
+  que abre (`hub.flags.mapa_visto`). **Continuar, o fim da partida, o Modo
   Livre e o Centro da derrota levam à vila, na frente de casa** (`openHub('home')`;
   até a 0.28, ao mapa). O mapa da jornada abre pela saída sul, pelo botão "Mapa da
   jornada" da barra (ou Start no controle) e tem um botão "Vila" de volta.
@@ -606,6 +618,9 @@ Nunca voltar bônus globais para o pool de level up — foi pedido explícito.
   pescador ("Às vezes fico imaginando o que tem lá embaixo...") é dele.
 - **Centro Pokémon**: a enfermeira e a máquina ao lado abrem o PC; o vendedor do
   outro balcão abre o Poké Mart de sempre. Fala-se por cima do balcão (`counter`).
+- **A loja de Pokédolls** (0.30, refinada a pedido do Fellipe): a entrada é um
+  tapete só, embaixo à direita, com o caminho livre (os dois vasos que bloqueavam
+  saíram), e o Lapras gigante fica no canto de cima, fora do corredor das vitrines.
 - **O quarto decorável**: a vendedora da loja de Pokédolls abre o catálogo
   (`modal-decor`): mesa com PC (abre o PC), estante (abre o Estojo), tapete com TV,
   até 4 plantas, 5 bonecos e o Lapras gigante (só depois de um Hall da Fama). Cada
@@ -618,8 +633,10 @@ Nunca voltar bônus globais para o pool de level up — foi pedido explícito.
 
 ### O lobby (0.13)
 - Desde a 0.29 ele é o **mapa da jornada**, aberto da vila (a saída sul ou o botão
-  da barra), com um botão "Vila" de volta no lugar do "Menu" (o Menu principal
-  fica na barra da vila).
+  da barra). Embaixo do mapa, **Voltar para a Vila** (0.30) fecha o mapa e volta
+  para onde o jogador estava. **O rosto do treinador acompanha a fase atual** (0.30):
+  ao entrar fica na próxima da jornada, e escolher outra fase no mapa faz ele
+  andar até lá (até a 0.29 ficava na cidade da última vitória).
 - **O mapa da jornada é o Town Map de Kanto do FireRed** (`ui/lobby.js`, Etapa 9
   do PLANEJAMENTO), no lugar da lista de 13 cards: o mapa do decomp
   (`extract_region_map.py`, 192x144) em pixels inteiros; cada fase na cidade do
@@ -1053,6 +1070,9 @@ botão Continuar). Estrutura:
 
 Desde a 0.29: `profile.decor` (os enfeites do quarto, de todas as jornadas) e
 `regions.<id>.hub.flags` (as falas de "uma vez só" da vila já vistas nesta jornada).
+Desde a 0.30: `profile.trainerName` (o nome do jogador da jornada ativa; null = o do
+modelo), guardado também no espaço de cada jornada e em cada equipe do Hall da Fama.
+O "Treinador" que os saves antigos tinham nesse campo vira null.
 
 `normalizeProfile` faz merge com os padrões, então **campo novo não quebra save
 antigo**. Ao carregar uma partida salva, a fase recomeça com a equipe curada.
@@ -1237,6 +1257,7 @@ tipo, som e o polimento de troca e captura.
 | 20 | fases levemente mais rápidas: de 3:30 para 2:45 | 0.15: a linha do tempo das 13 fases comprimida (×165/210; levas ×√f mais densas, XP ×1/√f); a equipe chega ao líder no mesmo nível (medido) |
 | 35 | manter a fase do Brock como está e dificultar todas as outras; a escala de ganho de nível muito alta; o Golpe Desperto por chave: maximizar certas melhorias (Gyarados: velocidade, penetração e dano; Gloom: área, intervalo entre os danos e cooldown), com a melhoria da chave marcada na tela de nível ("maximize para despertar") | 0.28: `xpLateExponent` 2,2 → 3,4 (o bot chega ao Campeão no ~74, era ~115; o Brock igual); `stage.difficulty` recalibrada fase a fase, todas mais duras que na 0.27 em tentativas do bot (ver seção 5); `data/awakening.js`: 3 melhorias por golpe que despertam o 2º golpe na hora, selo dourado na tela de nível, progresso na equipe e no PC, quem chega tarde treina a chave primeiro; `balance.mjs --jobs` (paralelo) e `--set` (testar um valor) |
 | 36 | tirar a tag "Golpe Desperto" das melhorias, deixar só o aviso de maximizar embaixo | 0.28.1: sem o selo no canto da carta; ficam a moldura dourada e o aviso |
+| 38 | refinar a loja de Pokédolls (o Lapras no meio atrapalhava, os 2 vasos da entrada bloqueavam); o Oak entrega o mapa junto com o inicial; "Voltar para a Vila" embaixo do mapa; o rosto do treinador acompanhando a fase atual no mapa; o nome do jogador no lugar de Red ou Leaf | 0.30: loja com um tapete livre e o Lapras no canto; `carvalho_inicial` com o Mapa da Jornada e o aviso no botão; `btn-village` embaixo do mapa (o Menu voltou para a barra); o ícone do mapa na fase escolhida; `screen-name`, `chooseName`, `cleanTrainerName` e `profile.trainerName` por jornada |
 | 37 | no lugar da tela do mapa, um lobby jogável: uma mini-vila com casas de NPC espalhadas, andar em tiles como no FireRed, o Centro com o balcão do PC (sem curar) e o do Mart, uma loja de Pokédolls, o quarto vazio decorável, o Oak dando o inicial com as saídas travadas até lá, o mato alto a oeste para um modo Endless, a lagoa com o easter egg do Dive, falas para todos (a do pescador é dele) | 0.29: `game/Hub.js`, `render/HubRenderer.js`, `ui/hubHud.js`, `data/hub.js`, `data/dialogue.js`, `data/decor.js` e `tools/assets/hub.py` (os mapas montados do FireRed, em duas camadas e com a colisão de origem); jornada começada = treinador escolhido; partida, Continuar e Centro voltam à vila; o Endless e o modo aquático ficam "em breve" (PLANEJAMENTO-LOBBY.md) |
 | 34 | Modo Livre no Campeão também | 0.27: depois do Hall da Fama, a tela de vitória de sempre, com o Modo Livre |
 | 33 | o Gengar não recebia o Golpe Desperto; capturado no nível alto vem sem melhorias e fica ruim | 0.26: sem bug no Golpe Desperto (precisava de 18 melhorias = 54 níveis); `trainToLevel`: quem chega tarde vem com 1 melhoria a cada 3 níveis, automáticas (opção 1, escolhida pelo Fellipe) |

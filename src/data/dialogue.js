@@ -124,19 +124,25 @@ export const DIALOGUE = {
     ]
   },
   // o fim da mini-história, depois da escolha (Game.chooseStarter)
+  // junto com o inicial, o Mapa da Jornada (0.30, pedido do Fellipe: "leve aqui o
+  // mapa, vai ser útil para você saber o caminho")
   carvalho_inicial: {
     name: 'Prof. Carvalho',
     lines: [
       { when: { shiny: true }, say: [
         '{pokemon}! Ótima escolha.',
         'Espere... a cor dele é diferente! Que sorte!',
-        'Capture, treine, troque quem luta. Seus Pokémon lutam por você; você só precisa saber onde pisar.',
-        'As saídas da vila estão livres. Ao sul, a Rota 1. Boa sorte!'
+        'Ah, e leve aqui este mapa. Vai ser útil para você saber o caminho.',
+        '{player} recebeu o MAPA DA JORNADA!',
+        'Nele estão as rotas de Kanto, fase por fase. Abra pelo botão lá em cima ou pela saída sul da vila.',
+        'Seus Pokémon lutam por você; você só precisa saber onde pisar. Boa sorte!'
       ] },
       { say: [
         '{pokemon}! Ótima escolha.',
-        'Capture, treine, troque quem luta. Seus Pokémon lutam por você; você só precisa saber onde pisar.',
-        'As saídas da vila estão livres. Ao sul, a Rota 1. Boa sorte!'
+        'Ah, e leve aqui este mapa. Vai ser útil para você saber o caminho.',
+        '{player} recebeu o MAPA DA JORNADA!',
+        'Nele estão as rotas de Kanto, fase por fase. Abra pelo botão lá em cima ou pela saída sul da vila.',
+        'Seus Pokémon lutam por você; você só precisa saber onde pisar. Boa sorte!'
       ] }
     ]
   },

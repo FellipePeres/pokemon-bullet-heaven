@@ -108,6 +108,28 @@
   </section>
 
   <!-- ============================================================
+       O NOME DO JOGADOR (0.30) — no lugar de Red e Leaf
+       ============================================================ -->
+  <section id="screen-name" class="screen hidden">
+    <div class="oak-intro">
+      <img id="name-oak" class="oak-portrait" alt="Prof. Carvalho" />
+      <div class="fr-window">
+        <p>Certo! E qual é o seu nome?</p>
+      </div>
+    </div>
+    <form id="name-form" class="name-form" autocomplete="off">
+      <img id="name-portrait" class="name-portrait" alt="" />
+      <label class="name-field">
+        <span class="name-label">Seu nome</span>
+        <input id="name-input" class="name-input fr-window" type="text" maxlength="12" spellcheck="false" />
+      </label>
+      <button id="name-ok" class="menu-btn primary" type="submit"><span class="btn-text">Confirmar</span></button>
+    </form>
+    <p id="name-hint" class="name-hint"></p>
+    <button class="menu-btn ghost back" data-back="screen-trainer">Voltar</button>
+  </section>
+
+  <!-- ============================================================
        JORNADAS — os espaços de jornada (0.19)
        ============================================================ -->
   <section id="screen-journeys" class="screen hidden">
@@ -207,14 +229,17 @@
         <button id="btn-mart" class="bar-btn strong" data-modal="modal-mart" title="Poké Mart: gaste os Shards"><span class="bar-icon" data-icon="mart"></span><span class="bar-text">Poké Mart</span></button>
         <button id="btn-hall" class="bar-btn strong hidden" title="Hall da Fama"><span class="bar-icon" data-icon="badge"></span><span class="bar-text">Hall</span></button>
         <button id="btn-save-campaign" class="bar-btn strong" title="Salvar o jogo num arquivo (.json)"><span class="bar-icon" data-icon="save"></span><span class="bar-text">Salvar</span></button>
-        <!-- desde a 0.29 o mapa é aberto da vila: o Menu principal fica na barra de lá -->
-        <button id="btn-village" class="bar-btn strong" title="Voltar para a vila"><span class="bar-icon" data-icon="menu"></span><span class="bar-text">Vila</span></button>
+        <button class="bar-btn strong" data-back="screen-title" title="Menu principal"><span class="bar-icon" data-icon="menu"></span><span class="bar-text">Menu</span></button>
       </nav>
     </header>
 
     <div class="lobby-main">
       <div class="lobby-map-frame">
         <div id="lobby-map" class="lobby-map"></div>
+        <!-- fecha o mapa e volta para onde o jogador estava na vila (0.30) -->
+        <div class="lobby-map-foot">
+          <button id="btn-village" class="menu-btn slim village-btn" type="button"><span class="btn-text">Voltar para a Vila</span></button>
+        </div>
       </div>
       <aside id="lobby-panel" class="lobby-panel"></aside>
     </div>

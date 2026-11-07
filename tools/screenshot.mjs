@@ -44,7 +44,9 @@ const ROTEIROS = {
   // o Carvalho, a escolha do inicial, o Centro remodelado, a loja de Pokédolls e o sábio
   vila: [
     { open: 'index.html' }, { wait: 500 },
-    { run: "game.newGame(); game.chooseTrainer('leaf')" }, { wait: 1800 }, { shot: 'vila-01-quarto' },
+    { run: "game.newGame(); game.chooseTrainer('leaf')" }, { wait: 900 }, { shot: 'vila-00-nome' },
+    { run: "document.getElementById('name-input').value = 'Fellipe'" }, { wait: 300 }, { shot: 'vila-00b-nome-escrito' },
+    { run: "game.chooseName(document.getElementById('name-input').value)" }, { wait: 1800 }, { shot: 'vila-01-quarto' },
     { run: "game.hub.enter({ map: 'casa_1f', x: 7, y: 4, dir: 'right' }); game.hub.interact()" }, { wait: 2200 }, { shot: 'vila-02-mae' },
     { run: "game.hub.dialog = null; game.hub.enter('home')" }, { wait: 1200 }, { shot: 'vila-03-vila' },
     { hold: ['KeyD'] }, { wait: 1100 }, { hold: [] }, { wait: 400 }, { shot: 'vila-04-andou' },
@@ -53,6 +55,9 @@ const ROTEIROS = {
     { run: "game.hub.dialog = null; game.hub.enter({ map: 'lab', x: 6, y: 4, dir: 'up' }); game.hub.interact()" }, { wait: 1800 }, { shot: 'vila-06-carvalho' },
     { run: "game.hub.dialog = null; game.hub.awaitStarter = true; game.openStarterChoice()" }, { wait: 1200 }, { shot: 'vila-07-escolha' },
     { run: "game.chooseStarter('charmander')" }, { wait: 1500 }, { shot: 'vila-08-depois-da-escolha' },
+    { run: "game.hub.dialog.index = 2; game.hub.dialog.shown = 0" }, { wait: 1500 }, { shot: 'vila-08b-o-mapa' },
+    { run: "game.hub.dialog = null; game.openCampaign()" }, { wait: 1500 }, { shot: 'vila-08c-mapa-da-jornada' },
+    { run: "game.openHub()" }, { wait: 600 },
     { run: "game.hub.dialog = null; game.hub.enter({ map: 'centro', x: 12, y: 5, dir: 'up' }); game.hub.interact()" }, { wait: 1500 }, { shot: 'vila-09-centro' },
     { run: "game.hub.dialog = null; game.hub.enter({ map: 'pokedoll', x: 8, y: 7, dir: 'up' })" }, { wait: 1200 }, { shot: 'vila-10-pokedoll' },
     { run: "game.hub.enter({ map: 'casa_sabio', x: 3, y: 6, dir: 'up' }); game.hub.interact()" }, { wait: 2500 }, { shot: 'vila-11-sabio' },
@@ -247,8 +252,9 @@ const ROTEIROS = {
   telas: [
     { open: 'index.html' }, { wait: 1200 }, { shot: 'tela-01-titulo' },
     { run: 'game.newGame()' }, { wait: 900 }, { shot: 'tela-02-treinador' },
-    { run: "game.chooseTrainer('leaf')" }, { wait: 1200 }, { shot: 'tela-03-vila' },
-    { run: 'game.openStarterChoice()' }, { wait: 900 }, { shot: 'tela-03b-inicial' },
+    { run: "game.chooseTrainer('leaf')" }, { wait: 900 }, { shot: 'tela-03-nome' },
+    { run: "game.chooseName('Leaf')" }, { wait: 1200 }, { shot: 'tela-03b-vila' },
+    { run: 'game.openStarterChoice()' }, { wait: 900 }, { shot: 'tela-03c-inicial' },
     { run: "game.chooseStarter('bulbasaur'); ['gym_1_pewter', 'gym_2_cerulean'].forEach((s) => game.campaign.clearedStages.push(s)); game.openCampaign()" },
     { wait: 1200 }, { shot: 'tela-04-jornada' },
     { run: "game.menus.showModal('modal-options')" }, { wait: 500 }, { shot: 'tela-05-opcoes' },

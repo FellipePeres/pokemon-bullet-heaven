@@ -46,3 +46,23 @@ export const TRAINER_LOOKS = {
 export const DEFAULT_TRAINER = 'red';
 
 export const getTrainerLook = (id) => TRAINER_LOOKS[id] ?? TRAINER_LOOKS[DEFAULT_TRAINER];
+
+/**
+ * O NOME DO JOGADOR (0.30, pedido do Fellipe: "substituir Red ou Leaf como
+ * personagens é meio ultrapassado"). Depois de escolher menino ou menina, o
+ * jogador escreve o nome dele; sem nome (ou num save antigo), fica o do modelo.
+ */
+export const TRAINER_NAME_MAX = 12;
+
+/** O nome que aparece: o escrito pelo jogador ou, sem ele, o do modelo (Red, Leaf). */
+export const trainerName = (lookId, custom = null) => (custom && String(custom).trim()) || getTrainerLook(lookId).name;
+
+/**
+ * Limpa o que foi digitado: letras (com acento), números, espaço, ponto, hífen e
+ * apóstrofo, no máximo TRAINER_NAME_MAX. O nome vai para a interface por
+ * innerHTML em alguns lugares, então nada de < > & ou aspas. Vazio vira null.
+ */
+export function cleanTrainerName(raw) {
+  const name = String(raw ?? '').replace(/[^\p{L}\p{N} .'-]/gu, '').replace(/\s+/g, ' ').trim().slice(0, TRAINER_NAME_MAX).trim();
+  return name || null;
+}

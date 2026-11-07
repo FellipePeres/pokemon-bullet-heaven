@@ -4,7 +4,7 @@ import { getAbility } from '../data/abilities.js';
 import { ACHIEVEMENTS, TOTAL_ACHIEVEMENT_TIERS } from '../data/achievements.js';
 import { roman } from '../save/profile.js';
 import { moveLineOf } from '../data/tms.js';
-import { getTrainerLook } from '../data/trainers.js';
+import { getTrainerLook, TRAINER_NAME_MAX } from '../data/trainers.js';
 import { spriteUrl, artworkUrl, pokemonImg } from '../render/sprites.js';
 import { assetUrl } from '../render/assets.js';
 import { saveOptions } from '../save/options.js';
@@ -23,7 +23,7 @@ import { MART_ITEMS, evolvedBy } from '../data/items.js';
 import { DECOR, decorMax } from '../data/decor.js';
 import { HUB_SPRITES, HUB_DECOR } from '../data/hubMaps.js';
 
-const SCREENS = ['screen-title', 'screen-journeys', 'screen-trainer', 'screen-starter', 'screen-campaign', 'screen-hub'];
+const SCREENS = ['screen-title', 'screen-journeys', 'screen-trainer', 'screen-name', 'screen-starter', 'screen-campaign', 'screen-hub'];
 const MODALS = ['modal-pokedex', 'modal-achievements', 'modal-team', 'modal-mart', 'modal-decor', 'modal-options', 'modal-help', 'modal-pc', 'modal-badges'];
 
 /**
@@ -68,6 +68,12 @@ export class Menus {
       // o Voltar da escolha do inicial devolve o jogador ao laboratório (0.29)
       btn.onclick = () => (btn.dataset.back === 'screen-hub' ? this.game.cancelStarter() : this.show(btn.dataset.back));
     });
+
+    // o nome do jogador (0.30): Enter no campo ou Confirmar
+    el('name-form').onsubmit = (e) => {
+      e?.preventDefault?.();
+      this.game.chooseName(el('name-input').value);
+    };
 
     el('save-file-input').onchange = async (e) => {
       const file = e.target.files?.[0];
@@ -192,10 +198,29 @@ export class Menus {
       const walker = create('div', 'trainer-walker');
       walker.style.backgroundImage = `url(${assetUrl(look.sheet)})`;
 
-      card.append(portrait, walker, create('h3', '', look.label), create('span', 'trainer-name', look.name));
+      // só Menino e Menina: o nome é o jogador quem escreve depois (0.30)
+      card.append(portrait, walker, create('h3', '', look.label));
       card.onclick = () => this.game.chooseTrainer(id);
       row.appendChild(card);
     }
+  }
+
+  /* ======================= o nome do jogador (0.30) ======================= */
+
+  /** A tela do nome: o retrato de quem foi escolhido e o campo, já com o nome de antes. */
+  buildNameEntry() {
+    const game = this.game;
+    const look = getTrainerLook(game.profile.trainer);
+    el('name-oak').src = assetUrl('portrait/oak');
+    el('name-portrait').src = assetUrl(look.portrait);
+    el('name-portrait').alt = look.label;
+    const input = el('name-input');
+    input.value = game.profile.trainerName ?? '';
+    input.placeholder = look.name;
+    input.maxLength = TRAINER_NAME_MAX;
+    el('name-hint').textContent = `Até ${TRAINER_NAME_MAX} letras. Em branco, fica ${look.name}.`;
+    // o campo já vem pronto para escrever
+    setTimeout(() => input.focus?.(), 60);
   }
 
   /* ======================= escolha do inicial ======================= */

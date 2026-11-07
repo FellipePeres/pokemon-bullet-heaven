@@ -25,6 +25,8 @@ export class Input {
 
   _onKeyDown(e) {
     if (e.repeat) return;
+    // escrevendo num campo de texto (o nome do jogador, 0.30): as teclas são do campo
+    if (e.target?.closest?.('input, textarea, [contenteditable="true"]')) return;
     this.keys.add(e.code);
 
     // ações pontuais (disparam uma vez por tecla pressionada)

@@ -17,8 +17,8 @@
 
 ## O jogo
 
-Você é um treinador atravessando Kanto: **menino ou menina**, você escolhe no começo,
-como no FireRed. **O treinador não luta** — ele só anda.
+Você é um treinador atravessando Kanto: **menino ou menina**, com o **seu nome**,
+você escolhe no começo, como no FireRed. **O treinador não luta** — ele só anda.
 Quem combate são os **Pokémon da sua equipe**, que atacam sozinhos enquanto você
 se preocupa com posicionamento, composição e build.
 

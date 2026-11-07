@@ -9,7 +9,10 @@
 > aberto pela saída sul da vila ou pelo HUD.
 >
 > **Status:** a vila está no jogo desde a **0.29.0** (2026-11-07): as etapas L-1 a
-> L-5 (andar, entrar, falar e começar, os serviços e o quarto decorável). Faltam
+> L-5 (andar, entrar, falar e começar, os serviços e o quarto decorável). Na
+> **0.30.0**: a loja de Pokédolls com a entrada livre, o Carvalho entregando o mapa,
+> o Voltar para a Vila embaixo do mapa, o rosto do treinador na fase atual e o nome
+> do jogador no lugar de Red e Leaf. Faltam
 > a L-6 (o golpe Dive e a TM Dive), a L-7 (sons e capricho), o modo Endless e o
 > modo aquático. As decisões que ainda faltam estão na seção 13. Onde o texto
 > diz "padrão", é a escolha recomendada até o Fellipe decidir (e é o que está no
@@ -125,8 +128,10 @@ um e cai direto no mapa da jornada.
    existe** (`buildStarters`), porque ela mostra os tipos e o golpe de cada um. As
    3 Poké Balls ficam na mesa do laboratório, como cenário (pegar a bola na mesa,
    como no FireRed, fica para a etapa de capricho, se for aprovado).
-5. Escolhido o inicial, o Carvalho fecha a conversa e **as saídas e o botão do
-   mapa são liberados** na hora.
+5. Escolhido o inicial, o Carvalho entrega o **Mapa da Jornada** ("leve aqui o
+   mapa, vai ser útil para você saber o caminho") e **as saídas e o botão do mapa
+   são liberados** na hora. No mapa, **Voltar para a Vila** (embaixo dele) volta
+   para onde o jogador estava, e o rosto do treinador fica na fase atual.
 
 **As travas** (enquanto `campaign.starter` estiver vazio):
 
@@ -172,8 +177,9 @@ balcões:
   pode aprendê-la (seção 8).
 
 **Loja de Pokédolls.** Por dentro, a base é a loja de Celadon: vitrines com os
-bonecos à venda e um **Lapras gigante** no meio, como peça rara. A vendedora
-abre o catálogo de decorações (seção 6).
+bonecos à venda e um **Lapras gigante** no canto de cima, como peça rara (na 0.29
+ele ficava no meio e atrapalhava o caminho). A entrada é um tapete só, com o
+caminho livre. A vendedora abre o catálogo de decorações (seção 6).
 
 **Laboratório.** O Carvalho, a mesa com as 3 Poké Balls (até o inicial ser
 escolhido) e as estantes. Depois do inicial, o Carvalho fica na mesa dele.

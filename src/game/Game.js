@@ -25,7 +25,7 @@ import {
 } from '../save/profile.js';
 import { STAGES, isStageUnlocked } from '../data/stages.js';
 import { getRegion, DEFAULT_REGION } from '../data/regions.js';
-import { TRAINER_LOOKS, getTrainerLook } from '../data/trainers.js';
+import { TRAINER_LOOKS, getTrainerLook, trainerName, cleanTrainerName } from '../data/trainers.js';
 import { POKEMON, getPokemon } from '../data/pokemon.js';
 import { ENEMIES } from '../data/enemies.js';
 import { MusicPlayer } from '../audio/music.js';
@@ -270,9 +270,27 @@ export class Game {
   chooseTrainer(lookId) {
     this.profile.trainer = getTrainerLook(lookId).id;
     this.autosave();
+    this.askName();
+  }
+
+  /** Depois de menino ou menina, o nome do jogador (0.30, no lugar de Red e Leaf). */
+  askName() {
+    this.menus.buildNameEntry();
+    this.menus.show('screen-name');
+  }
+
+  /** O nome escrito (limpo; vazio fica o do modelo) e segue o fluxo de antes da escolha. */
+  chooseName(raw) {
+    this.profile.trainerName = cleanTrainerName(raw);
+    this.autosave();
     const next = this.afterTrainer;
     this.afterTrainer = null;
     next?.();
+  }
+
+  /** O nome do jogador da jornada ativa: o que ele escreveu ou o do modelo. */
+  get playerName() {
+    return trainerName(this.profile.trainer, this.profile.trainerName);
   }
 
   chooseStarter(pokemonId) {
@@ -292,6 +310,11 @@ export class Game {
   }
 
   openCampaign() {
+    // o aviso no botão do mapa, na vila, some depois da primeira vez (0.30)
+    if (this.campaign.starter) {
+      this.campaign.hub ??= { flags: {} };
+      (this.campaign.hub.flags ??= {}).mapa_visto = true;
+    }
     this.menus.buildCampaign();
     this.menus.show('screen-campaign');
   }
@@ -369,13 +392,13 @@ export class Game {
     return this.profile.journeys.map((slot) => {
       const active = slot.id === this.profile.activeJourney;
       const data = active
-        ? { trainer: this.profile.trainer, region: this.profile.region, regions: this.profile.regions }
+        ? { trainer: this.profile.trainer, trainerName: this.profile.trainerName, region: this.profile.region, regions: this.profile.regions }
         : slot.data;
       const progress = data?.regions?.[data.region];
       // começada é quem já escolheu o treinador: desde a 0.29 o inicial vem depois, na vila
       if (!progress || !data?.trainer) return null;
       return {
-        id: slot.id, active, trainer: data.trainer, region: data.region, progress,
+        id: slot.id, active, trainer: data.trainer, trainerName: data.trainerName ?? null, region: data.region, progress,
         pendingRun: active ? this.pendingRun : slot.pendingRun, updatedAt: slot.updatedAt
       };
     }).filter(Boolean);
@@ -390,7 +413,8 @@ export class Game {
       this.profile.journeys.splice(this.profile.journeys.indexOf(slot), 1);
     } else {
       slot.data = JSON.parse(JSON.stringify({
-        trainer: this.profile.trainer, region: this.profile.region, regions: this.profile.regions
+        trainer: this.profile.trainer, trainerName: this.profile.trainerName ?? null,
+        region: this.profile.region, regions: this.profile.regions
       }));
       slot.pendingRun = this.pendingRun ? JSON.parse(JSON.stringify(this.pendingRun)) : null;
       slot.updatedAt = new Date().toISOString();
@@ -403,6 +427,7 @@ export class Game {
     const data = slot.data;
     this.profile.activeJourney = slot.id;
     this.profile.trainer = data?.trainer ?? null;
+    this.profile.trainerName = data?.trainerName ?? null;
     this.profile.region = data?.region ?? DEFAULT_REGION;
     this.profile.regions = data?.regions ?? { [DEFAULT_REGION]: createRegionProgress() };
     this.pendingRun = slot.pendingRun ?? null;
@@ -448,6 +473,7 @@ export class Game {
     if (id === this.profile.activeJourney) {
       this.profile.activeJourney = null;
       this.profile.trainer = null;
+      this.profile.trainerName = null;
       this.profile.regions = { [DEFAULT_REGION]: createRegionProgress() };
       this.profile.region = DEFAULT_REGION;
       this.pendingRun = null;
@@ -729,7 +755,7 @@ export class Game {
     const look = getTrainerLook(entry.trainer);
     this.hallOpen = true;
     this.hud.showHallOfFame(entry, {
-      trainerName: look.name,
+      trainerName: trainerName(entry.trainer, entry.trainerName),
       portrait: assetUrl(look.portrait),
       regionName: getRegion(entry.region).name
     }, () => {
@@ -843,6 +869,7 @@ export class Game {
       this.profile.hallOfFame.push({
         date: new Date().toISOString(),
         trainer: this.profile.trainer,
+        trainerName: this.profile.trainerName ?? null,
         region: this.profile.region,
         team: run.team.members.map((m) => ({ pokemonId: m.pokemonId, level: m.level, shiny: !!m.shiny }))
       });

@@ -40,8 +40,8 @@ export class HubHUD {
     const campaign = game.campaign;
     const look = getTrainerLook(game.profile.trainer);
     el('hub-trainer').src = assetUrl(look.portrait);
-    el('hub-trainer').alt = look.name;
-    el('hub-title').textContent = `${look.name} · ${game.region.name}`;
+    el('hub-trainer').alt = game.playerName;
+    el('hub-title').textContent = `${game.playerName} · ${game.region.name}`;
 
     const mini = clear(el('hub-case'));
     const stages = game.region.campaign.filter((e) => e.stage).map((e) => STAGES[e.stage]);
@@ -61,6 +61,8 @@ export class HubHUD {
     // o mapa só abre depois do inicial (seção 4 do planejamento)
     const map = el('hub-btn-map');
     map.classList.toggle('locked', !campaign.starter);
+    // recém-recebido do Carvalho: o aviso fica até a primeira vez que o mapa abre (0.30)
+    map.classList.toggle('alert', !!campaign.starter && !campaign.hub?.flags?.mapa_visto);
     map.title = campaign.starter ? 'Mapa da jornada: escolha a próxima fase' : 'Fale com o Prof. Carvalho primeiro';
     el('hub-achievements').classList.toggle('alert', game.tracker.claimableAchievements.length > 0);
     this.shown = {};

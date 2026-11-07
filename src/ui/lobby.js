@@ -20,8 +20,9 @@ const GEAR_SVG = '<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="t
  *   destaque).
  * - No meio, o mapa de Kanto em pixels inteiros: cada fase na cidade do
  *   ginásio, a Liga e o Campeão no Indigo Plateau. Concluída mostra a insígnia;
- *   a próxima, o cursor do Town Map; bloqueada fica apagada. O ícone do
- *   Red/Leaf fica na cidade da última vitória e anda até a nova ao voltar.
+ *   a próxima, o cursor do Town Map; bloqueada fica apagada. O rosto do
+ *   treinador fica na fase escolhida e anda até a outra quando ela muda (0.30).
+ *   Embaixo, o Voltar para a Vila.
  * - Ao lado, a fase escolhida: líder, trechos, métricas e Jogar.
  * - Embaixo, a equipe com os ícones do PC; clicar abre o PC.
  */
@@ -69,7 +70,7 @@ export class Lobby {
     const game = this.game;
     const trainer = getTrainerLook(game.profile.trainer);
     el('campaign-trainer').src = assetUrl(trainer.portrait);
-    el('campaign-trainer').alt = trainer.name;
+    el('campaign-trainer').alt = game.playerName;
     el('campaign-title').textContent = game.region.name;
 
     // o estojo em miniatura: as 8 insígnias, apagadas as que faltam
@@ -138,9 +139,9 @@ export class Lobby {
       map.appendChild(node);
     }
 
-    // o treinador fica na cidade da última vitória (Pallet no começo)
-    const last = [...this.stages].reverse().find((s) => cleared.includes(s.id));
-    const city = last ? STAGE_CITY[last.id] : HOME_CITY;
+    // o rosto do treinador acompanha a fase atual do mapa (0.30, pedido do Fellipe):
+    // ao entrar é a próxima da jornada; escolher outra no mapa faz ele andar até lá
+    const city = STAGE_CITY[this.selected] ?? HOME_CITY;
     const icon = create('span', 'map-player');
     icon.style.backgroundImage = `url(assets/ui/region-map/player-${this.game.profile.trainer === 'leaf' ? 'leaf' : 'red'}.png)`;
     const from = cityPoint(this.playerCity ?? city);
@@ -149,7 +150,7 @@ export class Lobby {
     icon.style.setProperty('--y', from.y);
     map.appendChild(icon);
     if (this.playerCity && this.playerCity !== city) {
-      // voltou de uma vitória: ele anda até a cidade nova
+      // outra fase (escolhida no mapa, ou a nova depois de uma vitória): ele anda até lá
       requestAnimationFrame(() => requestAnimationFrame(() => {
         icon.classList.add('walking');
         icon.style.setProperty('--x', to.x);
@@ -166,8 +167,10 @@ export class Lobby {
     if (!frame || !map || typeof frame.getBoundingClientRect !== 'function') return;
     const box = frame.getBoundingClientRect();
     if (!box.width) return;
+    // o Voltar para a Vila fica embaixo do mapa (0.30): o mapa usa o resto da altura
+    const foot = frame.querySelector?.('.lobby-map-foot')?.getBoundingClientRect?.().height ?? 0;
     const dpr = window.devicePixelRatio || 1;
-    const fit = Math.min((box.width - 24) / REGION_MAP.width, (box.height - 24) / REGION_MAP.height);
+    const fit = Math.min((box.width - 24) / REGION_MAP.width, (box.height - 24 - (foot ? foot + 26 : 0)) / REGION_MAP.height);
     const device = Math.max(1, Math.floor(fit * dpr));
     map.style.setProperty('--mpx', `${device / dpr}px`);
   }
