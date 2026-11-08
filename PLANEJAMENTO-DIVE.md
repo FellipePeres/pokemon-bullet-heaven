@@ -14,8 +14,11 @@
 > breve". Onde o texto diz "**padrão**", é a escolha recomendada até o Fellipe
 > decidir. As decisões em aberto estão na seção 12.
 >
-> **Maquete visual** (o fundo do mar do FireRed contra o do Emerald): o artifact
-> privado "Fundo da Lagoa", https://claude.ai/artifact/WzWyZwbiZhLRox7na5T1VQ.
+> **Maquetes** (artifacts privados do Fellipe):
+> - "Fundo da Lagoa", o fundo do mar do FireRed contra o do Emerald:
+>   https://claude.ai/artifact/WzWyZwbiZhLRox7na5T1VQ
+> - "A Descida", a descida **jogável** (os 6 níveis, as bolhas, o bolsão, o resgate
+>   e a chegada à caverna): https://claude.ai/artifact/WYVxGMgQ7DUCmofe4geVRv
 
 ---
 
@@ -113,22 +116,31 @@ que **encurta a cada nível**: é ele que faz o Nível 6 ter pouco tempo de rea�
 
 **Os padrões.** Cada nível traz um novo e mantém os anteriores:
 
-| Nível | Aviso | Padrão novo | Hordas no nível | Pokémon |
-|---|---|---|---|---|
-| 1 | 1,5 s | uma linha por vez | 12 | **Kanto:** Magikarp, Goldeen, Horsea |
-| 2 | 1,2 s | colunas; duas linhas ao mesmo tempo | 15 | **Kanto:** Shellder, Staryu, Tentacool, Krabby |
-| 3 | 1,0 s | linha com um só tile livre (passa só por ali) | 18 | **Kanto:** Seel, Seadra, Kingler, Tentacruel, Seaking |
-| 4 | 0,8 s | linha e coluna cruzadas | 22 | **misturado:** Cloyster, Starmie, Carvanha, Wailmer, Corphish, Clamperl |
-| 5 | 0,6 s | hordas em sequência na mesma linha | 26 | **Hoenn:** Sharpedo, Crawdaunt, Huntail, Gorebyss, Relicanth, Whiscash |
-| 6 | 0,4 s | até três ao mesmo tempo, tudo misturado | 32 | **Hoenn:** Wailord, Walrein, Sharpedo, Milotic, Relicanth |
+| Nível | Aviso | Velocidade | Padrão novo | Hordas no nível | Pokémon |
+|---|---|---|---|---|---|
+| 1 | 1,5 s | 8 | uma linha por vez (a próxima só depois da anterior) | 12 | **Kanto:** Magikarp, Goldeen, Horsea |
+| 2 | 1,2 s | 9 | colunas; duas linhas ao mesmo tempo | 15 | **Kanto:** Shellder, Staryu, Tentacool, Krabby |
+| 3 | 1,0 s | 10 | paredão: quatro linhas de uma vez, sobram duas | 18 | **Kanto:** Seel, Seadra, Kingler, Tentacruel, Seaking |
+| 4 | 0,8 s | 11 | linha e coluna cruzadas | 22 | **misturado:** Cloyster, Starmie, Carvanha, Wailmer, Corphish, Clamperl |
+| 5 | 0,6 s | 12 | hordas em sequência na mesma linha | 26 | **Hoenn:** Sharpedo, Crawdaunt, Huntail, Gorebyss, Relicanth, Whiscash |
+| 6 | 0,4 s | 14 | até três ao mesmo tempo, tudo misturado | 32 | **Hoenn:** Wailord, Walrein, Sharpedo, Milotic, Relicanth |
 
-Os números são o ponto de partida: o tempo de cada nível só se acerta jogando
-(seção 11, a maquete jogável).
+A velocidade é em tiles por segundo. Cada horda é um cardume do tamanho da linha
+(10 Pokémon numa linha, 6 numa coluna), de uma espécie só. Na maquete, o Nível 1
+dura ~56 s e os outros ~27 s cada. Esses números são o ponto de partida: o tempo
+de cada nível só se acerta jogando a maquete "A Descida".
 
 **Sempre tem saída.** O sorteio só aceita uma horda (ou um grupo de hordas) se
 existir um tile livre que o jogador alcança antes dela, **andando**, de onde ele
-está. No Nível 6, com 0,4 s de aviso, isso quer dizer um tile livre a 1 passo (ou
-até 3, correndo). Um teste confere isso para milhares de sorteios.
+está. A conta já desconta 0,25 s de reação e considera as hordas que ainda estão
+passando. No Nível 6, com 0,4 s de aviso, isso quer dizer um tile livre a 1 passo
+(ou até 3, correndo). A maquete tem um jogador automático (endereço `#bot`) que
+passou os 6 níveis 6 vezes cada, andando, sem tomar nenhum acerto. O mesmo teste
+vai para o `smoke-test` do jogo.
+
+**O passo sai no primeiro toque.** Na vila, tocar numa direção nova só vira o
+jogador (`turnDelay`); na descida, o passo sai na hora, porque cada fração de
+segundo conta.
 
 **Os desenhos.** Cada Pokémon da horda é o **ícone de caixa da 3ª geração** (32×32,
 dois quadros, que já parecem nadar), virado para o lado em que a horda anda. Os
@@ -283,9 +295,14 @@ captura: "A maré baixou."
 
 Cada etapa é entregável sozinha, com `npm test` e screenshots.
 
-0. **Maquete jogável** (artifact, fora do jogo): o tabuleiro 10×6 com os tiles do
-   Emerald, as hordas dos 6 níveis, as bolhas de vida e o bolsão de ar, para
-   acertar o tempo de aviso de cada nível jogando.
+0. **Maquete jogável** (feita em 2026-11-08: o artifact "A Descida"): o tabuleiro
+   10×6 com os tiles do Emerald, as hordas dos 6 níveis, as bolhas de vida, o
+   bolsão de ar, o resgate e a chegada à caverna, para acertar o tempo de cada
+   nível jogando. Ela também testou a faixa de mapa e o Red e a Leaf submersos:
+   - **a faixa:** a textura lilás do Emerald (o metatile 531) com as fendas
+     recortadas dos mapas por cima, cada vez maiores e com mais algas;
+   - **o mergulhador:** o sprite do FireRed mapeado para os 4 tons da paleta
+     submersa, sentado na sombra do Brendan.
 1. **D-1 — Assets:** um extrator `tools/assets/dive.py` que lê o decomp do
    Emerald (`D:\fellipe\Dev\pokeemerald`, pret/pokeemerald commit `731ad5b`, clone
    parcial) e gera:

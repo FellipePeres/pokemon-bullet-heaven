@@ -1329,7 +1329,9 @@ Nenhum pedido do Fellipe em aberto. O que está planejado:
   Nível 3), o resgate no Centro Pokémon ao perder; depois do 6, a caverna do Kyogre
   e uma luta de Bullet Heaven para nível 90+, com a captura pela Dive Ball (10%).
   O decomp do Emerald está em `D:\fellipe\Dev\pokeemerald` (pret/pokeemerald,
-  commit `731ad5b`, clone parcial). Próximo passo: a maquete jogável da descida.
+  commit `731ad5b`, clone parcial). A descida tem uma maquete jogável (o artifact
+  "A Descida", https://claude.ai/artifact/WYVxGMgQ7DUCmofe4geVRv). Próximo passo:
+  o Fellipe jogar e acertar o tempo de cada nível; depois, a etapa D-1 (os assets).
 - **O roteiro geral** ([PLANEJAMENTO.md](PLANEJAMENTO.md), combinado em
   2026-11-02): o som que falta (gritos e efeitos, Etapa 5), o celular e os assets
   locais da interface (Etapa 6), o pós-jogo além do Modo Livre (a revanche dos
