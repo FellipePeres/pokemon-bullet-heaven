@@ -5,9 +5,17 @@
  * no chão e dos projéteis dos líderes, vai atrás das Poké Balls, troca
  * Pokémon machucado por descansado e captura. Usado pelo smoke-test e pelo
  * balance.
+ *
+ * `typeAware` (0.32, o balance com --tipos): o jogador que monta o time pensando
+ * em tipos. Mantém a equipe como o bot de sempre (a experiência continua indo
+ * para os mesmos), mas escolhe na Poké Ball quem tem mais vantagem contra o líder
+ * da fase e, quando o líder aparece, põe em campo os que têm mais vantagem
+ * contra ele, uma troca por vez (respeitando o tempo de troca).
+ * Sem ele, pega sempre a primeira opção da Poké Ball.
  */
 import { Run } from '../src/game/Run.js';
 import { hpRatio } from '../src/systems/stats.js';
+import { leaderTeamTypes, matchupAgainst, matchupScore, moveTypesOf } from '../src/systems/matchup.js';
 
 export const DT = 1 / 60;
 
@@ -79,8 +87,12 @@ export function resolveLevelUp(run) {
  * Roda uma partida inteira com um "jogador virtual":
  * foge em círculos, desvia para pegar Poké Balls, resolve melhorias e capturas.
  */
-export function simulate(stageId, starter, { maxSeconds = 600, journey = null } = {}) {
+export function simulate(stageId, starter, { maxSeconds = 600, journey = null, typeAware = false } = {}) {
   const run = new Run(stageId, journey ? { team: journey.team, campaignStarter: starter } : { starter, campaignStarter: starter });
+  // a nota de cada Pokémon contra o time do líder desta fase (só o bot que pensa em tipos usa)
+  const teamTypes = typeAware ? leaderTeamTypes(run.stage, starter) : [];
+  const speciesFit = (pokemonId) => matchupScore(matchupAgainst(pokemonId, moveTypesOf(pokemonId), teamTypes));
+  const fit = (member) => matchupScore(matchupAgainst(member.pokemonId, moveTypesOf(member), teamTypes));
   let bossAt = null;          // quando o primeiro Pokémon do líder apareceu
   let levelsAtBoss = null;    // níveis da equipe nessa hora
   let peakEnemies = 0;
@@ -114,8 +126,10 @@ export function simulate(stageId, starter, { maxSeconds = 600, journey = null } 
     if (run.state === 'capture') {
       const options = run.captureSystem.rollChoices();
       if (options.length) {
-        if (run.team.isFull) run.captureSystem.captureReplacing(run.team.members[5].uid, options[0].id);
-        else run.captureSystem.capture(options[0].id);
+        // o bot que pensa em tipos escolhe quem tem mais vantagem contra o líder; o de sempre, a primeira opção
+        const pick = typeAware ? [...options].sort((a, b) => speciesFit(b.id) - speciesFit(a.id))[0] : options[0];
+        if (run.team.isFull) run.captureSystem.captureReplacing(run.team.members[5].uid, pick.id);
+        else run.captureSystem.capture(pick.id);
         captures++;
       }
       run.pendingBall = false;
@@ -123,6 +137,9 @@ export function simulate(stageId, starter, { maxSeconds = 600, journey = null } 
       run.state = 'running';
       continue;
     }
+
+    // com o líder em campo, quem pensa em tipos põe os de mais vantagem contra ele (uma troca por vez)
+    if (typeAware && run.boss && run.team.swapReady) swapForType(run, fit);
 
     // troca Pokémon machucado por um descansado (a reserva se cura sozinha)
     if (run.team.swapReady) {
@@ -132,7 +149,7 @@ export function simulate(stageId, starter, { maxSeconds = 600, journey = null } 
       if (hurt && hurt.r < 0.4) {
         const fresh = run.team.reserve
           .filter((m) => !m.fainted && hpRatio(m, run.playerStats.pokemonHpBonus) > 0.7)
-          .sort((a, b) => hpRatio(b) - hpRatio(a))[0];
+          .sort((a, b) => (typeAware ? fit(b) - fit(a) : hpRatio(b) - hpRatio(a)))[0];
         if (fresh) {
           run.team.selectedSlot = run.team.active.indexOf(hurt.m);
           run.team.swapIn(fresh.uid);
@@ -152,4 +169,19 @@ export function simulate(stageId, starter, { maxSeconds = 600, journey = null } 
   }
 
   return { run, levelUps, captures, ballsDropped, steps, bossAt, levelsAtBoss, peakEnemies };
+}
+
+/**
+ * Uma troca por vantagem de tipo: o da reserva com mais vantagem contra o líder
+ * entra no lugar do que tem menos em campo, se a diferença valer (meio passo de
+ * 2x) e ele estiver descansado. Devolve true quando trocou.
+ */
+function swapForType(run, fit) {
+  const team = run.team;
+  const bench = team.reserve.filter((m) => !m.fainted && hpRatio(m, run.playerStats.pokemonHpBonus) > 0.5)
+    .sort((a, b) => fit(b) - fit(a))[0];
+  const worst = team.activeMembers.slice().sort((a, b) => fit(a) - fit(b))[0];
+  if (!bench || !worst || fit(bench) - fit(worst) < 0.5) return false;
+  team.selectedSlot = team.active.indexOf(worst);
+  return team.swapIn(bench.uid);
 }

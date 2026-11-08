@@ -28,6 +28,8 @@ import { RETIRED_ABILITIES } from '../src/data/abilities.js';
 import { abilityFx } from '../src/data/fx.js';
 import { damageEnemy, bonusHeal } from '../src/systems/combat.js';
 import { LEGENDARY_KITS, LEGENDARY_MOVES, LEGENDARY_ENCOUNTERS } from '../src/data/legendaries.js';
+import { typeMultiplier } from '../src/data/types.js';
+import { leaderTeamTypes, matchupAgainst, moveTypesOf, teamWeaknesses } from '../src/systems/matchup.js';
 
 let failures = 0;
 
@@ -75,7 +77,9 @@ console.log('\n[jornada — equipe e build passam de fase em fase]');
       let attempts = 0;
       do {
         attempts++;
-        result = simulate(stageId, 'squirtle', { maxSeconds: stage.duration + 240, journey });
+        // o Bulbasaur não tem desvantagem de tipo no Brock nem na Misty (desde a 0.32 o tipo pesa, e o
+        // Squirtle contra a Misty virou o confronto mais duro do começo); aqui só interessa a jornada
+        result = simulate(stageId, 'bulbasaur', { maxSeconds: stage.duration + 240, journey });
       } while (result.run.state !== 'victory' && attempts < 6);
       results.push({ stage, result, attempts });
       if (result.run.state !== 'victory') break;
@@ -166,7 +170,9 @@ console.log('\n[habilidades — cada comportamento precisa causar dano]');
     if (run.state === 'capture') { run.pendingBall = false; run.state = 'running'; }
   };
 
-  const probe = (abilityId, seconds = 3, enemyId = 'rattata') => {
+  // o alvo do teste: o Rattata, menos para quem não o atinge (Fantasma não pega em Normal, desde a 0.32)
+  const targetFor = (abilityId) => (typeMultiplier(ABILITIES[abilityId].type, ['normal']) > 0 ? 'rattata' : 'geodude_wild');
+  const probe = (abilityId, seconds = 3, enemyId = targetFor(abilityId)) => {
     CONFIG.debug.godMode = true;              // aqui só interessa o dano causado
     const run = new Run('gym_1_pewter', { starter: 'charmander' });
     const companion = run.companions[0];
@@ -682,6 +688,45 @@ console.log('\n[2º golpe]');
     c.invulnTimer = 0;
     r.damageCompanion(c, 20);
     check('Reflect: a equipe leva 40% menos dano', Math.abs(c.member.hp - 88) < 1e-6, `${c.member.hp}`);
+  }
+
+  // a vantagem de tipo (0.32): a tabela completa, o status com tipo e a defesa
+  {
+    check('a tabela tem as resistências do próprio tipo e os tipos que faltavam',
+          typeMultiplier('fire', ['fire']) === 0.5 && typeMultiplier('water', ['water']) === 0.5
+          && typeMultiplier('ice', ['dragon']) === 2 && typeMultiplier('dragon', ['dragon']) === 2
+          && typeMultiplier('ghost', ['normal']) === 0 && typeMultiplier('grass', ['rock', 'ground']) === 4);
+    const r = new Run('gym_1_pewter', { starter: 'charmander' });
+    r.spawner.update = () => {};
+    const ember = { type: 'fire', effects: { burn: { dps: 4, duration: 2.5 } } };
+    const geodude = r.spawner.spawnAt('geodude_wild', 700, 700, 5);
+    const paras = r.spawner.spawnAt('paras', 760, 700, 5);
+    const growlithe = r.spawner.spawnAt('blaine_growlithe', 820, 700, 5);
+    damageEnemy(r, geodude, 1, ember);
+    damageEnemy(r, paras, 1, ember);
+    damageEnemy(r, growlithe, 1, ember);
+    check('a queimadura respeita o tipo: metade no Geodude, 4x no Paras e nada no Fogo',
+          geodude.status.burn?.dps === 2 && paras.status.burn?.dps === 16 && !growlithe.status.burn,
+          `${geodude.status.burn?.dps} / ${paras.status.burn?.dps} / ${growlithe.status.burn?.dps}`);
+    const c = r.companions[0];   // o Charmander
+    const hit = (type) => { c.member.hp = 100; c.invulnTimer = 0; r.damageCompanion(c, 20, type); return 100 - c.member.hp; };
+    const rock = hit('rock'), fire = hit('fire'), plain = hit(null);
+    check('a defesa por tipo: Pedra pega 1,5x no Charmander, Fogo 0,67x, sem tipo 1x',
+          Math.abs(rock - 30) < 1e-6 && Math.abs(fire - 13.4) < 1e-6 && Math.abs(plain - 20) < 1e-6, `${rock} / ${fire} / ${plain}`);
+    // a imunidade vale 1x no dano recebido, mas o golpe continua do tipo dele
+    c.member.pokemonId = 'pidgey';
+    const flyingHit = hit('ground');
+    c.member.pokemonId = 'pikachu';
+    const electricHit = hit('ground');
+    c.member.pokemonId = 'charmander';
+    check('o Voador toma o golpe de Terra como um golpe comum (1x), e o Elétrico continua tomando o super efetivo (1,5x)',
+          Math.abs(flyingHit - 20) < 1e-6 && Math.abs(electricHit - 30) < 1e-6, `${flyingHit} / ${electricHit}`);
+    const brockTeam = leaderTeamTypes(STAGES.gym_1_pewter);
+    const weak = teamWeaknesses(brockTeam).weak.map((w) => w.type);
+    const vsBrock = (id) => matchupAgainst(id, moveTypesOf(id), brockTeam);
+    check('o time do Brock é fraco a Água e Planta (4x); o Squirtle bate 4x nele e o Charmander bate pela metade e apanha mais',
+          ['water', 'grass'].includes(weak[0]) && weak.includes('fighting')
+          && vsBrock('squirtle').offense === 2 && vsBrock('charmander').offense === -1 && vsBrock('charmander').defense === 1);
   }
 
   // o tremor de tela só existe nos golpes dos líderes (0.14)

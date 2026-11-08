@@ -335,6 +335,12 @@ game.menus.lobby.render();
         && balls?.children.length === STAGES.gym_1_pewter.bossTeam.length
         && panel.some((c) => c.classes.has('panel-actions')));
   check('...e esconde as métricas até a primeira tentativa', !panel.some((c) => c.classes.has('panel-metrics')));
+  // as fraquezas do time do líder no banner (0.32): os 3 tipos que mais batem nele
+  const banner = panel.find((c) => c.classes.has('panel-banner'));
+  const weak = banner?.children.find((c) => c.classes.has('panel-weak'));
+  check('o banner mostra no "Fraco" os 3 tipos que mais batem no Brock, com a lista inteira na dica',
+        weak?.children[0]?.innerHTML === 'Fraco' && weak.children.filter((c) => c.classes.has('type-tag')).length === 3
+        && String(weak.title).includes('Resiste a'));
 }
 registry.get('btn-village').click();
 check('"Voltar para a Vila" fecha o mapa e volta para onde o jogador estava',

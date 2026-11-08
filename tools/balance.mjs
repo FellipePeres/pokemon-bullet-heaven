@@ -12,6 +12,8 @@
  * recomeça delas, sem rejogar as fases anteriores (calibrar as finais rápido).
  * --jobs N (0.28) divide as jornadas entre N processos: a mesma medida, N vezes
  * mais rápida (cada jornada continua sendo jogada inteira por um processo só).
+ * --tipos (0.32): o bot monta o time pensando em tipos (ver tools/bot.mjs); a
+ * diferença para o bot de sempre mostra quanto vale explorar as fraquezas.
  *
  * Cada jornada joga as fases em ordem, levando a equipe de uma para a outra
  * como no jogo. Desde a 0.17 a derrota também leva o progresso (níveis,
@@ -55,6 +57,7 @@ const SAVE = arg('save', null);
 const LOAD = arg('load', null);
 const FROM = arg('from', null);
 const JOBS = Math.max(1, Number(arg('jobs', 1)));
+const TYPE_AWARE = args.includes('--tipos');
 // processo filho do --jobs: joga só as jornadas da sua fatia e devolve os números crus
 const SLICE = arg('slice', null);
 const loaded = LOAD ? JSON.parse(readFileSync(LOAD, 'utf8')) : [];
@@ -96,7 +99,7 @@ function playJourneys(indices, onJourney = () => {}) {
       s.journeys++;
       for (; attempt < MAX_ATTEMPTS && !won; attempt++) {
         const entry = journey ? teamLevel(journey.team) : 1;
-        const result = simulate(stage.id, starter, { maxSeconds: stage.duration + 300, journey });
+        const result = simulate(stage.id, starter, { maxSeconds: stage.duration + 300, journey, typeAware: TYPE_AWARE });
         const { run } = result;
         s.tries++;
         s.faints.push(run.stats.faints);
@@ -165,7 +168,7 @@ if (SLICE) {
     ? merge(await playParallel())
     : playJourneys(all, () => process.stdout.write('.'));
 
-  console.log(`\n\nBALANCEAMENTO — ${RUNS} jornada(s), ${((Date.now() - startedAt) / 1000).toFixed(0)}s\n`);
+  console.log(`\n\nBALANCEAMENTO — ${RUNS} jornada(s)${STARTER ? ` de ${STARTER}` : ''}${TYPE_AWARE ? ', bot que monta o time por tipo' : ''}, ${((Date.now() - startedAt) / 1000).toFixed(0)}s\n`);
   console.log('fase                 1ª tent.   tentativas  entrada  nível ao vencer (ace)   luta    desmaios  pico   bolas (teto)');
   for (const stage of stages) {
     const s = stats.get(stage.id);

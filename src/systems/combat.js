@@ -40,13 +40,38 @@ export function enemiesInRadius(run, x, y, radius) {
   return out;
 }
 
-/** Aplica efeitos de status (queimadura, veneno, lentidão) a um inimigo. */
-export function applyEffects(enemy, effects) {
+/** Quem não pega o status, como na série: Fogo não queima; Veneno e Metálico não envenenam. */
+const STATUS_IMMUNE = { burn: ['fire'], poison: ['poison', 'steel'] };
+
+/**
+ * Aplica efeitos de status (queimadura, veneno, lentidão) a um inimigo. Desde a
+ * 0.32 a queimadura e o veneno passam pela tabela do golpe que os causou: o Ember
+ * queima o Geodude pela metade (até a 0.31 a queimadura ignorava a resistência).
+ */
+export function applyEffects(enemy, effects, type = null) {
   if (!effects) return;
-  if (effects.burn) enemy.applyStatus('burn', effects.burn);
-  if (effects.poison) enemy.applyStatus('poison', effects.poison);
+  for (const kind of ['burn', 'poison']) {
+    const payload = effects[kind];
+    if (!payload || enemy.types.some((t) => STATUS_IMMUNE[kind].includes(t))) continue;
+    const mult = type ? typeMultiplier(type, enemy.types) : 1;
+    if (mult > 0) enemy.applyStatus(kind, { ...payload, dps: payload.dps * mult });
+  }
   if (effects.slow) enemy.applyStatus('slow', effects.slow);
   if (effects.weak) enemy.applyStatus('weak', effects.weak);
+}
+
+/** O aviso de efetividade em cima do líder e dos elites, no máximo um a cada 2,5 s por alvo (0.32). */
+const EFFECT_LABEL = [
+  { test: (m) => m === 0, text: 'Não afeta…', color: '#c3cede' },
+  { test: (m) => m > 1, text: 'Super efetivo!', color: '#ffe066' },
+  { test: (m) => m < 1, text: 'Pouco efetivo…', color: '#8ea0c9' }
+];
+function effectivenessLabel(run, enemy, mult) {
+  if (mult === 1 || !(enemy.boss || enemy.elite)) return;
+  if (run.time - (enemy.labelAt ?? -Infinity) < 2.5) return;
+  enemy.labelAt = run.time;
+  const label = EFFECT_LABEL.find((l) => l.test(mult));
+  run.effects.push(new FloatingText(enemy.x, enemy.y - enemy.radius - 22, label.text, label.color, 13));
 }
 
 /**
@@ -77,7 +102,7 @@ export function damageEnemy(run, enemy, amount, opts = {}) {
   enemy.hitFlash = 0.08;
   run.stats.damageDealt += dealt;
 
-  if (opts.effects) applyEffects(enemy, opts.effects);
+  if (opts.effects) applyEffects(enemy, opts.effects, opts.type);
   // Hex: o amaldiçoado guarda o dano para explodir nos vizinhos quando morrer
   if (opts.effects?.curse) {
     const { area, ratio, duration } = opts.effects.curse;
@@ -92,11 +117,14 @@ export function damageEnemy(run, enemy, amount, opts = {}) {
     enemy.knockback(dx / d, dy / d, opts.knockback);
   }
 
-  // número de dano — limitado para não poluir a tela nem pesar
+  // número de dano — limitado para não poluir a tela nem pesar (o imune não mostra o 0)
   if (!opts.silent && run.effects.length < 90) {
-    const color = mult > 1 ? '#ffe066' : mult < 1 ? '#8ea0c9' : '#ffffff';
-    const size = mult > 1 ? 16 : 13;
-    run.effects.push(new FloatingText(enemy.x, enemy.y - enemy.radius, Math.round(dealt).toString(), color, size));
+    if (dealt > 0) {
+      const color = mult > 1 ? '#ffe066' : mult < 1 ? '#8ea0c9' : '#ffffff';
+      const size = mult > 1 ? 16 : 13;
+      run.effects.push(new FloatingText(enemy.x, enemy.y - enemy.radius, Math.round(dealt).toString(), color, size));
+    }
+    effectivenessLabel(run, enemy, mult);
   }
 
   if (enemy.hp <= 0) killEnemy(run, enemy, opts);

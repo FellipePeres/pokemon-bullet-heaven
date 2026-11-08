@@ -94,7 +94,6 @@ export const STAGES = {
     bossTeam: ['brock_geodude', 'brock_onix'],
 
     // o Squirtle sobrava aqui (0.11.5: 100% de vitórias quase sem desmaio, contra 43–67% dos outros)
-    starterTuning: { squirtle: 1.2 },
     capturePool: 'phase1',
     ballChance: 1,
     maxBalls: 3,
@@ -410,7 +409,6 @@ export const STAGES = {
     ],
 
     // o Squirtle sobrava aqui (0.11.5: 100%, contra 13–22% dos outros)
-    starterTuning: { squirtle: 1.2 },
     capturePool: 'phase6',
     ballChance: 1,
     maxBalls: 2,
@@ -476,7 +474,6 @@ export const STAGES = {
     bossTeam: ['blaine_growlithe', 'blaine_ponyta', 'blaine_rapidash', 'blaine_arcanine'],
 
     // o Squirtle sobrava aqui (0.11.5: 100%: Água contra o Blaine)
-    starterTuning: { squirtle: 1.15 },
     capturePool: 'phase7',
     ballChance: 1,
     maxBalls: 2,

@@ -152,6 +152,10 @@ não abre até você vencer.
   de Treinador do FireRed) com as métricas de cada fase.
 - **Cards de escolha**: o inicial e os Pokémon da Poké Ball aparecem em pixel na
   base de batalha, com barras de vida, dano por segundo e alcance tiradas dos dados.
+- **Tipos de verdade**: a tabela da série vale no dano que você causa e no que os seus
+  Pokémon recebem (a queimadura e o veneno também). O painel da fase mostra a que o
+  time do líder é **fraco**, e o jogo avisa o golpe super efetivo. Montar o time
+  pensando em tipos vira os confrontos difíceis.
 - **Golpe Desperto**: cada golpe tem uma **chave** de 3 melhorias (o Hydro Pump do
   Gyarados: Velocidade, Perfuração e Potência; o Toxic do Gloom: Amplitude,
   Intensidade e Reflexo). Elas aparecem em dourado na tela de nível, com o aviso

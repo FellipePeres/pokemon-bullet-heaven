@@ -2713,3 +2713,37 @@ button { font: inherit; color: inherit; }
 .panel-link:hover, .panel-link:focus-visible, .panel-link.pad-focus { color: var(--logo-blue-deep); outline: none; }
 .panel-metrics { display: flex; justify-content: space-between; gap: 8px; margin: 0; font-size: 13px; color: var(--gba-ink-soft); }
 .panel-metrics b { margin-left: 4px; font-family: var(--font-arcade); font-size: 9px; font-weight: 400; color: var(--gba-ink); }
+
+/* ===================== VANTAGEM DE TIPO (0.32) =====================
+   No banner do painel da fase, embaixo da pílula do tipo do ginásio, os 3 tipos
+   que mais batem no time do líder (systems/matchup.js). A lista inteira e as
+   resistências ficam na dica. */
+/* as fraquezas do líder: embaixo da pílula do tipo, numa placa escura em cima do salão */
+.panel-weak {
+  position: absolute;
+  top: 30px;
+  right: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  padding: 4px;
+  background: rgba(13, 20, 34, .74);
+  border-radius: 3px;
+  cursor: help;
+}
+.panel-weak-label {
+  font-family: var(--font-arcade);
+  font-size: 7px;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: #fff;
+}
+.panel-weak .type-tag {
+  padding: 2px 5px 1px;
+  font-family: var(--font-arcade);
+  font-size: 8px;
+  font-weight: 400;
+  letter-spacing: 0;
+  color: #fff;
+}

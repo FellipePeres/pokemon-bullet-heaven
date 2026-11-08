@@ -16,7 +16,8 @@ import { burst, FloatingText, SpriteFx } from '../entities/effects.js';
 import { updateSignatures } from '../systems/signatureMoves.js';
 import { abilityFx, zoneFx } from '../data/fx.js';
 import { bus, EVENTS } from '../core/events.js';
-import { typeColor } from '../data/types.js';
+import { typeColor, defenseMultiplier } from '../data/types.js';
+import { getPokemon } from '../data/pokemon.js';
 import { maxHpFor } from '../systems/stats.js';
 
 /**
@@ -212,14 +213,22 @@ export class Run {
     return best;
   }
 
-  /** Aplica dano a um Pokémon e trata o desmaio. */
-  damageCompanion(companion, amount) {
+  /**
+   * Aplica dano a um Pokémon e trata o desmaio. `type` é o tipo do golpe (o 1º tipo
+   * do inimigo, no contato e nos golpes do líder): desde a 0.32 ele passa pela
+   * tabela contra os tipos do Pokémon, suavizada (CONFIG.types.defense).
+   */
+  damageCompanion(companion, amount, type = null) {
     if (!companion) return;
     if (this.buffs?.reflect > 0) amount *= 0.6;   // a barreira do Reflect
+    const mult = type ? defenseMultiplier(type, getPokemon(companion.member.pokemonId)?.types ?? [], CONFIG.types.defense) : 1;
+    amount *= mult;
     const result = companion.takeDamage(amount);
     if (!result) return;
 
-    this.effects.push(new FloatingText(companion.x, companion.y - 26, `-${Math.round(amount)}`, '#ff6b6b', 13));
+    // o golpe que pega na fraqueza aparece maior; o resistido, menor e mais claro
+    const look = mult > 1 ? ['#ff3b30', 16] : mult < 1 ? ['#ffb4ad', 12] : ['#ff6b6b', 13];
+    this.effects.push(new FloatingText(companion.x, companion.y - 26, `-${Math.round(amount)}`, look[0], look[1]));
 
     if (result === 'fainted') {
       this.stats.faints++;
@@ -393,7 +402,7 @@ export class Run {
 
     if (!victim || !enemy.tryAttack()) return;
 
-    this.damageCompanion(victim, enemy.damage);
+    this.damageCompanion(victim, enemy.damage, enemy.types[0]);
     const dx = victim.x - enemy.x;
     const dy = victim.y - enemy.y;
     const d = Math.hypot(dx, dy) || 1;
@@ -478,7 +487,7 @@ export class Run {
     }
     if (!victim) return;
     p.dead = true;
-    this.damageCompanion(victim, p.damage);
+    this.damageCompanion(victim, p.damage, p.type);
     burst(this.particles, p.x, p.y, p.color, 6, 140, 3, 0.35);
   }
 
@@ -521,7 +530,7 @@ export class Run {
             const d = Math.hypot(companion.x - zone.x, companion.y - zone.y);
             if (d > zone.radius) continue;
             zone.hits.add(companion);
-            this.damageCompanion(companion, zone.damage);
+            this.damageCompanion(companion, zone.damage, zone.visualType ?? zone.type);
           }
           continue;
         }

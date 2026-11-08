@@ -5,7 +5,7 @@
 > decisão foi tomada e o que falta fazer. O `README.md` é o manual de uso;
 > este aqui é o contexto de desenvolvimento.
 
-**Versão atual:** `0.31.0` · **Última atualização:** 2026-11-07
+**Versão atual:** `0.32.0` · **Última atualização:** 2026-11-07
 **Stack:** HTML + CSS + JavaScript puro (ES Modules). Sem backend, sem build, sem dependências.
 **Repositório:** https://github.com/FellipePeres/pokemon-bullet-heaven (público)
 **Jogo no ar:** https://fellipeperes.github.io/pokemon-bullet-heaven/
@@ -44,6 +44,7 @@ python tools/assets/hub.py   # regera os mapas da vila (0.29) a partir do mesmo 
 python tools/assets/gym_banners.py   # regera os banners dos salões do painel da fase (0.31)
 npm run balance -- --runs 12 # joga a campanha com o bot: tentativas até passar cada fase, níveis e lutas
 npm run balance -- --runs 48 --jobs 12          # o mesmo, em 12 processos (0.28; a máquina tem 12 núcleos)
+npm run balance -- --runs 24 --jobs 12 --starter charmander --tipos   # o bot que monta o time por tipo (0.32)
 npm run balance -- --load equipes.json --from gym_6_saffron --until gym_6_saffron --set gym_6_saffron.difficulty=0.8
                                                 # testa um valor sem editar stages.js (vários --set valem)
 ```
@@ -63,7 +64,7 @@ vencer, a duração da luta, desmaios e pico de inimigos.
 
 **Conferência visual (desde a 0.5).** `tools/screenshot.mjs` abre o jogo no Chrome
 (ou Edge) sem janela, executa um roteiro (`vitrine`, `treinador`, `vila`, `jornada`,
-`partida`, `ux`), salva PNGs e lista os erros de JavaScript da página. Sai com código 1
+`partida`, `ux`, `efetivo`), salva PNGs e lista os erros de JavaScript da página. Sai com código 1
 se a página tiver erro. A `vitrine.html` desenha os assets com o mesmo código da
 partida: poses, andar e correr, as 8 direções, a proporção com os Pokémon e os
 retratos. **Olhe os screenshots antes de entregar mudança visual.** O feel
@@ -132,7 +133,7 @@ src/
     hubMaps.js        GERADO por tools/assets/hub.py: os mapas da vila (camadas e colisão), as folhas e os móveis
     dialogue.js       as falas da vila, com as condições (inicial, insígnias, Campeão, uma vez só)
     decor.js          a loja de Pokédolls: os enfeites do quarto, o preço e o lugar de cada um
-    types.js          tipos, cores e tabela de efetividade
+    types.js          tipos, cores, a tabela de efetividade completa e a defesa (0.32)
     kanto.js          nomes da Pokédex 1-151
     achievements.js   12 conquistas e suas recompensas em Shards
   entities/           Player, Companion, Enemy, projéteis, zonas, pickups, efeitos
@@ -148,6 +149,7 @@ src/
     pc.js             o PC da jornada: as casas de cada Pokémon, pegar e soltar
     stageStats.js     as métricas de cada fase (o Estojo de Insígnias)
     stats.js          vida máxima, XP por nível, multiplicador de dano por nível
+    matchup.js        a vantagem de tipo contra o time de um líder: o "Fraco" do painel e a nota do bot (0.32)
   game/
     Run.js            uma partida: estado, loop, colisões, condições de fim
     Hub.js            a vila (0.29): andar em grade, portas, saídas, conversas e o clique
@@ -484,6 +486,55 @@ Nunca voltar bônus globais para o pool de level up — foi pedido explícito.
 - Espécies evoluídas começam no golpe do estágio delas (Raticate já nasce com
   Hyper Fang), mas compartilham a mesma linha da família.
 
+### Tipos: fraquezas e vantagens (0.32)
+- Pedido do Fellipe: incentivar o jogador a explorar fraquezas e vantagens, "nos
+  jogos de Pokémon muitos jogadores montam time pensando em vantagens de tipos, pois
+  isso facilita, e jogar contra dificulta muito"; com o Charmander ele passava fácil
+  pelo Brock mesmo com a resistência a fogo. Eram quatro causas, todas corrigidas:
+  1. **A tabela estava incompleta** (só o essencial do começo: Fogo contra Fogo
+     valia 1x; Gelo, Fantasma e Dragão atacavam sempre em 1x). Agora é a da série
+     desde a 6ª geração, com Fada e Metálico (`EFFECTIVENESS` em `data/types.js`).
+     As imunidades valem 0 no ataque: **Fantasma não pega em Normal** (o Gengar não
+     faz nada no Rattata), Normal e Lutador não pegam em Fantasma, Elétrico em
+     Terra, Terra em Voador, Dragão em Fada, Veneno em Metálico.
+  2. **Queimadura e veneno ignoravam a resistência** (o Ember tirava os 4/s cheios
+     do Geodude). O dano por segundo passa pela tabela do golpe que os causou
+     (`applyEffects` em `combat.js`) e, como na série, Fogo não queima e Veneno e
+     Metálico não envenenam.
+  3. **O dano recebido não tinha tipo.** O contato, os projéteis e a onda do líder
+     usam o 1º tipo do inimigo contra os tipos do seu Pokémon (`Run.damageCompanion`),
+     pela tabela suavizada (`CONFIG.types.defense`): 2x → 1,5x, 4x → 2,25x,
+     0,5x → 0,67x, 0,25x → 0,44x. Suave porque o contato da horda é constante;
+     simétrica porque, com 0,6x na resistência, o jogo ficava mais fácil até para
+     quem ignora os tipos (medido com o bot). **A imunidade vale 1x no dano
+     recebido** (o Fellipe: "mesmo que o jogador tenha um pokemon tipo voador, e ele
+     receba ataque de um pokemon tipo ground, ele deve tomar um dano normal 1x...
+     só para garantir que não fique tão fácil"): vale para todas (Normal e Lutador
+     no seu Fantasma, Elétrico no seu Terrestre...) e para o resultado do Pokémon
+     inteiro (o Charizard, Fogo/Voador, toma 1x do Terra, como de um golpe Normal).
+     O golpe continua do tipo dele: o Terra segue super efetivo no seu Elétrico. No
+     ataque, a imunidade continua 0 (o seu Terra não pega em Voador).
+  4. **O jogo compensava a vantagem.** O `starterTuning` do Squirtle (+20% no Brock e
+     na Sabrina, +15% no Blaine) saiu; o mecanismo continua no `SpawnSystem`, sem
+     uso. E a chance de captura não muda por tipo: Poliwag, Goldeen e Oddish voltaram
+     de 2 para 4 na Fase 1 ("não acho justo diminuir a chance de aparição de certos
+     pokémons só pq eles tem vantagem de tipo").
+- **O que o jogador vê**: no banner do painel da fase, embaixo da pílula do tipo, o
+  **"Fraco"** com os 3 tipos que mais batem no time do líder (a dica tem a lista
+  inteira e as resistências; `teamWeaknesses` em `systems/matchup.js`, só com tipos
+  que algum golpe do jogo tem). Um selo ▲/▼ em cada Pokémon (nos cards da Poké Ball
+  e na equipe do mapa) foi testado e saiu: o Fellipe prefere só o "Fraco", antes de
+  começar a fase. Na luta, "Super efetivo!", "Pouco efetivo…" e "Não afeta…" em cima
+  do líder e dos elites, no máximo um a cada 2,5 s por alvo (roteiro `efetivo`); o
+  número de dano é amarelo e maior no super efetivo, azul e menor no resistido, e
+  some no imune; o dano que o seu Pokémon leva fica maior e mais vermelho na fraqueza.
+- **O bot que monta o time por tipo** (`balance.mjs --tipos`, `tools/bot.mjs`): escolhe
+  na Poké Ball quem tem mais vantagem contra o líder da fase e, com o líder em campo,
+  troca para os de mais vantagem (uma troca por vez). A diferença para o bot de
+  sempre mede quanto vale explorar as fraquezas (seção 5). Ele é um jogador fraco de
+  tipos: escolhe só pelo líder da fase e não olha a horda (um Gastly capturado na
+  Fase 6 não pega nos Normais da rota).
+
 ### Captura
 - Poké Ball dropa de inimigos derrotados, com **teto por fase** (`maxBalls`: 3 na
   Fase 1, 2 nas outras, 1 em cada sala da Liga, 0 no Campeão). Desde a 0.10 só a
@@ -516,7 +567,8 @@ Nunca voltar bônus globais para o pool de level up — foi pedido explícito.
 - A **Fase 1 foi ampliada** (0.11.2, "simples demais… mais chances de estágio 1"):
   28 espécies, 96% do peso em formas básicas (Rotas 1, 2, 22 e 3, Floresta de
   Viridian e a pesca do começo) e 4% nos evoluídos. Água e Planta (Poliwag,
-  Goldeen, Oddish) ficaram em 2% cada porque tiram 4x do Brock.
+  Goldeen, Oddish) ficaram em 2% cada porque tiram 4x do Brock. Na 0.32 voltaram a
+  4%: a chance não muda por vantagem de tipo (ver "Tipos").
 - **O card de escolha** (0.31, `ui/pokemonCard.js`), o mesmo do inicial e da Poké
   Ball: o sprite do FireRed em 2x na base de batalha, o nome e o papel, os tipos,
   três barras de 10 blocos e o golpe no pé. As barras saem de `starterStats`
@@ -791,9 +843,30 @@ Nunca voltar bônus globais para o pool de level up — foi pedido explícito.
   final é o Fellipe jogando.
 - **Ajuste por inicial** (0.11.5, `stage.starterTuning`): onde um inicial sobra,
   vida e dano dos inimigos e do líder sobem um pouco quando ele é o da jornada
-  (`SpawnSystem.spawnAt`, e `enemy.tilt` nos golpes do líder). Hoje só o Squirtle,
-  nas Fases 1 (×1,2), 6 (×1,2) e 7 (×1,15): ele vencia 100% delas, contra 13–67%
-  dos outros; com o ajuste, 45–56%, 24–31% e 50–83% (48 jornadas).
+  (`SpawnSystem.spawnAt`, e `enemy.tilt` nos golpes do líder). Até a 0.31 o Squirtle
+  tinha ×1,2 nas Fases 1 e 6 e ×1,15 na 7. **Saiu na 0.32**: a vantagem de tipo é
+  para ser sentida, não compensada (ver "Tipos" na seção 4).
+- **A vantagem de tipo medida** (0.32, 24 jornadas por inicial, `--runs 24 --jobs 12
+  --starter <inicial>`, com e sem `--tipos`). Vitórias de primeira contra o líder,
+  bot de sempre, da 0.31 para a 0.32:
+
+  | Líder | Charmander | Bulbasaur | Squirtle |
+  |---|---|---|---|
+  | Brock (Pedra) | 11 → 7 | 12 → 10 | 12 → 18 |
+  | Misty (Água) | 5 → 11 | 8 → 15 | 7 → 1 |
+  | Erika (Planta) | 12 → 16 | 10 → 16 | 14 → 12 |
+  | Blaine (Fogo) | 6 → 7 de 17 | 4 → 6 de 16 | 12 de 15 → 14 de 16 |
+
+  Na 0.31 os três iniciais venciam o Brock na mesma proporção; agora o tipo decide.
+  Quem explora as fraquezas vira os confrontos ruins: com o bot que monta o time por
+  tipo, o Charmander vence o Brock de primeira em 18 de 24 (7 com o de sempre) e o
+  Squirtle vence a Misty em 14 de 24 (1). Somando as tentativas até o Giovanni, o bot
+  de sempre fica em 21,8 (Charmander), 24,9 (Bulbasaur) e 20,4 (Squirtle) — eram 25,9,
+  29,2 e 17,9: os iniciais ficaram mais parecidos, e o Squirtle deixou de ser o fácil.
+  O bot por tipo soma 23,7, 22,7 e 17,5 (ele erra na Sabrina com o Charmander).
+  Variação: em 24 jornadas, ±3 vitórias de primeira é ruído. Medido com a imunidade
+  a 0,3x no dano recebido; a 1x (pedido logo depois) só deixa mais difícil, e só
+  onde havia imunidade: o Charizard volta a tomar 100% do Terra (Giovanni).
 - **Selvagens com nível** (0.7, só da Fase 3 em diante): cada onda tem `level:
   [mín, máx]`, que **acompanha a equipe** (alguns níveis abaixo dela no começo,
   perto do ace do líder no fim). Vida e dano crescem de forma composta por nível
@@ -1280,6 +1353,7 @@ tipo, som e o polimento de troca e captura.
 | 35 | manter a fase do Brock como está e dificultar todas as outras; a escala de ganho de nível muito alta; o Golpe Desperto por chave: maximizar certas melhorias (Gyarados: velocidade, penetração e dano; Gloom: área, intervalo entre os danos e cooldown), com a melhoria da chave marcada na tela de nível ("maximize para despertar") | 0.28: `xpLateExponent` 2,2 → 3,4 (o bot chega ao Campeão no ~74, era ~115; o Brock igual); `stage.difficulty` recalibrada fase a fase, todas mais duras que na 0.27 em tentativas do bot (ver seção 5); `data/awakening.js`: 3 melhorias por golpe que despertam o 2º golpe na hora, selo dourado na tela de nível, progresso na equipe e no PC, quem chega tarde treina a chave primeiro; `balance.mjs --jobs` (paralelo) e `--set` (testar um valor) |
 | 36 | tirar a tag "Golpe Desperto" das melhorias, deixar só o aviso de maximizar embaixo | 0.28.1: sem o selo no canto da carta; ficam a moldura dourada e o aviso |
 | 39 | melhoria de UX: a escolha do inicial e dos demais Pokémon em cards com o sprite em pixel na base de batalha e barras de vida, dano e alcance; o painel da fase com o cenário do ginásio, o líder em 2x, a faixa com as Poké Balls do time e o JOGAR vermelho; os banners dos ginásios no extrator; um artifact de antes e depois antes de subir | 0.31: `ui/pokemonCard.js` e `starterStats` (`CONFIG.cards`), a tela do inicial com véu, placa e Voltar no canto (ESC), o card na Poké Ball e na troca; `_panel` do `lobby.js` refeito; `tools/assets/gym_banners.py` (13 salões); roteiro `ux` no `screenshot.mjs`; testes do card e do painel; o check-data confere um banner por salão |
+| 40 | incentivar o jogador a explorar fraquezas e vantagens (com o Charmander ele passava fácil pelo Brock mesmo com a resistência); não diminuir a chance de captura de quem tem vantagem; medir antes de aplicar; o selo em cada Pokémon não precisa, só o "FRACO" do painel | 0.32: a tabela de tipos completa; queimadura e veneno pela tabela (Fogo não queima, Veneno e Metálico não envenenam); defesa por tipo suavizada e simétrica (`CONFIG.types.defense`); sem o `starterTuning` do Squirtle; Poliwag, Goldeen e Oddish de volta a 4% na Fase 1; o "Fraco" no banner do painel; "Super efetivo!" no líder e nos elites; `systems/matchup.js`; o bot `--tipos` no balance; medido antes e depois (seção 5) |
 | 38 | refinar a loja de Pokédolls (o Lapras no meio atrapalhava, os 2 vasos da entrada bloqueavam); o Oak entrega o mapa junto com o inicial; "Voltar para a Vila" embaixo do mapa; o rosto do treinador acompanhando a fase atual no mapa; o nome do jogador no lugar de Red ou Leaf | 0.30: loja com um tapete livre e o Lapras no canto; `carvalho_inicial` com o Mapa da Jornada e o aviso no botão; `btn-village` embaixo do mapa (o Menu voltou para a barra); o ícone do mapa na fase escolhida; `screen-name`, `chooseName`, `cleanTrainerName` e `profile.trainerName` por jornada |
 | 37 | no lugar da tela do mapa, um lobby jogável: uma mini-vila com casas de NPC espalhadas, andar em tiles como no FireRed, o Centro com o balcão do PC (sem curar) e o do Mart, uma loja de Pokédolls, o quarto vazio decorável, o Oak dando o inicial com as saídas travadas até lá, o mato alto a oeste para um modo Endless, a lagoa com o easter egg do Dive, falas para todos (a do pescador é dele) | 0.29: `game/Hub.js`, `render/HubRenderer.js`, `ui/hubHud.js`, `data/hub.js`, `data/dialogue.js`, `data/decor.js` e `tools/assets/hub.py` (os mapas montados do FireRed, em duas camadas e com a colisão de origem); jornada começada = treinador escolhido; partida, Continuar e Centro voltam à vila; o Endless e o modo aquático ficam "em breve" (PLANEJAMENTO-LOBBY.md) |
 | 34 | Modo Livre no Campeão também | 0.27: depois do Hall da Fama, a tela de vitória de sempre, com o Modo Livre |

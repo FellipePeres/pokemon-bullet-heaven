@@ -221,6 +221,24 @@ badSegments.length ? fail(`trechos com cenário inexistente: ${badSegments.join(
   : crowded.length ? fail(`cenários com obstáculo demais (mais de 45% bloqueado): ${crowded.join(', ')}`)
   : ok(`${Object.keys(SCENES).length} cenários do FireRed (${usedScenes.size} usados nas fases), todas as metatiles extraídas`);
 
+// os tipos (0.32): todo tipo de Pokémon, inimigo e golpe existe, e todo tipo de golpe tem linha na tabela
+{
+  const { TYPES, EFFECTIVENESS } = await import('../src/data/types.js');
+  const used = new Set([
+    ...Object.values(POKEMON).flatMap((p) => p.types ?? []),
+    ...Object.values(ENEMIES).flatMap((e) => e.types ?? [])
+  ]);
+  const attacks = new Set([...Object.values(ABILITIES), ...Object.values(BONUS_MOVES)].map((a) => a.type).filter(Boolean));
+  const unknown = [...used, ...attacks].filter((t) => !TYPES[t]);
+  const noRow = [...attacks].filter((t) => !EFFECTIVENESS[t]);
+  const badCell = Object.entries(EFFECTIVENESS).flatMap(([atk, row]) =>
+    Object.entries(row).filter(([def, m]) => !TYPES[def] || ![0, 0.5, 2].includes(m)).map(([def]) => `${atk}→${def}`));
+  unknown.length ? fail(`tipos que não existem: ${[...new Set(unknown)].join(', ')}`)
+    : noRow.length ? fail(`tipos de golpe sem linha na tabela de efetividade: ${noRow.join(', ')}`)
+    : badCell.length ? fail(`casas estranhas na tabela de efetividade: ${badCell.join(', ')}`)
+    : ok(`${Object.keys(EFFECTIVENESS).length} tipos na tabela de efetividade, todos os golpes cobertos`);
+}
+
 // os banners dos salões (0.31): o painel da fase mostra o salão do último trecho com cenário
 {
   const halls = [...new Set(Object.values(STAGES)

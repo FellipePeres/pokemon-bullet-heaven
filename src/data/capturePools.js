@@ -25,8 +25,9 @@ export const CAPTURE_POOLS = {
       rattata: 11, pidgey: 11, spearow: 8, caterpie: 8, weedle: 8,
       nidoran_f: 6, nidoran_m: 6, mankey: 5, jigglypuff: 5, ekans: 5,
       sandshrew: 4, magikarp: 4, zubat: 3, pikachu: 2, diglett: 2,
-      // Água e Planta tiram 4x do Brock (Pedra/Terra): ficam raros, para ele seguir difícil
-      poliwag: 2, goldeen: 2, oddish: 2,
+      // Água e Planta tiram 4x do Brock (Pedra/Terra). Até a 0.31 ficavam em 2 por isso;
+      // na 0.32 o Fellipe achou injusto: a chance não muda por vantagem de tipo
+      poliwag: 4, goldeen: 4, oddish: 4,
       clefairy: 1, abra: 1,
       // evoluídos: raros (4% somados)
       metapod: 1, kakuna: 1, raticate: 0.5, pidgeotto: 0.5,

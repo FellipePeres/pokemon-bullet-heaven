@@ -9,6 +9,7 @@ import { typeColor, typeName } from '../data/types.js';
 import { assetUrl } from '../render/assets.js';
 import { iconHTML } from '../render/icons.js';
 import { formatTime } from '../core/utils.js';
+import { leaderTeamTypes, teamWeaknesses } from '../systems/matchup.js';
 
 /** A engrenagem de Opções, a mesma do canto das outras telas. */
 const GEAR_SVG = '<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path fill="currentColor" d="M19.4 13a7.6 7.6 0 0 0 0-2l2.1-1.6-2-3.4-2.5 1a7.7 7.7 0 0 0-1.7-1L15 3.3h-4l-.4 2.7a7.7 7.7 0 0 0-1.7 1l-2.5-1-2 3.4L6.5 11a7.6 7.6 0 0 0 0 2l-2.1 1.6 2 3.4 2.5-1a7.7 7.7 0 0 0 1.7 1l.4 2.7h4l.4-2.7a7.7 7.7 0 0 0 1.7-1l2.5 1 2-3.4zM13 15.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z" transform="translate(-1 0)"/></svg>';
@@ -224,6 +225,21 @@ export class Lobby {
         type.style.background = typeColor(leader.type);
         banner.appendChild(type);
       }
+    }
+    // as fraquezas do time do líder (0.32), embaixo da pílula do tipo: os 3 tipos
+    // que mais batem nele; a lista inteira e as resistências ficam na dica
+    const { weak, resist } = teamWeaknesses(leaderTeamTypes(stage, this.campaign.starter));
+    if (weak.length) {
+      const plate = create('div', 'panel-weak');
+      plate.appendChild(create('span', 'panel-weak-label', 'Fraco'));
+      for (const { type } of weak.slice(0, 3)) {
+        const pill = create('span', 'type-tag', typeName(type));
+        pill.style.background = typeColor(type);
+        plate.appendChild(pill);
+      }
+      const names = (list) => list.map(({ type, avg }) => `${typeName(type)}${avg >= 3 ? ' (4x)' : avg === 0 ? ' (imune)' : ''}`).join(', ');
+      plate.title = `Fraco a: ${names(weak)}${resist.length ? `\nResiste a: ${names(resist)}` : ''}`;
+      banner.appendChild(plate);
     }
     panel.appendChild(banner);
 

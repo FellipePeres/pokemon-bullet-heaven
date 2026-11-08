@@ -464,6 +464,16 @@ const ROTEIROS = {
     // força o golpe do líder agora: primeiro o aviso, depois a onda
     { run: 'game.run.boss.abilities.forEach((a) => { a.timer = 0; })' }, { wait: 350 }, { shot: 'chefe-aviso' },
     { wait: 650 }, { shot: 'chefe-onda' }
+  ],
+  // o aviso de efetividade (0.32): o líder perto do Squirtle, cujo Water Gun bate 4x no Geodude
+  efetivo: [
+    { open: 'index.html' }, { wait: 500 },
+    { run: "game.newGame(); game.chooseTrainer('red'); game.chooseStarter('squirtle'); game.startStage('gym_1_pewter')" }, { wait: 300 },
+    { run: 'game.run.time = game.run.stage.duration + 0.5' }, { wait: 2500 },
+    { run: 'game.run.boss.x = game.run.player.x + 170; game.run.boss.y = game.run.player.y - 30' }, { wait: 300 },
+    // um golpe de Água no Geodude (4x): o número grande e o aviso em cima dele
+    { run: "import('./src/systems/combat.js').then(({ damageEnemy }) => damageEnemy(game.run, game.run.boss, 6, { type: 'water' }))" },
+    { wait: 250 }, { shot: 'efetivo' }
   ]
 };
 

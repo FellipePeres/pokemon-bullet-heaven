@@ -3,7 +3,7 @@
  * Nada de número mágico espalhado pelo gameplay: se precisar ajustar, ajuste aqui.
  */
 export const CONFIG = {
-  version: '0.31.0',
+  version: '0.32.0',
 
   canvas: { width: 1280, height: 720 },
 
@@ -67,6 +67,15 @@ export const CONFIG = {
    * barras de `blocks` blocos. Passar do máximo enche a barra; o número continua certo.
    */
   cards: { maxHp: 150, maxDps: 20, maxRange: 350, blocks: 10 },
+
+  // a vantagem de tipo no dano que os seus Pokémon recebem (0.32): o multiplicador
+  // da tabela (à esquerda) vira o aplicado (à direita); o ataque continua cheio.
+  // Simétrica: a fraqueza (1,5x) e a resistência (1/1,5) se anulam; com 0,6x na
+  // resistência o jogo ficava mais fácil até para quem ignora os tipos (medido).
+  // A imunidade vale 1x no dano recebido (o Fellipe: o Voador toma o golpe de Terra
+  // normalmente, "só para garantir que não fique tão fácil"); o golpe continua do
+  // tipo dele para o resto: o Terra segue super efetivo no seu Elétrico
+  types: { defense: { 0: 1, 0.25: 0.44, 0.5: 0.67, 1: 1, 2: 1.5, 4: 2.25 } },
 
   team: {
     maxSize: 6,
