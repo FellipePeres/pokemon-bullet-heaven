@@ -1325,13 +1325,19 @@ Nenhum pedido do Fellipe em aberto. O que está planejado:
   da vila, pegar o inicial na mesa, entrar em todas as casas, o rival).
 - **O modo aquático** ([PLANEJAMENTO-DIVE.md](PLANEJAMENTO-DIVE.md), combinado em
   2026-11-08): uma descida em tiles do Emerald, num tabuleiro de 10×6, desviando de
-  hordas que ocupam linhas inteiras; 6 níveis, 3 bolhas de vida (o bolsão de ar no
-  Nível 3), o resgate no Centro Pokémon ao perder; depois do 6, a caverna do Kyogre
-  e uma luta de Bullet Heaven para nível 90+, com a captura pela Dive Ball (10%).
-  O decomp do Emerald está em `D:\fellipe\Dev\pokeemerald` (pret/pokeemerald,
-  commit `731ad5b`, clone parcial). A descida tem uma maquete jogável (o artifact
-  "A Descida", https://claude.ai/artifact/WYVxGMgQ7DUCmofe4geVRv). Próximo passo:
-  o Fellipe jogar e acertar o tempo de cada nível; depois, a etapa D-1 (os assets).
+  hordas que ocupam linhas inteiras. **Regra do Fellipe: só os tiles navegáveis do
+  Emerald** (colisão 0 e elevação 3 no `map.bin`), na partida e nas animações; os
+  6 tabuleiros são áreas 10×6 inteiramente navegáveis das Rotas 126 e 127
+  submersas. São 6 níveis com 3 bolhas de vida (o bolsão de ar no Nível 3) e o
+  resgate no Centro ao perder. Depois do 6, a caverna do Kyogre e uma luta de
+  Bullet Heaven para nível 90+, com 2 Dive Balls (10% cada) e uma maré final de
+  30 s depois da captura. A captura dispara uma cena de história (o NPC
+  indignado que parte "a caminho do vulcão"), e o salão vira uma fase Endless
+  aquática sem XP. O decomp do Emerald está em `D:\fellipe\Dev\pokeemerald`
+  (pret/pokeemerald, commit `731ad5b`, clone parcial). A descida tem uma maquete
+  jogável (o artifact "A Descida",
+  https://claude.ai/artifact/WYVxGMgQ7DUCmofe4geVRv). Próximo passo: o Fellipe
+  jogar e acertar o tempo de cada nível; depois, a etapa D-1 (os assets).
 - **O roteiro geral** ([PLANEJAMENTO.md](PLANEJAMENTO.md), combinado em
   2026-11-02): o som que falta (gritos e efeitos, Etapa 5), o celular e os assets
   locais da interface (Etapa 6), o pós-jogo além do Modo Livre (a revanche dos
@@ -1496,6 +1502,7 @@ Nenhum pedido do Fellipe em aberto. O que está planejado:
 | 45 | na derrota, não oferecer recomeçar a jornada do zero; a opção fica nas configurações, com a confirmação "tem certeza que deseja reiniciar a jornada, seu progresso começa do zero" | 0.33: a derrota só com o Centro Pokémon; "Reiniciar a jornada" nas Opções (só com jornada ativa), com a pergunta no próprio item (Sim, reiniciar / Cancelar); testes e roteiros `opcoes` e `derrota` refeitos |
 | 46 | começar pela L-6 (o golpe Dive e a TM Dive); o modo aquático vai ser diferente do Bullet Heaven e vai usar os tiles do Emerald, mas ainda não criar nada dele | 0.34: o Dive (`tmOnly`, fora do sorteio) com o comportamento do Dig na horda mais perto; a TM Dive no Mart (`tm_dive`), só com um Pokémon de Água desperto; a fala do vendedor com `diveTm`; testes e o roteiro `dive`; o decomp do Emerald baixado para depois (seção 10) |
 | 47 | o modo aquático: tiles do Emerald, andar em tiles num espaço de 10×6, hordas de Pokémon aquáticos ocupando linhas inteiras para desviar, montado no Pokémon do Dive; 6 níveis cada vez mais difíceis com uma animação obrigatória entre eles; 3 bolhas de vida que voltam no Nível 3 ("um bolsão de ar"); ao morrer, o Centro Pokémon com a enfermeira contando que o pescador o pescou; hordas de Kanto até o 3, misturadas no 4, de Hoenn no 5 e no 6; depois do 6, a caverna do Kyogre e uma fase de Bullet Heaven 90+, com a captura pela Dive Ball (10%), a luta seguindo até o fim da fase e a volta pela lagoa | planejado em PLANEJAMENTO-DIVE.md (2026-11-08), nada construído; as decisões que faltam estão na seção 12 de lá |
+| 48 | os tiles jogáveis só os navegáveis no Emerald, nunca por cima das montanhas submersas; o bolsão só com a fala no Nível 3; 2 Dive Balls por tentativa; depois da captura, uma fase Endless aquática sem XP; perder depois de capturar leva ao Centro com o Kyogre; a maré final de 30 s; a cena da história depois da captura (no Centro ou na frente da lagoa), com o NPC indignado e o Pokémon voador, "a caminho do vulcão" | PLANEJAMENTO-DIVE.md refeito (seções 3 e 10 novas); a maquete "A Descida" refeita sobre as Rotas 126 e 127 submersas, com a grade de navegação do `map.bin` e o teste de que nenhum quadro das animações sai da água navegável |
 
 ---
 

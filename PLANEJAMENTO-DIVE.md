@@ -7,18 +7,20 @@
 > **6 níveis de profundidade**, cada um mais difícil, e o 6º é muito difícil. Quem
 > passa do 6º chega à **caverna do Kyogre**, e falar com ele abre uma fase de
 > Bullet Heaven extremamente difícil (nível recomendado 90+), com chance de
-> **capturar o Kyogre com uma Dive Ball**.
+> **capturar o Kyogre com uma Dive Ball**. A captura dispara uma **cena de
+> história** que aponta para a continuação do jogo (o vulcão).
 >
-> **Status:** planejado, nada construído. A TM Dive e o golpe Dive existem desde a
-> **0.34** (PLANEJAMENTO-LOBBY.md, seção 8); hoje o SIM da lagoa ainda diz "em
-> breve". Onde o texto diz "**padrão**", é a escolha recomendada até o Fellipe
-> decidir. As decisões em aberto estão na seção 12.
+> **Status:** planejado, nada construído no jogo. A TM Dive e o golpe Dive existem
+> desde a **0.34** (PLANEJAMENTO-LOBBY.md, seção 8); hoje o SIM da lagoa ainda diz
+> "em breve". Onde o texto diz "**padrão**", é a escolha recomendada até o Fellipe
+> decidir. As decisões em aberto estão na seção 13.
 >
 > **Maquetes** (artifacts privados do Fellipe):
 > - "Fundo da Lagoa", o fundo do mar do FireRed contra o do Emerald:
 >   https://claude.ai/artifact/WzWyZwbiZhLRox7na5T1VQ
-> - "A Descida", a descida **jogável** (os 6 níveis, as bolhas, o bolsão, o resgate
->   e a chegada à caverna): https://claude.ai/artifact/WYVxGMgQ7DUCmofe4geVRv
+> - "A Descida", a descida **jogável** (os 6 níveis nos mapas de verdade, as bolhas,
+>   o bolsão, o resgate e a chegada à caverna):
+>   https://claude.ai/artifact/WYVxGMgQ7DUCmofe4geVRv
 
 ---
 
@@ -29,6 +31,9 @@
 - "Hordas de Pokémon aquáticos vão passar **ocupando linhas completas** dos tiles,
   e o objetivo vai ser o jogador desviar, enquanto está em cima do Pokémon em
   Dive, no estilo submerso do Emerald."
+- "Um detalhe extremamente importante: **os tiles jogáveis devem ser apenas os
+  navegáveis no Emerald**. Em nenhum momento vamos fazer o Dive passando por cima
+  de montanhas submersas inacessíveis no Emerald."
 - "Ao encerrar um level, uma **pequena animação obrigatória** leva o jogador como
   se ele tivesse chegado em uma parte do mapa indo para frente, e essa parte
   mostra que dá para ir mais fundo ainda."
@@ -36,17 +41,27 @@
 - "Caso ele complete o 6, ele pode submergir para a **caverna do Kyogre**, que tem
   no Emerald. Ao conversar com ele, vai ter uma fase de Bullet Heaven extremamente
   difícil, com **nível recomendado 90+**."
-- "**3 bolhas de vida**, reseta no nível 3 de profundidade: *parece que encontrou
-  um bolsão de ar no caminho*."
+- "**3 bolhas de vida**. Não divida: só fale algo quando chegar no 3, algo como
+  *encontrou um bolsão de ar no caminho*."
 - "Caso morra, aparece no **Centro Pokémon** com a enfermeira falando algo cômico
   relacionando o pescador: o pescador disse que pescou você desmaiado."
 - "Hordas até o nível 3 somente de **Kanto**, o 4 **misturado**, 5 e 6 somente
   **Hoenn**."
-- "Captura vai ser o método **B, com Dive Ball**; a chance de captura é de **10%**."
-- "Pós-captura, continua a luta até o fim da fase completa. Se ele perder durante a
-  fase, volta para o Centro como se tivesse morrido na bolha. Se encerrar a luta
-  matando o Kyogre, ela encerra de alguma maneira normal e o jogador volta para a
-  superfície pelo lago; o mesmo caso ele capture e encerre."
+- "Captura vai ser o método **B, com Dive Ball**; a chance de captura é de **10%**;
+  **2 Dive Balls por tentativa**."
+- "Pós-captura, continua a luta até o fim da fase: uma **maré final de 30 segundos**.
+  Se ele perder durante a fase, volta para o Centro como se tivesse morrido na
+  bolha, **porém com o Kyogre**. Se encerrar a luta matando o Kyogre, ela encerra
+  de alguma maneira normal e o jogador volta para a superfície pelo lago; o mesmo
+  caso ele capture e encerre."
+- "Depois da captura, vai ficar uma **fase Endless aquática, sem ganho de XP**."
+- "Quando capturado, **uma história vai acontecer**. Caso ele capture e morra, a
+  história acontece no Centro; caso saia sem morrer, na frente do lago. Um NPC bem
+  característico aparece em cena, com um ponto de exclamação na cabeça, e fala
+  indignado: *não acredito que cheguei tarde, você capturou o lendário Kyogre, não
+  posso deixar que isso aconteça com os próximos*. Então a animação de soltar um
+  Pokémon voador (a definir), e ele diz: *a caminho do vulcão! O próximo lendário
+  será meu!* Dando indícios de uma continuação do jogo."
 
 ---
 
@@ -54,69 +69,96 @@
 
 ```
 VILA ─ lagoa, com Dive na equipe ─► "Quer usar Dive?" ─ SIM
-  └─► A DESCIDA: Nível 1 ─► Nível 2 ─► Nível 3 (bolsão de ar) ─► 4 ─► 5 ─► 6
-        │   cada fim de nível: a animação obrigatória para a frente e para baixo
+  └─► A DESCIDA (Rota 126): Nível 1 ─► 2 ─► 3 (bolsão de ar) ─► 4
+        │   ─► "Mais fundo..." ─► (Rota 127): Nível 5 ─► 6
+        │   cada fim de nível: a animação obrigatória, nadando pela água de verdade
         │   perdeu as 3 bolhas ─► CENTRO POKÉMON (a enfermeira e o pescador)
         └─► passou o 6 ─► entrada submersa da Caverna Marinha ─► "Quer emergir?"
               └─► O SALÃO DO KYOGRE (andar em tiles) ─► falar com o Kyogre
-                    └─► A LUTA (Bullet Heaven, 90+)
-                          ├─ venceu (Kyogre derrotado) ─► superfície, pela lagoa
-                          ├─ capturou e terminou a fase ─► superfície, pela lagoa
-                          └─ perdeu ─► CENTRO POKÉMON (como na descida)
+                    └─► A LUTA (Bullet Heaven, 90+), com 2 Dive Balls
+                          ├─ derrotou o Kyogre ─► superfície, pela lagoa
+                          ├─ capturou ─► maré final de 30 s
+                          │     ├─ sobreviveu ─► lagoa ─► A CENA (na frente da lagoa)
+                          │     └─ perdeu ─► Centro, com o Kyogre ─► A CENA (no Centro)
+                          └─ perdeu sem capturar ─► CENTRO POKÉMON
+
+Depois de capturado: o salão vira a FASE ENDLESS AQUÁTICA (sem XP).
 ```
 
 Padrão: cada mergulho começa do Nível 1. O recorde de profundidade fica guardado.
 
 ---
 
-## 3. A descida
+## 3. Só os tiles navegáveis do Emerald (a regra)
 
-**A tela.** Um tabuleiro de **10 tiles de largura por 6 de altura**, montado com
-trechos de verdade dos mapas submersos do Emerald (tilesets General e Underwater).
-Cada nível é um trecho diferente, e o fundo escurece a cada nível. Os 6 trechos
-ficam lado a lado numa faixa de mapa só, e a animação entre os níveis é a câmera
-correndo por ela (seção 5). Em volta do tabuleiro, a rocha lilás do Emerald faz a
-moldura. No topo: as 3 bolhas de vida, o nível e a profundidade, e a barra de
-quantas hordas faltam.
+**Tudo o que o jogador pisa, na descida e nas animações, é água navegável no
+Emerald.** Ele nunca passa por cima da rocha submersa (as "montanhas" lilases),
+nem por áreas que o jogo original não deixa alcançar.
 
-**O jogador.** Anda em tiles como na vila (`game/Hub.js`): um passo por toque, e
-segurando a seta continua andando. Padrão: o passo da vila andando (0,27 s por
-tile) e correndo com o botão de correr (0,13 s). O tabuleiro só deixa andar
-dentro dos 10×6.
+**Como se sabe o que é navegável.** O `map.bin` de cada mapa guarda, em cada
+tile, a colisão (bits 10-11) e a elevação (bits 12-15). Na água submersa do
+Emerald, o fundo onde se nada tem **colisão 0 e elevação 3**. Um tile de elevação
+0 aceita entrar de qualquer altura; por isso, na entrada da Caverna Marinha o
+poço navegável é o 3×3 de colisão 0 em volta do ponto de emergir. O extrator
+grava essa grade junto com cada mapa, e o jogo só usa tiles marcados nela.
 
-**O sprite.** No Emerald, o jogador submerso é um boneco azul-escuro sentado numa
-sombra escura, que é o Pokémon (`object_events/pics/people/brendan/underwater.png`,
-4 direções, com a paleta `player_underwater.pal`). O Emerald só tem o Brendan e a
-May, então o extrator pinta o **Red e a Leaf** com a paleta submersa e põe a
-mesma sombra embaixo.
+**Os tabuleiros** são áreas de 10×6 em que **todos** os tiles são navegáveis,
+procuradas em todos os mapas submersos. Só quatro mapas têm áreas assim (as Rotas
+124, 125, 126 e 127). A descida usa duas, cada uma com os tabuleiros ligados por
+água:
 
-**Os níveis e a profundidade** (padrão):
+| Nível | Mapa | Onde (x, y no mapa) | Até o próximo |
+|---|---|---|---|
+| 1 | Rota 126 submersa | 49, 16 | 9 tiles nadando |
+| 2 | Rota 126 submersa | 44, 26 | 80 tiles: um corredor longo |
+| 3 | Rota 126 submersa | 36, 66 | 7 tiles, para a frente |
+| 4 | Rota 126 submersa | 46, 66 | sai pelo corredor (17 tiles), "Mais fundo..." |
+| 5 | Rota 127 submersa | 24, 52 | entra pelo vale (10 tiles); depois, 5 tiles para baixo |
+| 6 | Rota 127 submersa | 26, 58 | desce pelo vale (14 tiles) até a Caverna Marinha |
 
-| Nível | Profundidade | O trecho |
-|---|---|---|
-| 1 | 10 m | fundo aberto, claro |
-| 2 | 25 m | fundo com as primeiras algas |
-| 3 | 45 m | fenda com algas (o bolsão de ar na chegada) |
-| 4 | 70 m | fenda funda |
-| 5 | 100 m | perto das paredes de rocha, mais escuro |
-| 6 | 140 m | o mais escuro, já na boca da Caverna Marinha |
+A Rota 126 tem água aberta com algas. A Rota 127 é um vale fundo, com o chão
+descendo em degraus mais escuros, e é onde a Caverna Marinha aparece no Emerald.
+Isso combina com os dois níveis mais fundos.
+
+**A conferência.** A maquete tem um teste que segue o mergulhador em todas as
+animações entre os níveis: em 1.229 quadros, nenhum fora da água navegável. O
+mesmo teste vai para o `smoke-test` do jogo.
 
 ---
 
-## 4. As hordas
+## 4. A descida
 
-**O que é uma horda.** Um cardume de Pokémon que entra por uma borda e atravessa
-o tabuleiro até a outra, ocupando **uma linha inteira** (10 tiles) ou, a partir
-do Nível 2, **uma coluna inteira** (6 tiles). Quem estiver num tile quando a
-horda passar por ele perde uma bolha.
+**A tela.** Durante a partida, a tela mostra **exatamente o tabuleiro**: 10×6
+tiles de água navegável de um mapa de verdade. Em cima: as 3 bolhas de vida, o
+nível e a profundidade, e a barra de quantas hordas faltam. O fundo escurece um
+pouco a cada nível.
 
-**O aviso.** Antes de cada horda, a borda de onde ela vem mostra bolhas e uma
-sombra na linha (ou coluna) inteira. O tempo entre o aviso e a horda entrar é o
-que **encurta a cada nível**: é ele que faz o Nível 6 ter pouco tempo de reação.
+**O jogador.** Anda em tiles como na vila (`game/Hub.js`), mas **o passo sai no
+primeiro toque** (na vila, tocar numa direção nova só vira o jogador), porque cada
+fração de segundo conta. Segurando, continua andando. Padrão: 0,27 s por tile
+andando e 0,13 s correndo. Só anda dentro dos 10×6.
 
-**Os padrões.** Cada nível traz um novo e mantém os anteriores:
+**O sprite.** No Emerald, o jogador submerso é um boneco azul-escuro sentado numa
+sombra escura, que é o Pokémon (`object_events/pics/people/brendan/underwater.png`,
+com a paleta `player_underwater.pal`). O Emerald só tem o Brendan e a May, então o
+extrator pinta o **Red e a Leaf** com os 4 tons da paleta submersa e põe a mesma
+sombra embaixo (a maquete já faz isso).
 
-| Nível | Aviso | Velocidade | Padrão novo | Hordas no nível | Pokémon |
+**A profundidade:** 10, 25, 45, 70, 100 e 140 m, um valor por nível.
+
+---
+
+## 5. As hordas
+
+**O que é uma horda.** Um cardume de uma espécie, do tamanho da linha (10
+Pokémon) ou da coluna (6), que entra por uma borda e atravessa o tabuleiro. Quem
+estiver num tile quando ela passar perde uma bolha.
+
+**O aviso.** Antes de cada horda, a linha (ou coluna) inteira fica marcada em tom
+avermelhado, com setas no sentido em que ela vem e bolhas na borda de entrada. O
+tempo entre o aviso e a horda entrar é o que **encurta a cada nível**.
+
+| Nível | Aviso | Velocidade | Padrão novo | Hordas | Pokémon |
 |---|---|---|---|---|---|
 | 1 | 1,5 s | 8 | uma linha por vez (a próxima só depois da anterior) | 12 | **Kanto:** Magikarp, Goldeen, Horsea |
 | 2 | 1,2 s | 9 | colunas; duas linhas ao mesmo tempo | 15 | **Kanto:** Shellder, Staryu, Tentacool, Krabby |
@@ -125,81 +167,75 @@ que **encurta a cada nível**: é ele que faz o Nível 6 ter pouco tempo de rea�
 | 5 | 0,6 s | 12 | hordas em sequência na mesma linha | 26 | **Hoenn:** Sharpedo, Crawdaunt, Huntail, Gorebyss, Relicanth, Whiscash |
 | 6 | 0,4 s | 14 | até três ao mesmo tempo, tudo misturado | 32 | **Hoenn:** Wailord, Walrein, Sharpedo, Milotic, Relicanth |
 
-A velocidade é em tiles por segundo. Cada horda é um cardume do tamanho da linha
-(10 Pokémon numa linha, 6 numa coluna), de uma espécie só. Na maquete, o Nível 1
-dura ~56 s e os outros ~27 s cada. Esses números são o ponto de partida: o tempo
-de cada nível só se acerta jogando a maquete "A Descida".
+A velocidade é em tiles por segundo. Na maquete, o Nível 1 dura ~56 s e os outros
+~27 s cada. Esses números são o ponto de partida, para acertar jogando.
 
-**Sempre tem saída.** O sorteio só aceita uma horda (ou um grupo de hordas) se
-existir um tile livre que o jogador alcança antes dela, **andando**, de onde ele
-está. A conta já desconta 0,25 s de reação e considera as hordas que ainda estão
-passando. No Nível 6, com 0,4 s de aviso, isso quer dizer um tile livre a 1 passo
-(ou até 3, correndo). A maquete tem um jogador automático (endereço `#bot`) que
-passou os 6 níveis 6 vezes cada, andando, sem tomar nenhum acerto. O mesmo teste
-vai para o `smoke-test` do jogo.
-
-**O passo sai no primeiro toque.** Na vila, tocar numa direção nova só vira o
-jogador (`turnDelay`); na descida, o passo sai na hora, porque cada fração de
-segundo conta.
+**Sempre tem saída.** O sorteio só aceita uma horda (ou um grupo) se existir um
+tile livre que o jogador alcança **andando**, já descontando 0,25 s de reação e
+considerando as hordas que ainda estão passando. No Nível 6, isso quer dizer um
+tile livre a 1 passo (ou até 3, correndo). O jogador automático da maquete
+(endereço `#bot`) passou os 6 níveis 6 vezes cada, andando, sem nenhum acerto; e
+um jogador parado no Nível 3 tomou 15 acertos em 30 s.
 
 **Os desenhos.** Cada Pokémon da horda é o **ícone de caixa da 3ª geração** (32×32,
-dois quadros, que já parecem nadar), virado para o lado em que a horda anda. Os
-de Kanto já estão em `assets/pokemon/gen3/icons/`; os de Hoenn vêm do Pokemon All
-(`assets/pokemon/gen3/icons/<dex>.png`, reduzidos de 4x, como os de Kanto). Os de
-Hoenn **só aparecem nas hordas**: não entram na Pokédex nem podem ser capturados.
-
-**Uma questão de escala.** O ícone tem 32 px e o metatile do Emerald tem 16. Padrão:
-cada tile do tabuleiro tem 32 px (o metatile em 2x), e o ícone entra em 1x,
-ocupando um tile. A maquete mostra se a diferença de densidade de pixel incomoda.
+dois quadros), virado para o lado em que a horda anda. Os de Kanto já estão em
+`assets/pokemon/gen3/icons/`; os de Hoenn vêm do Pokemon All, reduzidos de 4x. Os
+de Hoenn **só aparecem nas hordas**: não entram na Pokédex nem são capturados.
+Cada tile do tabuleiro tem 32 px (o metatile do Emerald em 2x) e o ícone entra em
+1x, ocupando um tile.
 
 ---
 
-## 5. A animação entre os níveis
+## 6. A animação entre os níveis
 
-Obrigatória, uns 3 segundos, sem pular:
+Obrigatória e sem pular:
 
-1. As hordas param e o tabuleiro fica livre.
-2. A câmera corre para a frente pela faixa de mapa até o trecho seguinte, onde
-   aparece uma fenda que desce.
-3. O jogador vai até a beira e desce; o fundo escurece.
-4. Aparece "Nível 2 · 25 m", e as hordas recomeçam.
+1. "Nível N concluído!", e as hordas param.
+2. O mergulhador **nada pelo caminho de verdade** até o próximo tabuleiro (a busca
+   do caminho só passa por tiles navegáveis), e a câmera vai com ele. O passo é
+   mais rápido nos corredores longos, para a animação ficar em 1,5 a 4 segundos.
+3. Na troca de mapa (do Nível 4 para o 5), ele sai por um corredor da Rota 126,
+   aparece "Mais fundo...", a tela escurece e ele entra pelo vale da Rota 127.
+4. "Nível N · X m", e as hordas recomeçam.
 
-Na chegada ao **Nível 3**, a animação passa por um **bolsão de ar**: bolhas
-grandes sobem, as 3 bolhas de vida enchem de novo, e a caixa de texto diz
-"Parece que você encontrou um bolsão de ar no caminho!".
+**O bolsão de ar** fica na chegada ao **Nível 3**: bolhas grandes sobem, as 3
+bolhas de vida enchem de novo e a caixa de texto diz "Parece que você encontrou um
+bolsão de ar no caminho!".
 
-Depois do **Nível 6**, a animação leva à entrada submersa da Caverna Marinha
-(`Underwater_MarineCave`, 20×10 no Emerald) e pergunta "Quer emergir?".
+**Depois do Nível 6**, ele desce pelo vale, a tela escurece e ele aparece no poço
+da entrada submersa da Caverna Marinha (`Underwater_MarineCave`), nadando até o
+ponto de emergir (o warp do Emerald, em 9,8): "Uma luz fraca vem lá de cima. Dá
+para emergir." e "Quer emergir?".
 
 ---
 
-## 6. As vidas e o resgate
+## 7. As vidas e o resgate
 
 - **3 bolhas de vida.** Cada horda que pega o jogador estoura uma. Depois de um
-  acerto, ele pisca e fica intocável por um instante (padrão: 1 s).
+  acerto, ele pisca e fica intocável por 1 s (padrão).
 - **O bolsão de ar** enche as 3 de novo, uma vez por mergulho, na chegada ao Nível 3.
 - **Perdeu as 3:** a tela escurece e o jogador acorda no **Centro Pokémon** da vila,
-  na frente da enfermeira, que conta que o pescador o pescou desmaiado (seção 10).
+  na frente da enfermeira, que conta que o pescador o pescou desmaiado (seção 11).
   O próximo mergulho começa do Nível 1.
 
 ---
 
-## 7. A caverna do Kyogre
+## 8. A caverna do Kyogre
 
 **O salão.** É o `MarineCave_End` do Emerald (27×30, tileset Cave), onde o Kyogre
-fica no jogo original. O jogador anda em tiles, como na vila, até o Kyogre, que
-dorme no fundo do salão.
+fica no jogo original. O jogador anda em tiles, como na vila, só pelos tiles
+navegáveis do mapa, até o Kyogre, que dorme no fundo.
 
 **Falar com o Kyogre.** "Um Pokémon gigante dorme no fundo do salão...", e a
 pergunta "Acordar o Kyogre? Nível recomendado: 90+". No SIM: o "!", o grito do
 Kyogre (o 382 dos gritos do Pokemon All) e a luta.
 
-**Depois de capturado** (padrão): o salão fica vazio, um Kyogre por jornada. A
-descida continua valendo pelo recorde e pelos prêmios (seção 9).
+**Depois de capturado:** o salão vira a **fase Endless aquática** (seção 10). Um
+Kyogre por jornada.
 
 ---
 
-## 8. A luta do Kyogre (Bullet Heaven)
+## 9. A luta do Kyogre (Bullet Heaven)
 
 Uma fase única, na arena da caverna (com os tiles do Emerald; padrão), com a
 equipe de sempre. A força dos inimigos vem na escala do nível 90+; para comparar,
@@ -221,9 +257,9 @@ hoje o bot chega ao Campeão por volta do nível 74.
    8 segundos, e uma **Dive Ball** aparece no campo, longe do treinador.
 2. O jogador vai até ela; pegar é jogar, e a bola voa até o Kyogre.
 3. A captura tem **10% de chance**.
-4. Se falhar, ele escapa, recupera vida (padrão: até 40%) e a luta continua. A
-   cada volta ao vermelho aparece outra Dive Ball, até **3 por luta** (padrão).
-   Com 10% em cada, a chance de capturar numa luta fica em ~27%.
+4. Se falhar, ele escapa, recupera vida (padrão: até 40%) e a luta continua.
+   Quando ele volta ao vermelho, aparece a segunda Dive Ball: **2 por tentativa**.
+   Com 10% em cada, a chance de capturar numa luta fica em ~19%.
 5. Sem mais bolas, a luta segue até o fim, e o Kyogre pode ser derrotado.
 
 A Dive Ball usa a arte do FireRed (`graphics/interface/ball/dive.png`).
@@ -234,13 +270,13 @@ A Dive Ball usa a arte do FireRed (`graphics/interface/ball/dive.png`).
   tela de vitória e o jogador volta à **superfície pela lagoa**. Sem captura, ele
   volta a dormir no salão, e outra chance exige descer os 6 níveis de novo.
 - **O Kyogre capturado:** ele entra para a equipe (ou vai para o PC, se a equipe
-  estiver cheia), e a luta **continua até o fim da fase**. Padrão do que é esse
-  fim: sem o Kyogre, a caverna se enche com uma **maré final** de 60 segundos de
-  hordas em fúria; sobreviver fecha a fase, "A maré baixou.", e o jogador volta à
-  superfície pela lagoa.
-- **Perdeu** (antes ou depois da captura): acorda no Centro Pokémon, como na
-  descida. Padrão: o Kyogre capturado **fica** com o jogador, como as capturas de
-  uma fase perdida já ficam hoje.
+  estiver cheia), e a luta **continua até o fim da fase**: sem o Kyogre, a caverna
+  se enche com uma **maré final de 30 segundos** de hordas em fúria. Sobreviver
+  fecha a fase, "A maré baixou.", e o jogador volta à superfície pela lagoa, onde
+  acontece **a cena** (seção 10).
+- **Perdeu depois de capturar:** acorda no Centro Pokémon, **com o Kyogre**, e a
+  cena acontece ali.
+- **Perdeu sem capturar:** acorda no Centro Pokémon, como na descida.
 
 ### O Kyogre na equipe
 
@@ -254,7 +290,52 @@ contar nas 151, como um lendário de outra região. Precisa:
 
 ---
 
-## 9. Os prêmios (padrão)
+## 10. Depois da captura
+
+### A cena da história
+
+Acontece **uma vez por jornada**, logo depois da captura:
+- **na frente da lagoa**, se o jogador sobreviveu à maré final e voltou à superfície;
+- **no Centro Pokémon**, se ele perdeu depois de capturar (depois das falas da
+  enfermeira).
+
+A sequência:
+1. Um NPC bem característico chega correndo e para na frente do jogador, com o
+   **"!"** na cabeça (o balão do Emerald, `field_effects/pics/emotion_exclamation.png`).
+2. Ele fala, indignado: "Não acredito que cheguei tarde! Você capturou o lendário
+   Kyogre! Não posso deixar que isso aconteça com os próximos..."
+3. Ele joga uma Poké Ball e solta um **Pokémon voador**. O Emerald tem essa
+   animação pronta, a do golpe Voar fora da batalha: o corte de tela com o Pokémon
+   na frente das listras (`field_effects/pics/field_move_streaks.png`) e o pássaro
+   que desce (`field_effects/pics/bird.png`).
+4. Ele diz: "A caminho do vulcão! O próximo lendário será meu!"
+5. Ele sai voando.
+
+É o gancho para a **continuação do jogo**: o vulcão aponta para o **Groudon**, o
+lendário de Hoenn que faz par com o Kyogre.
+
+**O NPC** (a decidir). O Emerald tem dois que combinam, no mesmo formato de 9
+quadros de 16×32 do Red, e que ficam bem na vila:
+- **Archie** (`people/team_aqua/archie.png`, paleta `npc_1`), o líder da Equipe
+  Aqua, que no Emerald quer justamente o Kyogre. Padrão: é quem chega tarde e,
+  sem o Kyogre, corre atrás do próximo.
+- **Maxie** (`people/team_magma/maxie.png`, paleta `npc_2`), o líder da Equipe
+  Magma, o homem do vulcão e do Groudon.
+
+**O Pokémon voador** (a decidir). Padrão: o **Crobat**, que o Archie e o Maxie usam
+no Emerald (e é da família do Zubat, conhecida de Kanto).
+
+### A fase Endless aquática
+
+Depois da captura, falar com o lugar onde o Kyogre dormia abre uma **fase Endless
+aquática**: a arena da caverna, com a chuva e as hordas de Água sem fim, **sem
+ganho de XP**. Padrão: o recorde de tempo vai para o Cartão de Treinador. Fala
+(rascunho): "O salão está quieto, mas as águas ainda se agitam. Enfrentar a maré
+sem fim?"
+
+---
+
+## 11. Os prêmios (padrão)
 
 - **Shards por nível concluído** na descida: 10, 15, 20, 30, 40 e 60 (175 numa
   descida completa de uns 5 minutos, perto do que rende rejogar fases).
@@ -264,7 +345,7 @@ contar nas 151, como um lendário de outra região. Precisa:
 
 ---
 
-## 10. As falas (rascunho para o Fellipe ajustar)
+## 12. As falas (rascunho para o Fellipe ajustar)
 
 **Enfermeira** (depois de perder na descida ou na luta):
 > "Ah, você acordou! O pescador da lagoa trouxe você até aqui."
@@ -289,60 +370,62 @@ contar nas 151, como um lendário de outra região. Precisa:
 **O fim da luta:** "O Kyogre afundou de volta no abismo. A água fica calma."; com a
 captura: "A maré baixou."
 
+**A cena** (as do Fellipe):
+> "Não acredito que cheguei tarde! Você capturou o lendário Kyogre! Não posso
+> deixar que isso aconteça com os próximos..."
+> "A caminho do vulcão! O próximo lendário será meu!"
+
 ---
 
-## 11. Como construir (esboço)
+## 13. Como construir (esboço)
 
 Cada etapa é entregável sozinha, com `npm test` e screenshots.
 
-0. **Maquete jogável** (feita em 2026-11-08: o artifact "A Descida"): o tabuleiro
-   10×6 com os tiles do Emerald, as hordas dos 6 níveis, as bolhas de vida, o
-   bolsão de ar, o resgate e a chegada à caverna, para acertar o tempo de cada
-   nível jogando. Ela também testou a faixa de mapa e o Red e a Leaf submersos:
-   - **a faixa:** a textura lilás do Emerald (o metatile 531) com as fendas
-     recortadas dos mapas por cima, cada vez maiores e com mais algas;
-   - **o mergulhador:** o sprite do FireRed mapeado para os 4 tons da paleta
-     submersa, sentado na sombra do Brendan.
+0. **Maquete jogável** (feita em 2026-11-08: o artifact "A Descida"): os 6
+   tabuleiros nos mapas de verdade, as hordas, as bolhas, o bolsão, as animações
+   pela água navegável, o resgate e a chegada à caverna. Na primeira versão, os
+   tabuleiros ficavam numa faixa montada sobre a rocha lilás; o Fellipe barrou
+   ("só os tiles navegáveis"), e ela foi refeita sobre os mapas.
 1. **D-1 — Assets:** um extrator `tools/assets/dive.py` que lê o decomp do
    Emerald (`D:\fellipe\Dev\pokeemerald`, pret/pokeemerald commit `731ad5b`, clone
    parcial) e gera:
-   - os 6 trechos da descida;
+   - as Rotas 126 e 127 submersas, recortadas na região usada, **com a grade do
+     que é navegável**;
    - a entrada submersa e o salão da Caverna Marinha;
    - o Red e a Leaf submersos;
-   - a arena da luta.
+   - a arena da luta;
+   - o NPC da cena, o balão de "!" e a animação de voo.
 
    Também traz do Pokemon All os ícones de Hoenn, a tira do Kyogre e o grito.
    Tudo registrado no `assets/PROVENIENCIA.md`.
 2. **D-2 — A descida:**
-   - `game/Dive.js` (o tabuleiro, o passo, as hordas, as bolhas, a animação);
-   - `data/dive.js` (os níveis, os padrões e as espécies: conteúdo, sem lógica);
-   - o gatilho da lagoa;
-   - o resgate no Centro;
-   - o teste de que toda horda sorteada tem saída.
+   - `game/Dive.js` (o tabuleiro, o passo, as hordas, as bolhas, as animações);
+   - `data/dive.js` (os níveis, os tabuleiros, os padrões e as espécies:
+     conteúdo, sem lógica);
+   - o gatilho da lagoa e o resgate no Centro;
+   - os testes de que toda horda sorteada tem saída e de que nenhum passo sai da
+     água navegável.
 3. **D-3 — A caverna:** o salão como um lugar da vila (o mesmo motor do
    `game/Hub.js`), o Kyogre e as falas.
 4. **D-4 — A luta:**
    - a fase do Kyogre em `data/stages.js` e o chefe em `data/enemies.js`;
    - os ataques (de preferência com os comportamentos que já existem);
-   - a chuva;
-   - a Dive Ball e a maré final;
+   - a chuva, as 2 Dive Balls e a maré final de 30 s;
    - a volta pela lagoa.
 5. **D-5 — O Kyogre na equipe:** a espécie especial, o kit, a Pokédex e o `check-data`.
-6. **D-6 — Capricho:** os sons (o mergulho, a bolha que estoura, o alarme do
+6. **D-6 — A cena e o Endless:** a cena da história (na lagoa ou no Centro) e a
+   fase Endless aquática sem XP.
+7. **D-7 — Capricho:** os sons (o mergulho, a bolha que estoura, o alarme do
    aviso), as falas e os prêmios; medir a luta com o `balance.mjs` numa equipe
    de nível 90+.
 
 ---
 
-## 12. Decisões em aberto
+## 14. Decisões em aberto
 
-1. **O bolsão de ar:** na chegada ao Nível 3 (a leitura deste plano) ou depois de
-   terminar o 3 (metade da descida: 3 níveis com as primeiras bolhas, 3 com as novas)?
-2. **Quantas Dive Balls por luta:** 3 (padrão) ou uma só?
-3. **O fim da fase depois da captura:** a maré final de 60 s (padrão) ou outra coisa?
-4. **Perder depois de capturar:** o Kyogre fica (padrão, como as capturas de hoje)
-   ou só vale se terminar a fase?
-5. **Depois de capturado:** o salão fica vazio (padrão) ou a luta continua
-   disponível, só pelos Shards?
-6. **Correr na descida:** vale correr (padrão) ou só andar?
-7. **Os prêmios** da seção 9.
+1. **O NPC da cena:** Archie (padrão) ou Maxie, ou outro?
+2. **O Pokémon voador da cena:** Crobat (padrão) ou outro?
+3. **A fase Endless aquática:** além do recorde de tempo, rende alguma coisa
+   (Shards dos elites, por exemplo)?
+4. **Correr na descida:** vale correr (padrão) ou só andar?
+5. **Os prêmios** da seção 11.
