@@ -21,6 +21,8 @@
 > - "A Descida", a descida **jogável** (os 6 níveis nos mapas de verdade, as bolhas,
 >   o bolsão, o resgate e a chegada à caverna):
 >   https://claude.ai/artifact/WYVxGMgQ7DUCmofe4geVRv
+> - "Depois do Kyogre", a **cena da captura** nas duas versões (na frente da lagoa e
+>   no Centro Pokémon): https://claude.ai/artifact/1CQ2os9bD5otGFJ78A62Bv
 
 ---
 
@@ -165,18 +167,19 @@ tempo entre o aviso e a horda entrar é o que **encurta a cada nível**.
 
 | Nível | Aviso | Velocidade | Padrão novo | Hordas | Pokémon |
 |---|---|---|---|---|---|
-| 1 | 1,5 s | 8 | uma linha por vez (a próxima só depois da anterior) | 12 | **Kanto:** Magikarp, Goldeen, Horsea |
-| 2 | 1,2 s | 9 | colunas; duas linhas ao mesmo tempo | 15 | **Kanto:** Shellder, Staryu, Tentacool, Krabby |
-| 3 | 1,0 s | 10 | paredão: quatro linhas de uma vez, sobram duas | 18 | **Kanto:** Seel, Seadra, Kingler, Tentacruel, Seaking |
-| 4 | 0,8 s | 11 | linha e coluna cruzadas | 22 | **misturado:** Cloyster, Starmie, Carvanha, Wailmer, Corphish, Clamperl |
-| 5 | 0,6 s | 12 | hordas em sequência na mesma linha | 26 | **Hoenn:** Sharpedo, Crawdaunt, Huntail, Gorebyss, Relicanth, Whiscash |
-| 6 | 0,4 s | 14 | até três ao mesmo tempo, tudo misturado | 32 | **Hoenn:** Wailord, Walrein, Sharpedo, Milotic, Relicanth |
+| 1 | 1,3 s | 9 | uma linha por vez (a próxima só depois da anterior) | 10 | **Kanto:** Magikarp, Goldeen, Horsea |
+| 2 | 1,0 s | 10 | colunas; duas linhas ao mesmo tempo | 15 | **Kanto:** Shellder, Staryu, Tentacool, Krabby |
+| 3 | 0,85 s | 11 | paredão: quatro linhas de uma vez, sobram duas | 18 | **Kanto:** Seel, Seadra, Kingler, Tentacruel, Seaking |
+| 4 | 0,65 s | 12 | linha e coluna cruzadas | 22 | **misturado:** Cloyster, Starmie, Carvanha, Wailmer, Corphish, Clamperl |
+| 5 | 0,5 s | 13 | em sequência na mesma linha; paredão de cinco, sobra uma | 26 | **Hoenn:** Sharpedo, Crawdaunt, Huntail, Gorebyss, Relicanth, Whiscash |
+| 6 | 0,35 s | 15 | até três ao mesmo tempo; três colunas juntas | 32 | **Hoenn:** Wailord, Walrein, Sharpedo, Milotic, Relicanth |
 
-A velocidade é em tiles por segundo. Na maquete, o Nível 1 dura ~56 s e os outros
-~27 s cada. Esses números são o ponto de partida, para acertar jogando.
+A velocidade é em tiles por segundo. Na maquete, o Nível 1 dura ~40 s e os outros
+~20 a 23 s cada. Estes números já são a segunda versão (2026-11-08): a primeira
+ficou fácil demais na medição (abaixo) e foi endurecida.
 
 **Sempre tem saída.** O sorteio só aceita uma horda (ou um grupo) se existir um
-tile livre que o jogador alcança **andando**, já descontando 0,25 s de reação e
+tile livre que o jogador alcança **andando**, já descontando 0,2 s de reação e
 considerando as hordas que ainda estão passando. No Nível 6, isso quer dizer um
 tile livre a 1 passo. O jogador automático da maquete (endereço `#bot`) passou os
 6 níveis 6 vezes cada, sem nenhum acerto; e um jogador parado no Nível 3 tomou 15
@@ -185,34 +188,43 @@ acertos em 30 s.
 ### A medição de tentativas (2026-11-08)
 
 O endereço `#medir` da maquete joga a descida inteira com cinco perfis de jogador
-automático, 30 descidas cada (a tabela soma duas rodadas, 60 por perfil). As
-regras são as do jogo: sem correr, 3 bolhas, o bolsão no Nível 3, e sempre a
-partir do Nível 1. O jogador automático só enxerga uma horda depois do seu tempo
-de reação e planeja o melhor caminho; nos dois últimos perfis, uma parte dos
-passos sai para o lado errado, como um erro de comando.
+automático. As regras são as do jogo: sem correr, 3 bolhas, o bolsão no Nível 3,
+e sempre a partir do Nível 1. O jogador automático só enxerga uma horda depois
+do seu tempo de reação e planeja o melhor caminho; nos dois últimos perfis, uma
+parte dos passos sai para o lado errado, como um erro de comando. Cada linha soma
+60 descidas.
 
-| Perfil | Descidas completas | Tentativas por descida | Passam N1-N6 | Acertos por nível N1-N6 |
-|---|---|---|---|---|
-| reação de 0,25 s | 60/60 (100%) | ~1,0 | 100, 100, 100, 100, 100, 100% | 0; 0; 0; 0; 0; 0 |
-| reação de 0,35 s | 51/60 (85%) | ~1,2 | 100, 100, 97, 100, 98, 89% | 0; 0; 0,3; 0,1; 0,2; 0,5 |
-| reação de 0,5 s | 36/60 (60%) | ~1,7 | 100, 100, 100, 92, 87, 75% | 0; 0,1; 0,4; 0,3; 0,6; 0,7 |
-| 0,35 s, errando 5% dos passos | 27/60 (45%) | ~2,2 | 100, 98, 95, 82, 78, 75% | 0; 0,5; 0,8; 0,5; 0,7; 0,6 |
-| 0,5 s, errando 10% dos passos | 10/60 (17%) | ~6,0 | 100, 98, 86, 73, 49, 56% | 0; 0,7; 1,2; 0,7; 1,1; 0,7 |
+**A primeira versão estava fácil demais.** Quem reagia em 0,25 s passava sempre, e
+o Nível 6 não segurava quase ninguém. Mudou para a versão de agora:
+- menos tempo de aviso;
+- hordas mais rápidas;
+- o sorteio conta 0,2 s de reação (era 0,25 s), o que deixa os padrões mais
+  apertados;
+- dois padrões novos: o paredão de cinco linhas (sobra uma) e três colunas juntas;
+- o Nível 1 mais curto.
+
+| Perfil | Antes: descidas completas | Agora: descidas completas | Agora: passam N1-N6 |
+|---|---|---|---|
+| reação de 0,25 s | 100% (~1,0 tentativa) | 93% (~1,1) | 100, 100, 100, 100, 100, 93% |
+| reação de 0,35 s | 85% (~1,2) | 63% (~1,6) | 100, 100, 100, 98, 92, 70% |
+| reação de 0,5 s | 60% (~1,7) | **0%** | 100, 100, 92, 80, 34, 0% |
+| 0,35 s, errando 5% dos passos | 45% (~2,2) | 28% (~3,5) | 100, 100, 97, 90, 60, 55% |
+| 0,5 s, errando 10% dos passos | 17% (~6) | 2% (~60) | 100, 98, 85, 46, 4, 100%* |
+
+\* só 1 das 60 descidas chegou ao Nível 6.
 
 **O que dá para ler:**
-- **O tempo de reação puro quase não reprova.** Quem reage em 0,25 s passa sempre,
-  e mesmo com 0,5 s passa 60% das descidas. O aviso não é a parte difícil para
-  quem sempre escolhe o tile certo, porque o sorteio garante a saída e a horda
-  ainda leva um tempo para atravessar até o jogador.
-- **O que reprova é errar.** Com 5% dos passos errados, menos da metade completa;
-  com 10%, só uma em seis. Para uma pessoa de verdade, que também lê errado e
-  hesita, a descida deve ficar entre esses dois últimos perfis.
-- **O Nível 1 e o 2 quase não tiram bolhas**, e o perigo começa no 3 (o paredão).
-  Os níveis 4 a 6 são onde as descidas acabam, com o 5 e o 6 parecidos, porque o
-  bolsão do Nível 3 enche as bolhas antes deles.
-- O jogador automático é um modelo: ele planeja melhor que uma pessoa. Os números
-  servem para comparar níveis e mudanças, e o feel de verdade vem de o Fellipe
-  jogar.
+- **O Nível 6 virou uma barreira de reação.** Quem reage em 0,5 s não passa dele;
+  em 0,35 s, passa 70% das vezes. Para uma pessoa, que ainda precisa escolher a
+  direção, isso o deixa muito difícil, como o Fellipe pediu.
+- **Os níveis 1 e 2 continuam de aquecimento**; o perigo começa no 3 e cresce até o 6.
+- **Errar continua pesando**: com 5% dos passos errados, ~3,5 tentativas por
+  descida completa.
+- **O sorteio continua justo:** o jogador automático que reage na hora passa os 6
+  níveis sem nenhum acerto (o endereço `#bot`).
+- O jogador automático planeja melhor que uma pessoa: os números servem para
+  comparar níveis e mudanças, e o feel de verdade vem de o Fellipe jogar. Se ficar
+  difícil demais, a corrida volta à mesa (decisão dele).
 
 **Os desenhos.** Cada Pokémon da horda é o **ícone de caixa da 3ª geração** (32×32,
 dois quadros), virado para o lado em que a horda anda. Os de Kanto já estão em
@@ -346,7 +358,13 @@ A sequência:
    na frente das listras (`field_effects/pics/field_move_streaks.png`) e o pássaro
    que desce (`field_effects/pics/bird.png`).
 4. Ele diz: "A caminho do vulcão! O próximo lendário será meu!"
-5. Ele sai voando.
+5. Ele vai embora: na frente da lagoa, o pássaro do Voar desce e o leva pelo céu.
+   No Centro, ele sai correndo pela porta com o Crobat, porque nos jogos não dá
+   para voar dentro de casa.
+
+A maquete "Depois do Kyogre" mostra as duas versões, com a vila e o Centro do
+jogo, o Maxie e o "!" do Emerald, o corte de tela com as listras (a faixa preta
+fora de casa, a azul dentro) e o Crobat, e o pássaro do Voar.
 
 É o gancho para a **continuação do jogo**: o vulcão aponta para o **Groudon**, o
 lendário de Hoenn que faz par com o Kyogre.
@@ -461,6 +479,6 @@ Cada etapa é entregável sozinha, com `npm test` e screenshots.
 ## 14. Decisões em aberto
 
 1. **Os prêmios por nível** da descida (seção 11): o Fellipe vai bolar mais tarde.
-2. **O tempo de cada nível:** a medição (seção 5) diz que o perigo começa no Nível
-   3 e que o erro pesa mais que a reação. O ajuste fino vem de o Fellipe jogar a
-   maquete; se ficar difícil demais, a corrida volta à mesa.
+2. **O tempo de cada nível:** a segunda versão (seção 5) faz do Nível 6 uma barreira
+   de reação. O ajuste fino vem de o Fellipe jogar a maquete; se ficar difícil
+   demais, a corrida volta à mesa.
