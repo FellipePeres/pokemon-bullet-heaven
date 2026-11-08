@@ -31,6 +31,11 @@ const ROTEIROS = {
   vitrine: [
     { open: 'vitrine.html' }, { wait: 1500 }, { shot: 'vitrine' }
   ],
+  // o banner do README (tools/banner.html): o logo sobre a arte do título.
+  // Regerar: npm run screens -- banner --size 1280x480 --out assets
+  banner: [
+    { open: 'tools/banner.html' }, { run: 'document.fonts.ready.then(() => true)' }, { wait: 800 }, { shot: 'banner' }
+  ],
   treinador: [
     { open: 'index.html' }, { wait: 500 },
     { run: 'game.newGame()' }, { wait: 900 }, { shot: 'tela-treinador' }

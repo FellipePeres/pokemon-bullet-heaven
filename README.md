@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/banner.svg" alt="Pokémon Bullet Heaven" width="720" />
+  <img src="assets/banner.png" alt="Pokémon Bullet Heaven: o logo sobre a clareira à noite, cercada pela horda" width="100%" />
 </p>
 
 <h1 align="center">Pokémon Bullet Heaven</h1>

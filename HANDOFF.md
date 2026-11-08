@@ -5,7 +5,7 @@
 > decisão foi tomada e o que falta fazer. O `README.md` é o manual de uso;
 > este aqui é o contexto de desenvolvimento.
 
-**Versão atual:** `0.32.2` · **Última atualização:** 2026-11-08
+**Versão atual:** `0.32.3` · **Última atualização:** 2026-11-08
 **Stack:** HTML + CSS + JavaScript puro (ES Modules). Sem backend, sem build, sem dependências.
 **Repositório:** https://github.com/FellipePeres/pokemon-bullet-heaven (público)
 **Jogo no ar:** https://fellipeperes.github.io/pokemon-bullet-heaven/
@@ -39,6 +39,7 @@ npm run smoke                # lógica: fases inteiras simuladas, sem navegador
 npm run smoke:ui             # interface: DOM simulado a partir do index.html real
 
 npm run screens -- <roteiro> --out <pasta>   # screenshots no Chrome sem janela
+npm run screens -- banner --size 1280x480 --out assets   # regera o banner do README (tools/banner.html)
 npm run assets               # regera os sprites a partir do Pokemon All (Python + Pillow)
 python tools/assets/hub.py   # regera os mapas da vila (0.29) a partir do mesmo decomp
 python tools/assets/gym_banners.py   # regera os banners dos salões do painel da fase (0.31)
@@ -65,7 +66,7 @@ padrão 10, é o teto; quem não passa "para ali"), o nível médio da equipe ao
 vencer, a duração da luta, desmaios e pico de inimigos.
 
 **Conferência visual (desde a 0.5).** `tools/screenshot.mjs` abre o jogo no Chrome
-(ou Edge) sem janela, executa um dos 37 roteiros (os mais usados: `vitrine`,
+(ou Edge) sem janela, executa um dos 38 roteiros (os mais usados: `vitrine`,
 `treinador`, `vila`, `jornada`, `partida`, `ux`, `efetivo`; um nome desconhecido lista
 todos), salva PNGs e lista os erros de JavaScript da página. Sai com código 1
 se a página tiver erro. A `vitrine.html` desenha os assets com o mesmo código da
@@ -208,6 +209,7 @@ tools/
   bot.mjs             o jogador virtual (usado pelo smoke e pelo balance)
   balance.mjs         mede a dificuldade fase a fase (ver seção 5)
   screenshot.mjs      screenshots no Chrome sem janela (DevTools Protocol, sem dependências)
+  banner.html         o banner do README: o logo sobre a arte do título (roteiro `banner`)
   assets/extract.py   gera assets/ a partir do decomp do FireRed no Pokemon All
   assets/render_music.py  renderiza as músicas do FireRed (cópia do sintetizador do Pokemon All)
   assets/copy_pc_art.py   traz do Pokemon All a arte do PC, os sprites do FireRed e o Cartão de Treinador
@@ -1157,6 +1159,7 @@ Procedência e como regerar: `assets/PROVENIENCIA.md`.
 | Moldura das janelas e dos botões | `assets/ui/window-frame.png` (3x, fatia 24) e `window-frame-button.png` (2x, fatia 16): a `text_window` do FireRed, copiadas do Pokemon All |
 | Fontes | `assets/fonts/`: Press Start 2P e Pixelify Sans (licença OFL), as do Pokemon All |
 | Fundo da tela de título | `assets/ui/title-background.webp`: arte do Fellipe (a clareira à noite cercada pela horda) |
+| Banner do README (0.32.3) | `assets/banner.png` (1280x480): o logo do jogo sobre essa arte, fotografado de `tools/banner.html` pelo roteiro `banner`; mudou o logo, é só regerar. Até a 0.32.2 era um SVG da 0.4 |
 | Banners dos salões (0.31) | `assets/ui/gym-banners/<cenário>.png`: 12x4 metatiles (192x64) do mapa de cada salão de líder, em volta de onde ele fica; o painel da fase mostra em 2x. Gerados por `tools/assets/gym_banners.py` |
 | A vila (0.29) | `assets/hub/<mapa>.png` e `-top.png` (o chão e o que cobre os personagens), `assets/hub/npc/<id>.png` (as pessoas e os bonecos), `assets/hub/decor/<id>.png` (os móveis do quarto); `src/data/hubMaps.js` diz o tamanho e a colisão de cada mapa. Gerados por `tools/assets/hub.py` |
 | Músicas | `assets/music/*.ogg`: 18 do FireRed, a vinheta de cura do Centro Pokémon (`tools/assets/render_music.py`) e o tema do lobby do Pokemon All; 7,5 MB ao todo, cada uma carregada quando toca |
@@ -1450,6 +1453,7 @@ Nenhum pedido do Fellipe em aberto. O que está planejado:
 | 40 | incentivar o jogador a explorar fraquezas e vantagens (com o Charmander ele passava fácil pelo Brock mesmo com a resistência); não diminuir a chance de captura de quem tem vantagem; medir antes de aplicar; o selo em cada Pokémon não precisa, só o "FRACO" do painel | 0.32: a tabela de tipos completa; queimadura e veneno pela tabela (Fogo não queima, Veneno e Metálico não envenenam); defesa por tipo suavizada e simétrica (`CONFIG.types.defense`); sem o `starterTuning` do Squirtle; Poliwag, Goldeen e Oddish de volta a 4% na Fase 1; o "Fraco" no banner do painel; "Super efetivo!" no líder e nos elites; `systems/matchup.js`; o bot `--tipos` no balance; medido antes e depois (seção 5) |
 | 41 | ler o HANDOFF e arrumar tudo o que estava desatualizado no projeto inteiro | 0.32.1: o HANDOFF conferido com o código (arquitetura com os arquivos que faltavam, contagens, Poké Balls, Shards, o Mart na vila, o Modo Livre e o Centro levando à vila, save, estado do conteúdo, próximos passos, histórico em ordem); README, PLANEJAMENTOs e PROVENIENCIA atualizados; comentários vencidos no código; nas Opções, o tremor (só os líderes) e o autosave (botão Jornada); a Ajuda com os controles da vila; a arte oficial (código morto) e o `.pyc` versionado saíram |
 | 42 | o "Sobre" do GitHub estava "IAzudo": humanizar e pôr os controles (setas e demais), com o Espaço como a tecla de ação | 0.32.2: a descrição do repositório reescrita (`gh repo edit`), com os controles; na Ajuda do jogo e no README, o Espaço como a ação da vila (Enter e Z também servem) |
+| 43 | o banner do README estava muito antigo (era o da primeira versão) | 0.32.3: `assets/banner.png`, o logo do jogo sobre a arte do título, gerado de `tools/banner.html` pelo roteiro `banner` (some o `banner.svg` da 0.4); na vila, o rodapé diz "Espaço ação" (era "Enter falar") |
 
 ---
 

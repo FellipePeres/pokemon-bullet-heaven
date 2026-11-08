@@ -122,7 +122,7 @@ nos `.pal`. O índice 0 é transparente, e o recorte é sempre pelo índice, nun
 | Arquivo | Origem |
 |---|---|
 | `ui/title-background.webp` | arte do Fellipe para a tela de título (2026-11-02), convertida para WebP |
-| `banner.svg` | feito para o projeto |
+| `banner.png` | o banner do README: o logo do jogo sobre a arte do título (a do Fellipe), fotografado de `tools/banner.html` com `npm run screens -- banner --size 1280x480 --out assets` |
 | os GIFs animados da interface (HUD da equipe, telas de nível e evolução, Pokédex), os ícones de item e as insígnias | não ficam aqui: vêm do [PokeAPI/sprites](https://github.com/PokeAPI/sprites) pela internet (ver `CONFIG.sprites`). Os Pokémon em campo e nos cards de escolha são os locais, acima |
 
 ## Licença
