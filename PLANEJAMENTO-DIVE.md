@@ -68,6 +68,12 @@
   aquático rende **Shards por chefe e elite**. Vamos deixar **bloqueada a corrida**;
   se ficar muito difícil, a gente repensa. Depois roda uma medição de tentativas
   para a gente entender. Vamos bolar os prêmios por nível mais tarde."
+- "A velocidade de movimento do jogador deve ser **por tiles como no FireRed**, na
+  mesma velocidade do caminhar no FireRed."
+- "Na descida e nas fases, **não pode ser impossível**. Por exemplo: temos 6
+  fileiras que podem vir hordas laterais; se a fileira 2 está disponível, na
+  próxima horda a fileira 1 ou 3 precisa estar livre para ele se mover para ela,
+  pois se não fica impossível em algum momento."
 
 ---
 
@@ -175,15 +181,39 @@ tempo entre o aviso e a horda entrar é o que **encurta a cada nível**.
 | 6 | 0,35 s | 15 | até três ao mesmo tempo; três colunas juntas | 32 | **Hoenn:** Wailord, Walrein, Sharpedo, Milotic, Relicanth |
 
 A velocidade é em tiles por segundo. Na maquete, o Nível 1 dura ~40 s e os outros
-~20 a 23 s cada. Estes números já são a segunda versão (2026-11-08): a primeira
+de 32 a 46 s cada. Estes números já são a segunda versão (2026-11-08): a primeira
 ficou fácil demais na medição (abaixo) e foi endurecida.
 
-**Sempre tem saída.** O sorteio só aceita uma horda (ou um grupo) se existir um
-tile livre que o jogador alcança **andando**, já descontando 0,2 s de reação e
-considerando as hordas que ainda estão passando. No Nível 6, isso quer dizer um
-tile livre a 1 passo. O jogador automático da maquete (endereço `#bot`) passou os
-6 níveis 6 vezes cada, sem nenhum acerto; e um jogador parado no Nível 3 tomou 15
-acertos em 30 s.
+**Nunca é impossível** (a regra do Fellipe). O sorteio só solta uma horda (ou um
+grupo) se o jogador puder escapar dela. São três condições:
+
+1. **A horda nova só sai quando o jogador está a salvo** das que já estão passando:
+   o tile dele (ou o do passo em curso) fica livre até a última delas sair. Assim
+   ele não está no meio de uma fuga quando o aviso aparece. Enquanto ele não está
+   a salvo, a próxima horda espera.
+2. **Do tile dele existe saída andando**, depois de 0,2 s de reação (mais 0,05 s de
+   folga para os quadros de 17 ms): ou ficar parado, ou um caminho até um tile que
+   fica livre até a horda passar. Os tiles do caminho também não podem ser pegos
+   enquanto ele passa. No exemplo do Fellipe: se a fileira 2 é a única livre e a
+   próxima horda cobre a 2, ela só sai se a 1 ou a 3 (ou outro tile alcançável)
+   estiver livre a tempo.
+3. **Um passo dado antes de ver o aviso não pode cair numa horda:** a horda nova
+   não pega nenhum tile vizinho antes de o jogador conseguir reagir.
+
+E nada fica escondido: no padrão "em sequência", a segunda horda mostra o aviso
+junto com a primeira, e a fileira fica marcada até as duas passarem.
+
+**A prova** (o endereço `#prova` da maquete) é um jogador perfeito que só enxerga
+o que está na tela: a horda existe para ele a partir do aviso, mais o tempo de
+reação. Ele anda, sem correr, com bolhas infinitas, 50 partidas por nível. Com
+reação de 0,2 s, tomou **zero acertos em 12.300 hordas** (duas rodadas). Antes das
+condições 1 e 3, ele tomava 1 ou 2 acertos a cada 450 hordas no Nível 3, sempre
+nos paredões: eram os momentos impossíveis que o Fellipe apontou. Esse teste vai
+para o `smoke-test` do jogo.
+
+**O passo** é o do FireRed andando: 16 quadros por tile (3,75 tiles por segundo),
+deslizando de um tile ao outro. Ele sai no primeiro toque (na vila, tocar numa
+direção nova só vira o jogador), porque cada fração de segundo conta.
 
 ### A medição de tentativas (2026-11-08)
 
@@ -211,18 +241,22 @@ quadros por tile, 3,75 tiles por segundo).
 
 | Perfil | Versão original | Versão de agora | Agora: passam N1-N6 |
 |---|---|---|---|
-| reação de 0,25 s | 100% (~1,0 tentativa) | 98% (~1,0) | 100, 100, 100, 100, 98, 100% |
-| reação de 0,35 s | 93% (~1,1) | 67% (~1,5) | 100, 100, 100, 98, 86, 78% |
-| reação de 0,5 s | 8% (~12) | **0%** | 100, 100, 98, 81, 8, 0% |
-| 0,35 s, errando 5% dos passos | 68% (~1,5) | 28% (~3,5) | 100, 100, 100, 90, 72, 44% |
-| 0,5 s, errando 10% dos passos | 0% | 0% | 100, 98, 95, 59, 3, 0% |
+| reação de 0,25 s | 100% (~1,0 tentativa) | 100% (~1,0) | 100, 100, 100, 100, 100, 100% |
+| reação de 0,35 s | 93% (~1,1) | 67% (~1,5) | 100, 100, 100, 100, 97, 69% |
+| reação de 0,5 s | 8% (~12) | **0%** | 100, 100, 95, 82, 26, 0% |
+| 0,35 s, errando 5% dos passos | 68% (~1,5) | 47% (~2,1) | 100, 100, 98, 93, 85, 60% |
+| 0,5 s, errando 10% dos passos | 0% | 0% | 100, 100, 92, 58, 25, 0% |
+
+A "versão de agora" já tem a regra de nunca ser impossível. Com ela, cada nível
+dura de 32 a 46 s na maquete (antes, ~22 s), porque a horda nova espera o jogador
+estar a salvo.
 
 **O que dá para ler:**
 - **O Nível 6 virou uma barreira de reação.** Quem reage em 0,5 s já para no 5 e
-  no 6; em 0,35 s, passa o 6 em 78% das vezes. Para uma pessoa, que ainda precisa escolher a
+  no 6; em 0,35 s, passa o 6 em 69% das vezes. Para uma pessoa, que ainda precisa escolher a
   direção, isso o deixa muito difícil, como o Fellipe pediu.
 - **Os níveis 1 e 2 continuam de aquecimento**; o perigo começa no 3 e cresce até o 6.
-- **Errar continua pesando**: com 5% dos passos errados, ~3,5 tentativas por
+- **Errar continua pesando**: com 5% dos passos errados, ~2 tentativas por
   descida completa.
 - **O sorteio continua justo:** o jogador automático que reage na hora passa os 6
   níveis sem nenhum acerto (o endereço `#bot`).
