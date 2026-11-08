@@ -30,9 +30,9 @@ const HEAL_FALLBACK = {
  * - Cada Pokémon tem nível e XP próprios. O XP do inimigo é dividido entre a
  *   equipe com pesos (CONFIG.progression.xpWeight): com a equipe cheia dá
  *   exatamente 25% por ativo e 8,33% por reserva.
- * - O 2º golpe (o Golpe Desperto) vem na hora em que a chave do golpe fica
- *   completa (data/awakening.js, 0.28; até a 0.27, um sorteio raro com todas as
- *   melhorias).
+ * - A chave do golpe completa (data/awakening.js) libera o 2º golpe, o Golpe
+ *   Desperto: 4% de chance a cada nível (0.33; de 0.28 a 0.32 ele vinha na hora;
+ *   até a 0.27, um sorteio raro com todas as melhorias).
  * - Subir de nível aumenta vida máxima e dano e, do nível 11 em diante, cura
  *   1/10 da vida (CONFIG.progression.levelUpHeal); evoluir cura tudo.
  * - A tela de melhoria aparece a cada `upgradeEveryLevels` níveis.
@@ -88,7 +88,7 @@ export class ProgressionSystem {
       }
 
       this.checkEvolution(member);
-      this.maybeLearnBonusMove(member);
+      this.rollBonusMove(member);   // com a chave completa, 4% a cada nível (0.33)
       need = this.xpToNext(member.level);
       bus.emit(EVENTS.POKEMON_LEVELED, { member, level: member.level });
     }
@@ -145,8 +145,8 @@ export class ProgressionSystem {
     return awakeningKeyOf(member);
   }
 
-  /** A chave completa (as 3 no máximo)? */
-  isAwakened(member) {
+  /** A chave completa (as 3 no máximo)? Ela libera a chance do Golpe Desperto a cada nível (0.33). */
+  keyComplete(member) {
     const key = this.awakeningKey(member);
     return key.length > 0 && key.every((part) => part.stacks >= part.max);
   }
@@ -158,16 +158,25 @@ export class ProgressionSystem {
   }
 
   /**
-   * O 2º golpe (0.14, data/bonusMoves.js). Desde a 0.28 ele vem na hora em que a
-   * chave do golpe fica completa (antes: com todas as melhorias, 2% por nível). É
-   * um dos 3 do tipo principal ou, em quem tem dois tipos, um dos 3 do secundário
-   * (`CONFIG.bonusMove.secondaryShare` das vezes). Um por Pokémon, para sempre;
-   * ele mantém o golpe de antes e usa os dois. `announce: false` aprende sem a
-   * tela (fora da partida, ao montar a equipe).
+   * A chance do Golpe Desperto a cada nível que o Pokémon sobe (0.33, o Fellipe:
+   * "quando você maximiza, você libera a chance de 4% de aprender quando evoluir de
+   * lvl"): só com a chave completa e enquanto ele ainda não tem o golpe. Completar
+   * a chave não ensina na hora (de 0.28 a 0.32, ensinava).
    */
-  maybeLearnBonusMove(member, { announce = true } = {}) {
+  rollBonusMove(member) {
+    if (member.abilities.some(isBonusMove) || !this.keyComplete(member)) return null;
+    if (Math.random() >= CONFIG.bonusMove.chancePerLevel) return null;
+    return this.learnBonusMove(member);
+  }
+
+  /**
+   * Ensina o 2º golpe (0.14, data/bonusMoves.js): um dos 3 do tipo principal ou, em
+   * quem tem dois tipos, um dos 3 do secundário (`CONFIG.bonusMove.secondaryShare`
+   * das vezes). Um por Pokémon, para sempre; ele mantém o golpe de antes e usa os
+   * dois. `announce: false` aprende sem a tela.
+   */
+  learnBonusMove(member, { announce = true } = {}) {
     if (member.abilities.some(isBonusMove)) return null;
-    if (!this.isAwakened(member)) return null;
     const [primary, secondary] = getPokemon(member.pokemonId).types;
     const useSecondary = secondary && BONUS_BY_TYPE[secondary]?.length && Math.random() < CONFIG.bonusMove.secondaryShare;
     const options = BONUS_BY_TYPE[useSecondary ? secondary : primary] ?? BONUS_BY_TYPE[secondary];
@@ -187,8 +196,9 @@ export class ProgressionSystem {
    * níveis —, menos as que ainda estão guardadas no ▲. As que faltam são aplicadas
    * sozinhas: primeiro as da chave do Golpe Desperto (0.28), depois na ordem de
    * AUTO_TRAIN_ORDER (dano primeiro). Vale para captura, presente e para quem já
-   * estava na jornada (ao carregar a equipe). Se a chave fechar, ele já chega com
-   * o Golpe Desperto. Devolve quantas foram aplicadas.
+   * estava na jornada (ao carregar a equipe). Se a chave fechar, ele chega com a
+   * chance do Golpe Desperto liberada; o golpe vem subindo de nível (0.33; de 0.28 a
+   * 0.32 ele já chegava desperto). Devolve quantas foram aplicadas.
    */
   trainToLevel(member) {
     const owned = Object.values(member.upgrades ?? {}).reduce((sum, n) => sum + n, 0);
@@ -207,8 +217,6 @@ export class ProgressionSystem {
       if (up.grantsAbility && !member.abilities.includes(up.grantsAbility)) member.abilities.push(up.grantsAbility);
       applied++;
     }
-    // quem já tem a chave (de agora ou de um save de antes da 0.28) desperta sem tela
-    this.maybeLearnBonusMove(member, { announce: false });
     return applied;
   }
 
@@ -343,7 +351,7 @@ export class ProgressionSystem {
     member.abilities[0] = newAbility;
     member.upgrades = transferUpgrades(member.upgrades, oldAbility, newAbility);
     this.run.rebuildCompanionAbilities(member);
-    this.maybeLearnBonusMove(member);   // a chave do golpe novo pode já estar completa
+    // a chave do golpe novo pode já estar completa: a chance vale a partir do próximo nível
 
     const ability = getAbility(newAbility);
     bus.emit(EVENTS.TOAST, {
@@ -372,14 +380,20 @@ export class ProgressionSystem {
     const up = getUpgrade(upgradeId);
     if (!up) return;
 
+    const keyBefore = this.keyComplete(member);
     member.upgrades[up.id] = (member.upgrades[up.id] ?? 0) + 1;
     if (up.grantsAbility && !member.abilities.includes(up.grantsAbility)) {
       member.abilities.push(up.grantsAbility);
       run.rebuildCompanionAbilities();
     }
 
-    // a melhoria que fecha a chave desperta o 2º golpe (0.28)
-    this.maybeLearnBonusMove(member);
+    // a melhoria que fecha a chave libera a chance do Golpe Desperto (0.33: não ensina na hora)
+    if (!keyBefore && this.keyComplete(member) && !member.abilities.some(isBonusMove)) {
+      bus.emit(EVENTS.TOAST, {
+        text: `${getPokemon(member.pokemonId).name} completou a chave: ${Math.round(CONFIG.bonusMove.chancePerLevel * 100)}% de chance de despertar um golpe a cada nível`,
+        icon: '✦'
+      });
+    }
     run.refreshStats();
     bus.emit(EVENTS.UPGRADE_TAKEN, { upgrade: up, member });
   }

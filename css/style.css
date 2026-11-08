@@ -772,6 +772,10 @@ button { font: inherit; color: inherit; }
 }
 .node button:not(.claim-btn):not(.buy-btn):hover { background: var(--gba-hover); }
 .node button:not(.claim-btn):not(.buy-btn):active { transform: translate(2px, 2px); box-shadow: var(--relief); }
+/* a pergunta de reiniciar a jornada (Opções, 0.33): os dois botões lado a lado, e o
+   "Sim" no vermelho do que não volta (depois da regra de cima, com o mesmo peso) */
+.node .node-actions { display: flex; gap: 8px; flex-shrink: 0; }
+.node .node-actions button.danger { color: var(--poke-red); border-color: var(--poke-red); }
 
 .stat-list { display: flex; flex-direction: column; gap: 6px; width: 100%; }
 .stat-list div {

@@ -28,6 +28,7 @@
  *   desmaios     média por tentativa
  *   pico         maior número de inimigos vivos ao mesmo tempo
  *   bolas        Poké Balls que caíram por tentativa (média), e o teto da fase
+ *   despertos    quantos da equipe tinham o Golpe Desperto ao vencer (média; 0.33)
  *
  * Alvo (0.17, "forçar o jogador a melhorar os Pokémon para passar"): o bot
  * passa as Fases 1 e 2 em 1–2 tentativas e precisa de ~2–4 nas seguintes,
@@ -42,6 +43,7 @@ import { simulate } from './bot.mjs';
 import { STAGES } from '../src/data/stages.js';
 import { getRegion } from '../src/data/regions.js';
 import { getEnemy } from '../src/data/enemies.js';
+import { isBonusMove } from '../src/data/bonusMoves.js';
 
 const args = process.argv.slice(2);
 const arg = (name, fallback) => {
@@ -79,7 +81,7 @@ for (const entry of getRegion('kanto').campaign) {
   if (entry.stage === UNTIL) break;
 }
 
-const blankStats = () => new Map(stages.map((s) => [s.id, { tries: 0, wins: 0, first: 0, journeys: 0, attempts: [], entry: [], levels: [], balls: [], fights: [], faints: [], peaks: [], blocked: 0 }]));
+const blankStats = () => new Map(stages.map((s) => [s.id, { tries: 0, wins: 0, first: 0, journeys: 0, attempts: [], entry: [], levels: [], balls: [], fights: [], faints: [], peaks: [], awakened: [], blocked: 0 }]));
 const teamLevel = (team) => avg(team.members.map((m) => m.level));
 const avg = (list) => (list.length ? list.reduce((a, b) => a + b, 0) / list.length : NaN);
 
@@ -114,6 +116,7 @@ function playJourneys(indices, onJourney = () => {}) {
           s.entry.push(entry);
           s.fights.push(run.time - result.bossAt);
           s.levels.push(teamLevel(journey.team));
+          s.awakened.push(run.team.members.filter((m) => m.abilities.some(isBonusMove)).length);
         }
       }
       s.attempts.push(attempt);
@@ -169,7 +172,7 @@ if (SLICE) {
     : playJourneys(all, () => process.stdout.write('.'));
 
   console.log(`\n\nBALANCEAMENTO — ${RUNS} jornada(s)${STARTER ? ` de ${STARTER}` : ''}${TYPE_AWARE ? ', bot que monta o time por tipo' : ''}, ${((Date.now() - startedAt) / 1000).toFixed(0)}s\n`);
-  console.log('fase                 1ª tent.   tentativas  entrada  nível ao vencer (ace)   luta    desmaios  pico   bolas (teto)');
+  console.log('fase                 1ª tent.   tentativas  entrada  nível ao vencer (ace)   luta    desmaios  pico   bolas (teto)  despertos');
   for (const stage of stages) {
     const s = stats.get(stage.id);
     const ace = Math.max(...(stage.bossTeam ?? []).map((id) => getEnemy(id)?.level ?? 0));
@@ -178,6 +181,7 @@ if (SLICE) {
       `${avg(s.entry).toFixed(1).padStart(7)}      ` +
       `${avg(s.levels).toFixed(1).padStart(5)} (${ace || '?'})`.padEnd(24) +
       `${avg(s.fights).toFixed(0).padStart(4)}s  ${avg(s.faints).toFixed(1).padStart(6)}  ${Math.round(avg(s.peaks)).toString().padStart(5)}   ${avg(s.balls).toFixed(2)} (${stage.maxBalls ?? '∞'})` +
+      `${avg(s.awakened).toFixed(1).padStart(9)}` +
       (s.blocked ? `   ${s.blocked} jornada(s) parada(s) aqui` : '')
     );
   }

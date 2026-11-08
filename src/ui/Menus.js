@@ -136,7 +136,7 @@ export class Menus {
       'modal-team': () => this.buildTeamDetail(),
       'modal-mart': () => this.buildMart(),
       'modal-decor': () => this.buildDecor(),
-      'modal-options': () => this.buildOptions(),
+      'modal-options': () => { this.confirmRestart = false; this.buildOptions(); },
       'modal-pc': () => this.pcScreen.open(),
       'modal-badges': () => this.badgeCase.open(options)
     };
@@ -350,6 +350,11 @@ export class Menus {
           : `<span style="opacity:.55">${a.name}</span>`))
         .join(' <span style="opacity:.4">→</span> ');
       const extras = member.abilities.slice(1).filter((id) => !isBonusMove(id)).map((id) => getAbility(id)?.name).filter(Boolean);
+      // a chave do Golpe Desperto (0.28): cada parte; completa, a chance a cada nível (0.33)
+      const key = awakeningKeyOf(member);
+      const keyText = key.every((p) => p.stacks >= p.max)
+        ? `chave completa · ${Math.round(CONFIG.bonusMove.chancePerLevel * 100)}% de despertar a cada nível`
+        : key.map((p) => `${awakeningPartName(p.up)} ${p.stacks}/${p.max}`).join(' · ');
       const second = member.abilities.find(isBonusMove);   // o 2º golpe (0.14)
       const upgrades = Object.entries(member.upgrades ?? {})
         .reduce((total, [, stacks]) => total + stacks, 0);
@@ -364,7 +369,7 @@ export class Menus {
         <div class="node-meta">${moves}</div>
         <div class="node-meta">${upgrades} melhoria(s)${extras.length ? ` · extra: ${extras.join(', ')}` : ''}</div>
         ${second ? `<div class="node-meta bonus-move" title="${getAbility(second).description}">✦ ${BONUS_MOVE_LABEL}: ${getAbility(second).name}</div>`
-          : awakeningKeyOf(member).length ? `<div class="node-meta awaken-key">✦ ${BONUS_MOVE_LABEL}: ${awakeningKeyOf(member).map((p) => `${awakeningPartName(p.up)} ${p.stacks}/${p.max}`).join(' · ')}</div>` : ''}
+          : key.length ? `<div class="node-meta awaken-key">✦ ${BONUS_MOVE_LABEL}: ${keyText}</div>` : ''}
       `;
       node.appendChild(body);
 
@@ -505,6 +510,7 @@ export class Menus {
       btn.onclick = () => { onClick(); saveOptions(); this.buildOptions(); };
       node.appendChild(btn);
       list.appendChild(node);
+      return node;
     };
 
     // o mixer: a música do lobby e das fases (a barra em degraus, a Poké Ball de manopla)
@@ -556,6 +562,35 @@ export class Menus {
       'Guarda o progresso no navegador, para o botão Jornada. O arquivo .json continua sendo o save oficial.',
       CONFIG.save.useLocalStorage ? 'Ligado' : 'Desligado',
       () => { CONFIG.save.useLocalStorage = !CONFIG.save.useLocalStorage; });
+
+    // reiniciar a jornada ativa do zero (0.33, pedido do Fellipe: saiu da tela de
+    // derrota e veio para cá, e pergunta antes de apagar tudo)
+    if (this.game.profile.trainer) {
+      if (this.confirmRestart) {
+        const node = create('div', 'node confirm-node');
+        node.dataset.option = 'restart-confirm';
+        node.innerHTML = `
+          <div class="node-icon">${icon('poke-ball')}</div>
+          <div class="node-body"><h4>Reiniciar a jornada</h4><p>Tem certeza que deseja reiniciar a jornada? Seu progresso começa do zero.</p></div>
+        `;
+        const actions = create('div', 'node-actions');
+        const yes = create('button', 'icon-btn danger', 'Sim, reiniciar');
+        yes.dataset.action = 'restart-yes';
+        yes.onclick = () => { this.confirmRestart = false; this.closeModal(); this.game.restartJourney(); };
+        const no = create('button', 'icon-btn', 'Cancelar');
+        no.dataset.action = 'restart-no';
+        no.onclick = () => { this.confirmRestart = false; this.buildOptions(); };
+        actions.append(yes, no);
+        node.appendChild(actions);
+        list.appendChild(node);
+      } else {
+        const restart = option(icon('poke-ball'), 'Reiniciar a jornada',
+          `Recomeça do zero a jornada de ${this.game.playerName}: insígnias, equipe e PC. A Pokédex, as conquistas e os Shards continuam.`,
+          'Reiniciar',
+          () => { this.confirmRestart = true; });
+        restart.dataset.option = 'restart';
+      }
+    }
 
     option(icon('escape-rope'), 'Apagar progresso local',
       'Remove o autosave do navegador. Não afeta os arquivos .json já salvos.',

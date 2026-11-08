@@ -2,7 +2,8 @@
  * O 2º GOLPE (D11 do PLANEJAMENTO, aprovado pelo Fellipe na 0.13; feito na 0.14).
  *
  * Quando um Pokémon completa a chave do golpe dele (as 3 melhorias de
- * data/awakening.js no máximo; 0.28), ele desperta um golpe a mais: do tipo
+ * data/awakening.js no máximo; 0.28), cada nível que ele sobe tem 4% de chance
+ * de despertar um golpe a mais (0.33; de 0.28 a 0.32 vinha na hora): do tipo
  * principal ou, em 1/3 das vezes, do secundário (CONFIG.bonusMove). Até a 0.27
  * era preciso ter todas as melhorias e contar com 2% por nível. Cada tipo tem 3
  * opções e ele recebe uma, ao acaso; um por Pokémon, para sempre. Ele mantém o

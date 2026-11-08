@@ -165,9 +165,10 @@ não abre até você vencer.
 - **Golpe Desperto**: cada golpe tem uma **chave** de 3 melhorias (o Hydro Pump do
   Gyarados: Velocidade, Perfuração e Potência; o Toxic do Gloom: Amplitude,
   Intensidade e Reflexo). Elas aparecem em dourado na tela de nível, com o aviso
-  "maximize para despertar"; com
-  as 3 no máximo, o Pokémon desperta na hora um golpe a mais do tipo dele (51 ao
-  todo: Flame Wheel, Whirlpool, Draco Meteor...), que usa junto do dele. As outras
+  "maximize para liberar"; com
+  as 3 no máximo, cada nível que ele sobe tem 4% de chance de despertar um golpe a
+  mais do tipo dele (51 ao todo: Flame Wheel, Whirlpool, Draco Meteor...), que usa
+  junto do dele. As outras
   melhorias continuam valendo; com todas no máximo, cada nível de melhoria cura
   20% sozinho, sem abrir tela.
 - **Lendários**: Articuno, Zapdos, Moltres, Mewtwo e Mew têm um golpe exclusivo
@@ -186,7 +187,9 @@ não abre até você vencer.
   Pokédex, as conquistas, os Shards, a mochila e o quarto valem para todas.
 - **Derrota sem perda**: o que a equipe ganhou na tentativa (níveis, melhorias,
   evoluções e capturas) fica; só a próxima fase não abre. No Centro Pokémon a
-  equipe é curada e você tenta de novo, ou rejoga fases anteriores para upar. O
+  equipe é curada e você tenta de novo, ou rejoga fases anteriores para upar.
+  Recomeçar a jornada do zero fica em Opções → Reiniciar a jornada, que pergunta
+  antes. O
   mapa da jornada mostra o **nível recomendado** de cada fase ao lado do nível da
   sua equipe.
 - **Pokédex na captura**: quem você já registrou aparece com uma Poké Ball ao

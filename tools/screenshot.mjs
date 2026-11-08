@@ -99,9 +99,13 @@ const ROTEIROS = {
            "game.menus.closeModal(); game.hub.enter({ map: 'casa_2f', x: 5, y: 6, dir: 'down' }); document.getElementById('toast-container').innerHTML = ''" },
     { wait: 1500 }, { shot: 'vila-14-quarto-decorado' }
   ],
+  // as Opções; com uma jornada ativa aparece o Reiniciar a jornada, que pergunta antes (0.33)
   opcoes: [
     { open: 'index.html' }, { wait: 500 },
-    { run: "game.menus.showModal('modal-options')" }, { wait: 700 }, { shot: 'opcoes' }
+    { run: "game.menus.showModal('modal-options')" }, { wait: 700 }, { shot: 'opcoes' },
+    { run: "game.menus.closeModal(); game.newGame(); game.chooseTrainer('leaf'); game.chooseName('Leaf'); game.menus.showModal('modal-options')" },
+    { wait: 900 }, { shot: 'opcoes-2-reiniciar' },
+    { run: "game.menus.confirmRestart = true; game.menus.buildOptions()" }, { wait: 500 }, { shot: 'opcoes-3-confirmar' }
   ],
   partida: [
     { open: 'index.html' }, { wait: 500 },
@@ -259,7 +263,7 @@ const ROTEIROS = {
     { run: "game.resolveCapture(); game.run.team.members.splice(3); game.run.pendingBall = true; game.run.state = 'capture'; game.openCapture()" },
     { wait: 900 }, { shot: 'captura-cheia-3-com-vaga', raw: true }
   ],
-  // a derrota: as duas saídas, o aviso de recomeçar do zero e o Centro Pokémon
+  // a derrota: o Centro Pokémon (reiniciar a jornada fica nas Opções desde a 0.33)
   derrota: [
     { open: 'index.html' }, { wait: 500 },
     { run: "game.newGame(); game.chooseTrainer('red'); game.chooseStarter('charmander'); game.campaign.clearedStages.push('gym_1_pewter');" +
@@ -268,10 +272,9 @@ const ROTEIROS = {
            "game.campaign.journey = { team: r.team.serialize(), pc: [] }; game.startStage('gym_2_cerulean');" +
            "game.run.captureSystem.capture('clefairy'); game.run.team.members.forEach((m) => { m.fainted = true; m.hp = 0; }); game.run.state = 'defeat'; })" },
     { wait: 1500 }, { shot: 'derrota-1-escolha', raw: true },
-    { run: "document.getElementById('btn-result-restart').click()" }, { wait: 400 }, { shot: 'derrota-2-confirmar', raw: true },
-    { run: "document.getElementById('btn-restart-no').click(); document.getElementById('btn-result-center').click()" },
-    { wait: 1200 }, { shot: 'derrota-3-centro', raw: true },
-    { run: "document.getElementById('btn-center-go').click()" }, { wait: 900 }, { shot: 'derrota-4-de-volta', raw: true }
+    { run: "document.getElementById('btn-result-center').click()" },
+    { wait: 1200 }, { shot: 'derrota-2-centro', raw: true },
+    { run: "document.getElementById('btn-center-go').click()" }, { wait: 900 }, { shot: 'derrota-3-de-volta', raw: true }
   ],
   // as conquistas em níveis, com algumas prontas para coletar e outras já subidas de degrau
   conquistas: [
@@ -455,7 +458,8 @@ const ROTEIROS = {
     { run: "game.newGame(); game.chooseTrainer('red'); game.chooseStarter('squirtle');" +
            "game.campaign.clearedStages.push('gym_1_pewter'); game.startStage('gym_2_cerulean');" +
            "const m = game.run.team.members[0]; m.level = 30; m.upgrades = { water_gun_damage: 3, water_gun_pierce: 1, water_gun_count: 2 };" +
-           "import('./src/data/upgrades.js').then(({ UPGRADES }) => { game.run.levelUpMember = m; m.pendingLevels = 1; game.run.state = 'levelup';" +
+           // levelUpOpen antes do estado: senão o jogo abre a tela dele, com outras opções, por cima desta
+           "import('./src/data/upgrades.js').then(({ UPGRADES }) => { game.run.levelUpMember = m; m.pendingLevels = 1; game.levelUpOpen = true; game.run.state = 'levelup';" +
            "game.hud.showLevelUp(m, [UPGRADES.water_gun_damage, UPGRADES.water_gun_count, UPGRADES.water_gun_pierce], () => {}); })" },
     { wait: 1200 }, { shot: 'despertar-1-nivel', raw: true },
     { run: "game.hud.hideLevelUp(); game.run.state = 'running'; game.campaign.journey = { ...(game.campaign.journey ?? {}), team: game.run.team.serialize() }; game.menus.showModal('modal-team')" },

@@ -38,8 +38,9 @@ export class PadNavigator {
       return;
     }
     if (button === 'b') {
-      // voltar: o botão de fechar ou de voltar da camada, se ela tiver
-      scope.querySelector('[data-close], [data-back], #capture-skip, #btn-restart-no')?.click();
+      // voltar: o botão de fechar ou de voltar da camada, se ela tiver (nas Opções, o ✕
+      // também desiste de reiniciar a jornada: a confirmação some ao reabrir)
+      scope.querySelector('[data-close], [data-back], #capture-skip')?.click();
       return;
     }
     const step = button === 'left' || button === 'up' ? -1 : 1;

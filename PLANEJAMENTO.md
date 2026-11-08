@@ -653,7 +653,7 @@ a estar nos líderes. Com o bot novo, metade das derrotas da Fase 1 é no Brock.
 | D8 | Celular e controle importam? | Controle feito na 0.7 (padrão); celular depois de Kanto fechado. | Etapa 6 |
 | D9 | Final e pós-jogo | Hall da Fama e créditos feitos na 0.7; os lendários vieram na 0.18 (sorteio próprio, da Fase 7 ao Campeão) e o Modo Livre na 0.20. Falta a revanche dos líderes. | Etapa 7 |
 | D10 | Como refinar o XP? (o Fellipe pediu sugestões na 0.9) | Ver as opções em "Segundo retorno" abaixo. Recomendação: orbes por faixa de valor com o visual de doce, que se juntam no chão. | — |
-| D11 | ✅ Feito na 0.14 (ver "O 2º golpe — 3 por tipo"); desde a 0.28 ele vem pela chave de 3 melhorias de cada golpe (`data/awakening.js`), não por sorteio. **Ideia do Fellipe (0.12):** quando um Pokémon chega ao máximo de melhorias, cada nível que ele sobe tem uma chance bem baixa de ganhar um **2º golpe**: ele mantém o golpe de hoje e passa a usar outro junto — o Charizard ganha um anel de fogo, por exemplo. Para todos. (O "mesmo golpe com um mega bônus" foi recusado.) | Recomendação: vale quando não há mais melhoria para sortear (é quando aparece a Poção de 20%). Em cada nível, ~2% de chance de uma das opções virar o **2º golpe** da espécie: um golpe de área do tipo dela que gira em volta do Pokémon (o anel), com o sprite de golpe do FireRed que o tipo já tem (Fogo: o anel de fogo do Fire Spin; Água: o redemoinho; Planta: as folhas; Elétrico: as faíscas...). Um por Pokémon, para sempre, e ele começa sem melhorias. A conferir: a %, se é por tipo ou por espécie, e se o 2º golpe também recebe melhorias depois. | — |
+| D11 | ✅ Feito na 0.14 (ver "O 2º golpe — 3 por tipo"); desde a 0.28 depende da chave de 3 melhorias de cada golpe (`data/awakening.js`), e desde a 0.33 a chave completa libera 4% de chance a cada nível (de 0.28 a 0.32 ensinava na hora). **Ideia do Fellipe (0.12):** quando um Pokémon chega ao máximo de melhorias, cada nível que ele sobe tem uma chance bem baixa de ganhar um **2º golpe**: ele mantém o golpe de hoje e passa a usar outro junto — o Charizard ganha um anel de fogo, por exemplo. Para todos. (O "mesmo golpe com um mega bônus" foi recusado.) | Recomendação: vale quando não há mais melhoria para sortear (é quando aparece a Poção de 20%). Em cada nível, ~2% de chance de uma das opções virar o **2º golpe** da espécie: um golpe de área do tipo dela que gira em volta do Pokémon (o anel), com o sprite de golpe do FireRed que o tipo já tem (Fogo: o anel de fogo do Fire Spin; Água: o redemoinho; Planta: as folhas; Elétrico: as faíscas...). Um por Pokémon, para sempre, e ele começa sem melhorias. A conferir: a %, se é por tipo ou por espécie, e se o 2º golpe também recebe melhorias depois. | — |
 | D12 | Shiny: "vamos implementar, não aparece shiny nos inimigos, apenas na captura e para o jogador" | ✅ Feito na 0.13.1; o inicial também (0.13.2, 1% na escolha). Em aberto: a chance (padrão 1% por opção da Poké Ball) e se o shiny ganha algum bônus além das cores (hoje, não) | — |
 
 Enquanto uma decisão não vem, a recomendação vale como padrão. O que foi feito
@@ -669,8 +669,8 @@ secundário, e ele fica com o primeiro que sair; o nome oficial; 60% do dano do
 golpe atual. O Air Slash ficou "para ver como fica". Raio do Céu virou **Bolt
 Strike** (Thunder já é um golpe do jogo).
 
-A regra (aprovada na 0.13; valeu até a 0.27, e desde a 0.28 o golpe vem quando a
-chave do golpe fica completa): quando o Pokémon já tem todas as melhorias, cada
+A regra (aprovada na 0.13; valeu até a 0.27; desde a 0.28 depende da chave do
+golpe, e desde a 0.33 a chave completa libera 4% a cada nível): quando o Pokémon já tem todas as melhorias, cada
 nível tem uma chance baixa (~2%) de dar o **2º golpe**: ele mantém o golpe dele
 e passa a usar outro junto. Cada tipo tem 3 opções e o Pokémon recebe **uma, ao
 acaso**. Os 3 de cada tipo têm mecânicas diferentes entre si e dos golpes que o

@@ -3,7 +3,7 @@
  * Nada de número mágico espalhado pelo gameplay: se precisar ajustar, ajuste aqui.
  */
 export const CONFIG = {
-  version: '0.32.3',
+  version: '0.33.0',
 
   canvas: { width: 1280, height: 720 },
 
@@ -191,14 +191,16 @@ export const CONFIG = {
   },
 
   /**
-   * O 2º golpe, o Golpe Desperto (0.14, data/bonusMoves.js). Desde a 0.28 vem na
-   * hora em que a chave do golpe fica completa (data/awakening.js; antes era 2%
-   * por nível com todas as melhorias, e 1% do tipo secundário). Em quem tem dois
-   * tipos, `secondaryShare` das vezes ele vem do secundário (a mesma proporção de
-   * antes, 1 para 2). O dano por acerto é `damageRatio` do golpe principal; as
-   * curas dele param em `healPerSecond` da vida máxima do Pokémon por segundo.
+   * O 2º golpe, o Golpe Desperto (0.14, data/bonusMoves.js). A chave do golpe
+   * completa (data/awakening.js) libera a chance dele: `chancePerLevel` a cada
+   * nível que o Pokémon sobe (0.33, o Fellipe: "quando você maximiza, você libera a
+   * chance de 4% de aprender quando evoluir de lvl"). De 0.28 a 0.32 a chave
+   * completa ensinava na hora; até a 0.27 eram 2% por nível com todas as melhorias.
+   * Em quem tem dois tipos, `secondaryShare` das vezes ele vem do secundário. O
+   * dano por acerto é `damageRatio` do golpe principal; as curas dele param em
+   * `healPerSecond` da vida máxima do Pokémon por segundo.
    */
-  bonusMove: { secondaryShare: 1 / 3, damageRatio: 0.6, healPerSecond: 0.02 },
+  bonusMove: { chancePerLevel: 0.04, secondaryShare: 1 / 3, damageRatio: 0.6, healPerSecond: 0.02 },
 
   capture: {
     choices: 4,              // opções por Poké Ball (0.11: eram 3)

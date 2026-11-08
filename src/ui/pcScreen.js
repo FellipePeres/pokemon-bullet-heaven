@@ -249,9 +249,10 @@ export class PCScreen {
     const second = mon.abilities?.find(isBonusMove);   // o 2º golpe (raro)
     if (second) info.appendChild(create('p', 'pc-data__line pc-data__bonus', `+ ${getAbility(second).name}`));
     else {
-      // a chave do Golpe Desperto (0.28): quanto falta
+      // a chave do Golpe Desperto (0.28): quanto falta; completa, a chance a cada nível (0.33)
       const { have, need } = awakeningProgress(mon);
-      if (need) info.appendChild(create('p', 'pc-data__line pc-data__bonus', `✦ Desperto ${have}/${need}`));
+      const chance = Math.round(CONFIG.bonusMove.chancePerLevel * 100);
+      if (need) info.appendChild(create('p', 'pc-data__line pc-data__bonus', have >= need ? `✦ Desperto ${chance}%/nível` : `✦ Desperto ${have}/${need}`));
     }
     const team = this.journey?.team;
     const where = mon.slot !== undefined ? 'No PC'

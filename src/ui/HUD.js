@@ -50,9 +50,6 @@ export class HUD {
     el('btn-result-menu').onclick = () => this.game.quitToMenu();
     // derrota: o Centro Pokémon, ou a jornada do zero (que pede confirmação)
     el('btn-result-center').onclick = () => this.game.pokemonCenter();
-    el('btn-result-restart').onclick = () => this._confirmRestart(true);
-    el('btn-restart-no').onclick = () => this._confirmRestart(false);
-    el('btn-restart-yes').onclick = () => this.game.restartJourney();
     el('btn-center-go').onclick = () => this.game.leaveCenter();
     el('btn-center-map').onclick = () => this.game.quitToMenu();
     el('capture-skip').onclick = () => this.game.resolveCapture();
@@ -279,6 +276,7 @@ export class HUD {
     const progression = this.game.run.progression;
     // a chave do Golpe Desperto (0.28): quanto falta das 3 melhorias que despertam o golpe
     const { have: keyHave, need: keyNeed } = awakeningProgress(member);
+    const keyChance = Math.round(CONFIG.bonusMove.chancePerLevel * 100);
     choices.forEach((up) => {
       const stacks = progression.stacksOf(up, member);
       const awaken = progression.isAwakeningPart(up, member);
@@ -290,7 +288,7 @@ export class HUD {
         <p>${up.description}</p>
         ${up.scope === 'tm' ? '' : up.maxStacks ? `<div class="stack-info">${stacks}/${up.maxStacks}</div>` : ''}
         ${up.scope === 'tm' ? '<div class="chip">TROCA O GOLPE BASE · MANTÉM AS MELHORIAS</div>' : ''}
-        ${awaken ? `<div class="chip awaken">Maximize para despertar um golpe novo · chave ${keyHave}/${keyNeed}</div>` : ''}
+        ${awaken ? `<div class="chip awaken">Maximize para liberar o ${BONUS_MOVE_LABEL} (${keyChance}% a cada nível) · chave ${keyHave}/${keyNeed}</div>` : ''}
       `;
       card.onclick = () => onPick(up.id);
       row.appendChild(card);
@@ -496,7 +494,6 @@ export class HUD {
 
     el('result-victory').classList.toggle('hidden', !victory);
     el('result-defeat').classList.toggle('hidden', victory);
-    hide(el('result-confirm'));
 
     clear(el('result-team')).append(...this._teamSummary(run.team.members));
 
@@ -518,14 +515,6 @@ export class HUD {
   }
 
   hideResult() { hide(el('result-overlay')); }
-
-  /** Recomeçar a jornada apaga o progresso da região: mostra o aviso antes. */
-  _confirmRestart(open) {
-    // o "voltar" do controle (B) também chega aqui, mesmo sem o aviso aberto
-    if (!open && el('result-confirm').classList.contains('hidden')) return;
-    el('result-defeat').classList.toggle('hidden', open);
-    el('result-confirm').classList.toggle('hidden', !open);
-  }
 
   /**
    * O Centro Pokémon: a equipe que volta para a fase, curada. Desde a 0.17 é a

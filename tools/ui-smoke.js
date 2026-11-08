@@ -469,8 +469,9 @@ check('derrota não avança a jornada', game.campaign.clearedStages.length === 0
 check('derrota guarda o que a equipe ganhou (níveis e melhorias)',
       game.campaign.journey?.team?.members[0]?.level === 9 && game.campaign.journey.team.members[0].upgrades.keep_test === 1,
       `nível ${game.campaign.journey?.team?.members[0]?.level}`);
-check('derrota oferece o Centro Pokémon e recomeçar a jornada',
-      !registry.get('result-defeat').classes.has('hidden') && registry.get('result-victory').classes.has('hidden'));
+check('derrota oferece o Centro Pokémon, e não mais recomeçar a jornada (foi para as Opções, 0.33)',
+      !registry.get('result-defeat').classes.has('hidden') && registry.get('result-victory').classes.has('hidden') &&
+      !registry.get('btn-result-restart') && !registry.get('result-confirm'));
 registry.get('btn-result-center').click();
 check('o Centro Pokémon mostra a equipe curada',
       game.centerOpen && !registry.get('center-overlay').classes.has('hidden') &&
@@ -751,25 +752,37 @@ registry.get('btn-center-map').click();
 check('do Centro Pokémon dá para voltar para a vila',
       !game.centerOpen && !game.run && registry.get('center-overlay').classes.has('hidden') && hubVisible());
 
-// ---- derrota → recomeçar a jornada do zero ----
+// ---- reiniciar a jornada do zero: nas Opções, com confirmação (0.33; até a 0.32, na derrota) ----
 const dexBefore = game.profile.pokedex.caught.length;
 game.startStage('gym_1_pewter');
 for (const member of game.run.team.members) member.fainted = true;
 game.run.state = 'defeat';
 game._handleRunState();
-registry.get('btn-result-restart').click();
-check('recomeçar a jornada pede confirmação antes',
-      !registry.get('result-confirm').classes.has('hidden') && registry.get('result-defeat').classes.has('hidden') &&
-      !!game.campaign.starter);
-registry.get('btn-restart-no').click();
-check('"Voltar" desiste de recomeçar',
-      registry.get('result-confirm').classes.has('hidden') && !registry.get('result-defeat').classes.has('hidden'));
-registry.get('btn-result-restart').click();
-registry.get('btn-restart-yes').click();
-check('recomeçar apaga a jornada e mantém a Pokédex e o Hall da Fama',
+registry.get('btn-result-center').click();
+registry.get('btn-center-map').click();   // da derrota para a vila, e de lá as Opções
+const optionNode = (key) => registry.get('options-list').children.find((n) => n.dataset?.option === key);
+const optionButton = (node) => node.children.find((c) => c.tagName === 'BUTTON');
+const confirmAction = (key) => optionNode('restart-confirm').children.find((c) => c.classes.has('node-actions'))
+  .children.find((b) => b.dataset.action === key);
+game.menus.showModal('modal-options');
+check('as Opções têm "Reiniciar a jornada", com uma jornada ativa', hubVisible() && !!optionNode('restart'));
+optionButton(optionNode('restart')).click();
+check('reiniciar pede confirmação antes, com o texto do Fellipe',
+      !!optionNode('restart-confirm') && !optionNode('restart') && !!game.campaign.starter &&
+      optionNode('restart-confirm').innerHTML.includes('Tem certeza que deseja reiniciar a jornada? Seu progresso começa do zero.'));
+confirmAction('restart-no').click();
+check('"Cancelar" desiste de reiniciar', !!optionNode('restart') && !optionNode('restart-confirm') && !!game.campaign.starter);
+optionButton(optionNode('restart')).click();
+game.menus.closeModal();
+game.menus.showModal('modal-options');
+check('fechar e abrir as Opções desfaz a pergunta', !!optionNode('restart') && !optionNode('restart-confirm'));
+optionButton(optionNode('restart')).click();
+confirmAction('restart-yes').click();
+check('reiniciar apaga a jornada e mantém a Pokédex e o Hall da Fama',
       !game.run && !game.campaign.starter && !game.campaign.journey && game.campaign.badges.length === 0 &&
       game.profile.pokedex.caught.length === dexBefore && game.profile.hallOfFame.length === 1);
-check('a jornada nova começa pela escolha de treinador', !registry.get('screen-trainer').classes.has('hidden'));
+check('a jornada nova começa pela escolha de treinador, com as Opções fechadas',
+      !registry.get('screen-trainer').classes.has('hidden') && registry.get('modal-options').classes.has('hidden'));
 
 // ---- o inicial também pode vir shiny (0.13.2): sorteado na escolha e guardado na jornada ----
 const starterChance = CONFIG.capture.shinyChance;

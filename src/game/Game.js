@@ -241,7 +241,8 @@ export class Game {
   }
 
   /**
-   * Recomeça a jornada ATIVA do zero (o "Recomeçar a jornada" da derrota). Sem
+   * Recomeça a jornada ATIVA do zero (o "Reiniciar a jornada" das Opções; até a
+   * 0.32, o "Recomeçar a jornada" da tela de derrota). Sem
    * jornada ativa, ela nasce aqui. Uma jornada nova, ao lado das outras, é o
    * `newJourney`.
    */
@@ -965,9 +966,10 @@ export class Game {
   }
 
   /**
-   * Recomeçar a jornada do zero: a campanha da região recomeça (insígnias,
-   * equipe e PC), e a Pokédex, as conquistas, os Shards, a mochila, o quarto e o
-   * Hall da Fama continuam, como na Nova jornada da tela de título.
+   * Reiniciar a jornada do zero (as Opções, depois da confirmação; 0.33): a
+   * campanha da região recomeça (insígnias, equipe e PC), e a Pokédex, as
+   * conquistas, os Shards, a mochila, o quarto e o Hall da Fama continuam, como na
+   * Nova jornada da tela de título. No meio de uma fase, a partida acaba sem guardar.
    */
   restartJourney() {
     this.run = null;

@@ -5,7 +5,7 @@
 > decisão foi tomada e o que falta fazer. O `README.md` é o manual de uso;
 > este aqui é o contexto de desenvolvimento.
 
-**Versão atual:** `0.32.3` · **Última atualização:** 2026-11-08
+**Versão atual:** `0.33.0` · **Última atualização:** 2026-11-08
 **Stack:** HTML + CSS + JavaScript puro (ES Modules). Sem backend, sem build, sem dependências.
 **Repositório:** https://github.com/FellipePeres/pokemon-bullet-heaven (público)
 **Jogo no ar:** https://fellipeperes.github.io/pokemon-bullet-heaven/
@@ -63,7 +63,8 @@ campanha inteira várias vezes com o jogador virtual (`tools/bot.mjs`, o mesmo d
 outra** (a derrota guarda o progresso, como no jogo). Mostra por fase: quantas
 jornadas venceram de primeira, a média de tentativas até passar (`--attempts`,
 padrão 10, é o teto; quem não passa "para ali"), o nível médio da equipe ao
-vencer, a duração da luta, desmaios e pico de inimigos.
+vencer, a duração da luta, desmaios, pico de inimigos, Poké Balls e quantos da
+equipe têm o Golpe Desperto ao vencer (coluna "despertos", 0.33).
 
 **Conferência visual (desde a 0.5).** `tools/screenshot.mjs` abre o jogo no Chrome
 (ou Edge) sem janela, executa um dos 38 roteiros (os mais usados: `vitrine`,
@@ -370,25 +371,33 @@ Nunca voltar bônus globais para o pool de level up — foi pedido explícito.
   seria velocidade, penetração e dano; o Gloom, área, intervalo entre os danos e
   cooldown"). Cada golpe tem **3 melhorias que formam a chave**
   (`data/awakening.js`: `AWAKENING_KEYS` por golpe, `AWAKENING_BY_BEHAVIOR` para o
-  resto); com as 3 no máximo, o 2º golpe vem **na hora, sem sorteio**
-  (`ProgressionSystem.maybeLearnBonusMove`, chamado ao aplicar a melhoria, ao
-  trocar de golpe, ao subir de nível e no `trainToLevel`). A chave é do golpe, não
+  resto). **Com as 3 no máximo, a chance do 2º golpe fica liberada: 4% a cada
+  nível que o Pokémon sobe** (0.33, o Fellipe: "ele não aprende quando você
+  maximiza os status obrigatórios, quando você maximiza, você libera a chance de 4%
+  de aprender quando evoluir de lvl"; `CONFIG.bonusMove.chancePerLevel`,
+  `ProgressionSystem.rollBonusMove` a cada nível do `addXpTo`). Fechar a chave
+  avisa: "X completou a chave: 4% de chance de despertar um golpe a cada nível".
+  De 0.28 a 0.32, a chave completa ensinava na hora, sem sorteio. A chave é do golpe, não
   da espécie, porque as melhorias são do golpe (o Gyarados usa Hydro Pump, o Gloom
   usa Toxic); trocar de golpe transfere as melhorias, então o progresso quase
   sempre vem junto. Todas somam 11 a 13 melhorias (33 a 39 níveis no mínimo; o
   `check-data` confere). Padrão até o Fellipe decidir golpe a golpe.
   - **Na tela de nível**, a melhoria da chave vem com moldura dourada e o aviso
-    "Maximize para despertar um golpe novo · chave 4/12" embaixo (pedido do
-    Fellipe; o selo "✦ GOLPE DESPERTO" no canto saiu na 0.28.1, também a pedido
-    dele); na janela da equipe, o progresso de cada parte; no PC, "✦ Desperto
-    4/12". Roteiro `despertar` no `screenshot.mjs`.
+    "Maximize para liberar o Golpe Desperto (4% a cada nível) · chave 4/12"
+    embaixo (pedido do Fellipe; o selo "✦ GOLPE DESPERTO" no canto saiu na 0.28.1,
+    também a pedido dele); na janela da equipe, o progresso de cada parte ("chave
+    completa · 4% de despertar a cada nível" quando fecha); no PC, "✦ Desperto
+    4/12" ("✦ Desperto 4%/nível" com a chave completa). Roteiro `despertar` no
+    `screenshot.mjs`.
   - O golpe é um dos 3 do tipo principal ou, em quem tem dois tipos, um dos 3 do
     secundário em 1/3 das vezes (`CONFIG.bonusMove.secondaryShare`, a proporção
     dos antigos 2% e 1%). Um por Pokémon, para sempre; ele mantém o golpe dele e
     usa os dois.
   - **Quem chega tarde** (`trainToLevel`) recebe primeiro as melhorias da chave:
-    um Gyarados capturado no nível 45 já chega desperto (sem a tela). Saves de
-    antes da 0.28 com a chave completa despertam ao carregar.
+    um Gyarados capturado no nível 45 chega com a chave feita e a chance
+    liberada, mas o golpe só vem subindo de nível (até a 0.32 ele já chegava
+    desperto). Quem já tinha despertado continua com o golpe; os lendários
+    continuam chegando com ele (o kit).
   - O bot (`tools/bot.mjs`) escolhe TM, depois a chave, depois dano.
   - Até a 0.27: com **todas** as melhorias (~18, nível ~54), 2% por nível do tipo
     principal e 1% do secundário.
@@ -820,13 +829,19 @@ Nunca voltar bônus globais para o pool de level up — foi pedido explícito.
   terminando no ace. Vencer dá insígnia + Shards.
 - A **jornada carrega equipe, níveis e build** de uma fase para a próxima
   (`regions.kanto.journey`). **Desde a 0.17 a derrota também carrega** (ver
-  "Progressão por tentativas" abaixo). A **derrota tem duas saídas** (0.11.1): o
-  **Centro Pokémon** (`Game.pokemonCenter`) cura a equipe da jornada — a do fim
-  da tentativa, com o que ela ganhou — e a fase recomeça (`leaveCenter`); ali
-  mesmo dá para abrir o PC ou voltar para a vila (0.29; antes, o mapa da
-  jornada). Ou **recomeçar a jornada** do zero (`restartJourney` → `newGame`),
-  com confirmação: perde insígnias, equipe e PC da região; Pokédex, conquistas,
-  Shards, a mochila, o quarto e o Hall da Fama ficam.
+  "Progressão por tentativas" abaixo). A **derrota leva ao Centro Pokémon**
+  (`Game.pokemonCenter`), que cura a equipe da jornada — a do fim da tentativa,
+  com o que ela ganhou — e a fase recomeça (`leaveCenter`); ali mesmo dá para
+  abrir o PC ou voltar para a vila (0.29; antes, o mapa da jornada).
+- **Reiniciar a jornada do zero fica nas Opções** (0.33, o Fellipe: "quando
+  derrotado, não deve aparecer a opção de recomeçar do zero a jornada... essa
+  opção deve existir nas configurações"; de 0.11.1 a 0.32 era a 2ª saída da
+  derrota). Só aparece com uma jornada ativa e, antes de apagar, pergunta no
+  próprio item: "Tem certeza que deseja reiniciar a jornada? Seu progresso começa
+  do zero." (Sim, reiniciar / Cancelar; fechar as Opções também desiste;
+  `Menus.buildOptions`, `restartJourney` → `newGame`). Perde insígnias, equipe e
+  PC da região; Pokédex, conquistas, Shards, a mochila, o quarto e o Hall da Fama
+  ficam. No meio de uma fase, a partida acaba sem guardar.
 - **Kanto tem 13 etapas** (0.7): os 8 ginásios, a Elite Four em 4 salas (uma por
   membro, cada uma com o time de 5 do FireRed) e o Campeão. Os times são os do
   FireRed, com os níveis dele; o do rival muda pelo seu inicial
@@ -939,7 +954,7 @@ Valores em `src/core/config.js` (o que não estiver lá está em `/data`):
 | Duração das fases | 2:45 até o líder em todas (~3:15 com a luta), desde a 0.15 (3:30 na 0.11) |
 | Opções por Poké Ball | 4 (tabelas acumuladas; os outros iniciais raros da Fase 3 em diante) |
 | Selvagens por nível (Fase 3+) | vida ×1,075 e dano ×1,035 por nível acima do 5; XP +8% por nível |
-| Golpe Desperto | 60% do dano do golpe principal; 1/3 das vezes do 2º tipo; curas com teto de 2% da vida por segundo (`CONFIG.bonusMove`) |
+| Golpe Desperto | com a chave completa, 4% de chance a cada nível (0.33); 60% do dano do golpe principal; 1/3 das vezes do 2º tipo; curas com teto de 2% da vida por segundo (`CONFIG.bonusMove`) |
 | Modo Livre | XP ×0,4; inimigos ×1,2 por minuto (composto) e +8% por minuto até o dobro; um elite por minuto e uma Poké Ball a cada 3 min (`CONFIG.endless`) |
 
 **A vantagem de tipo medida na 0.32** (24 jornadas por inicial,
@@ -1457,6 +1472,8 @@ Nenhum pedido do Fellipe em aberto. O que está planejado:
 | 41 | ler o HANDOFF e arrumar tudo o que estava desatualizado no projeto inteiro | 0.32.1: o HANDOFF conferido com o código (arquitetura com os arquivos que faltavam, contagens, Poké Balls, Shards, o Mart na vila, o Modo Livre e o Centro levando à vila, save, estado do conteúdo, próximos passos, histórico em ordem); README, PLANEJAMENTOs e PROVENIENCIA atualizados; comentários vencidos no código; nas Opções, o tremor (só os líderes) e o autosave (botão Jornada); a Ajuda com os controles da vila; a arte oficial (código morto) e o `.pyc` versionado saíram |
 | 42 | o "Sobre" do GitHub estava "IAzudo": humanizar e pôr os controles (setas e demais), com o Espaço como a tecla de ação | 0.32.2: a descrição do repositório reescrita (`gh repo edit`), com os controles; na Ajuda do jogo e no README, o Espaço como a ação da vila (Enter e Z também servem) |
 | 43 | o banner do README estava muito antigo (era o da primeira versão) | 0.32.3: `assets/banner.png`, o logo do jogo sobre a arte do título, gerado de `tools/banner.html` pelo roteiro `banner` (some o `banner.svg` da 0.4); na vila, o rodapé diz "Espaço ação" (era "Enter falar"), e as teclas dele perderam a sombra do texto, que borrava as letras ("a sombra dos controles no rodapé está deixando ruim de enxergar") |
+| 44 | o Golpe Desperto não vem quando a chave fica completa: maximizar libera a chance de 4% de aprender a cada nível | 0.33: `CONFIG.bonusMove.chancePerLevel` (0,04) e `ProgressionSystem.rollBonusMove` a cada nível; a chave fechada só avisa; quem chega tarde vem com a chance liberada, sem o golpe; os textos da tela de nível, da equipe e do PC dizem a chance; o `balance.mjs` ganhou a coluna "despertos"; medido (seção 5) |
+| 45 | na derrota, não oferecer recomeçar a jornada do zero; a opção fica nas configurações, com a confirmação "tem certeza que deseja reiniciar a jornada, seu progresso começa do zero" | 0.33: a derrota só com o Centro Pokémon; "Reiniciar a jornada" nas Opções (só com jornada ativa), com a pergunta no próprio item (Sim, reiniciar / Cancelar); testes e roteiros `opcoes` e `derrota` refeitos |
 
 ---
 

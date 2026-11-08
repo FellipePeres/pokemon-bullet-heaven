@@ -5,9 +5,11 @@
  * recarga").
  *
  * Cada golpe tem 3 melhorias que formam a chave dele. Quando as 3 chegam ao
- * máximo, o Pokémon desperta o 2º golpe na hora (data/bonusMoves.js) — sem
- * sorteio. Antes (0.14 a 0.27) era preciso ter TODAS as melhorias e torcer por
- * 2% a cada nível.
+ * máximo, a chance do 2º golpe (data/bonusMoves.js) fica liberada: 4% a cada
+ * nível que o Pokémon sobe (`CONFIG.bonusMove.chancePerLevel`, 0.33, o Fellipe:
+ * "quando você maximiza, você libera a chance de 4% de aprender quando evoluir de
+ * lvl"). De 0.28 a 0.32 ele vinha na hora; antes (0.14 a 0.27) era preciso ter
+ * TODAS as melhorias e torcer por 2% a cada nível.
  *
  * A chave é do golpe, não da espécie, porque as melhorias são do golpe: o
  * Gyarados usa Hydro Pump e o Gloom usa Toxic. Se o golpe troca (TM ou
