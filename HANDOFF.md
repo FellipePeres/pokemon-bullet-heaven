@@ -1323,14 +1323,13 @@ Nenhum pedido do Fellipe em aberto. O que está planejado:
   capricho), o modo Endless pelo mato alto e o modo aquático pela lagoa (cada um
   com o seu plano, quando chegar a vez) e as decisões da seção 13 de lá (o nome
   da vila, pegar o inicial na mesa, entrar em todas as casas, o rival).
-- **O modo aquático** (2026-11-08): o Fellipe está pensando nele. Já decidido: vai
-  ser **diferente do Bullet Heaven** e vai usar os **tiles do Emerald** (o FireRed
-  não tem fundo do mar). O decomp do Emerald foi baixado em
-  `D:\fellipe\Dev\pokeemerald` (pret/pokeemerald, commit `731ad5b`, clone
-  parcial: tilesets General e Underwater, os mapas submersos das Rotas 124 e 126,
-  o jogador nadando, as bolhas). **Não criar nada do modo até ele decidir.** A
-  maquete visual que comparou FireRed e Emerald é o artifact privado "Fundo da
-  Lagoa" (https://claude.ai/artifact/WzWyZwbiZhLRox7na5T1VQ).
+- **O modo aquático** ([PLANEJAMENTO-DIVE.md](PLANEJAMENTO-DIVE.md), combinado em
+  2026-11-08): uma descida em tiles do Emerald, num tabuleiro de 10×6, desviando de
+  hordas que ocupam linhas inteiras; 6 níveis, 3 bolhas de vida (o bolsão de ar no
+  Nível 3), o resgate no Centro Pokémon ao perder; depois do 6, a caverna do Kyogre
+  e uma luta de Bullet Heaven para nível 90+, com a captura pela Dive Ball (10%).
+  O decomp do Emerald está em `D:\fellipe\Dev\pokeemerald` (pret/pokeemerald,
+  commit `731ad5b`, clone parcial). Próximo passo: a maquete jogável da descida.
 - **O roteiro geral** ([PLANEJAMENTO.md](PLANEJAMENTO.md), combinado em
   2026-11-02): o som que falta (gritos e efeitos, Etapa 5), o celular e os assets
   locais da interface (Etapa 6), o pós-jogo além do Modo Livre (a revanche dos
@@ -1494,6 +1493,7 @@ Nenhum pedido do Fellipe em aberto. O que está planejado:
 | 44 | o Golpe Desperto não vem quando a chave fica completa: maximizar libera a chance de 4% de aprender a cada nível | 0.33: `CONFIG.bonusMove.chancePerLevel` (0,04) e `ProgressionSystem.rollBonusMove` a cada nível; a chave fechada só avisa; quem chega tarde vem com a chance liberada, sem o golpe; os textos da tela de nível, da equipe e do PC dizem a chance; o `balance.mjs` ganhou a coluna "despertos"; medido (seção 5) |
 | 45 | na derrota, não oferecer recomeçar a jornada do zero; a opção fica nas configurações, com a confirmação "tem certeza que deseja reiniciar a jornada, seu progresso começa do zero" | 0.33: a derrota só com o Centro Pokémon; "Reiniciar a jornada" nas Opções (só com jornada ativa), com a pergunta no próprio item (Sim, reiniciar / Cancelar); testes e roteiros `opcoes` e `derrota` refeitos |
 | 46 | começar pela L-6 (o golpe Dive e a TM Dive); o modo aquático vai ser diferente do Bullet Heaven e vai usar os tiles do Emerald, mas ainda não criar nada dele | 0.34: o Dive (`tmOnly`, fora do sorteio) com o comportamento do Dig na horda mais perto; a TM Dive no Mart (`tm_dive`), só com um Pokémon de Água desperto; a fala do vendedor com `diveTm`; testes e o roteiro `dive`; o decomp do Emerald baixado para depois (seção 10) |
+| 47 | o modo aquático: tiles do Emerald, andar em tiles num espaço de 10×6, hordas de Pokémon aquáticos ocupando linhas inteiras para desviar, montado no Pokémon do Dive; 6 níveis cada vez mais difíceis com uma animação obrigatória entre eles; 3 bolhas de vida que voltam no Nível 3 ("um bolsão de ar"); ao morrer, o Centro Pokémon com a enfermeira contando que o pescador o pescou; hordas de Kanto até o 3, misturadas no 4, de Hoenn no 5 e no 6; depois do 6, a caverna do Kyogre e uma fase de Bullet Heaven 90+, com a captura pela Dive Ball (10%), a luta seguindo até o fim da fase e a volta pela lagoa | planejado em PLANEJAMENTO-DIVE.md (2026-11-08), nada construído; as decisões que faltam estão na seção 12 de lá |
 
 ---
 

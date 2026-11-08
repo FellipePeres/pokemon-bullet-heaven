@@ -273,11 +273,9 @@ então o Dive precisa de uma marca para ficar de fora.
 - Padrão: só dispara ao interagir com a água (`A` de frente para ela), para não
   entrar por acidente.
 
-**O modo aquático** ainda vai ser pensado pelo Fellipe. Já decidido (2026-11-08):
-vai ser **diferente do Bullet Heaven** e vai usar os **tiles do Emerald**, que tem
-o fundo do mar (o FireRed não tem). O decomp do Emerald está em
-`D:\fellipe\Dev\pokeemerald` (pret/pokeemerald, commit `731ad5b`, clone parcial).
-Nada do modo é criado antes de ele decidir.
+**O modo aquático** tem o próprio plano: [PLANEJAMENTO-DIVE.md](PLANEJAMENTO-DIVE.md)
+(2026-11-08). É uma descida em tiles do Emerald desviando de hordas, com 6 níveis
+e a caverna do Kyogre no fim.
 
 **Feito na 0.34 (L-6):** o Dive (`data/bonusMoves.js`, `tmOnly`) e a TM Dive
 (`tm_dive` em `data/items.js`, 1.500) como descrito acima; a troca é para sempre
