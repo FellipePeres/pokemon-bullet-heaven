@@ -471,6 +471,7 @@ export class Hub {
       dex: game.tracker.dexProgress.caught,
       veteran: game.listJourneys().some((j) => !j.active && j.progress?.starter),
       dive: members.some((m) => m.abilities?.includes('dive')),
+      diveTm: game.martTargets('tm_dive').length > 0,
       locked: !!extra.locked,
       item: extra.item ?? '',
       player: game.playerName,
@@ -483,7 +484,7 @@ export class Hub {
     if (!when) return true;
     for (const [key, value] of Object.entries(when)) {
       switch (key) {
-        case 'starter': case 'shiny': case 'champion': case 'veteran': case 'dive': case 'locked':
+        case 'starter': case 'shiny': case 'champion': case 'veteran': case 'dive': case 'diveTm': case 'locked':
           if (ctx[key] !== value) return false;
           break;
         case 'starterIs': if (ctx.starterId !== value) return false; break;

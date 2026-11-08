@@ -5,7 +5,7 @@
 > decisão foi tomada e o que falta fazer. O `README.md` é o manual de uso;
 > este aqui é o contexto de desenvolvimento.
 
-**Versão atual:** `0.33.0` · **Última atualização:** 2026-11-08
+**Versão atual:** `0.34.0` · **Última atualização:** 2026-11-08
 **Stack:** HTML + CSS + JavaScript puro (ES Modules). Sem backend, sem build, sem dependências.
 **Repositório:** https://github.com/FellipePeres/pokemon-bullet-heaven (público)
 **Jogo no ar:** https://fellipeperes.github.io/pokemon-bullet-heaven/
@@ -67,7 +67,7 @@ vencer, a duração da luta, desmaios, pico de inimigos, Poké Balls e quantos d
 equipe têm o Golpe Desperto ao vencer (coluna "despertos", 0.33).
 
 **Conferência visual (desde a 0.5).** `tools/screenshot.mjs` abre o jogo no Chrome
-(ou Edge) sem janela, executa um dos 38 roteiros (os mais usados: `vitrine`,
+(ou Edge) sem janela, executa um dos 39 roteiros (os mais usados: `vitrine`,
 `treinador`, `vila`, `jornada`, `partida`, `ux`, `efetivo`; um nome desconhecido lista
 todos), salva PNGs e lista os erros de JavaScript da página. Sai com código 1
 se a página tiver erro. A `vitrine.html` desenha os assets com o mesmo código da
@@ -130,7 +130,7 @@ src/
   data/               ⭐ CONTEÚDO (só dados, sem lógica)
     pokemon.js        as 151 espécies: tipos, hp, power, evolução, moveLine
     abilities.js      61 golpes: os 52 jogáveis (no máximo 4 por tipo), os 5 exclusivos dos lendários e os 4 dos líderes
-    bonusMoves.js     o Golpe Desperto (0.14): 51 golpes, 3 por tipo
+    bonusMoves.js     o Golpe Desperto (0.14): 51 golpes, 3 por tipo, e o Dive (0.34, só pela TM Dive)
     awakening.js      a chave do Golpe Desperto (0.28): as 3 melhorias de cada golpe
     legendaries.js    os lendários (0.16): golpe exclusivo, kit, poder e onde aparecem (0.18)
     items.js          o Poké Mart (0.23): itens, preços e quem evolui com cada item
@@ -485,6 +485,18 @@ Nunca voltar bônus globais para o pool de level up — foi pedido explícito.
   Troca **2.500** cada (evoluem agora: `evolveMember`, as mesmas regras de golpe da
   evolução por nível). A TM e os de evolução abrem, no card, a lista de quem da
   jornada (equipe ou PC) pode receber; sem ninguém, o botão fica apagado.
+- **A TM Dive (0.34, a L-6 do PLANEJAMENTO-LOBBY):** **1.500**, `kind: 'tm_dive'`.
+  Troca **para sempre** o Golpe Desperto de um Pokémon **de Água** (tipo principal
+  ou secundário, equipe ou PC) por **Dive**; o golpe principal fica. Só aparece na
+  loja quando alguém pode aprender (`martTargets('tm_dive')` não vazio), e a lista
+  mostra o golpe esquecido ("esquece Surf → Dive"). Um Pokémon de dois tipos que
+  despertou o golpe do outro tipo (o Kabuto com Rock Tomb) também troca. O Dive
+  está em `data/bonusMoves.js` com `tmOnly: true`, que o deixa **fora do sorteio**
+  do Golpe Desperto (`BONUS_BY_TYPE`). Em campo é o comportamento do Dig (`rain`
+  com `ownerBlink`): o Pokémon some, intocável, e sai embaixo da horda **mais
+  perto** (o Dig vai no mais forte), num impacto de água em área. Na vila, o
+  vendedor comenta uma vez quando a TM aparece (condição `diveTm`), e com Dive na
+  equipe o pescador e a lagoa mudam; o SIM da lagoa ainda diz "em breve".
 - **Na fase:** o Reviver aparece no card de quem desmaiou ("✚ Reviver", pulsando):
   clicar traz de volta com metade da vida, e ele entra em campo se houver vaga
   (`Game.useRevive`). O Novo Sorteio aparece na tela da Poké Ball (não nos
@@ -1297,7 +1309,7 @@ animados desde a 0.7.
 **Ainda não existe** (ver `PLANEJAMENTO.md` e `PLANEJAMENTO-LOBBY.md`): os gritos e
 os efeitos sonoros (a música existe desde a 0.11), o celular (o controle funciona
 desde a 0.7), a revanche dos líderes, as outras regiões e, na vila, o modo Endless
-(o mato alto), o modo aquático e a TM Dive (a lagoa).
+(o mato alto) e o modo aquático (a lagoa; a TM Dive existe desde a 0.34).
 
 `npm run check` mostra o quadro das tabelas de captura sempre atualizado.
 
@@ -1307,11 +1319,18 @@ desde a 0.7), a revanche dos líderes, as outras regiões e, na vila, o modo End
 
 Nenhum pedido do Fellipe em aberto. O que está planejado:
 
-- **A vila** ([PLANEJAMENTO-LOBBY.md](PLANEJAMENTO-LOBBY.md)): a L-6 (o golpe Dive e
-  a TM Dive no Mart, só para Pokémon de Água com o Golpe Desperto), a L-7 (sons e
+- **A vila** ([PLANEJAMENTO-LOBBY.md](PLANEJAMENTO-LOBBY.md)): a L-7 (sons e
   capricho), o modo Endless pelo mato alto e o modo aquático pela lagoa (cada um
   com o seu plano, quando chegar a vez) e as decisões da seção 13 de lá (o nome
   da vila, pegar o inicial na mesa, entrar em todas as casas, o rival).
+- **O modo aquático** (2026-11-08): o Fellipe está pensando nele. Já decidido: vai
+  ser **diferente do Bullet Heaven** e vai usar os **tiles do Emerald** (o FireRed
+  não tem fundo do mar). O decomp do Emerald foi baixado em
+  `D:\fellipe\Dev\pokeemerald` (pret/pokeemerald, commit `731ad5b`, clone
+  parcial: tilesets General e Underwater, os mapas submersos das Rotas 124 e 126,
+  o jogador nadando, as bolhas). **Não criar nada do modo até ele decidir.** A
+  maquete visual que comparou FireRed e Emerald é o artifact privado "Fundo da
+  Lagoa" (https://claude.ai/artifact/WzWyZwbiZhLRox7na5T1VQ).
 - **O roteiro geral** ([PLANEJAMENTO.md](PLANEJAMENTO.md), combinado em
   2026-11-02): o som que falta (gritos e efeitos, Etapa 5), o celular e os assets
   locais da interface (Etapa 6), o pós-jogo além do Modo Livre (a revanche dos
@@ -1474,6 +1493,7 @@ Nenhum pedido do Fellipe em aberto. O que está planejado:
 | 43 | o banner do README estava muito antigo (era o da primeira versão) | 0.32.3: `assets/banner.png`, o logo do jogo sobre a arte do título, gerado de `tools/banner.html` pelo roteiro `banner` (some o `banner.svg` da 0.4); na vila, o rodapé diz "Espaço ação" (era "Enter falar"), e as teclas dele perderam a sombra do texto, que borrava as letras ("a sombra dos controles no rodapé está deixando ruim de enxergar") |
 | 44 | o Golpe Desperto não vem quando a chave fica completa: maximizar libera a chance de 4% de aprender a cada nível | 0.33: `CONFIG.bonusMove.chancePerLevel` (0,04) e `ProgressionSystem.rollBonusMove` a cada nível; a chave fechada só avisa; quem chega tarde vem com a chance liberada, sem o golpe; os textos da tela de nível, da equipe e do PC dizem a chance; o `balance.mjs` ganhou a coluna "despertos"; medido (seção 5) |
 | 45 | na derrota, não oferecer recomeçar a jornada do zero; a opção fica nas configurações, com a confirmação "tem certeza que deseja reiniciar a jornada, seu progresso começa do zero" | 0.33: a derrota só com o Centro Pokémon; "Reiniciar a jornada" nas Opções (só com jornada ativa), com a pergunta no próprio item (Sim, reiniciar / Cancelar); testes e roteiros `opcoes` e `derrota` refeitos |
+| 46 | começar pela L-6 (o golpe Dive e a TM Dive); o modo aquático vai ser diferente do Bullet Heaven e vai usar os tiles do Emerald, mas ainda não criar nada dele | 0.34: o Dive (`tmOnly`, fora do sorteio) com o comportamento do Dig na horda mais perto; a TM Dive no Mart (`tm_dive`), só com um Pokémon de Água desperto; a fala do vendedor com `diveTm`; testes e o roteiro `dive`; o decomp do Emerald baixado para depois (seção 10) |
 
 ---
 

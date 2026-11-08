@@ -112,7 +112,8 @@ o PC.
 numa derrota), da **primeira** vitória de cada fase e das conquistas. Gaste no
 **Poké Mart** (o balcão do Centro Pokémon, na vila, ou o botão no mapa da jornada):
 Novo Sorteio (300) e Reviver (600) vão para a mochila; a TM (1.500) ensina o
-próximo golpe na hora; as pedras e o Cabo de Troca (2.500) são a única forma de
+próximo golpe na hora; a TM Dive (1.500), que só aparece quando um Pokémon de
+Água já tem o Golpe Desperto, troca esse golpe por Dive para sempre; as pedras e o Cabo de Troca (2.500) são a única forma de
 evoluir quem evolui por item (Pikachu, Eevee, Kadabra, Gloom...). E na loja de
 Pokédolls, nos enfeites do quarto.
 
@@ -137,7 +138,7 @@ não abre até você vencer.
   o prêmio do Dojo de Saffron: Hitmonlee ou Hitmonchan).
 - **52 golpes** com o sprite da animação do FireRed, no máximo 4 por tipo, sobre 7
   comportamentos genéricos (projétil, arco, órbita, aura, zona de chão, onda de
-  choque e raio em corrente), fora os 51 do Golpe Desperto e os 5 exclusivos dos
+  choque e raio em corrente), fora os 51 do Golpe Desperto (mais o Dive, que vem da TM Dive) e os 5 exclusivos dos
   lendários (abaixo).
 - **Cenário do FireRed**: cada trecho da jornada é montado com as metatiles do lugar
   (a grama e as árvores da Rota 1, a mata da Floresta de Viridian, o Monte Lua) e

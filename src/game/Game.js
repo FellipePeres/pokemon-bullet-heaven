@@ -35,6 +35,7 @@ import { getDecor, decorMax } from '../data/decor.js';
 import { evolveMember, learnNextMove } from '../systems/moves.js';
 import { nextMoveFor } from '../data/tms.js';
 import { getAbility } from '../data/abilities.js';
+import { isBonusMove } from '../data/bonusMoves.js';
 import { maxHpFor } from '../systems/stats.js';
 
 /**
@@ -1040,6 +1041,13 @@ export class Game {
         .filter((m) => m.result)
         .map((m) => ({ ...m, label: `${getAbility(m.member.abilities[0])?.name} → ${getAbility(m.result)?.name}` }));
     }
+    if (item.kind === 'tm_dive') {
+      // de Água (principal ou secundário), com um Golpe Desperto que ainda não é o Dive
+      return mons.filter((m) => getPokemon(m.member.pokemonId)?.types.includes('water'))
+        .map((m) => ({ ...m, result: m.member.abilities?.find(isBonusMove) }))
+        .filter((m) => m.result && m.result !== 'dive')
+        .map((m) => ({ ...m, label: `esquece ${getAbility(m.result)?.name} → Dive` }));
+    }
     if (item.kind === 'evolution') {
       return mons.map((m) => ({ ...m, result: itemEvolutions(m.member.pokemonId)[itemId] }))
         .filter((m) => m.result)
@@ -1068,6 +1076,12 @@ export class Game {
         const learned = learnNextMove(target.member);
         if (!learned) return false;
         toast(`${name} aprendeu ${getAbility(learned).name}!`, 'tm');
+      } else if (item.kind === 'tm_dive') {
+        // para sempre, como o Golpe Desperto: o golpe de antes sai do lugar dele
+        const slot = target.member.abilities.indexOf(target.result);
+        if (slot < 0) return false;
+        target.member.abilities[slot] = 'dive';
+        toast(`${name} esqueceu ${getAbility(target.result).name} e aprendeu Dive!`, 'tm');
       } else {
         const result = evolveMember(target.member, target.result);
         if (!result) return false;

@@ -392,6 +392,8 @@ export class Menus {
     el('mart-shards').innerHTML = `${iconHTML('shards', 18)} <b>${shards.toLocaleString('pt-BR')}</b> Shards`;
 
     for (const item of MART_ITEMS) {
+      // a TM Dive só aparece quando alguém da jornada pode aprender (0.34)
+      if (item.kind === 'tm_dive' && !game.martTargets(item.id).length) continue;
       const card = create('div', 'shop-card mart-card');
       const evolves = item.kind === 'evolution'
         ? `Evolui agora: ${evolvedBy(item.id).map((p) => p.name).join(', ')}.` : item.description;

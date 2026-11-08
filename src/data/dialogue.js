@@ -18,6 +18,7 @@
  *            dex       quantos Pokémon na Pokédex: [mínimo, máximo]
  *            veteran   já começou outra jornada antes desta
  *            dive      alguém da equipe sabe Dive (seção 8 do planejamento)
+ *            diveTm    a TM Dive está na loja: alguém da jornada pode aprender (0.34)
  *            locked    a saída que este guarda está travada (a fala da trava)
  *            once      só uma vez por jornada: a chave fica guardada depois de mostrar
  *                      ({badges} vira o número de insígnias: uma vez por insígnia)
@@ -196,7 +197,7 @@ export const DIALOGUE = {
   vendedor: {
     name: 'Vendedor',
     lines: [
-      { when: { dive: true, once: 'vendedor_dive' }, say: [
+      { when: { diveTm: true, once: 'vendedor_dive' }, say: [
         'Chegou uma TM diferente hoje. Dizem que ensina um Pokémon de Água a mergulhar bem fundo...'
       ], then: 'mart' },
       { say: ['Bem-vindo ao Poké Mart! Do que você precisa?'], then: 'mart' }

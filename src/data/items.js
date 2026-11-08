@@ -16,6 +16,11 @@ import { POKEMON } from './pokemon.js';
  *   tm         ensina na hora o próximo golpe da linha de um Pokémon (equipe ou PC)
  *   evolution  evolui na hora um Pokémon que só evolui com aquele item (desde a
  *              0.23, quem evolui por pedra ou troca não evolui mais por nível)
+ *   tm_dive    a TM Dive (0.34; PLANEJAMENTO-LOBBY.md, seção 8): troca para
+ *              sempre o Golpe Desperto de um Pokémon de Água (tipo principal ou
+ *              secundário) por Dive. Só aparece na loja quando alguém da jornada
+ *              pode aprender. No FireRed não existe (a MO08 é do Ruby, Sapphire e
+ *              Emerald); aqui ela é uma TM especial.
  */
 export const STONES = ['fire_stone', 'water_stone', 'thunder_stone', 'leaf_stone', 'moon_stone'];
 
@@ -26,6 +31,8 @@ export const MART_ITEMS = [
     description: 'Na fase, traz de volta um Pokémon desmaiado com metade da vida: clique no card dele. Vai para a mochila.' },
   { id: 'tm', name: 'TM', icon: 'tm', price: 1500, kind: 'tm',
     description: 'Ensina agora o próximo golpe da linha de um Pokémon, com as melhorias que ele já tem.' },
+  { id: 'tm_dive', name: 'TM Dive', icon: 'tm', price: 1500, kind: 'tm_dive',
+    description: 'Troca para sempre o Golpe Desperto de um Pokémon de Água por Dive: ele mergulha e sai embaixo da horda.' },
   { id: 'fire_stone', name: 'Pedra do Fogo', icon: 'fireStone', price: 2500, kind: 'evolution' },
   { id: 'water_stone', name: 'Pedra da Água', icon: 'waterStone', price: 2500, kind: 'evolution' },
   { id: 'thunder_stone', name: 'Pedra do Trovão', icon: 'thunderStone', price: 2500, kind: 'evolution' },

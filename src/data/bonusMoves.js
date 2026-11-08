@@ -32,6 +32,10 @@
  * uso), `speedScale` (mais forte com o treinador correndo), `delayedBlast` (o
  * projétil gruda e explode depois) e os efeitos `weak` (o inimigo leva mais
  * dano) e `curse` (o inimigo explode ao morrer).
+ *
+ * `tmOnly` (0.34): o golpe fica FORA do sorteio do Golpe Desperto. Só chega por
+ * uma TM especial do Poké Mart, que troca o Golpe Desperto de um Pokémon por ele
+ * (o Dive: PLANEJAMENTO-LOBBY.md, seção 8).
  */
 
 const RADIAL = (count) => (Math.PI * 2) / count;
@@ -74,6 +78,14 @@ export const BONUS_MOVES = {
     description: 'Uma onda larga varre a frente e empurra a horda para longe.',
     base: { cooldown: 3.4, speed: 300, size: 46, pierce: 99, count: 1, spread: 0, range: 380, duration: 1.4,
             knockback: 320, hitScale: 1 }
+  },
+
+  // fora do sorteio (tmOnly): vem da TM Dive, que troca o Golpe Desperto de um Pokémon de Água
+  dive: {
+    id: 'dive', name: 'Dive', type: 'water', behavior: 'rain', tmOnly: true,
+    description: 'O Pokémon mergulha, fica intocável e reaparece embaixo da horda mais perto, num impacto em área.',
+    base: { cooldown: 4, count: 1, area: 130, delay: 0.7, range: 600, target: 'nearest', knockback: 240,
+            hitScale: 2.2, ownerBlink: true }
   },
 
   /* =============================== Planta =============================== */
@@ -356,9 +368,12 @@ export const BONUS_MOVES = {
   }
 };
 
-/** Os 3 de cada tipo (Sombrio fica de fora: nenhuma das 151 é desse tipo). */
+/**
+ * Os 3 de cada tipo que o sorteio do Golpe Desperto usa (Sombrio fica de fora:
+ * nenhuma das 151 é desse tipo; os `tmOnly` também, como o Dive).
+ */
 export const BONUS_BY_TYPE = {};
-for (const move of Object.values(BONUS_MOVES)) (BONUS_BY_TYPE[move.type] ??= []).push(move.id);
+for (const move of Object.values(BONUS_MOVES)) if (!move.tmOnly) (BONUS_BY_TYPE[move.type] ??= []).push(move.id);
 
 export const isBonusMove = (id) => !!BONUS_MOVES[id];
 

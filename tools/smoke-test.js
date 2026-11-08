@@ -566,8 +566,9 @@ console.log('\n[2º golpe]');
 {
   const types151 = new Set(Object.values(POKEMON).flatMap((p) => p.types));
   check('3 golpes por tipo, para todos os tipos das 151', [...types151].every((t) => BONUS_BY_TYPE[t]?.length === 3)
-        && Object.keys(BONUS_MOVES).length === 3 * Object.keys(BONUS_BY_TYPE).length,
+        && Object.values(BONUS_MOVES).filter((m) => !m.tmOnly).length === 3 * Object.keys(BONUS_BY_TYPE).length,
         `${Object.keys(BONUS_MOVES).length} golpes em ${Object.keys(BONUS_BY_TYPE).length} tipos`);
+  check('o Dive fica fora do sorteio (só vem da TM Dive)', BONUS_MOVES.dive?.tmOnly && !BONUS_BY_TYPE.water.includes('dive'));
   const clash = Object.keys(BONUS_MOVES).filter((id) => ABILITIES[id] || RETIRED_ABILITIES[id] || !abilityFx(id));
   check('cada um com visual e sem repetir o id de um golpe (atual ou que saiu)', clash.length === 0, clash.join(', '));
 
@@ -659,7 +660,24 @@ console.log('\n[2º golpe]');
     }
     if (!seen) silent.push(id);
   }
-  check('os 51 golpes disparam numa partida curta', silent.length === 0, silent.join(', '));
+  check(`os ${Object.keys(BONUS_MOVES).length} golpes disparam numa partida curta`, silent.length === 0, silent.join(', '));
+
+  // Dive (0.34, a TM Dive): o Pokémon some (intocável) e o impacto sai na horda mais perto
+  {
+    const r = new Run('gym_1_pewter', { starter: 'squirtle' });
+    r.spawner.update = () => {};
+    const c = r.companions[0];
+    c.member.abilities.push('dive');
+    r.rebuildCompanionAbilities();
+    const near = r.spawner.spawnAt('rattata', c.x + 120, c.y, 5);
+    r.spawner.spawnAt('rattata', c.x - 420, c.y, 5);
+    r.update(1 / 60, { x: 0, y: 0 });
+    c.invulnTimer = 0;
+    r.abilitySystem.fire(c, c.abilities.find((i) => i.abilityId === 'dive'));
+    const hit = r.zones.filter((z) => z.abilityId === 'dive').at(-1);
+    check('Dive: o impacto sai embaixo da horda mais perto, e o Pokémon fica intocável no mergulho',
+          !!hit && Math.hypot(hit.x - near.x, hit.y - near.y) < 40 && c.invulnTimer >= BONUS_MOVES.dive.base.delay);
+  }
 
   // Whirlpool longe do próprio Pokémon; cura dentro do teto; Hex; Acid Spray; Reflect
   {

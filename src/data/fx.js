@@ -173,6 +173,7 @@ export const ABILITY_FX = {
   whirlpool_zone: { center: 'blue_ring', scatter: 'bubble' },
   aqua_ring:      { body: 'bubble' },
   surf:           { body: 'water_impact', hit: 'bubble_pop' },
+  dive:           { ring: 'bubble', count: 10, strike: 'water_impact' },   // a TM Dive (0.34)
   petal_spiral:   { body: 'leaf', hit: 'razor_leaf' },
   leech_seed:     { ring: 'green_sparkle', count: 10 },
   grassy_terrain: { ring: 'leaf' },

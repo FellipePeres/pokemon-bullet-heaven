@@ -653,6 +653,23 @@ check('depois da escolha, o Continuar segue para a jornada (na vila); sem nome, 
   check('usar a pedra evolui na hora e desconta 2.500',
         game.buyMartItem('thunder_stone', 'mart-eevee') && journey.pc.find((m) => m.uid === 'mart-eevee').pokemonId === 'jolteon' && game.profile.shards === 9100 - 2500);
   check('a pedra sem ninguém que evolua com ela não vende', game.buyMartItem('leaf_stone', 'mart-eevee') === false);
+
+  // a TM Dive (0.34): só aparece com um Pokémon de Água que tenha o Golpe Desperto
+  check('sem Pokémon de Água com Golpe Desperto, a TM Dive não aparece na loja',
+        game.martTargets('tm_dive').length === 0 && !registry.get('mart-list').children.some((c) => c.innerHTML.includes('TM Dive')));
+  journey.pc.push({ uid: 'mart-kabuto', pokemonId: 'kabuto', level: 40, xp: 0, hp: 80, abilities: ['rock_throw', 'surf'], upgrades: {} });
+  journey.pc.push({ uid: 'mart-squirtle', pokemonId: 'squirtle', level: 20, xp: 0, hp: 40, abilities: ['water_gun'], upgrades: {} });
+  const diveTargets = game.martTargets('tm_dive');
+  check('com um Pokémon de Água (mesmo de tipo secundário) com Golpe Desperto, ela aparece; sem o Golpe Desperto, não',
+        diveTargets.length === 1 && diveTargets[0].member.uid === 'mart-kabuto' && diveTargets[0].label.includes('Surf'));
+  game.menus.buildMart();
+  check('...e a loja mostra a TM Dive', registry.get('mart-list').children.some((c) => c.innerHTML.includes('TM Dive')));
+  const before = game.profile.shards;
+  check('a TM Dive troca o Golpe Desperto por Dive e mantém o golpe principal',
+        game.buyMartItem('tm_dive', 'mart-kabuto') && journey.pc.find((m) => m.uid === 'mart-kabuto').abilities.join() === 'rock_throw,dive'
+        && game.profile.shards === before - 1500);
+  check('quem já sabe Dive não aparece mais para a TM', game.martTargets('tm_dive').length === 0);
+  journey.pc = journey.pc.filter((m) => m.uid !== 'mart-kabuto' && m.uid !== 'mart-squirtle');
   game.menus.closeModal();
 
   // o Reviver na fase e o Novo Sorteio na Poké Ball

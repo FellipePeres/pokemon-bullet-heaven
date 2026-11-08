@@ -13,9 +13,9 @@
 > **0.30.0**: a loja de Pokédolls com a entrada livre, o Carvalho entregando o mapa,
 > o Voltar para a Vila embaixo do mapa, o rosto do treinador na fase atual e o nome
 > do jogador no lugar de Red e Leaf. Na **0.31**, a tela do inicial que o Carvalho
-> abre passou aos cards em pixel, com as barras de vida, dano e alcance. Faltam
-> a L-6 (o golpe Dive e a TM Dive), a L-7 (sons e capricho), o modo Endless e o
-> modo aquático. As decisões que ainda faltam estão na seção 13. Onde o texto
+> abre passou aos cards em pixel, com as barras de vida, dano e alcance. Na
+> **0.34**, a L-6: o golpe Dive e a TM Dive no Mart (seção 8). Faltam a L-7 (sons e
+> capricho), o modo Endless e o modo aquático. As decisões que ainda faltam estão na seção 13. Onde o texto
 > diz "padrão", é a escolha recomendada até o Fellipe decidir (e é o que está no
 > jogo).
 >
@@ -273,8 +273,17 @@ então o Dive precisa de uma marca para ficar de fora.
 - Padrão: só dispara ao interagir com a água (`A` de frente para ela), para não
   entrar por acidente.
 
-**O modo aquático** ainda vai ser pensado: arena, inimigos, regras, se repete e
-qual a recompensa.
+**O modo aquático** ainda vai ser pensado pelo Fellipe. Já decidido (2026-11-08):
+vai ser **diferente do Bullet Heaven** e vai usar os **tiles do Emerald**, que tem
+o fundo do mar (o FireRed não tem). O decomp do Emerald está em
+`D:\fellipe\Dev\pokeemerald` (pret/pokeemerald, commit `731ad5b`, clone parcial).
+Nada do modo é criado antes de ele decidir.
+
+**Feito na 0.34 (L-6):** o Dive (`data/bonusMoves.js`, `tmOnly`) e a TM Dive
+(`tm_dive` em `data/items.js`, 1.500) como descrito acima; a troca é para sempre
+(o padrão da decisão 1). Em campo o Dive sai na horda mais perto, com o
+comportamento do Dig. A fala do vendedor usa a condição nova `diveTm` (a TM está
+na loja), e o SIM da lagoa continua em "em breve".
 
 ### Implementação (resumo)
 
@@ -529,8 +538,8 @@ quarto também saem do `tools/assets/hub.py` (peças soltas, com a colisão de o
    Pokédolls, a cama para salvar e o HUD com os pop-overs.
 5. **L-5 — O quarto:** o catálogo de decoração, a compra com Shards e os móveis
    aparecendo no quarto.
-6. **L-6 — Dive:** o golpe Dive, a TM Dive no Mart (com a condição do Golpe
-   Desperto) e o gatilho da lagoa. O modo aquático em si vem depois.
+6. **L-6 — Dive** (feito na 0.34): o golpe Dive, a TM Dive no Mart (com a condição
+   do Golpe Desperto) e o gatilho da lagoa. O modo aquático em si vem depois.
 7. **L-7 — Capricho:** sons (passos, "bump" na parede, porta, abrir menu),
    Pokémon soltos andando, as falas que mudam com as insígnias e, se aprovado,
    pegar o inicial na mesa.

@@ -339,6 +339,22 @@ const ROTEIROS = {
     { shot: 'mart-4-reviver', raw: true },
     { run: "game.run.pendingBall = true" }, { wait: 900 }, { shot: 'mart-5-sorteio', raw: true }
   ],
+  // a TM Dive (0.34): aparece na loja com um Pokémon de Água desperto, a escolha mostra o golpe esquecido; o Dive em campo
+  dive: [
+    { open: 'index.html' }, { wait: 500 },
+    { run: "game.newGame(); game.chooseTrainer('red'); game.chooseStarter('squirtle');" +
+           "game.campaign.journey = { team: { members: [{ uid: 'a', pokemonId: 'wartortle', level: 30, xp: 0, hp: 60, abilities: ['water_gun', 'surf'], upgrades: {} }, { uid: 'b', pokemonId: 'pikachu', level: 20, xp: 0, hp: 40, abilities: ['thunder_shock'], upgrades: {} }], active: ['a', 'b'] }," +
+           " pc: [{ uid: 'c', pokemonId: 'kabuto', level: 28, xp: 0, hp: 50, abilities: ['rock_throw', 'rock_tomb'], upgrades: {}, slot: 0 }] };" +
+           "game.profile.shards = 5200; game.openCampaign(); document.getElementById('toast-container').style.display = 'none'" },
+    { wait: 700 },
+    { run: "game.menus.showModal('modal-mart')" }, { wait: 700 },
+    { run: "const card = [...document.querySelectorAll('#mart-list .mart-card')].find((c) => c.textContent.includes('TM Dive')); card.querySelector('.buy-btn').click(); card.scrollIntoView()" },
+    { wait: 500 }, { shot: 'dive-1-loja' },
+    { run: "game.menus.closeModal(); game.startStage('gym_1_pewter')" }, { wait: 1500 },
+    { run: "const r = game.run; r.spawner.update = () => {}; r.team.members[0].abilities = ['water_gun', 'dive']; r.team.members.forEach((m) => { m.level = 30; }); r.rebuildCompanionAbilities();" +
+           "for (let i = 0; i < 26; i++) { const a = i / 26 * Math.PI * 2, d = 150 + (i % 5) * 45; r.spawner.spawnAt('rattata', r.player.x + Math.cos(a) * d, r.player.y + Math.sin(a) * d, 14); }" },
+    { wait: 900 }, { shot: 'dive-2', raw: true }, { wait: 450 }, { shot: 'dive-3', raw: true }, { wait: 450 }, { shot: 'dive-4', raw: true }
+  ],
   // o tamanho em campo (fieldScale): as aves lendárias, sem inimigos nem golpes
   aves: [
     { open: 'index.html' }, { wait: 500 },
