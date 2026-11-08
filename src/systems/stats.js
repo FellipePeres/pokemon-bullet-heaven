@@ -7,7 +7,7 @@ import { getAbility } from '../data/abilities.js';
  * Ficam em um módulo só para que HUD, combate e save usem exatamente a mesma conta.
  */
 
-/** Vida máxima: base da espécie + ganho por nível + bônus de upgrades da equipe. */
+/** Vida máxima: base da espécie + ganho por nível (+ o bônus da equipe, 0 desde a 0.21). */
 export function maxHpFor(member, bonus = 0) {
   const data = getPokemon(member.pokemonId);
   const base = data?.hp ?? CONFIG.pokemon.baseHp;

@@ -56,7 +56,7 @@ const ITEM = {
   chains:       { item: 'magnet',       emoji: '⚡' },
   status:       { item: 'poison-barb',  emoji: '☠️' },
 
-  /* melhorias do treinador */
+  /* do treinador, das conquistas e da troca (a loja de melhorias do treinador saiu na 0.21) */
   speed:        { item: 'bicycle',      emoji: '👟' },
   pickup:       { item: 'magnet',       emoji: '🧲' },
   xp:           { item: 'exp-share',    emoji: '🍀' },

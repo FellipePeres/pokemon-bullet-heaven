@@ -5,11 +5,13 @@ import { getSheet, drawFrame } from './assets.js';
 /**
  * SPRITES
  *
- * O jogo tenta carregar o sprite oficial pelo número da Pokédex
- * (repositório público PokeAPI/sprites). Se não conseguir — sem internet,
- * por exemplo — desenha um sprite procedural com a cor do tipo.
- * Assim o jogo nunca fica sem imagem e você pode trocar por arte própria
- * depois: basta colocar "assets/sprites/<dex>.png" e ligar CONFIG.sprites.useLocal.
+ * Em campo, o Pokémon é a tira animada local (assets/pokemon/<dex>.png, os GIFs
+ * da Gen 5 do Pokemon All; a shiny em assets/pokemon/shiny). Enquanto ela não
+ * carrega, vale o sprite estático do PokeAPI/sprites e, sem internet, um desenho
+ * procedural com a cor do tipo: o jogo nunca fica sem imagem. Na interface, os
+ * GIFs animados do PokeAPI (os cards de escolha usam o sprite do FireRed, em
+ * ui/pokemonCard.js). Para arte própria no lugar do PokeAPI: coloque
+ * "assets/sprites/<dex>.png" e ligue CONFIG.sprites.useLocal.
  */
 const cache = new Map();
 
@@ -64,12 +66,6 @@ export function spriteUrl(dex, shiny = false) {
 export function animatedUrl(dex, shiny = false) {
   if (!CONFIG.sprites.useAnimatedUI || CONFIG.sprites.useLocal || dex > 649) return spriteUrl(dex, shiny);
   return `${CONFIG.sprites.animatedBase}${shiny ? 'shiny/' : ''}${dex}.gif`;
-}
-
-/** Arte oficial em alta resolução (telas grandes, como a escolha do inicial). */
-export function artworkUrl(dex) {
-  if (CONFIG.sprites.useLocal) return spriteUrl(dex);
-  return `${CONFIG.sprites.artworkBase}${dex}.png`;
 }
 
 /** Insígnia de ginásio de Kanto (1 = Pedra, 2 = Cascata, ...). */

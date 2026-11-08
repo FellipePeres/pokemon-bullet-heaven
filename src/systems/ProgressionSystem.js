@@ -30,11 +30,14 @@ const HEAL_FALLBACK = {
  * - Cada Pokémon tem nível e XP próprios. O XP do inimigo é dividido entre a
  *   equipe com pesos (CONFIG.progression.xpWeight): com a equipe cheia dá
  *   exatamente 25% por ativo e 8,33% por reserva.
- * - Com todas as melhorias, subir de nível pode ensinar o 2º golpe (raro).
+ * - O 2º golpe (o Golpe Desperto) vem na hora em que a chave do golpe fica
+ *   completa (data/awakening.js, 0.28; até a 0.27, um sorteio raro com todas as
+ *   melhorias).
  * - Subir de nível aumenta vida máxima e dano e, do nível 11 em diante, cura
  *   1/10 da vida (CONFIG.progression.levelUpHeal); evoluir cura tudo.
  * - A tela de melhoria aparece a cada `upgradeEveryLevels` níveis.
- * - Ao atingir o nível de evolução, o Pokémon evolui (níveis fiéis aos jogos).
+ * - Ao atingir o nível de evolução, o Pokémon evolui (níveis fiéis aos jogos);
+ *   quem evolui por pedra ou troca só evolui com o item do Poké Mart (0.23).
  * - As melhorias de partida são só do Pokémon (não há bônus globais desde a
  *   0.21, quando a loja do treinador saiu).
  */

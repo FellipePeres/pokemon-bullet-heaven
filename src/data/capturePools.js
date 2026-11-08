@@ -4,13 +4,14 @@ import { POKEMON } from './pokemon.js';
  * POOLS DE CAPTURA — quais Pokémon podem aparecer na Poké Ball, por fase.
  *
  * As porcentagens são as da tabela de design: a chance de cada espécie
- * aparecer entre as opções oferecidas. Os três iniciais ficam de fora de
- * propósito (são escolhidos no começo e não competem com as capturas).
+ * aparecer entre as opções oferecidas. Os iniciais não estão nas tabelas: os
+ * dois que o jogador não escolheu entram raros da Fase 3 em diante
+ * (STARTER_CAPTURES, 0.11). Os lendários têm sorteio próprio (0.18,
+ * data/legendaries.js).
  *
- * As fases 3 a 9 já estão registradas aqui como especificação. Espécies que
- * ainda não existem em data/pokemon.js são ignoradas automaticamente
- * (`poolEntries` filtra), e passam a aparecer sozinhas assim que forem
- * implementadas — não é preciso mexer em código nenhum.
+ * As 151 espécies existem desde a 0.7. `poolEntries` continua ignorando quem
+ * não estiver em data/pokemon.js, então uma espécie nova (de outra região, por
+ * exemplo) pode entrar na tabela antes de ser implementada.
  *
  * Para conferir o quanto de cada fase já está pronto: `npm run check`.
  */

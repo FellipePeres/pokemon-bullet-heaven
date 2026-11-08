@@ -18,8 +18,8 @@ const GEAR_SVG = '<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="t
  * O LOBBY — o mapa da jornada como o Town Map do FireRed (0.13, Etapa 9).
  *
  * - Na barra do topo: o treinador, o estojo em miniatura (abre o Estojo de
- *   Insígnias), Shards e Pokédex, e todos os botões (PC, Salvar e Menu em
- *   destaque).
+ *   Insígnias), Shards e Pokédex, e todos os botões (PC, Poké Mart, Hall,
+ *   Salvar e Menu em destaque).
  * - No meio, o mapa de Kanto em pixels inteiros: cada fase na cidade do
  *   ginásio, a Liga e o Campeão no Indigo Plateau. Concluída mostra a insígnia;
  *   a próxima, o cursor do Town Map; bloqueada fica apagada. O rosto do
@@ -27,7 +27,8 @@ const GEAR_SVG = '<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="t
  *   Embaixo, o Voltar para a Vila.
  * - Ao lado, a fase escolhida (0.31): o salão do líder com ele por cima e o tipo
  *   do ginásio, o nome da fase, a faixa do líder (insígnia e uma Poké Ball por
- *   Pokémon), o caminho com a duração, o nível recomendado e o JOGAR.
+ *   Pokémon), o caminho com a duração, o nível recomendado e o JOGAR. No
+ *   banner, o "Fraco" (0.32): os tipos que mais batem no time do líder.
  * - Embaixo, a equipe com os ícones do PC; clicar abre o PC.
  */
 export class Lobby {

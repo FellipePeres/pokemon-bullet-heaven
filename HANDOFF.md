@@ -5,7 +5,7 @@
 > decisão foi tomada e o que falta fazer. O `README.md` é o manual de uso;
 > este aqui é o contexto de desenvolvimento.
 
-**Versão atual:** `0.32.0` · **Última atualização:** 2026-11-07
+**Versão atual:** `0.32.1` · **Última atualização:** 2026-11-08
 **Stack:** HTML + CSS + JavaScript puro (ES Modules). Sem backend, sem build, sem dependências.
 **Repositório:** https://github.com/FellipePeres/pokemon-bullet-heaven (público)
 **Jogo no ar:** https://fellipeperes.github.io/pokemon-bullet-heaven/
@@ -42,6 +42,7 @@ npm run screens -- <roteiro> --out <pasta>   # screenshots no Chrome sem janela
 npm run assets               # regera os sprites a partir do Pokemon All (Python + Pillow)
 python tools/assets/hub.py   # regera os mapas da vila (0.29) a partir do mesmo decomp
 python tools/assets/gym_banners.py   # regera os banners dos salões do painel da fase (0.31)
+# as outras ferramentas de assets (render_music.py, copy_pc_art.py, extract_region_map.py): ver assets/PROVENIENCIA.md
 npm run balance -- --runs 12 # joga a campanha com o bot: tentativas até passar cada fase, níveis e lutas
 npm run balance -- --runs 48 --jobs 12          # o mesmo, em 12 processos (0.28; a máquina tem 12 núcleos)
 npm run balance -- --runs 24 --jobs 12 --starter charmander --tipos   # o bot que monta o time por tipo (0.32)
@@ -52,7 +53,8 @@ npm run balance -- --load equipes.json --from gym_6_saffron --until gym_6_saffro
 Os testes são a rede de segurança do projeto — **rode sempre que mexer em
 balanceamento, dados ou interface**. `smoke` usa um "jogador virtual" que foge da
 horda em círculos, desvia para pegar Poké Balls, troca Pokémon machucado por
-descansado, escolhe melhorias e prefere TMs.
+descansado e escolhe melhorias: a TM primeiro, depois a chave do Golpe Desperto,
+depois dano.
 
 **Balanceamento (desde a 0.6; métrica nova na 0.17).** `tools/balance.mjs` joga a
 campanha inteira várias vezes com o jogador virtual (`tools/bot.mjs`, o mesmo do
@@ -63,8 +65,9 @@ padrão 10, é o teto; quem não passa "para ali"), o nível médio da equipe ao
 vencer, a duração da luta, desmaios e pico de inimigos.
 
 **Conferência visual (desde a 0.5).** `tools/screenshot.mjs` abre o jogo no Chrome
-(ou Edge) sem janela, executa um roteiro (`vitrine`, `treinador`, `vila`, `jornada`,
-`partida`, `ux`, `efetivo`), salva PNGs e lista os erros de JavaScript da página. Sai com código 1
+(ou Edge) sem janela, executa um dos 37 roteiros (os mais usados: `vitrine`,
+`treinador`, `vila`, `jornada`, `partida`, `ux`, `efetivo`; um nome desconhecido lista
+todos), salva PNGs e lista os erros de JavaScript da página. Sai com código 1
 se a página tiver erro. A `vitrine.html` desenha os assets com o mesmo código da
 partida: poses, andar e correr, as 8 direções, a proporção com os Pokémon e os
 retratos. **Olhe os screenshots antes de entregar mudança visual.** O feel
@@ -75,16 +78,20 @@ retratos. **Olhe os screenshots antes de entregar mudança visual.** O feel
 ## 2b. Publicação (GitHub Pages)
 
 O jogo está no ar em **https://fellipeperes.github.io/pokemon-bullet-heaven/**
-(a 0.10.1 desde 2026-11-03),
+(desde a 0.10.1, em 2026-11-03),
 servido pelo GitHub Pages direto da branch `main`, pasta raiz (`build_type: legacy`).
 
-**Para publicar uma atualização, basta `git push` na `main`** — o workflow
-*pages build and deployment* roda sozinho e leva ~1-2 minutos. Acompanhe com:
+**Publicar é levar o commit para a `main`, e só quando o Fellipe pedir** (o push
+coloca o jogo no ar). O trabalho fica na branch `etapa-0-1-treinador`; a
+publicação é `git push origin HEAD:main` e, para a branch acompanhar,
+`git push origin HEAD`. O workflow *pages build and deployment* roda sozinho e
+leva ~1-2 minutos. Acompanhe com:
 
 ```bash
 gh run list --limit 3                  # status do deploy
 gh api repos/FellipePeres/pokemon-bullet-heaven/pages --jq .status
 curl -sI https://fellipeperes.github.io/pokemon-bullet-heaven/ | head -1
+curl -s https://fellipeperes.github.io/pokemon-bullet-heaven/src/core/config.js | grep "version:"   # a versão no ar
 ```
 
 ⚠️ **O site é servido em um subcaminho** (`/pokemon-bullet-heaven/`), então
@@ -104,7 +111,7 @@ do GitHub, para não expor o e-mail pessoal no histórico público).
 index.html            página única (telas, HUD, overlays, modais)
 vitrine.html          conferência visual dos assets (ver seção 2)
 css/style.css         toda a interface
-assets/               sprites do FireRed gerados pelo extrator + PROVENIENCIA.md
+assets/               sprites, cenários, mapas e músicas do FireRed gerados pelos extratores + PROVENIENCIA.md
 src/
   main.js             ponto de entrada
   vitrine.js          a cena da vitrine.html
@@ -112,18 +119,22 @@ src/
     config.js         ⭐ TODO o balanceamento e as opções
     events.js         EventBus + nomes de eventos
     input.js          teclado e controle (Gamepad API)
-    utils.js          matemática, sorteios, sistema de modificadores
+    utils.js          matemática, sorteios, sistema de modificadores, ids (`uid`, `uniqueId`)
   data/               ⭐ CONTEÚDO (só dados, sem lógica)
     pokemon.js        as 151 espécies: tipos, hp, power, evolução, moveLine
-    abilities.js      52 golpes (no máximo 4 por tipo) + 3 golpes dos líderes
+    abilities.js      61 golpes: os 52 jogáveis (no máximo 4 por tipo), os 5 exclusivos dos lendários e os 4 dos líderes
+    bonusMoves.js     o Golpe Desperto (0.14): 51 golpes, 3 por tipo
+    awakening.js      a chave do Golpe Desperto (0.28): as 3 melhorias de cada golpe
+    legendaries.js    os lendários (0.16): golpe exclusivo, kit, poder e onde aparecem (0.18)
     items.js          o Poké Mart (0.23): itens, preços e quem evolui com cada item
-    upgrades.js       217 upgrades de partida, gerados a partir das habilidades
-    tms.js            linha de golpes: qual o próximo golpe de cada Pokémon
+    upgrades.js       235 melhorias de partida, geradas a partir dos golpes
+    tms.js            linha de golpes: qual o próximo golpe de cada Pokémon e o número de cada TM
     capturePools.js   chances de captura por fase (as 9 tabelas do design)
     enemies.js        159 inimigos: selvagens, elites e Pokémon dos líderes
-    stages.js         as 13 etapas de Kanto (ondas, elites, trechos, líder)
+    stages.js         as 13 etapas de Kanto (ondas, elites, trechos, líder, força)
     regions.js        regiões: Pokédex, iniciais, campanha e treinadores de cada uma
-    trainers.js       modelos de treinador (Red, Leaf) e o mapa de quadros da folha
+    regionMap.js      o Town Map de Kanto (0.13): em que casa do mapa fica cada fase
+    trainers.js       modelos de treinador (Red, Leaf), o mapa de quadros da folha e o nome do jogador (0.30)
     fx.js             qual sprite do FireRed cada golpe usa
     scenery.js        receitas dos 17 cenários (rota, floresta, caverna, salões)
     assetManifest.js  GERADO pelo extrator: tamanho e quadros de cada folha
@@ -135,38 +146,44 @@ src/
     decor.js          a loja de Pokédolls: os enfeites do quarto, o preço e o lugar de cada um
     types.js          tipos, cores, a tabela de efetividade completa e a defesa (0.32)
     kanto.js          nomes da Pokédex 1-151
-    achievements.js   12 conquistas e suas recompensas em Shards
+    achievements.js   20 conquistas em 99 degraus, com as recompensas em Shards
   entities/           Player, Companion, Enemy, projéteis, zonas, pickups, efeitos
   systems/            comportamento genérico
-    combat.js         dano, morte, drops, alvo mais próximo
-    AbilitySystem.js  calcula stats e executa os 7 comportamentos de habilidade
-    ProgressionSystem.js  XP, níveis, evolução, TMs, melhorias, stats do treinador
+    combat.js         dano (com o tipo), queimadura e veneno, morte, drops, alvo mais próximo
+    AbilitySystem.js  calcula stats e executa os 12 comportamentos de golpe (seção 6)
+    signatureMoves.js os golpes exclusivos dos lendários (o comportamento `signature`, 0.16)
+    moves.js          trocar de golpe levando as melhorias (TM, evolução, saves antigos) e o kit dos lendários
+    ProgressionSystem.js  XP, níveis, evolução, TMs, melhorias, a chave do Golpe Desperto
     TeamSystem.js     equipe, slots ativos, troca, desmaio, serialização
-    CaptureSystem.js  sorteio da captura
-    SpawnSystem.js    ondas, elites, Poké Balls roteirizadas, time do líder
+    CaptureSystem.js  sorteio da captura (e do lendário)
+    SpawnSystem.js    ondas, elites, Poké Balls roteirizadas, time do líder, Modo Livre
     SpatialGrid.js    grade espacial (evita colisão O(n²))
     terrain.js        gera o cenário de cada trecho e diz o que bloqueia (colisão)
     pc.js             o PC da jornada: as casas de cada Pokémon, pegar e soltar
     stageStats.js     as métricas de cada fase (o Estojo de Insígnias)
-    stats.js          vida máxima, XP por nível, multiplicador de dano por nível
+    stats.js          vida máxima, XP por nível, dano por nível e as barras dos cards (0.31)
     matchup.js        a vantagem de tipo contra o time de um líder: o "Fraco" do painel e a nota do bot (0.32)
   game/
-    Run.js            uma partida: estado, loop, colisões, condições de fim
+    Run.js            uma partida: estado, loop, colisões, dano recebido (com o tipo), condições de fim
     Hub.js            a vila (0.29): andar em grade, portas, saídas, conversas e o clique
-    Game.js           orquestra tudo: perfil, telas, loop principal, save
+    Game.js           orquestra tudo: perfil, jornadas, telas, loop principal, save
   render/
     Renderer.js       canvas: chão, atores, efeitos, barra do chefe, treinador
     assets.js         carrega as folhas do catálogo e desenha quadros em escala inteira
     trainer.js        qual quadro do treinador mostrar (passo pela distância andada)
     HubRenderer.js    a vila: o chão, as pessoas, a camada de cima e o escurecer das portas
     fx.js             desenha os sprites de golpe
+    signature.js      desenha em código os golpes exclusivos dos lendários (0.16)
     scenery.js        pinta o chão da arena (o grid do terreno) num canvas por cenário
-    sprites.js        sprites de Pokémon (estático/animado/artwork) e insígnias
+    sprites.js        Pokémon em campo (a tira animada local), as URLs do PokeAPI e as insígnias
     icons.js          ícones de item por chave semântica
   ui/
-    HUD.js            HUD da partida e overlays (nível, captura, evolução, pausa)
+    HUD.js            HUD da partida e overlays (nível, captura, evolução, pausa, resultado, Centro Pokémon)
     pokemonCard.js    o card de escolha (0.31): o inicial e a Poké Ball, em pixel, com as barras
-    Menus.js          menu, mapa, modais (Pokédex, conquistas, equipe, opções)
+    Menus.js          telas e janelas (Pokédex, conquistas, equipe, Poké Mart, Pokédolls, Opções)
+    titleMenu.js      o menu da tela de título: ↑ ↓ e Enter, Poké Ball de ponteiro
+    journeys.js       a tela de jornadas (0.19): os 3 espaços, Jogar e Apagar
+    backdrop.js       o fundo dos menus: um trecho de rota montado pelo gerador do cenário
     pcScreen.js       a tela do PC (a do FireRed, portada do Pokemon All): caixas, equipe, pegar e soltar
     lobby.js          o mapa da jornada: o Town Map de Kanto, a fase escolhida, a equipe e a barra do topo
     hubHud.js         a vila (0.29): a barra do topo, a caixa de texto do FireRed, o SIM/NÃO e a placa do lugar
@@ -174,12 +191,11 @@ src/
     dom.js            helpers de DOM e toasts
     pad.js            o controle nas telas: foco nos alvos clicáveis da camada de cima
   audio/
-    music.js          a música: uma faixa por vez, loop do jogo, troca suave, volume
-    backdrop.js       o fundo dos menus: um trecho de rota montado pelo gerador do cenário
-    titleMenu.js      o menu da tela de título: ↑ ↓ e Enter, Poké Ball de ponteiro
+    music.js          a música: uma faixa por vez, loop do jogo, troca suave, volume e a vinheta
   save/
     SaveManager.js    arquivo .json + autosave em localStorage
-    profile.js        progresso permanente + ProfileTracker (eventos → perfil)
+    profile.js        progresso permanente e os espaços de jornada + ProfileTracker (eventos → perfil)
+    options.js        as Opções (volume, tremor de tela, autosave), guardadas no navegador, fora do save
 tools/
   check-data.mjs      conferência dos dados
   smoke-test.js       teste da lógica
@@ -190,7 +206,7 @@ tools/
   assets/extract.py   gera assets/ a partir do decomp do FireRed no Pokemon All
   assets/render_music.py  renderiza as músicas do FireRed (cópia do sintetizador do Pokemon All)
   assets/copy_pc_art.py   traz do Pokemon All a arte do PC, os sprites do FireRed e o Cartão de Treinador
-  assets/extract_region_map.py  monta o Town Map de Kanto do decomp (o mapa do lobby)
+  assets/extract_region_map.py  monta o Town Map de Kanto do decomp (o mapa da jornada)
   assets/hub.py       monta a vila e os interiores com pedaços de mapas do FireRed (0.29)
   assets/gym_banners.py  recorta os salões dos líderes para o painel da fase (0.31)
 ```
@@ -258,7 +274,8 @@ confirmar com ele**.
   "✦ Shiny"; quem entra guarda `member.shiny` (no save, na evolução e no PC). No
   campo, a tira animada shiny (`pokemon/shiny/<dex>`, os GIFs `front-shiny` do
   Pokemon All) e três estrelinhas piscando de tempos em tempos (`drawShinySparkles`);
-  nos cards, os GIFs shiny do PokeAPI; no PC, o sprite shiny do FireRed (o ícone de
+  nos cards de escolha, o sprite shiny do FireRed (0.31); na equipe da partida, os
+  GIFs shiny do PokeAPI; no PC, o sprite shiny do FireRed (o ícone de
   caixa não muda, como no jogo) e o ✦. A Pokédex marca com ✦ quem você já teve
   shiny (`pokedex.shiny`), e a conquista **Brilho Raro** conta `shinyCaught`
   (1, 3, 5, 10). Selvagens nunca são shiny. O inicial pode ser (0.13.2, "inicial
@@ -302,8 +319,9 @@ confirmar com ele**.
   |---|---|---|---|---|
   | nenhuma | 24 / 20 / 76% | 18 / 26 / 41% | 50 / 27 / 92% | 1,2–4,3 |
   | 1/4 do nível 11 (0.11.3) | 48 / 63 / 94% | 100 / 100 / 84% | 100% | 0–1,7 |
-  | 1/10 do nível 11 (0.11.4) | 43 / 56 / 100% | 59 / 81 / 57% | 100 / 92 / 87% | 0–3,4 | Fora isso, cura vem de poções no chão, da regeneração da
-  reserva e da troca.
+  | 1/10 do nível 11 (0.11.4) | 43 / 56 / 100% | 59 / 81 / 57% | 100 / 92 / 87% | 0–3,4 |
+
+  Fora isso, cura vem de poções no chão, da regeneração da reserva e da troca.
 - A tela de melhoria aparece **a cada 3 níveis** (`upgradeEveryLevels`). Os níveis
   intermediários valem em vida e dano, sem interromper. Isso caiu de ~45 telas
   por fase para ~20, que foi a reclamação do Fellipe.
@@ -366,8 +384,9 @@ Nunca voltar bônus globais para o pool de level up — foi pedido explícito.
     antes da 0.28 com a chave completa despertam ao carregar.
   - O bot (`tools/bot.mjs`) escolhe TM, depois a chave, depois dano.
   - Até a 0.27: com **todas** as melhorias (~18, nível ~54), 2% por nível do tipo
-    principal e 1% do secundário. O 2º golpe entra em `member.abilities` (o mesmo lugar do golpe
-  extra dos iniciais), então o save, o PC e a troca já o levam.
+    principal e 1% do secundário.
+  - O 2º golpe entra em `member.abilities` (o mesmo lugar do golpe extra dos
+    iniciais), então o save, o PC e a troca já o levam.
 - 51 golpes (3 por tipo, 17 tipos — Sombrio não tem Pokémon nas 151), com o nome
   oficial e a descrição em português. **Dano por acerto: 60% do golpe principal
   atual** (com as melhorias dele) × `hitScale`, que diminui o de quem acerta
@@ -428,7 +447,7 @@ Nunca voltar bônus globais para o pool de level up — foi pedido explícito.
   e Campeão 12% (aves, Mewtwo e Mew; eram 2% a 10%, e o Fellipe pediu "aumentar
   levemente"). Entre eles, peso 1 por ave, 0,35 Mewtwo e
   0,15 Mew. O Campeão ganhou 1 Poké Ball (tinha 0). **Um de cada**: quem está na
-  equipe, no PC da partida ou no do lobby (`run.ownedElsewhere`) não volta, e na
+  equipe, no PC da partida ou no da jornada (`run.ownedElsewhere`) não volta, e na
   mesma tentativa cada um aparece uma vez só, mesmo recusado
   (`run.legendariesOffered`). Medido: ~1,7 Poké Ball por tentativa nas Fases 7
   e 8, ~0,9 por sala da Liga; passando cada fase em ~1,5 tentativa, ~50% das
@@ -440,8 +459,9 @@ Nunca voltar bônus globais para o pool de level up — foi pedido explícito.
 
 ### Poké Mart (0.23)
 - Pedido do Fellipe: os Shards compram itens "bem caros, para prender o jogador a
-  jogar para comprar as coisas"; Rare Candy e Creche foram cortados. Fica na barra
-  do lobby (**Poké Mart**, janela `modal-mart`; dados em `data/items.js`, regras
+  jogar para comprar as coisas"; Rare Candy e Creche foram cortados. Fica no
+  balcão do vendedor, no Centro Pokémon da vila (0.29), e na barra do mapa da
+  jornada (**Poké Mart**, janela `modal-mart`; dados em `data/items.js`, regras
   em `Game.martTargets/buyMartItem`).
 - **Itens e preços:** Novo Sorteio **300** e Reviver **600** (vão para a mochila,
   `profile.bag`, do jogador como os Shards); TM **1.500** (ensina agora o próximo
@@ -537,13 +557,15 @@ Nunca voltar bônus globais para o pool de level up — foi pedido explícito.
 
 ### Captura
 - Poké Ball dropa de inimigos derrotados, com **teto por fase** (`maxBalls`: 3 na
-  Fase 1, 2 nas outras, 1 em cada sala da Liga, 0 no Campeão). Desde a 0.10 só a
+  Fase 1, 2 nas outras, 1 em cada sala da Liga e 1 no Campeão, que tinha 0 até a
+  0.17). Desde a 0.10 só a
   Fase 1 tem **garantidas** (`scriptedBalls`, duas, para o inicial ganhar
   companhia): o Fellipe achou que elas deixavam a captura fácil demais.
 - A bola rola devagar na direção do treinador quando ele está perto: sem isso,
   builds de longo alcance matavam longe e nunca capturavam.
-- A chance de cair é ×0,07 (`CONFIG.capture.dropChanceMultiplier`; ×0,45 na
-  0.8, ×0,15 na 0.9): pegar Pokémon novo é raro, a pedido do Fellipe.
+- A chance de cair é ×0,085 (`CONFIG.capture.dropChanceMultiplier`; ×0,45 na
+  0.8, ×0,15 na 0.9, ×0,07 na 0.10 e +20% na 0.18): pegar Pokémon novo é raro, a
+  pedido do Fellipe.
 - **Mais opções** (0.11): cada Poké Ball oferece 4 espécies; a tabela de uma
   fase acumula as das anteriores com metade do peso (`poolEntries`); os dois
   iniciais que o jogador não escolheu entram raros da Fase 3 em diante
@@ -562,8 +584,8 @@ Nunca voltar bônus globais para o pool de level up — foi pedido explícito.
   por vez no mapa). Ao pegar, todo o XP do mapa vem até o treinador
   (`Pickup.magnetized`), acelerando até 2400 px/s.
 - Quais espécies aparecem e com qual chance está em `capturePools.js`, com as
-  **9 tabelas de porcentagem definidas pelo Fellipe**. Espécies ainda não
-  implementadas são filtradas automaticamente.
+  **9 tabelas de porcentagem definidas pelo Fellipe**. Uma espécie que não esteja
+  em `data/pokemon.js` é filtrada automaticamente (as 151 estão lá desde a 0.7).
 - A **Fase 1 foi ampliada** (0.11.2, "simples demais… mais chances de estágio 1"):
   28 espécies, 96% do peso em formas básicas (Rotas 1, 2, 22 e 3, Floresta de
   Viridian e a pesca do começo) e 4% nos evoluídos. Água e Planta (Poliwag,
@@ -599,13 +621,14 @@ Nunca voltar bônus globais para o pool de level up — foi pedido explícito.
   `SpawnSystem.endlessFactor`, que multiplica a força da fase), e +8% de inimigos
   por minuto até o dobro. **Uma Poké Ball a cada 3 minutos** sobrevividos, fora do
   teto da fase (0.22, `CONFIG.endless.ballEvery`), com o sorteio de lendário da
-  Fase 7 em diante. **XP ×0,4** (era ×0,5: "ainda é muito"). As Poké Balls
-  seguem o teto da fase.
+  Fase 7 em diante. **XP ×0,4** (era ×0,5: "ainda é muito"). As Poké Balls que
+  caem dos inimigos seguem o teto da fase.
 - **HUD**: o relógio mostra "∞" e o tempo no modo; a faixa, "MODO LIVRE -
   INIMIGOS MAIS FORTES" (texto do Fellipe). **"Voltar para o Centro Pokémon"** (vermelho, no canto) e cair
   com a equipe toda fazem o mesmo (`Game.leaveEndless`): guardam na jornada o que
-  a equipe ganhou e vão direto ao mapa da jornada (0.20.1; antes abriam a janela
-  do Centro). A equipe chega curada na próxima fase.
+  a equipe ganhou e vão para a vila, na frente de casa (0.29; na 0.20.1, direto
+  ao mapa da jornada; antes, a janela do Centro). A equipe chega curada na
+  próxima fase.
   Abandonar pela pausa também guarda. O PC: o da vitória já está na jornada, então
   o da partida recomeça vazio e a jornada soma ao que havia na entrada
   (`endlessBasePc`); o autosave do loop atualiza a jornada a cada 15 s.
@@ -628,11 +651,13 @@ Nunca voltar bônus globais para o pool de level up — foi pedido explícito.
   de jornada e no `continueGame`) — a equipe e o PC dela ficam — e o jogador cai
   no mapa. A foto da partida não fica mais em `pendingRun` depois de salvar ou
   abandonar (podia voltar por cima do progresso).
-- **Cada jornada tem o seu**: treinador (Red/Leaf), inicial, insígnias, fases,
-  equipe, PC, métricas e a partida em andamento. **Do jogador, para todas**:
-  Pokédex, conquistas, Shards, melhorias do treinador e Hall da Fama.
+- **Cada jornada tem o seu**: treinador (menino ou menina) e o nome do jogador
+  (0.30), inicial, insígnias, fases, equipe, PC, métricas, as falas já vistas na
+  vila (0.29) e a partida em andamento. **Do jogador, para todas**: Pokédex,
+  conquistas, Shards, a mochila do Poké Mart (0.23), a decoração do quarto (0.29)
+  e o Hall da Fama.
 - **Como fica no save** (`save/profile.js`): a jornada ATIVA mora nos campos de
-  sempre (`trainer`, `region`, `regions`, e o `run` do save), então o resto do
+  sempre (`trainer`, `trainerName`, `region`, `regions`, e o `run` do save), então o resto do
   jogo não mudou. `profile.journeys` guarda os espaços, e cada um guarda a sua em
   `data` (e a partida em `pendingRun`) enquanto não é a ativa; `activeJourney` é
   o id da ativa. Trocar (`openJourney`) guarda a ativa no espaço dela
@@ -698,7 +723,7 @@ Nunca voltar bônus globais para o pool de level up — foi pedido explícito.
   aquático do Dive, com a TM Dive no Mart) só mostram o aviso. Ver as seções 7 e 8
   do PLANEJAMENTO-LOBBY.md.
 
-### O lobby (0.13)
+### O mapa da jornada (o lobby, 0.13)
 - Desde a 0.29 ele é o **mapa da jornada**, aberto da vila (a saída sul ou o botão
   da barra). Embaixo do mapa, **Voltar para a Vila** (0.30) fecha o mapa e volta
   para onde o jogador estava. **O rosto do treinador acompanha a fase atual** (0.30):
@@ -709,21 +734,24 @@ Nunca voltar bônus globais para o pool de level up — foi pedido explícito.
   (`extract_region_map.py`, 192x144) em pixels inteiros; cada fase na cidade do
   ginásio e a Liga e o Campeão no Indigo Plateau (`data/regionMap.js`, as casas
   da grade 22x15 do jogo). Concluída mostra a insígnia; a próxima, o cursor do
-  Town Map; bloqueada fica apagada; o número da fase embaixo. O ícone do Red/Leaf
-  fica na cidade da última vitória e anda até a nova ao voltar. Ao entrar, a
-  próxima fase já vem escolhida.
+  Town Map; bloqueada fica apagada; o número da fase embaixo. O rosto do
+  treinador fica na fase escolhida e anda até a outra quando ela muda (0.30; até
+  a 0.29, na cidade da última vitória). Ao entrar, a próxima fase já vem
+  escolhida.
 - **Ao lado, a fase escolhida** (refeita na 0.31): o salão do líder
   (`assets/ui/gym-banners`, do último trecho com cenário) com ele em 2x por cima e a
   pílula do tipo; "FASE 4" e o nome da fase; a faixa do líder (nome, insígnia, uma
   Poké Ball por Pokémon do `bossTeam` e a insígnia apagada até vencer); o caminho
   com a duração; o nível recomendado; as métricas numa linha, só depois da
-  primeira tentativa; o JOGAR vermelho e o "Ver no estojo" como link. Na Liga, as
+  primeira tentativa; o JOGAR vermelho e o "Ver no estojo" como link; no banner,
+  o "Fraco" (0.32, ver "Tipos"). Na Liga, as
   cinco salas para escolher em cima (ícones de 40 px), e a faixa não repete o nome
   quando ele já é o título. **Embaixo, a equipe** com os
   ícones do PC (a bolinha marca os 3 em campo); clicar abre o PC.
 - **Barra do topo** com tudo: o treinador, o estojo em miniatura, Shards e
   Pokédex, os ícones (Pokédex, Conquistas com o aviso de "para coletar", Equipe,
-  Opções, Ajuda; o Treinador saiu na 0.21) e PC, Hall, Salvar e Menu escritos. A lateral de
+  Opções, Ajuda; o Treinador saiu na 0.21) e PC, Poké Mart, Hall, Salvar e Menu
+  escritos. A lateral de
   ícones e a engrenagem do canto saem desta tela.
 - **Estojo de Insígnias** (`ui/badgeCase.js`): o Cartão de Treinador azul do
   FireRed (do Pokemon All) com as 8 insígnias nas casas dele, a Liga embaixo e,
@@ -773,10 +801,11 @@ Nunca voltar bônus globais para o pool de level up — foi pedido explícito.
   (`stage.xpScale`), para a equipe chegar ao líder no mesmo nível de antes.
   Medido na 0.15 (16 jornadas por inicial): Brock 20,6–21,5, Misty 26,8–28,9,
   Surge 37,9–39,2, Erika ~46,6, Koga 49,9–54,8, Sabrina 57–63,5 — o mesmo da
-  `stage.leaderLevel` do líder que acompanha a equipe.
+  `stage.leaderLevel` do líder que acompanhava a equipe (saiu na 0.17).
 - **Música** (0.11): cada fase tem `music` e `leaderMusic`. `Game._updateMusic`
-  escolhe a faixa a cada quadro (lobby, fase, líder, vitória, Hall da Fama,
-  Centro Pokémon) e
+  escolhe a faixa a cada quadro (menus e vila, ou a do lugar da vila que tem a
+  sua, como o Centro; fase, líder, vitória, Hall da Fama, Centro Pokémon da
+  derrota) e
   `audio/music.js` toca com loop sem emenda (Web Audio, pontos do loop do jogo em
   `data/musicTracks.js`). O volume é o `CONFIG.audio.musicVolume`, salvo nas
   opções; na pausa a música abaixa.
@@ -787,10 +816,10 @@ Nunca voltar bônus globais para o pool de level up — foi pedido explícito.
   "Progressão por tentativas" abaixo). A **derrota tem duas saídas** (0.11.1): o
   **Centro Pokémon** (`Game.pokemonCenter`) cura a equipe da jornada — a do fim
   da tentativa, com o que ela ganhou — e a fase recomeça (`leaveCenter`); ali
-  mesmo dá para abrir o PC ou ir ao mapa da jornada. Ou **recomeçar a
-  jornada** do zero (`restartJourney` → `newGame`), com confirmação: perde
-  insígnias, equipe e PC da região; Pokédex, conquistas, Shards, melhorias do
-  treinador e Hall da Fama ficam.
+  mesmo dá para abrir o PC ou voltar para a vila (0.29; antes, o mapa da
+  jornada). Ou **recomeçar a jornada** do zero (`restartJourney` → `newGame`),
+  com confirmação: perde insígnias, equipe e PC da região; Pokédex, conquistas,
+  Shards, a mochila, o quarto e o Hall da Fama ficam.
 - **Kanto tem 13 etapas** (0.7): os 8 ginásios, a Elite Four em 4 salas (uma por
   membro, cada uma com o time de 5 do FireRed) e o Campeão. Os times são os do
   FireRed, com os níveis dele; o do rival muda pelo seu inicial
@@ -808,7 +837,7 @@ Nunca voltar bônus globais para o pool de level up — foi pedido explícito.
   - a próxima fase só abre vencendo; fases vencidas podem ser rejogadas para upar;
   - cada fase tem uma **força** (`stage.difficulty`): multiplica a vida e o dano
     de tudo nela, selvagens, elites e o time do líder. É a alavanca da campanha;
-  - o lobby mostra o **nível recomendado** (`stage.recommendedLevel`: a média com
+  - o mapa da jornada mostra o **nível recomendado** (`stage.recommendedLevel`: a média com
     que a equipe do bot ENTRA na tentativa que vence — a coluna "entrada" do
     `balance.mjs`; não o nível ao vencer, que já inclui o que a fase dá) ao lado
     da média da equipe: verde pronta, laranja perto (até 5 abaixo), vermelho longe;
@@ -845,28 +874,7 @@ Nunca voltar bônus globais para o pool de level up — foi pedido explícito.
   vida e dano dos inimigos e do líder sobem um pouco quando ele é o da jornada
   (`SpawnSystem.spawnAt`, e `enemy.tilt` nos golpes do líder). Até a 0.31 o Squirtle
   tinha ×1,2 nas Fases 1 e 6 e ×1,15 na 7. **Saiu na 0.32**: a vantagem de tipo é
-  para ser sentida, não compensada (ver "Tipos" na seção 4).
-- **A vantagem de tipo medida** (0.32, 24 jornadas por inicial, `--runs 24 --jobs 12
-  --starter <inicial>`, com e sem `--tipos`). Vitórias de primeira contra o líder,
-  bot de sempre, da 0.31 para a 0.32:
-
-  | Líder | Charmander | Bulbasaur | Squirtle |
-  |---|---|---|---|
-  | Brock (Pedra) | 11 → 7 | 12 → 10 | 12 → 18 |
-  | Misty (Água) | 5 → 11 | 8 → 15 | 7 → 1 |
-  | Erika (Planta) | 12 → 16 | 10 → 16 | 14 → 12 |
-  | Blaine (Fogo) | 6 → 7 de 17 | 4 → 6 de 16 | 12 de 15 → 14 de 16 |
-
-  Na 0.31 os três iniciais venciam o Brock na mesma proporção; agora o tipo decide.
-  Quem explora as fraquezas vira os confrontos ruins: com o bot que monta o time por
-  tipo, o Charmander vence o Brock de primeira em 18 de 24 (7 com o de sempre) e o
-  Squirtle vence a Misty em 14 de 24 (1). Somando as tentativas até o Giovanni, o bot
-  de sempre fica em 21,8 (Charmander), 24,9 (Bulbasaur) e 20,4 (Squirtle) — eram 25,9,
-  29,2 e 17,9: os iniciais ficaram mais parecidos, e o Squirtle deixou de ser o fácil.
-  O bot por tipo soma 23,7, 22,7 e 17,5 (ele erra na Sabrina com o Charmander).
-  Variação: em 24 jornadas, ±3 vitórias de primeira é ruído. Medido com a imunidade
-  a 0,3x no dano recebido; a 1x (pedido logo depois) só deixa mais difícil, e só
-  onde havia imunidade: o Charizard volta a tomar 100% do Terra (Giovanni).
+  para ser sentida, não compensada (ver "Tipos" acima; a medição está na seção 5).
 - **Selvagens com nível** (0.7, só da Fase 3 em diante): cada onda tem `level:
   [mín, máx]`, que **acompanha a equipe** (alguns níveis abaixo dela no começo,
   perto do ace do líder no fim). Vida e dano crescem de forma composta por nível
@@ -891,9 +899,9 @@ Nunca voltar bônus globais para o pool de level up — foi pedido explícito.
   jornada inteira, ~1.300 dos chefes (com as tentativas extras) + 1.700 das fases
   ≈ 3.000. Depois da campanha, rejogar paga só os chefes (~20–30 por minuto) e o
   Modo Livre, 5 por minuto.
-- Serão gastos no **Poké Mart** (aprovado como ideia; a planejar item por item).
-- Eram gastos na loja de melhorias do treinador, que saiu na 0.21 (o que fazer
-  com eles fica para o Fellipe decidir).
+- São gastos no **Poké Mart** (0.23: de 300 a 2.500) e na **loja de Pokédolls**
+  (0.29: os enfeites do quarto, de 60 a 1.500). Até a 0.21 iam para a loja de
+  melhorias do treinador, que saiu.
 - Saves antigos com `coins` migram para `shards` sozinhos.
 
 ---
@@ -913,16 +921,44 @@ Valores em `src/core/config.js` (o que não estiver lá está em `/data`):
 | Invencibilidade após golpe | 0,5s |
 | Regeneração: campo / reserva | 0,6 / 2,5 HP/s |
 | Chance de poção (selvagem comum) | 4% |
-| Poké Balls por fase | até 3 na Fase 1 (uma garantida), 2 nas outras, 1 em cada sala da Liga e no Campeão (desde a 0.18); chance de cair ×0,085 (×0,07 até a 0.17) |
+| Poké Balls por fase | até 3 na Fase 1 (duas garantidas), 2 nas outras, 1 em cada sala da Liga e no Campeão (desde a 0.18); chance de cair ×0,085 (×0,07 até a 0.17) |
 | Ímã | 0,05% por selvagem, 1,5% por elite ou Pokémon de líder |
-| Jogador virtual (`tools/bot.mjs`) | escolhe a melhoria que mais dá dano (TM primeiro), circula pela arena desviando do que encosta, dos avisos e dos projéteis dos líderes, e vai atrás das Poké Balls |
+| Jogador virtual (`tools/bot.mjs`) | escolhe a TM, depois a chave do Golpe Desperto, depois a melhoria que mais dá dano; circula pela arena desviando do que encosta, dos avisos e dos projéteis dos líderes, e vai atrás das Poké Balls; com `--tipos` (0.32), escolhe na Poké Ball e troca em campo pela vantagem contra o líder |
 | Dano, vida e quantidade de inimigos | dano ×1,3, vida ×1,2 e ondas ×1,2 em todas as fases (`CONFIG.enemies`), além do `scaling` de cada fase |
 | Líderes | vida ×4, dano ×1,6, golpes a cada 60% do tempo, Rajada, fúria abaixo de 50% (`CONFIG.enemies.boss`) |
+| Dano recebido por tipo (0.32) | 2x → 1,5x · 4x → 2,25x · 0,5x → 0,67x · 0,25x → 0,44x · imune → 1x (`CONFIG.types.defense`); o dano que a equipe causa usa a tabela cheia |
 | Nível de quem entra na equipe | média da equipe − 3 |
-| Shards por fase | 120 (+180 na 1ª vez) |
+| Shards | só a 1ª vitória da fase paga: 100 nos ginásios, 150 em cada sala da Liga, 300 no Campeão; 10 por Pokémon de líder e 5 por elite, na hora (0.22) |
 | Duração das fases | 2:45 até o líder em todas (~3:15 com a luta), desde a 0.15 (3:30 na 0.11) |
 | Opções por Poké Ball | 4 (tabelas acumuladas; os outros iniciais raros da Fase 3 em diante) |
 | Selvagens por nível (Fase 3+) | vida ×1,075 e dano ×1,035 por nível acima do 5; XP +8% por nível |
+| Golpe Desperto | 60% do dano do golpe principal; 1/3 das vezes do 2º tipo; curas com teto de 2% da vida por segundo (`CONFIG.bonusMove`) |
+| Modo Livre | XP ×0,4; inimigos ×1,2 por minuto (composto) e +8% por minuto até o dobro; um elite por minuto e uma Poké Ball a cada 3 min (`CONFIG.endless`) |
+
+**A vantagem de tipo medida na 0.32** (24 jornadas por inicial,
+`--runs 24 --jobs 12 --starter <inicial>`, com e sem `--tipos`). Vitórias de
+primeira contra o líder, bot de sempre, da 0.31 para a 0.32:
+
+| Líder | Charmander | Bulbasaur | Squirtle |
+|---|---|---|---|
+| Brock (Pedra) | 11 → 7 | 12 → 10 | 12 → 18 |
+| Misty (Água) | 5 → 11 | 8 → 15 | 7 → 1 |
+| Erika (Planta) | 12 → 16 | 10 → 16 | 14 → 12 |
+| Blaine (Fogo) | 6 → 7 de 17 | 4 → 6 de 16 | 12 de 15 → 14 de 16 |
+
+Na 0.31 os três iniciais venciam o Brock na mesma proporção; agora o tipo decide.
+Quem explora as fraquezas vira os confrontos ruins: com o bot que monta o time por
+tipo, o Charmander vence o Brock de primeira em 18 de 24 (7 com o de sempre) e o
+Squirtle vence a Misty em 14 de 24 (1). Somando as tentativas até o Giovanni, o bot
+de sempre fica em 21,8 (Charmander), 24,9 (Bulbasaur) e 20,4 (Squirtle) — eram 25,9,
+29,2 e 17,9: os iniciais ficaram mais parecidos, e o Squirtle deixou de ser o fácil.
+O bot por tipo soma 23,7, 22,7 e 17,5 (ele erra na Sabrina com o Charmander).
+Variação: em 24 jornadas, ±3 vitórias de primeira é ruído. Medido com a imunidade
+a 0,3x no dano recebido; a 1x (pedido logo depois) só deixa mais difícil, e só
+onde havia imunidade: o Charizard volta a tomar 100% do Terra (Giovanni).
+
+A campanha inteira não foi medida de novo depois da 0.32: as tabelas abaixo são de
+antes da defesa por tipo e do fim do `starterTuning`.
 
 **Dificuldade medida na 0.28** (curva de XP nova, chave do Golpe Desperto e
 `difficulty` recalibrada; `npm run balance -- --runs 60 --jobs 12`, o bot mirando a
@@ -1025,7 +1061,7 @@ joga melhor que o bot: se a sensação for de jogo fácil, a primeira alavanca �
 0. **`stage.difficulty`** (0.17) — a força da fase: vida e dano de tudo nela, o
    líder inclusive. É a primeira alavanca agora; meça em tentativas até passar.
 1. `scaling.damage` da fase — é o que mais mata. Por cima dele vale o
-   `CONFIG.enemies.damageMult` (1,2), igual para todas.
+   `CONFIG.enemies.damageMult` (1,3), igual para todas.
 2. Densidade das ondas (`batch`, `interval`, `maxAlive`) e quantidade de elites;
    `CONFIG.enemies.spawnMult` (1,2) aumenta todas de uma vez.
 3. `scaling.hp` da fase — alonga a partida sem matar.
@@ -1046,7 +1082,8 @@ de vitória. **Mexa em uma, meça, repita.**
 
 ## 6. Comportamentos genéricos de habilidade
 
-O `AbilitySystem` conhece 7 comportamentos. Habilidade nova quase sempre reusa um:
+O `AbilitySystem` conhece 12 comportamentos: os 7 de sempre, o `signature` dos
+lendários e 4 que vieram com o Golpe Desperto (0.14). Golpe novo quase sempre reusa um:
 
 | Comportamento | O que faz | Exemplos |
 |---|---|---|
@@ -1058,6 +1095,10 @@ O `AbilitySystem` conhece 7 comportamentos. Habilidade nova quase sempre reusa u
 | `nova` | onda que se expande do Pokémon | Gust, Earthquake |
 | `chain` | raio que salta entre inimigos | Thunder Shock, Thunder |
 | `signature` | golpe exclusivo de lendário, com lógica e desenho próprios (0.16) | Sheer Cold, Psystrike |
+| `rain` | cai do céu: o aviso no chão e o impacto (na horda mais perto, ao acaso ou no de mais vida) | Hail, Bolt Strike, Draco Meteor |
+| `trail` | rastro no chão por onde o Pokémon passa | Flame Charge |
+| `buff` | reforço por alguns segundos (dano e recarga, escudo, intangível) | Dragon Dance, Reflect, Phantom Force |
+| `reactive` | revida quando o Pokémon leva dano | Counter |
 
 Stats suportadas: `damage, cooldown, count, speed, range, pierce, size, duration,
 area, arc, spread, tickRate, chains, knockback, homing, explodeDamage` +
@@ -1068,9 +1109,11 @@ Os upgrades genéricos (dano, recarga, quantidade, área, perfuração...) são
 
 **No máximo 4 golpes por tipo** (pedido do Fellipe na 0.6, para o jogo ficar leve
 no navegador): cada tipo tem base, TM e final, reaproveitados pelas espécies. São
-52 golpes jogáveis em 16 tipos; o `smoke` falha se algum tipo passar de 4. Os
-golpes dos líderes são à parte: `boss_shockwave` é um golpe só, que muda de cara
-conforme o tipo de quem usa (`BOSS_WAVE_FX`).
+52 golpes jogáveis em 16 tipos; o `smoke` falha se algum tipo passar de 4. Ficam
+fora dessa conta os 5 exclusivos dos lendários, os 51 do Golpe Desperto
+(`data/bonusMoves.js`) e os 4 dos líderes: `leader_barrage` (a Rajada de todo
+líder), `leader_rock_barrage`, `leader_whirlpool` e `boss_shockwave`, um golpe só
+que muda de cara conforme o tipo de quem usa (`BOSS_WAVE_FX`).
 
 **Golpes que saíram** ficam em `RETIRED_ABILITIES` (`abilities.js`): um save antigo
 que ainda tenha um deles recebe o golpe da mesma posição na linha nova da espécie,
@@ -1100,9 +1143,12 @@ Procedência e como regerar: `assets/PROVENIENCIA.md`.
 | Retratos (escolha, mapa, Opções) | `assets/trainers/portraits/<id>.png`: Red, Leaf, Oak, os 8 líderes, a Elite Four e o rival |
 | Caixa de texto do FireRed | `assets/ui/text_window.png`, usada como `border-image` (`.fr-window`) |
 | Sprites de golpe | `assets/fx/<id>.png`: 46 folhas tiradas de `graphics/battle_anims/sprites` (ver `FX` em `extract.py`) |
-| Pokémon animados | `assets/pokemon/<dex>.png`: os GIFs da Gen 5 do Pokemon All em tiras de quadros |
+| Pokémon animados (em campo) | `assets/pokemon/<dex>.png`: os GIFs da Gen 5 do Pokemon All em tiras de quadros; `assets/pokemon/shiny/<dex>.png`, as cores shiny |
+| Pokémon do FireRed | `assets/pokemon/gen3/{front,front-shiny,icons}/<dex>.png`: o sprite frontal (cards de escolha e PC) e o ícone de caixa (PC e a equipe do mapa da jornada) |
+| PC do FireRed (0.12) | `assets/pc/`: fundo, painéis, botões, a mão, as setas e os 16 papéis de parede |
+| Mapa da jornada e Estojo (0.13) | `assets/ui/region-map/` (o Town Map de Kanto, o cursor e os ícones do Red e da Leaf) e `assets/ui/trainer-card.png` (o Cartão de Treinador) |
 | Poké Ball, Ímã e Poção no chão | `assets/items/{poke-ball,magnet,potion}.png` |
-| Cenário | `assets/scenes/<id>.png`: as metatiles de cada mapa (17 cenários); `src/data/sceneManifest.js` diz qual metatile é cada quadro e guarda o mapa dos salões |
+| Cenário | `assets/scenes/<id>.png`: as metatiles de cada mapa (17 cenários em 16 folhas: o corredor da Liga usa a da sala do Lance); `src/data/sceneManifest.js` diz qual metatile é cada quadro e guarda o mapa dos salões |
 | Moldura das janelas e dos botões | `assets/ui/window-frame.png` (3x, fatia 24) e `window-frame-button.png` (2x, fatia 16): a `text_window` do FireRed, copiadas do Pokemon All |
 | Fontes | `assets/fonts/`: Press Start 2P e Pixelify Sans (licença OFL), as do Pokemon All |
 | Fundo da tela de título | `assets/ui/title-background.webp`: arte do Fellipe (a clareira à noite cercada pela horda) |
@@ -1114,16 +1160,15 @@ Procedência e como regerar: `assets/PROVENIENCIA.md`.
   hoje 2). `render/assets.js` carrega sob demanda e, enquanto a folha não carrega,
   devolve null: quem desenha cai no desenho procedural de antes. É assim que os
   testes sem navegador continuam rodando.
-- O Pokemon All ainda tem o que as próximas etapas usam: sprites de golpe, tilesets
-  de Kanto, GIFs da Gen 5, gritos, efeitos sonoros e músicas (ver `PLANEJAMENTO.md` §3).
+- Do Pokemon All, o que ainda não entrou no jogo são os gritos e os efeitos
+  sonoros (a Etapa 5 do `PLANEJAMENTO.md`; a §3 de lá diz onde eles ficam).
 
 **2. PokeAPI/sprites, pela internet** (verificado, tudo 200):
 
 | Uso | Caminho |
 |---|---|
-| Canvas (jogo) | `sprites/pokemon/<dex>.png` — estático (canvas não anima GIF) |
-| Menus, HUD, cards | `.../versions/generation-v/black-white/animated/<dex>.gif` |
-| Arte oficial (sem uso desde a 0.31, quando a escolha do inicial passou ao sprite do FireRed) | `.../other/official-artwork/<dex>.png` |
+| Canvas (jogo) | `sprites/pokemon/<dex>.png` — o estático, só enquanto a tira animada local não carrega |
+| HUD da equipe, telas de nível e evolução, Pokédex | `.../versions/generation-v/black-white/animated/<dex>.gif` (os cards de escolha usam o sprite do FireRed desde a 0.31) |
 | Ícones de interface | `sprites/items/<nome>.png` |
 | Insígnias de ginásio | `sprites/badges/<n>.png` (1 = Pedra, 2 = Cascata...) |
 
@@ -1138,60 +1183,82 @@ Procedência e como regerar: `assets/PROVENIENCIA.md`.
 
 ## 8. Save
 
-Arquivo `.json` baixado pelo navegador + autosave em `localStorage` (só para o
-botão Continuar). Estrutura:
+Arquivo `.json` baixado pelo navegador (o botão Salvar das barras da vila e do
+mapa, ou a cama do quarto) + autosave em `localStorage` (para o botão Jornada da
+tela de título). Estrutura, resumida:
 
 ```jsonc
 {
-  "signature": "pokemon-bullet-heaven", "schemaVersion": 1, "gameVersion": "0.5.0",
+  "signature": "pokemon-bullet-heaven", "schemaVersion": 1, "gameVersion": "0.32.1", "savedAt": "...",
   "profile": {
-    "trainer": "leaf",                               // null = ainda não escolheu
+    "trainer": "leaf",                               // da jornada ativa; null = ainda não escolheu
+    "trainerName": "Ash",                            // da jornada ativa (0.30); null = o do modelo
     "shards": 620,
-    "pokedex": { "caught": [4, 5, 25] },            // só capturados/evoluídos
+    "bag": { "reroll": 0, "revive": 1 },             // a mochila do Poké Mart (0.23)
+    "decor": { "planta": 2, "doll_pikachu": 1 },     // o quarto (0.29), o mesmo em todas as jornadas
+    "pokedex": { "caught": [4, 5, 25], "shiny": [25] },  // só capturados/evoluídos; shiny: 0.13.1
     "achievements": { "tiers": { "catcher": 2 }, "notified": { "catcher": 3 } },  // degraus coletados (0.11)
     "stats": { "totalKills": 0, "badges": 1, "...": 0 },
-    "region": "kanto",                               // região da jornada atual
+    "hallOfFame": [{ "date": "...", "trainer": "leaf", "trainerName": "Ash", "region": "kanto", "team": [] }],
+    "region": "kanto",                               // região da jornada ativa
     "regions": {
       "kanto": {
-        "starter": "charmander", "clearedStages": ["gym_1_pewter"], "badges": ["Insígnia Pedra"],
+        "starter": "charmander", "starterShiny": false,
+        "clearedStages": ["gym_1_pewter"], "badges": ["Insígnia Pedra"], "lastStage": "gym_2_cerulean",
         "journey": { "team": { "members": [], "active": [] }, "level": 18, "pc": [] },  // pc: 0.11
-        "stageStats": { "gym_1_pewter": { "attempts": 2, "wins": 1, "bestTime": 241, "...": 0 } }  // 0.13
+        "stageStats": { "gym_1_pewter": { "attempts": 2, "wins": 1, "bestTime": 241, "...": 0 } },  // 0.13
+        "hub": { "flags": { "mapa_visto": true } }   // as falas de "uma vez só" já vistas (0.29)
       }
-    }
+    },
+    "journeys": [{ "id": "journey-...", "createdAt": "...", "updatedAt": "...", "data": null, "pendingRun": null }],  // 0.19
+    "activeJourney": "journey-..."
   },
-  "run": { "stageId": "...", "time": 95, "team": {}, "pc": [], "stats": {} }
+  "run": { "stageId": "...", "time": 95, "team": {}, "pc": [], "stats": {} }   // a partida no meio, se houver
 }
 ```
 
-Desde a 0.29: `profile.decor` (os enfeites do quarto, de todas as jornadas) e
-`regions.<id>.hub.flags` (as falas de "uma vez só" da vila já vistas nesta jornada).
-Desde a 0.30: `profile.trainerName` (o nome do jogador da jornada ativa; null = o do
-modelo), guardado também no espaço de cada jornada e em cada equipe do Hall da Fama.
-O "Treinador" que os saves antigos tinham nesse campo vira null.
+A jornada ativa mora nos campos de cima; as outras ficam em `journeys[].data`
+(`trainer`, `trainerName`, `region`, `regions`) e `journeys[].pendingRun` (ver "Os
+espaços de jornada" na seção 4). O "Treinador" que os saves antigos tinham em
+`trainerName` vira null. As Opções (volume, tremor, autosave) ficam fora do save,
+em `pbh.options` no navegador (`save/options.js`).
 
 `normalizeProfile` faz merge com os padrões, então **campo novo não quebra save
-antigo**. Ao carregar uma partida salva, a fase recomeça com a equipe curada.
+antigo**. Um save com a partida no meio não volta para a fase: ela entra na jornada
+como um abandono e o jogador vai para a vila (`_foldPendingRun`, 0.24).
 
 **Migrações que ele faz:** `coins` vira `shards`; a campanha antiga em `campaign`
-vira `regions.kanto`; e as insígnias que a 0.4 deixou de registrar (ver seção 11)
-são repostas a partir das fases de ginásio concluídas. No código, a campanha da
-região atual é `game.campaign` (`regionProgress(profile)`).
+vira `regions.kanto`; as insígnias que a 0.4 deixou de registrar (ver seção 11)
+são repostas a partir das fases de ginásio concluídas; o save de antes da 0.19
+vira o espaço de jornada 1 (`normalizeJourneys`); a loja do treinador
+(`trainerUpgrades`, 0.21) e os degraus de conquistas que não existem mais são
+descartados. Fora dele, ao carregar: os golpes que saíram viram os da linha nova
+(`migrateMember`) e ids repetidos são consertados (`fixDuplicateUids`). No código,
+a campanha da região atual é `game.campaign` (`regionProgress(profile)`).
 
 ---
 
 ## 9. Estado do conteúdo
 
-**Pronto e jogável (0.7): Kanto inteira.**
+**Pronto e jogável: Kanto inteira, da vila ao Hall da Fama.**
 - **13 etapas**: Fase 1 (Brock) → Fase 2 (Misty) → Fase 3 (Lt. Surge) → Fase 4
   (Erika) → Fase 5 (Koga) → Fase 6 (Sabrina) → Fase 7 (Blaine) → Fase 8
   (Giovanni) → Elite Four (Lorelei, Bruno, Agatha, Lance) → Campeão (o rival).
   Cada uma com trechos dos lugares do FireRed, selvagens das rotas, elites e o
   time do líder com os níveis do jogo.
-- **151 espécies jogáveis**, todas com linha de 3 golpes e evolução (pedra e troca
-  por nível equivalente; Eevee sorteia a evolução).
+- **151 espécies jogáveis**, todas com linha de golpes e evolução: por nível, ou
+  com o item do Poké Mart para quem evolui por pedra ou troca (a Eevee escolhe
+  pela pedra). Os 5 lendários têm golpe exclusivo e sorteio próprio, da Fase 7 em
+  diante.
 - **Tabelas de captura**: as 9 do Fellipe, 100% das espécies disponíveis; mais
   Goldeen, Onix, Venonat, Doduo e Seel com peso 3 (padrão até o Fellipe decidir).
-- **52 golpes**, no máximo 4 por tipo, todos com sprite do FireRed.
+- **Golpes**: 52 jogáveis (no máximo 4 por tipo) e os 51 do Golpe Desperto, com
+  sprite do FireRed; os 5 exclusivos dos lendários, desenhados em código.
+- **A vila** (0.29): 7 interiores, 17 moradores, o Centro com o PC e o Poké Mart,
+  a loja de Pokédolls e o quarto decorável; o mapa da jornada sai pela saída sul.
+- E também: os tipos de verdade (0.32), o Modo Livre depois de cada vitória
+  (0.20), 3 espaços de jornada (0.19), o Poké Mart (0.23), shiny (0.13.1) e 20
+  conquistas em 99 degraus (0.11).
 
 Quando o líder chega, a partida pausa na **apresentação** dele (retrato, nome e a
 fala na caixa de texto do FireRed) até o jogador apertar "Lutar!".
@@ -1204,9 +1271,10 @@ Desde a 0.8 o chão de cada trecho é o **cenário de tiles do FireRed** (rota,
 floresta, caverna e o salão de cada ginásio e da Liga), e os Pokémon em campo são
 animados desde a 0.7.
 
-**Ainda não existe** (ver `PLANEJAMENTO.md`): os lendários como encontros
-especiais, o pós-jogo, o som (Etapa 5) e o celular (Etapa 6). O controle (gamepad)
-funciona desde a 0.7.
+**Ainda não existe** (ver `PLANEJAMENTO.md` e `PLANEJAMENTO-LOBBY.md`): os gritos e
+os efeitos sonoros (a música existe desde a 0.11), o celular (o controle funciona
+desde a 0.7), a revanche dos líderes, as outras regiões e, na vila, o modo Endless
+(o mato alto), o modo aquático e a TM Dive (a lagoa).
 
 `npm run check` mostra o quadro das tabelas de captura sempre atualizado.
 
@@ -1214,18 +1282,18 @@ funciona desde a 0.7.
 
 ## 10. Próximos passos
 
-**A vila (0.29)**: as etapas que faltam estão em
-**[PLANEJAMENTO-LOBBY.md](PLANEJAMENTO-LOBBY.md)**: o golpe Dive e a TM Dive no
-Mart (só para Pokémon de Água com o Golpe Desperto), o modo Endless pelo mato alto,
-o modo aquático pela lagoa, sons e capricho, e as decisões em aberto (o nome da
-vila, entrar em todas as casas, o rival).
+Nenhum pedido do Fellipe em aberto. O que está planejado:
 
-O roteiro está em **[PLANEJAMENTO.md](PLANEJAMENTO.md)**, combinado em 2026-11-02:
-fundação de assets a partir do Pokemon All, escolha de treinador (Menino ou
-Menina), golpes com sprite, Pokémon animados e cenário de tiles, fases 3 a 8 +
-Elite Four + Campeão com a curva de dificuldade, som e outras regiões.
-Os itens que estavam aqui foram para lá: Revive, pedras evolutivas, sinergias de
-tipo, som e o polimento de troca e captura.
+- **A vila** ([PLANEJAMENTO-LOBBY.md](PLANEJAMENTO-LOBBY.md)): a L-6 (o golpe Dive e
+  a TM Dive no Mart, só para Pokémon de Água com o Golpe Desperto), a L-7 (sons e
+  capricho), o modo Endless pelo mato alto e o modo aquático pela lagoa (cada um
+  com o seu plano, quando chegar a vez) e as decisões da seção 13 de lá (o nome
+  da vila, pegar o inicial na mesa, entrar em todas as casas, o rival).
+- **O roteiro geral** ([PLANEJAMENTO.md](PLANEJAMENTO.md), combinado em
+  2026-11-02): o som que falta (gritos e efeitos, Etapa 5), o celular e os assets
+  locais da interface (Etapa 6), o pós-jogo além do Modo Livre (a revanche dos
+  líderes, D9) e as outras regiões (Etapa 8; Hoenn é a recomendação). Em aberto
+  lá: o XP em orbes (D10) e as sinergias de tipo entre os membros da equipe.
 
 ---
 
@@ -1250,10 +1318,15 @@ tipo, som e o polimento de troca e captura.
   (e recuam abaixo de 35% de vida). Sem isso, quem tem golpe curto nunca alcança.
 - **Captura impossível:** a Poké Ball rola na direção do treinador quando ele está
   perto; sem isso, builds de longo alcance nunca capturavam.
-- **Tabela de tipos:** Elétrico não causa dano em Terrestre. Se um teste de dano
-  der 0, confira o tipo do alvo antes de suspeitar do código.
+- **Tabela de tipos:** Elétrico não causa dano em Terrestre e, desde a 0.32 (a
+  tabela completa), Fantasma não pega em Normal, Normal e Lutador não pegam em
+  Fantasma, Terra não pega em Voador, Dragão em Fada e Veneno em Metálico. Se um
+  teste de dano der 0, confira o tipo do alvo antes de suspeitar do código (o
+  `smoke` escolhe o alvo pelo tipo do golpe: `targetFor`). No dano que os seus
+  Pokémon recebem, a imunidade vale 1x.
 - **Metatile fora da tira:** o extrator só guarda as metatiles que o mapa de origem
-  usa. Um ID novo num gerador de `render/scenery.js` precisa existir naquele mapa;
+  usa. Um ID novo numa receita de `data/scenery.js` (ou num gerador de
+  `systems/terrain.js`) precisa existir naquele mapa;
   o `npm run check` monta todos os cenários e acusa o que faltar.
 - **Caminhos de areia que se cruzam:** o tileset das rotas só tem cantos de dentro
   para curvas desenhadas à mão; o gerador faz retas separadas (`Taken.free`).
@@ -1279,7 +1352,7 @@ tipo, som e o polimento de troca e captura.
   `assets/fonts` (e o jogo também fica independente do Google Fonts).
 - **Level up trava o update:** `Run.update` retorna cedo quando o estado não é
   `running`. Testes que simulam frames precisam resolver `levelup`/`capture`/
-  `evolution`, senão o tempo congela.
+  `unlock`/`evolution`/`intro`, senão o tempo congela.
 - **Órbita com "anel vazio":** em habilidades `orbit`, se `area` (raio da órbita)
   for muito maior que o alcance em que os inimigos se acumulam, os orbes passam
   por fora e não acertam ninguém. Petal Dance tinha `area: 118` e causava zero
@@ -1304,7 +1377,7 @@ tipo, som e o polimento de troca e captura.
 - **Pular o relógio nos testes** (`game.run.time = ...`) dispara de uma vez todos
   os eventos que ficaram para trás: elites, Poké Balls garantidas, presentes e
   avisos. É efeito do atalho, não do jogo.
-- **Estados que pausam a partida** (`levelup`, `capture`, `evolution`, `intro`):
+- **Estados que pausam a partida** (`levelup`, `capture`, `unlock`, `evolution`, `intro`):
   `Run.update` não roda fora de `running`. Todo estado novo precisa ser resolvido
   pelo `Game`, pelo bot (`tools/bot.mjs`) e pelo `SETTLE` do `screenshot.mjs`,
   senão a simulação congela.
@@ -1350,26 +1423,27 @@ tipo, som e o polimento de troca e captura.
 | 18 | lobby mais bonito e único (planejado junto: o Town Map, o estojo com as métricas, tudo na barra do topo); o 2º golpe no lugar do bônus de ataque; shiny só na captura e do jogador; publicar o lobby | 0.13: `ui/lobby.js`, `ui/badgeCase.js`, `systems/stageStats.js`, `data/regionMap.js`, mapa e cartão por script; D11 reescrita (publicada com a Poção e os líderes). 0.13.1: shiny (1% por opção da Poké Ball), com sprites shiny no campo, nos cards e no PC, ✦ na Pokédex e a conquista Brilho Raro |
 | 19 | o inicial também shiny (1%) e publicar; refinar os 3 2º golpes por tipo (aprovados com ajustes: Whirlpool longe, curas com teto, 2%/1% pelos tipos, nome oficial, 60% do dano); tremor só nos golpes dos líderes; o nível passando de 100 (o número saía do selo) e os líderes fáceis demais | 0.13.2: inicial shiny. 0.14: `data/bonusMoves.js` (51 golpes) e o motor deles; o líder acompanha a equipe (`leaderLevel`, `bossLift`); tremor só dos líderes; selo do nível que cresce com o número |
 | 20 | fases levemente mais rápidas: de 3:30 para 2:45 | 0.15: a linha do tempo das 13 fases comprimida (×165/210; levas ×√f mais densas, XP ×1/√f); a equipe chega ao líder no mesmo nível (medido) |
+| 21 | lendários naturalmente mais fortes, com melhorias e 2º golpe de saída, e um golpe exclusivo, único e muito bonito; com todas as melhorias, curar os 20% sem abrir tela, e a tela só para o 2º golpe, com uma opção única; um nome mais impactante para o 2º golpe | 0.16: `data/legendaries.js` (5 golpes exclusivos desenhados em código, kit, poder maior, entram no nível da equipe); Poção automática e anúncio do "Golpe Desperto" (nome padrão até o Fellipe escolher; sugestões dadas na conversa); roteiro `lendarios` no `screenshot.mjs` |
+| 22 | equilibrar de novo: forçar o jogador a melhorar os Pokémon para passar; ao morrer não perde o progresso da fase, só não libera a seguinte (a Elite Four estava "a coisa mais fácil"); Pokémon já registrados com uma Poké Ball na captura | 0.17: derrota e abandono guardam o progresso; o líder não cresce mais com a equipe (`bossLift` saiu); `stage.difficulty` (a força da fase) calibrada em tentativas até passar, com a Liga mais forte; nível recomendado no lobby; `balance.mjs` mede tentativas e o nível de entrada; Poké Ball no card de quem já está na Pokédex |
+| 23 | taxa dos lendários: aparecer desde a Fase 7, com chance baixa que cresce até o Campeão; um de cada por jornada; depois, subir levemente lendários e Poké Balls | 0.18: sorteio próprio por Poké Ball (3% → 12%), aves desde a Fase 7, Mewtwo e Mew só na Liga; um de cada (equipe, PC) e uma vez por tentativa; o Campeão com 1 Poké Ball; Poké Ball ×0,085 (era ×0,07); `balance.mjs` mostra as Poké Balls; corrigido o travamento dos golpes que caem do céu (inimigo na borda do alcance) |
+| 24 | no título, "Jornada" no lugar de "Continuar", com os espaços das jornadas: fazer mais de uma, com novos Pokémon, e voltar para a outra | 0.19: 3 espaços de jornada (`ui/journeys.js`, `Game.openJourney/newJourney/deleteJourney`); cada uma com treinador, inicial, insígnias, equipe, PC e partida; Pokédex, conquistas, Shards e melhorias valem para todas; save antigo vira a jornada 1 |
+| 25 | Modo Livre: depois da vitória, a fase sem fim com XP reduzido, inimigos cada vez mais fortes até ficar quase impossível, e o botão "Voltar para o Centro Pokémon" no canto | 0.20: `Game.startEndless/leaveEndless`, `Run.startEndless`, `SpawnSystem` com as ondas da segunda metade em laço, um elite por minuto e ×1,2 por minuto; XP ×0,4; testes e roteiro de screenshot "livre" |
+| 26 | "tá tudo meio bugado": capturar trocando um ativo deixava ele no mapa; barras de vida vazias com o Pokémon ativo; trocas quebradas; o botão do Modo Livre direto para o mapa da jornada | 0.20.1: ids de Pokémon únicos entre sessões (`uniqueId`) e conserto dos saves com ids repetidos; o Modo Livre em si estava certo (conferido no Chrome); "Voltar para o Centro Pokémon" vai direto ao mapa |
+| 27 | remover a aba de melhorias do treinador; conquistas e Pokédex valem para todas as jornadas | 0.21: a loja saiu inteira (botões, janela, bônus, `data/trainerUpgrades.js`, a conquista "Cliente Fiel"); saves antigos carregam sem ela |
+| 28 | o Articuno em campo muito pequeno | 0.21.1: `fieldScale` por espécie (Articuno ×1,8, Moltres ×1,5) |
+| 29 | Modo Livre com Poké Ball (1 a cada 3 min); Shards: a fase paga uma vez só, Pokémon de líder 10, chefe simples 5, no Modo Livre só os chefes simples; base para os preços do Poké Mart | 0.22: `CONFIG.shards.leaderPokemon/elite`, `CONFIG.endless.ballEvery`, recompensa só na primeira vitória; "+N Shards" no campo e no resultado |
+| 30 | Poké Mart: tirar Rare Candy e Creche, o resto nos preços caros; quem evolui por item ou troca não evolui mais por nível | 0.23: `data/items.js`, a janela no lobby, a mochila (Reviver na fase, Novo Sorteio na Poké Ball), TM e evolução na hora pela equipe ou PC; 18 espécies só por item; o `pendingRun` consumido ao retomar |
+| 31 | tela de jornadas com os níveis encavalados; continuar a jornada sempre no mapa, mesmo saindo no meio da fase | 0.23.1: equipe do card em 3 por linha e o nome completo da fase; 0.24: `_foldPendingRun` (a partida do meio entra na jornada), sem retomar no meio da fase |
+| 32 | a partida continuar rodando com a aba em segundo plano; a luta com o líder começar sozinha depois de 7 s, com a contagem pequena; mostrar os Shards na tela | 0.25: relógio num Worker + passos de 50 ms (`_frame`), contagem na apresentação (`leaderIntroSeconds`), "◆ Shards" no HUD |
+| 33 | o Gengar não recebia o Golpe Desperto; capturado no nível alto vem sem melhorias e fica ruim | 0.26: sem bug no Golpe Desperto (precisava de 18 melhorias = 54 níveis); `trainToLevel`: quem chega tarde vem com 1 melhoria a cada 3 níveis, automáticas (opção 1, escolhida pelo Fellipe) |
+| 34 | Modo Livre no Campeão também | 0.27: depois do Hall da Fama, a tela de vitória de sempre, com o Modo Livre |
 | 35 | manter a fase do Brock como está e dificultar todas as outras; a escala de ganho de nível muito alta; o Golpe Desperto por chave: maximizar certas melhorias (Gyarados: velocidade, penetração e dano; Gloom: área, intervalo entre os danos e cooldown), com a melhoria da chave marcada na tela de nível ("maximize para despertar") | 0.28: `xpLateExponent` 2,2 → 3,4 (o bot chega ao Campeão no ~74, era ~115; o Brock igual); `stage.difficulty` recalibrada fase a fase, todas mais duras que na 0.27 em tentativas do bot (ver seção 5); `data/awakening.js`: 3 melhorias por golpe que despertam o 2º golpe na hora, selo dourado na tela de nível, progresso na equipe e no PC, quem chega tarde treina a chave primeiro; `balance.mjs --jobs` (paralelo) e `--set` (testar um valor) |
 | 36 | tirar a tag "Golpe Desperto" das melhorias, deixar só o aviso de maximizar embaixo | 0.28.1: sem o selo no canto da carta; ficam a moldura dourada e o aviso |
+| 37 | no lugar da tela do mapa, um lobby jogável: uma mini-vila com casas de NPC espalhadas, andar em tiles como no FireRed, o Centro com o balcão do PC (sem curar) e o do Mart, uma loja de Pokédolls, o quarto vazio decorável, o Oak dando o inicial com as saídas travadas até lá, o mato alto a oeste para um modo Endless, a lagoa com o easter egg do Dive, falas para todos (a do pescador é dele) | 0.29: `game/Hub.js`, `render/HubRenderer.js`, `ui/hubHud.js`, `data/hub.js`, `data/dialogue.js`, `data/decor.js` e `tools/assets/hub.py` (os mapas montados do FireRed, em duas camadas e com a colisão de origem); jornada começada = treinador escolhido; partida, Continuar e Centro voltam à vila; o Endless e o modo aquático ficam "em breve" (PLANEJAMENTO-LOBBY.md) |
+| 38 | refinar a loja de Pokédolls (o Lapras no meio atrapalhava, os 2 vasos da entrada bloqueavam); o Oak entrega o mapa junto com o inicial; "Voltar para a Vila" embaixo do mapa; o rosto do treinador acompanhando a fase atual no mapa; o nome do jogador no lugar de Red ou Leaf | 0.30: loja com um tapete livre e o Lapras no canto; `carvalho_inicial` com o Mapa da Jornada e o aviso no botão; `btn-village` embaixo do mapa (o Menu voltou para a barra); o ícone do mapa na fase escolhida; `screen-name`, `chooseName`, `cleanTrainerName` e `profile.trainerName` por jornada |
 | 39 | melhoria de UX: a escolha do inicial e dos demais Pokémon em cards com o sprite em pixel na base de batalha e barras de vida, dano e alcance; o painel da fase com o cenário do ginásio, o líder em 2x, a faixa com as Poké Balls do time e o JOGAR vermelho; os banners dos ginásios no extrator; um artifact de antes e depois antes de subir | 0.31: `ui/pokemonCard.js` e `starterStats` (`CONFIG.cards`), a tela do inicial com véu, placa e Voltar no canto (ESC), o card na Poké Ball e na troca; `_panel` do `lobby.js` refeito; `tools/assets/gym_banners.py` (13 salões); roteiro `ux` no `screenshot.mjs`; testes do card e do painel; o check-data confere um banner por salão |
 | 40 | incentivar o jogador a explorar fraquezas e vantagens (com o Charmander ele passava fácil pelo Brock mesmo com a resistência); não diminuir a chance de captura de quem tem vantagem; medir antes de aplicar; o selo em cada Pokémon não precisa, só o "FRACO" do painel | 0.32: a tabela de tipos completa; queimadura e veneno pela tabela (Fogo não queima, Veneno e Metálico não envenenam); defesa por tipo suavizada e simétrica (`CONFIG.types.defense`); sem o `starterTuning` do Squirtle; Poliwag, Goldeen e Oddish de volta a 4% na Fase 1; o "Fraco" no banner do painel; "Super efetivo!" no líder e nos elites; `systems/matchup.js`; o bot `--tipos` no balance; medido antes e depois (seção 5) |
-| 38 | refinar a loja de Pokédolls (o Lapras no meio atrapalhava, os 2 vasos da entrada bloqueavam); o Oak entrega o mapa junto com o inicial; "Voltar para a Vila" embaixo do mapa; o rosto do treinador acompanhando a fase atual no mapa; o nome do jogador no lugar de Red ou Leaf | 0.30: loja com um tapete livre e o Lapras no canto; `carvalho_inicial` com o Mapa da Jornada e o aviso no botão; `btn-village` embaixo do mapa (o Menu voltou para a barra); o ícone do mapa na fase escolhida; `screen-name`, `chooseName`, `cleanTrainerName` e `profile.trainerName` por jornada |
-| 37 | no lugar da tela do mapa, um lobby jogável: uma mini-vila com casas de NPC espalhadas, andar em tiles como no FireRed, o Centro com o balcão do PC (sem curar) e o do Mart, uma loja de Pokédolls, o quarto vazio decorável, o Oak dando o inicial com as saídas travadas até lá, o mato alto a oeste para um modo Endless, a lagoa com o easter egg do Dive, falas para todos (a do pescador é dele) | 0.29: `game/Hub.js`, `render/HubRenderer.js`, `ui/hubHud.js`, `data/hub.js`, `data/dialogue.js`, `data/decor.js` e `tools/assets/hub.py` (os mapas montados do FireRed, em duas camadas e com a colisão de origem); jornada começada = treinador escolhido; partida, Continuar e Centro voltam à vila; o Endless e o modo aquático ficam "em breve" (PLANEJAMENTO-LOBBY.md) |
-| 34 | Modo Livre no Campeão também | 0.27: depois do Hall da Fama, a tela de vitória de sempre, com o Modo Livre |
-| 33 | o Gengar não recebia o Golpe Desperto; capturado no nível alto vem sem melhorias e fica ruim | 0.26: sem bug no Golpe Desperto (precisava de 18 melhorias = 54 níveis); `trainToLevel`: quem chega tarde vem com 1 melhoria a cada 3 níveis, automáticas (opção 1, escolhida pelo Fellipe) |
-| 32 | a partida continuar rodando com a aba em segundo plano; a luta com o líder começar sozinha depois de 7 s, com a contagem pequena; mostrar os Shards na tela | 0.25: relógio num Worker + passos de 50 ms (`_frame`), contagem na apresentação (`leaderIntroSeconds`), "◆ Shards" no HUD |
-| 31 | tela de jornadas com os níveis encavalados; continuar a jornada sempre no mapa, mesmo saindo no meio da fase | 0.23.1: equipe do card em 3 por linha e o nome completo da fase; 0.24: `_foldPendingRun` (a partida do meio entra na jornada), sem retomar no meio da fase |
-| 30 | Poké Mart: tirar Rare Candy e Creche, o resto nos preços caros; quem evolui por item ou troca não evolui mais por nível | 0.23: `data/items.js`, a janela no lobby, a mochila (Reviver na fase, Novo Sorteio na Poké Ball), TM e evolução na hora pela equipe ou PC; 18 espécies só por item; o `pendingRun` consumido ao retomar |
-| 29 | Modo Livre com Poké Ball (1 a cada 3 min); Shards: a fase paga uma vez só, Pokémon de líder 10, chefe simples 5, no Modo Livre só os chefes simples; base para os preços do Poké Mart | 0.22: `CONFIG.shards.leaderPokemon/elite`, `CONFIG.endless.ballEvery`, recompensa só na primeira vitória; "+N Shards" no campo e no resultado |
-| 28 | o Articuno em campo muito pequeno | 0.21.1: `fieldScale` por espécie (Articuno ×1,8, Moltres ×1,5) |
-| 27 | remover a aba de melhorias do treinador; conquistas e Pokédex valem para todas as jornadas | 0.21: a loja saiu inteira (botões, janela, bônus, `data/trainerUpgrades.js`, a conquista "Cliente Fiel"); saves antigos carregam sem ela |
-| 26 | "tá tudo meio bugado": capturar trocando um ativo deixava ele no mapa; barras de vida vazias com o Pokémon ativo; trocas quebradas; o botão do Modo Livre direto para o mapa da jornada | 0.20.1: ids de Pokémon únicos entre sessões (`uniqueId`) e conserto dos saves com ids repetidos; o Modo Livre em si estava certo (conferido no Chrome); "Voltar para o Centro Pokémon" vai direto ao mapa |
-| 25 | Modo Livre: depois da vitória, a fase sem fim com XP reduzido, inimigos cada vez mais fortes até ficar quase impossível, e o botão "Voltar para o Centro Pokémon" no canto | 0.20: `Game.startEndless/leaveEndless`, `Run.startEndless`, `SpawnSystem` com as ondas da segunda metade em laço, um elite por minuto e ×1,2 por minuto; XP ×0,4; testes e roteiro de screenshot "livre" |
-| 24 | no título, "Jornada" no lugar de "Continuar", com os espaços das jornadas: fazer mais de uma, com novos Pokémon, e voltar para a outra | 0.19: 3 espaços de jornada (`ui/journeys.js`, `Game.openJourney/newJourney/deleteJourney`); cada uma com treinador, inicial, insígnias, equipe, PC e partida; Pokédex, conquistas, Shards e melhorias valem para todas; save antigo vira a jornada 1 |
-| 23 | taxa dos lendários: aparecer desde a Fase 7, com chance baixa que cresce até o Campeão; um de cada por jornada; depois, subir levemente lendários e Poké Balls | 0.18: sorteio próprio por Poké Ball (3% → 12%), aves desde a Fase 7, Mewtwo e Mew só na Liga; um de cada (equipe, PC) e uma vez por tentativa; o Campeão com 1 Poké Ball; Poké Ball ×0,085 (era ×0,07); `balance.mjs` mostra as Poké Balls; corrigido o travamento dos golpes que caem do céu (inimigo na borda do alcance) |
-| 22 | equilibrar de novo: forçar o jogador a melhorar os Pokémon para passar; ao morrer não perde o progresso da fase, só não libera a seguinte (a Elite Four estava "a coisa mais fácil"); Pokémon já registrados com uma Poké Ball na captura | 0.17: derrota e abandono guardam o progresso; o líder não cresce mais com a equipe (`bossLift` saiu); `stage.difficulty` (a força da fase) calibrada em tentativas até passar, com a Liga mais forte; nível recomendado no lobby; `balance.mjs` mede tentativas e o nível de entrada; Poké Ball no card de quem já está na Pokédex |
-| 21 | lendários naturalmente mais fortes, com melhorias e 2º golpe de saída, e um golpe exclusivo, único e muito bonito; com todas as melhorias, curar os 20% sem abrir tela, e a tela só para o 2º golpe, com uma opção única; um nome mais impactante para o 2º golpe | 0.16: `data/legendaries.js` (5 golpes exclusivos desenhados em código, kit, poder maior, entram no nível da equipe); Poção automática e anúncio do "Golpe Desperto" (nome padrão até o Fellipe escolher; sugestões dadas na conversa); roteiro `lendarios` no `screenshot.mjs` |
+| 41 | ler o HANDOFF e arrumar tudo o que estava desatualizado no projeto inteiro | 0.32.1: o HANDOFF conferido com o código (arquitetura com os arquivos que faltavam, contagens, Poké Balls, Shards, o Mart na vila, o Modo Livre e o Centro levando à vila, save, estado do conteúdo, próximos passos, histórico em ordem); README, PLANEJAMENTOs e PROVENIENCIA atualizados; comentários vencidos no código; nas Opções, o tremor (só os líderes) e o autosave (botão Jornada); a Ajuda com os controles da vila; a arte oficial (código morto) e o `.pyc` versionado saíram |
 
 ---
 

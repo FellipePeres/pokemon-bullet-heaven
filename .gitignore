@@ -2,6 +2,9 @@ node_modules/
 *.log
 .DS_Store
 
+# cache do Python (tools/assets)
+__pycache__/
+
 # arquivos temporarios de medicao
 *.tmp.mjs
 m.mjs

@@ -714,7 +714,7 @@ check('depois da escolha, o Continuar segue para a jornada (na vila); sem nome, 
   game.campaign.clearedStages.splice(0, game.campaign.clearedStages.length, ...keep, 'champion');
 }
 
-// ---- continuar sempre vai para o mapa (0.24): a partida que ficou no meio entra na jornada ----
+// ---- continuar nunca volta ao meio da fase (0.24; desde a 0.29, vai à vila): a partida que ficou no meio entra na jornada ----
 {
   game.startStage('gym_1_pewter');
   game.run.team.members[0].level = 44;

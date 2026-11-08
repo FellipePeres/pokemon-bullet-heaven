@@ -3,7 +3,7 @@
  * Nada de número mágico espalhado pelo gameplay: se precisar ajustar, ajuste aqui.
  */
 export const CONFIG = {
-  version: '0.32.0',
+  version: '0.32.1',
 
   canvas: { width: 1280, height: 720 },
 
@@ -87,8 +87,8 @@ export const CONFIG = {
   pokemon: {
     baseHp: 100,            // usado se a espécie não definir `hp`
     hpPerLevel: 6,          // vida máxima ganha por nível
-    // Subir de nível NÃO cura: cura vem de poções, da reserva e de itens.
-    // (Curar a cada nível tornava a fase trivial.)
+    // Subir de nível cura pouco (progression.levelUpHeal: 1/10, do nível 11 em
+    // diante; curar tudo tornava a fase trivial); o resto vem das poções, da reserva e da troca.
     // Como a melhoria só aparece a cada 3 níveis, cada nível em si
     // precisa valer mais: o poder vem do nível, não da quantidade de telas.
     damagePerLevel: 0.07,
@@ -207,8 +207,8 @@ export const CONFIG = {
     shinyChance: 0.01,
     levelsBehindTeam: 3,     // quem entra chega com a média da equipe menos isso
     // Poké Ball rara (pedidos do Fellipe: ×0,45 na 0.8, ×0,15 na 0.9, ×0,07 na
-    // 0.10, quando as garantidas também saíram: sobrou uma, na Fase 1; ×0,085 na
-    // 0.18, "aumentar levemente": ~20% mais, onde a fase não está no teto)
+    // 0.10, quando as garantidas também saíram: só a Fase 1 ficou com elas, duas;
+    // ×0,085 na 0.18, "aumentar levemente": ~20% mais, onde a fase não está no teto)
     dropChanceMultiplier: 0.085,
     // Ímã: puxa todo o XP do mapa até o treinador. Raríssimo; um por vez no chão.
     magnetChance: 0.0005,
@@ -221,7 +221,7 @@ export const CONFIG = {
    * primeira vitória paga; rejogar não ganha nada); cada Pokémon de líder
    * derrotado dá 10 e cada chefe simples (elite) dá 5, na hora, mesmo que a
    * tentativa termine em derrota. No Modo Livre só os chefes simples pagam.
-   * Mais as conquistas. Os Shards serão gastos no Poké Mart (planejado).
+   * Mais as conquistas. Gastos no Poké Mart (0.23) e na loja de Pokédolls (0.29).
    */
   shards: {
     perStageClear: 100,     // a recompensa da fase sem `reward` próprio (só na primeira vitória)
@@ -231,12 +231,12 @@ export const CONFIG = {
   },
 
   sprites: {
-    // Sprites do repositório público PokeAPI/sprites.
-    // Estáticos no canvas (o canvas não anima GIF) e animados na interface.
+    // Do repositório público PokeAPI/sprites: os GIFs animados da interface, os
+    // ícones de item e as insígnias. Em campo o Pokémon é a tira animada local
+    // (assets/pokemon); o estático daqui só aparece enquanto ela não carrega.
     useRemote: true,
     remoteBase: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/',
     animatedBase: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/',
-    artworkBase: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/',
     itemBase: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/',
     badgeBase: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/badges/',
     useAnimatedUI: true,

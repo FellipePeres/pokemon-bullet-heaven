@@ -12,7 +12,8 @@
 > L-5 (andar, entrar, falar e começar, os serviços e o quarto decorável). Na
 > **0.30.0**: a loja de Pokédolls com a entrada livre, o Carvalho entregando o mapa,
 > o Voltar para a Vila embaixo do mapa, o rosto do treinador na fase atual e o nome
-> do jogador no lugar de Red e Leaf. Faltam
+> do jogador no lugar de Red e Leaf. Na **0.31**, a tela do inicial que o Carvalho
+> abre passou aos cards em pixel, com as barras de vida, dano e alcance. Faltam
 > a L-6 (o golpe Dive e a TM Dive), a L-7 (sons e capricho), o modo Endless e o
 > modo aquático. As decisões que ainda faltam estão na seção 13. Onde o texto
 > diz "padrão", é a escolha recomendada até o Fellipe decidir (e é o que está no
@@ -232,8 +233,8 @@ A desenhar: como a dificuldade cresce (ondas, tempo, nível dos inimigos), como
 os Shards são pagos (por onda, por tempo, por recorde), se existe um placar de
 recorde, e o que acontece com capturas e itens lá dentro.
 
-Relação com o **Modo Livre** de hoje (0.27, depois do Campeão): são coisas
-diferentes. O Modo Livre sobe a equipe sem avançar na jornada; o Endless não dá
+Relação com o **Modo Livre** de hoje (0.20, depois de vencer qualquer fase; no
+Campeão desde a 0.27): são coisas diferentes. O Modo Livre sobe a equipe sem avançar na jornada; o Endless não dá
 XP, só Shards.
 
 ---
@@ -555,13 +556,17 @@ projeto.
 6. **Móveis em lugar fixo** (padrão, no jogo) ou o jogador escolhe onde pôr?
 7. **O rival:** ganha uma casa na vila (por exemplo a cabana), ou só aparece em
    momentos marcados?
-8. **A cama:** é o único jeito de salvar, ou o menu START também salva?
+8. **A cama:** é o único jeito de salvar, ou o menu START também salva? (No jogo:
+   a cama e o botão Salvar da barra; o START abre o mapa da jornada.)
 9. **Endless e modo aquático:** cada um vai ganhar o seu próprio planejamento
    quando chegar a vez.
 
 ---
 
 ## 14. Relação com o PLANEJAMENTO-VISUAL.md
+
+> Esse arquivo nunca entrou no repositório. O estado atual do mapa da jornada está
+> no HANDOFF (seção 4, "O mapa da jornada").
 
 - A tela do **mapa da jornada** continua, agora aberta pela saída sul e pelo HUD:
   as propostas L1 a L9 do plano visual continuam valendo para ela. A L7 (barra do

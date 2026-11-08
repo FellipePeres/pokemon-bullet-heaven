@@ -7,8 +7,9 @@ import { STAGES } from '../data/stages.js';
 import { bus, EVENTS } from '../core/events.js';
 
 /**
- * PERFIL — tudo o que sobrevive entre partidas:
- * Pokédex, conquistas, estatísticas e progresso de campanha.
+ * PERFIL — tudo o que sobrevive entre partidas: Pokédex, conquistas,
+ * estatísticas, Shards, a mochila, o quarto, o Hall da Fama e as jornadas (cada
+ * uma com o seu treinador e a sua campanha).
  *
  * É propositalmente "burro": só dados simples, fáceis de serializar em JSON
  * e fáceis de estender (basta adicionar campos, o merge cuida dos saves antigos).
@@ -34,7 +35,7 @@ export function createProfile() {
       unlocked: [],
       claimed: []
     },
-    /** Shards: vêm das fases e das conquistas. */
+    /** Shards: vêm dos chefes, da primeira vitória de cada fase e das conquistas (0.22). */
     shards: 0,
     // a mochila do Poké Mart (0.23): itens comprados que se usam depois
     bag: { reroll: 0, revive: 0 },
@@ -64,7 +65,7 @@ export function createProfile() {
       champions: 0,
       shinyCaught: 0
     },
-    // equipes campeãs (Hall da Fama): { date, trainer, region, team: [{ pokemonId, level }] }
+    // equipes campeãs (Hall da Fama): { date, trainer, trainerName, region, team: [{ pokemonId, level, shiny }] }
     hallOfFame: [],
     // a campanha é guardada por região (data/regions.js); `region` é a da jornada atual
     region: DEFAULT_REGION,
@@ -74,13 +75,14 @@ export function createProfile() {
     // campos de cima (`trainer`, `region`, `regions`; a partida em andamento é o
     // `run` do save), e todo o resto do jogo continua lendo dali. Cada espaço
     // guarda a sua em `data` enquanto está guardado (null enquanto é a ativa).
-    // Pokédex, conquistas, Shards e Hall da Fama são do jogador e valem para todas.
-    journeys: [],          // [{ id, createdAt, updatedAt, data: { trainer, region, regions } | null, pendingRun }]
+    // Pokédex, conquistas, Shards, a mochila, o quarto e o Hall da Fama são do
+    // jogador e valem para todas.
+    journeys: [],          // [{ id, createdAt, updatedAt, data: { trainer, trainerName, region, regions } | null, pendingRun }]
     activeJourney: null    // o id do espaço que está nos campos de cima
   };
 }
 
-/** Um espaço de jornada novo (vazio até o jogador escolher treinador e inicial). */
+/** Um espaço de jornada novo (vazio até o jogador escolher o treinador; até a 0.28, o inicial). */
 export function createJourneySlot() {
   const now = new Date().toISOString();
   const id = `journey-${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`;
@@ -95,8 +97,8 @@ export function createRegionProgress() {
     clearedStages: [],
     badges: [],
     lastStage: null,
-    // "jornada": equipe, build e nível levados de uma fase para a seguinte.
-    // É atualizada a cada fase concluída e serve de checkpoint em caso de derrota.
+    // "jornada": equipe, build, nível e PC levados de uma fase para a seguinte.
+    // É atualizada no fim de cada tentativa, vencendo ou não (0.17), e no abandono.
     journey: null,
     // métricas de cada fase, para o Estojo de Insígnias (0.13; systems/stageStats.js)
     stageStats: {},

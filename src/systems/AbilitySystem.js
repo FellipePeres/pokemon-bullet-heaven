@@ -14,7 +14,9 @@ import { castSignature } from './signatureMoves.js';
 
 /**
  * Calcula as stats finais de uma habilidade:
- *   base + upgrades daquele Pokémon + nível do Pokémon + bônus globais da equipe.
+ *   base + upgrades daquele Pokémon + poder da espécie + nível do Pokémon.
+ *   (Os bônus da equipe, `run.playerStats`, ficam em 1 desde a 0.21, quando a loja
+ *   do treinador saiu.)
  * Sempre recalculado do zero — assim nenhum upgrade "gruda" por engano.
  */
 export function computeAbility(run, abilityId, companion = null) {
@@ -38,7 +40,7 @@ export function computeAbility(run, abilityId, companion = null) {
   const stats = applyModifiers(ability.base, mods);
   const ps = run.playerStats;
 
-  // bônus globais, poder da espécie e nível do Pokémon
+  // bônus da equipe (1 desde a 0.21), poder da espécie e nível do Pokémon
   const level = companion?.member?.level ?? 1;
   stats.damage = (stats.damage ?? 0) * ps.damageMult
                  * (companion?.data?.power ?? 1)

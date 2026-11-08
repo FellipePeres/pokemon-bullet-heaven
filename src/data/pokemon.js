@@ -15,11 +15,14 @@
  *   power       multiplicador de dano próprio da espécie
  *   hp          vida máxima no nível 1 (cresce com o nível — ver CONFIG.pokemon)
  *   starter     marca os três iniciais
- *   evolution   { to, level, method?, item? }
+ *   evolution   { to, level }, ou { to, method: 'stone' | 'trade', item } para quem
+ *               evolui com item (a Eevee tem `by`: qual pedra leva a qual espécie)
+ *   fieldScale  sobe o teto de altura em campo de quem tem a animação num quadro
+ *               enorme (as asas abertas do Articuno e do Moltres; 0.21.1)
  *
- * EVOLUÇÃO: os níveis seguem os jogos originais. Quando a evolução real depende
- * de pedra ou troca, usamos um nível equivalente e marcamos `method` — assim é
- * só trocar por itens quando eles existirem, sem mexer no sistema.
+ * EVOLUÇÃO: os níveis seguem os jogos originais. Quem evolui por pedra ou troca
+ * só evolui com o item do Poké Mart (0.23, data/items.js); até a 0.22 era um
+ * nível equivalente, e a Eevee sorteava a evolução.
  */
 export const POKEMON = {
   /* ============================= INICIAIS ============================= */

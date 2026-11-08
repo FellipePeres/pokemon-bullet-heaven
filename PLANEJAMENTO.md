@@ -23,7 +23,7 @@ golpes). O sprite do treinador tem 4 poses, e na diagonal a pose atual continua
 se fizer parte do movimento; senão, ele fica de lado. A `vitrine.html` mostra as
 8 direções.
 
-## 2. Onde estamos (0.4.0)
+## 2. De onde partimos (0.4.0)
 
 | Área | Hoje |
 |---|---|
@@ -89,14 +89,15 @@ quando o Fellipe mandar**, porque o push publica o jogo.
 | # | Etapa | Versão | Status |
 |---|---|---|---|
 | 0 | Fundação: extrator, carregador, vitrine e estrutura por região | 0.5 | ✅ feita (2026-11-02) |
-| 1 | Treinador: Menino ou Menina | 0.5 | 🟡 feita; falta a partida do Fellipe |
+| 1 | Treinador: Menino ou Menina | 0.5 | ✅ feita (2026-11-02); na 0.30, o nome do jogador no lugar de Red e Leaf |
 | 2 | Golpes com sprite (e no máximo 4 por tipo) | 0.6 | ✅ feita (2026-11-02) |
 | 3 | Pokémon animados e cenário de tiles | 0.7 → 0.8 | ✅ feita (2026-11-02): Pokémon animados na 0.7, cenário de tiles na 0.8 |
-| 4 | Fases 3 a 8, Elite Four e Campeão | 0.7 | ✅ feita (2026-11-02); falta só os lendários como encontros especiais |
-| 5 | Som | 1.0 | 🔶 música feita (0.11): uma por fase, a do lobby, a do líder e a da vitória, com o mixer de volume; faltam gritos e efeitos |
+| 4 | Fases 3 a 8, Elite Four e Campeão | 0.7 | ✅ feita (2026-11-02); os lendários como encontros especiais vieram na 0.18 |
+| 5 | Som | 1.0 | 🔶 música feita (0.11): uma por fase, a do lobby, a do líder, a da vitória, a do Centro Pokémon e a do Hall da Fama, com o mixer de volume; faltam gritos e efeitos |
 | 6 | Acabamento: opções salvas, controle, celular, desempenho, assets locais, identidade visual | 0.6 → 1.0 | 🔶 opções, desempenho, controle e identidade visual (0.10) feitos; faltam celular e assets locais |
-| 7 | Final da jornada: Hall da Fama e créditos | 0.7 | ✅ feita (2026-11-02); o pós-jogo (D9) fica para depois |
+| 7 | Final da jornada: Hall da Fama e créditos | 0.7 | ✅ feita (2026-11-02); do pós-jogo (D9), os lendários vieram na 0.18 e o Modo Livre na 0.20; falta a revanche dos líderes |
 | 8 | Outras regiões | 1.x | ⏳ |
+| 9 | Lobby: o Mapa de Kanto e o Estojo de Insígnias | 0.13 | ✅ feita (2026-11-04); desde a 0.29 ele é o mapa da jornada, aberto pela vila (PLANEJAMENTO-LOBBY.md) |
 
 Kanto completo (a 1.0) é o fim das etapas 2 a 7. Os itens pequenos da Etapa 6
 (opções salvas, controle) podem entrar antes, junto de qualquer outra etapa.
@@ -419,9 +420,10 @@ Levantamento de 2026-11-02:
   pequena. O site é público, e hoje no celular o jogo não é jogável.
 - ✅ **Desempenho medido** (0.6): `vitrine.html?estresse` deu 60 FPS e ~2 ms por
   quadro com 245 inimigos. Medir de novo com os Pokémon animados (Etapa 3).
-- **Assets locais.** Os sprites de Pokémon, itens e insígnias ainda vêm do
-  raw.githubusercontent.com a cada partida. Com a Etapa 3 o canvas fica local;
-  falta a interface (HUD, menus, Pokédex).
+- **Assets locais.** Com a Etapa 3 o canvas ficou local (0.7), e os cards de
+  escolha também (0.31, o sprite do FireRed). Ainda vêm do
+  raw.githubusercontent.com os GIFs da interface (HUD, telas de nível e
+  evolução, Pokédex), os ícones de item e as insígnias.
 - ✅ **Identidade visual** (0.10, pedido do Fellipe: "remodelar todo o front,
   copiando o UX do Pokemon All"): o padrão do DEC-002 de lá. A caixa de diálogo
   do FireRed de verdade como moldura (`assets/ui/window-frame*.png`, as mesmas do
@@ -441,7 +443,7 @@ Levantamento de 2026-11-02:
   entrada, com a Poké Ball de ponteiro, ↑ ↓ e Enter (pula o que está
   desabilitado) e o mouse escolhendo ao passar; selos com moldura ("Sem jogo
   salvo", de onde a jornada continua); atalhos no canto (Pokédex, Conquistas,
-  Treinador e a engrenagem de Opções), no lugar da barra lateral; o progresso da
+  Treinador — que saiu na 0.21 — e a engrenagem de Opções), no lugar da barra lateral; o progresso da
   conta e as teclas no rodapé; a saída esmaece como a abertura do jogo.
 
 ### Etapa 7 — Final da jornada
@@ -641,7 +643,7 @@ a estar nos líderes. Com o bot novo, metade das derrotas da Fase 1 é no Brock.
 
 | | Pergunta | Recomendação | Trava |
 |---|---|---|---|
-| D1 | Pokémon em campo: GIF animado da Gen 5, sprite do FireRed (parado, mas no estilo do cenário) ou ícone da caixa (2 quadros, estilo "mini")? | GIF animado, porque é o que dá movimento. A vitrine mostra os três lado a lado para escolher olhando. | Etapa 3 |
+| D1 | Pokémon em campo: GIF animado da Gen 5, sprite do FireRed (parado, mas no estilo do cenário) ou ícone da caixa (2 quadros, estilo "mini")? | ✅ Feito na 0.7: o GIF animado da Gen 5, em tiras locais (`assets/pokemon`). O sprite do FireRed ficou para os cards de escolha (0.31) e o PC; o ícone de caixa, para o PC e a equipe do mapa. | Etapa 3 |
 | D2 | Árvores e pedras do cenário: só decoração ou obstáculo de verdade? | ✅ Decidido (0.9): bloqueiam o treinador e os inimigos. Quem bloqueia é a colisão do próprio mapa do FireRed; os Pokémon da equipe, os golpes e os itens passam por cima. | Etapa 3 |
 | D3 | Selvagens com nível e curva de XP cúbica? | ✅ Feito na 0.7, com ajustes: nível acompanha a equipe; curva exponencial até o 20 e potência depois. | Etapa 4 |
 | D4 | Quem já tem save escolhe o treinador ao abrir o jogo, ou fica Menino até trocar em Opções? | ✅ Decidido: escolhe ao continuar (a tela aparece uma vez) e pode trocar em Opções. | Etapa 1 |
@@ -649,9 +651,9 @@ a estar nos líderes. Com o bot novo, metade das derrotas da Fase 1 é no Brock.
 | D6 | Músicas novas do FireRed: renderizar (numa cópia temporária do Pokemon All, ou com o Braga) ou ficar com as 3 prontas por enquanto? | ✅ Feito na 0.11: a cópia do sintetizador roda neste repositório, com as partituras do decomp público. | Etapa 5 |
 | D7 | Onde entram as 9 espécies que não estão em tabela nenhuma? | Aplicado como padrão na 0.7 (lugares do FireRed com peso 3, e os presentes). As porcentagens são suas: é só mudar em `capturePools.js`. | Etapa 4 |
 | D8 | Celular e controle importam? | Controle feito na 0.7 (padrão); celular depois de Kanto fechado. | Etapa 6 |
-| D9 | Final e pós-jogo | Hall da Fama e créditos na 1.0; revanche dos líderes e lendários depois. | Etapa 7 |
+| D9 | Final e pós-jogo | Hall da Fama e créditos feitos na 0.7; os lendários vieram na 0.18 (sorteio próprio, da Fase 7 ao Campeão) e o Modo Livre na 0.20. Falta a revanche dos líderes. | Etapa 7 |
 | D10 | Como refinar o XP? (o Fellipe pediu sugestões na 0.9) | Ver as opções em "Segundo retorno" abaixo. Recomendação: orbes por faixa de valor com o visual de doce, que se juntam no chão. | — |
-| D11 | ✅ Feito na 0.14 (ver "O 2º golpe — 3 por tipo"). **Ideia do Fellipe (0.12):** quando um Pokémon chega ao máximo de melhorias, cada nível que ele sobe tem uma chance bem baixa de ganhar um **2º golpe**: ele mantém o golpe de hoje e passa a usar outro junto — o Charizard ganha um anel de fogo, por exemplo. Para todos. (O "mesmo golpe com um mega bônus" foi recusado.) | Recomendação: vale quando não há mais melhoria para sortear (é quando aparece a Poção de 20%). Em cada nível, ~2% de chance de uma das opções virar o **2º golpe** da espécie: um golpe de área do tipo dela que gira em volta do Pokémon (o anel), com o sprite de golpe do FireRed que o tipo já tem (Fogo: o anel de fogo do Fire Spin; Água: o redemoinho; Planta: as folhas; Elétrico: as faíscas...). Um por Pokémon, para sempre, e ele começa sem melhorias. A conferir: a %, se é por tipo ou por espécie, e se o 2º golpe também recebe melhorias depois. | — |
+| D11 | ✅ Feito na 0.14 (ver "O 2º golpe — 3 por tipo"); desde a 0.28 ele vem pela chave de 3 melhorias de cada golpe (`data/awakening.js`), não por sorteio. **Ideia do Fellipe (0.12):** quando um Pokémon chega ao máximo de melhorias, cada nível que ele sobe tem uma chance bem baixa de ganhar um **2º golpe**: ele mantém o golpe de hoje e passa a usar outro junto — o Charizard ganha um anel de fogo, por exemplo. Para todos. (O "mesmo golpe com um mega bônus" foi recusado.) | Recomendação: vale quando não há mais melhoria para sortear (é quando aparece a Poção de 20%). Em cada nível, ~2% de chance de uma das opções virar o **2º golpe** da espécie: um golpe de área do tipo dela que gira em volta do Pokémon (o anel), com o sprite de golpe do FireRed que o tipo já tem (Fogo: o anel de fogo do Fire Spin; Água: o redemoinho; Planta: as folhas; Elétrico: as faíscas...). Um por Pokémon, para sempre, e ele começa sem melhorias. A conferir: a %, se é por tipo ou por espécie, e se o 2º golpe também recebe melhorias depois. | — |
 | D12 | Shiny: "vamos implementar, não aparece shiny nos inimigos, apenas na captura e para o jogador" | ✅ Feito na 0.13.1; o inicial também (0.13.2, 1% na escolha). Em aberto: a chance (padrão 1% por opção da Poké Ball) e se o shiny ganha algum bônus além das cores (hoje, não) | — |
 
 Enquanto uma decisão não vem, a recomendação vale como padrão. O que foi feito
@@ -667,7 +669,8 @@ secundário, e ele fica com o primeiro que sair; o nome oficial; 60% do dano do
 golpe atual. O Air Slash ficou "para ver como fica". Raio do Céu virou **Bolt
 Strike** (Thunder já é um golpe do jogo).
 
-A regra (aprovada na 0.13): quando o Pokémon já tem todas as melhorias, cada
+A regra (aprovada na 0.13; valeu até a 0.27, e desde a 0.28 o golpe vem quando a
+chave do golpe fica completa): quando o Pokémon já tem todas as melhorias, cada
 nível tem uma chance baixa (~2%) de dar o **2º golpe**: ele mantém o golpe dele
 e passa a usar outro junto. Cada tipo tem 3 opções e o Pokémon recebe **uma, ao
 acaso**. Os 3 de cada tipo têm mecânicas diferentes entre si e dos golpes que o
@@ -696,18 +699,20 @@ tipo já tem; todos usam um efeito do FireRed que o jogo já tem (`fx/...`).
 Sombrio não entra: nenhuma das 151 é desse tipo. Metálico só aparece como o
 2º tipo do Magnemite e do Magneton.
 
-**Ainda para decidir:**
-- **Pokémon de dois tipos:** sorteia só entre os 3 do 1º tipo (padrão: o Charizard
-  sempre ganha um de Fogo) ou entre os 6 dos dois tipos.
+**Decidido na 0.14** (estava "ainda para decidir"):
+- **Pokémon de dois tipos:** um dos 3 do 1º tipo ou, em 1/3 das vezes, um dos 3 do
+  2º (`CONFIG.bonusMove.secondaryShare`, a proporção dos antigos 2% e 1%).
 - **Nome no jogo:** o nome oficial em inglês, como os outros golpes (Flame Wheel),
-  com a descrição em português ao passar o mouse; ou o nome em português.
-- **Força:** padrão de ~60% do dano de um golpe-base do mesmo estágio, e sem
+  com a descrição em português. O recurso se chama "Golpe Desperto" (0.16).
+- **Força:** 60% do dano do golpe principal atual (com as melhorias dele), sem
   melhorias próprias.
 
 ## 6. Depois de Kanto
 
 Vieram da lista antiga do HANDOFF e continuam valendo:
 
-- **Item Revive**: o `TeamSystem.handleFaint` já isola o desmaio.
-- **Pedras evolutivas como item**: o `method: 'stone'` já marca quem depende delas.
-- **Sinergias de tipo** entre membros da equipe.
+- ~~**Item Revive**~~: feito na 0.23 (o Reviver do Poké Mart, no card de quem desmaiou).
+- ~~**Pedras evolutivas como item**~~: feito na 0.23 (as 5 pedras e o Cabo de Troca
+  no Poké Mart; quem evolui por item não evolui mais por nível).
+- **Sinergias de tipo** entre membros da equipe. (A vantagem de tipo contra os
+  inimigos veio na 0.32: a tabela completa e a defesa por tipo.)

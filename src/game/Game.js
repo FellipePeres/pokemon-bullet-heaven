@@ -184,9 +184,10 @@ export class Game {
   }
 
   /**
-   * A música que deveria tocar agora: o tema do lobby nos menus, a da fase na
-   * partida, a do líder quando ele entra, a da vitória no resultado, a do Hall
-   * da Fama e a do Centro Pokémon depois de uma derrota. A pausa só abaixa o volume.
+   * A música que deveria tocar agora: o tema do lobby nos menus e na vila (ou a
+   * do lugar: o Centro Pokémon tem a dele), a da fase na partida, a do líder
+   * quando ele entra, a da vitória no resultado, a do Hall da Fama e a do Centro
+   * Pokémon depois de uma derrota. A pausa só abaixa o volume.
    */
   _updateMusic() {
     const run = this.run;
@@ -437,7 +438,7 @@ export class Game {
     this.profile.stats.badges = countBadges(this.profile);
   }
 
-  /** Abre uma jornada (de onde ela parou: a partida em andamento ou o mapa). */
+  /** Abre uma jornada, sempre na vila (a partida que ficou no meio entra nela antes, 0.24). */
   openJourney(id) {
     const slot = this.profile.journeys.find((s) => s.id === id);
     if (!slot) return;
@@ -483,9 +484,10 @@ export class Game {
   }
 
   /**
-   * Continuar a jornada é sempre ir para o mapa (0.24, pedido do Fellipe: "mesmo
-   * que tenha saído no meio da fase"). A partida que ficou no meio já entrou na
-   * jornada (`_foldPendingRun`), como um abandono: nada do que a equipe ganhou se perde.
+   * Continuar a jornada nunca volta ao meio da fase (0.24, pedido do Fellipe:
+   * "mesmo que tenha saído no meio da fase"): leva à vila, na frente de casa (0.29;
+   * até a 0.28, ao mapa). A partida que ficou no meio já entrou na jornada
+   * (`_foldPendingRun`), como um abandono: nada do que a equipe ganhou se perde.
    */
   continueGame() {
     // saves de antes da escolha de treinador perguntam uma vez
@@ -497,7 +499,7 @@ export class Game {
   /**
    * A partida que ficou no meio (o navegador fechou durante a fase, ou um save
    * feito na pausa) entra na jornada: a equipe dela e o PC que ela juntou, como
-   * um abandono — e o jogador volta ao mapa, não à fase (0.24).
+   * um abandono — e o jogador volta à vila (na 0.24, ao mapa), não à fase.
    */
   _foldPendingRun() {
     const snapshot = this.pendingRun;
@@ -912,15 +914,16 @@ export class Game {
 
   /**
    * Sai do Modo Livre (o botão do canto ou a equipe toda caída): guarda o que a
-   * equipe ganhou e vai direto para o mapa da jornada (0.20.1, pedido do Fellipe;
-   * antes abria a janela do Centro). A equipe chega curada na próxima fase.
+   * equipe ganhou e vai para a vila, na frente de casa (0.29; na 0.20.1, a pedido
+   * do Fellipe, ia direto ao mapa da jornada; antes abria a janela do Centro). A
+   * equipe chega curada na próxima fase.
    */
   leaveEndless() {
     const run = this.run;
     if (!run?.endless) return;
     run.state = 'ended';
     this.music.jingle('mus_heal');
-    this.quitToMenu();   // guarda a jornada (Modo Livre) e abre o mapa
+    this.quitToMenu();   // guarda a jornada (Modo Livre) e volta para a vila
     toast('Sua equipe descansou no Centro Pokémon. O que ela ganhou no Modo Livre ficou.', 'potion');
   }
 
@@ -953,7 +956,7 @@ export class Game {
     });
   }
 
-  /** Do Centro Pokémon de volta para a fase, do começo (ou para o mapa: `quitToMenu`). */
+  /** Do Centro Pokémon de volta para a fase, do começo (ou para a vila: `quitToMenu`). */
   leaveCenter() {
     if (!this.centerOpen) return;
     this.centerOpen = false;
@@ -963,8 +966,8 @@ export class Game {
 
   /**
    * Recomeçar a jornada do zero: a campanha da região recomeça (insígnias,
-   * equipe e PC), e a Pokédex, as conquistas, os Shards e as melhorias do
-   * treinador continuam, como na Nova jornada da tela de título.
+   * equipe e PC), e a Pokédex, as conquistas, os Shards, a mochila, o quarto e o
+   * Hall da Fama continuam, como na Nova jornada da tela de título.
    */
   restartJourney() {
     this.run = null;
@@ -1001,7 +1004,7 @@ export class Game {
     return true;
   }
 
-  /** No lobby: troca um da equipe por um do PC (ver systems/pc.js). */
+  /** Fora da partida (o PC da vila, do mapa ou do Centro): troca um da equipe por um do PC (ver systems/pc.js). */
   pcSwap(teamUid, pcUid) {
     const ok = swapWithPC(this.campaign.journey, teamUid, pcUid, CONFIG.team.maxSize);
     if (ok && this.centerOpen) this._showCenter();   // o PC do Centro Pokémon muda quem volta para a fase
@@ -1160,7 +1163,7 @@ export class Game {
       this.tracker.setProfile(this.profile);
       this.pendingRun = data.run;
       this.run = null;
-      this._foldPendingRun();   // a partida do save entra na jornada; o jogador vai ao mapa (0.24)
+      this._foldPendingRun();   // a partida do save entra na jornada; o jogador vai à vila (0.29)
       this.autosave();
 
       toast(`Save carregado (${data.savedAt ? new Date(data.savedAt).toLocaleString('pt-BR') : 'sem data'}).`, '📂');

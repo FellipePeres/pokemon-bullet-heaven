@@ -48,7 +48,7 @@ guardam modos que ainda estão por vir.
 | Trocar o Pokémon em campo | `1` – `6` (ou clique no card) |
 | Escolher quem sai na troca (o card marcado "⇄ sai") | `Tab` ou clique no card |
 | Ligar ou desligar o ataque de um Pokémon em campo | botão da espadinha no card (desligado, ele só acompanha) |
-| Opções e volume da música | a engrenagem no canto (na partida, ao lado da pausa) |
+| Opções e volume da música | Opções na barra do topo, ou a engrenagem no canto (na partida, ao lado da pausa) |
 | Gastar os níveis acumulados de um Pokémon | botão `▲` no card |
 | Pausar / fechar janela | `ESC` |
 | Controle (gamepad) | analógico ou direcional anda · LB/RB escolhem o slot · X/Y/B põem a reserva em campo · Start pausa · nas telas, direcional e A |
@@ -67,7 +67,8 @@ Os ataques são automáticos. O que você controla é **onde estar**, **quem est
 campo** e **quais melhorias escolher**.
 
 > O progresso fica salvo no navegador e também pode ser exportado como arquivo
-> `.json` pelo botão **Salvar Jogo** — dá para levar sua jornada para outra máquina.
+> `.json` pelo botão **Salvar** (na vila e no mapa da jornada) ou dormindo na cama do
+> quarto — dá para levar sua jornada para outra máquina.
 
 ## Os sistemas
 
@@ -102,16 +103,18 @@ da linha daquele Pokémon** — nunca um golpe aleatório de outro — e **leva 
 todas as melhorias já investidas**. Trocar de golpe nunca é um downgrade.
 
 **Captura.** Inimigos derrotados podem deixar uma Poké Ball. Ao coletar, o jogo
-pausa e oferece três Pokémon sorteados pela tabela de chances daquela fase. Cada
-fase tem um teto de bolas e alguns momentos garantidos, para a jornada não depender
-de sorte.
+pausa e oferece quatro Pokémon sorteados pela tabela de chances daquela fase. Cada
+fase tem um teto de bolas, e a primeira tem duas garantidas, para o inicial não
+ficar sozinho. Com a equipe cheia, nada se perde: quem sai (ou quem chega) vai para
+o PC.
 
 **Shards.** Vêm dos chefes (10 por Pokémon de líder, 5 por chefe simples, mesmo
 numa derrota), da **primeira** vitória de cada fase e das conquistas. Gaste no
-**Poké Mart**, na barra do lobby: Novo Sorteio (300) e Reviver (600) vão para a
-mochila; a TM (1.500) ensina o próximo golpe na hora; as pedras e o Cabo de Troca
-(2.500) são a única forma de evoluir quem evolui por item (Pikachu, Eevee,
-Kadabra, Gloom...).
+**Poké Mart** (o balcão do Centro Pokémon, na vila, ou o botão no mapa da jornada):
+Novo Sorteio (300) e Reviver (600) vão para a mochila; a TM (1.500) ensina o
+próximo golpe na hora; as pedras e o Cabo de Troca (2.500) são a única forma de
+evoluir quem evolui por item (Pikachu, Eevee, Kadabra, Gloom...). E na loja de
+Pokédolls, nos enfeites do quarto.
 
 **A jornada continua.** Equipe, níveis e build passam de uma fase para a seguinte.
 Perder não tira nada: o que a equipe ganhou na tentativa fica, só a próxima fase
@@ -123,8 +126,8 @@ não abre até você vencer.
   Koga, Sabrina, Blaine e Giovanni), a Elite Four (Lorelei, Bruno, Agatha e Lance)
   e o Campeão, cada líder com o time do FireRed. O time do rival muda conforme o
   seu inicial, como no jogo.
-- **Treinador à sua escolha**: Red ou Leaf, com os sprites de andar e correr do FireRed
-  e o Prof. Carvalho fazendo a pergunta.
+- **Treinador à sua escolha**: menino ou menina, com o seu nome, os sprites de andar
+  e correr do FireRed e o Prof. Carvalho fazendo as perguntas.
 - **A Vila da Jornada** (0.29): o lobby jogável, montado com os mapas do FireRed. São 7
   interiores (a sua casa e o quarto, o laboratório do Carvalho, o Centro Pokémon com
   dois balcões, a loja de Pokédolls, a cabana e a casa do velho sábio), 17 moradores e
@@ -134,7 +137,8 @@ não abre até você vencer.
   o prêmio do Dojo de Saffron: Hitmonlee ou Hitmonchan).
 - **52 golpes** com o sprite da animação do FireRed, no máximo 4 por tipo, sobre 7
   comportamentos genéricos (projétil, arco, órbita, aura, zona de chão, onda de
-  choque e raio em corrente).
+  choque e raio em corrente), fora os 51 do Golpe Desperto e os 5 exclusivos dos
+  lendários (abaixo).
 - **Cenário do FireRed**: cada trecho da jornada é montado com as metatiles do lugar
   (a grama e as árvores da Rota 1, a mata da Floresta de Viridian, o Monte Lua) e
   cada ginásio e sala da Liga tem o visual do mapa original. O andar continua livre,
@@ -144,12 +148,14 @@ não abre até você vencer.
   você e uma fase de fúria abaixo da metade da vida.
 - **Visual de GBA**: as janelas e botões do FireRed, fontes em pixel e o fundo dos
   menus montado com o próprio cenário do jogo.
-- **Música do FireRed**: uma por fase, a do líder, a da vitória e o tema do lobby,
-  com volume ajustável.
-- **Lobby no Town Map de Kanto**: cada fase na cidade do ginásio, o treinador
-  andando pelo mapa, a fase escolhida ao lado (o salão do líder em pixel, o time
-  dele em Poké Balls e o nível recomendado) e o **Estojo de Insígnias** (o Cartão
-  de Treinador do FireRed) com as métricas de cada fase.
+- **Música do FireRed**: uma por fase, a do líder, a da vitória, a do Centro
+  Pokémon, a do Hall da Fama e o tema do lobby (nos menus e na vila), com volume
+  ajustável.
+- **O mapa da jornada no Town Map de Kanto** (pela saída sul da vila): cada fase na
+  cidade do ginásio, o treinador andando pelo mapa, a fase escolhida ao lado (o
+  salão do líder em pixel, o time dele em Poké Balls, a que tipos ele é fraco e o
+  nível recomendado) e o **Estojo de Insígnias** (o Cartão de Treinador do FireRed)
+  com as métricas de cada fase.
 - **Cards de escolha**: o inicial e os Pokémon da Poké Ball aparecem em pixel na
   base de batalha, com barras de vida, dano por segundo e alcance tiradas dos dados.
 - **Tipos de verdade**: a tabela da série vale no dano que você causa e no que os seus
@@ -174,26 +180,28 @@ não abre até você vencer.
 - **Modo Livre**: ao vencer uma fase, dá para seguir nela sem fim, com XP
   reduzido e inimigos cada vez mais fortes, até ficar quase impossível. O botão
   "Voltar para o Centro Pokémon", no canto, sai guardando o que a equipe ganhou.
-- **Jornadas**: até 3 ao mesmo tempo, cada uma com o seu treinador, inicial,
-  insígnias e equipe. No título, **Jornada** mostra os espaços (Jogar, Apagar ou
-  começar outra) e **Nova jornada** abre uma sem apagar as outras. A Pokédex, as
-  conquistas e os Shards valem para todas.
+- **Jornadas**: até 3 ao mesmo tempo, cada uma com o seu treinador e nome,
+  inicial, insígnias e equipe. No título, **Jornada** mostra os espaços (Jogar,
+  Apagar ou começar outra) e **Nova jornada** abre uma sem apagar as outras. A
+  Pokédex, as conquistas, os Shards, a mochila e o quarto valem para todas.
 - **Derrota sem perda**: o que a equipe ganhou na tentativa (níveis, melhorias,
   evoluções e capturas) fica; só a próxima fase não abre. No Centro Pokémon a
   equipe é curada e você tenta de novo, ou rejoga fases anteriores para upar. O
-  lobby mostra o **nível recomendado** de cada fase ao lado do nível da sua equipe.
+  mapa da jornada mostra o **nível recomendado** de cada fase ao lado do nível da
+  sua equipe.
 - **Pokédex na captura**: quem você já registrou aparece com uma Poké Ball ao
   lado do nome.
 - **PC do FireRed**: com a equipe cheia, nada se perde — quem sai (ou quem chega)
-  vai para o PC. No mapa da jornada, o PC é o do jogo: caixas com papel de parede,
-  a mão como cursor, pegar e soltar para montar a equipe da próxima fase.
+  vai para o PC. Na vila (com a enfermeira do Centro) e no mapa da jornada, o PC é
+  o do jogo: caixas com papel de parede, a mão como cursor, pegar e soltar para
+  montar a equipe da próxima fase.
 - **Conquistas em níveis**: 20 conquistas, cada uma com vários degraus — ao coletar,
   ela volta com um objetivo maior e mais Shards.
 - Fases curtas: 2:45 até o líder, cerca de 3 minutos com a luta.
 - **Pokédex de Kanto** (151) que se preenche conforme você captura e evolui.
-- **12 conquistas** com recompensa em Shards.
 - A dificuldade e a quantidade de inimigos sobem fase a fase: os selvagens ganham
-  nível junto com a sua equipe, e as hordas passam de 80 para mais de 150 na tela.
+  nível junto com a sua equipe, e o teto da horda vai de ~90 inimigos na Fase 1 a
+  ~250 no Campeão.
 
 ## Rodando localmente
 
@@ -234,10 +242,11 @@ src/
   entities/       treinador, Pokémon, inimigos, projéteis, áreas, itens
   systems/        comportamento genérico (combate, habilidades, spawn, equipe...)
   game/           Run (uma partida), Hub (a vila) e Game (orquestração)
-  render/         canvas, sprites e ícones
-  ui/             HUD, menus e modais
-  save/           arquivo .json e progresso permanente
-tools/            testes automatizados e os extratores de assets (assets/)
+  render/         canvas (a partida e a vila), sprites e ícones
+  ui/             HUD, menus, janelas, o mapa da jornada e o PC
+  audio/          a música
+  save/           arquivo .json, progresso permanente e opções
+tools/            testes, o jogador virtual, o balance, os screenshots e os extratores de assets (assets/)
 ```
 
 A regra do projeto: **`/data` é conteúdo, `/systems` é comportamento**. Adicionar
@@ -250,14 +259,14 @@ os próximos passos.
 
 ## Créditos
 
-Sprites, ícones de item e insígnias vêm do repositório público
-[PokeAPI/sprites](https://github.com/PokeAPI/sprites) — estáticos no canvas,
-animados (Gen V) na interface e arte oficial nas telas grandes. Sem internet, o
-jogo desenha versões procedurais e a interface cai para ícones simples.
+Os sprites animados da interface (Gen V), os ícones de item e as insígnias vêm do
+repositório público [PokeAPI/sprites](https://github.com/PokeAPI/sprites). Sem
+internet, o jogo desenha versões procedurais e a interface cai para ícones simples.
 
-Os treinadores (andar, correr e retratos), os golpes, o cenário e a caixa de texto vêm
-do FireRed, pelo decomp [pret/pokefirered](https://github.com/pret/pokefirered), e ficam
-em `assets/`.
+Os treinadores (andar, correr e retratos), os golpes, o cenário, a vila, o PC, o Town
+Map, os sprites dos cards, a caixa de texto e as músicas vêm do FireRed, pelo decomp
+[pret/pokefirered](https://github.com/pret/pokefirered); os Pokémon animados em campo
+são os GIFs da Gen 5 do Pokemon All. Tudo fica em `assets/`.
 A procedência de cada arquivo está em [assets/PROVENIENCIA.md](assets/PROVENIENCIA.md).
 
 > **Projeto de fã, sem fins lucrativos.** Pokémon e todos os nomes relacionados são

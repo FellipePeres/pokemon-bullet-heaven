@@ -13,7 +13,7 @@ import { CONFIG } from '../core/config.js';
  * podendo fazer mais de uma com novos Pokémon, e voltar para a outra").
  *
  * Um card por jornada começada (treinador, inicial, insígnias, equipe, a
- * próxima fase e quando foi jogada), com Jogar (sempre para o mapa, 0.24) e Apagar
+ * próxima fase e quando foi jogada), com Jogar (sempre para a vila, 0.29) e Apagar
  * (que confirma no próprio card); os espaços livres têm Nova jornada. As regras
  * ficam no Game (`listJourneys`, `openJourney`, `newJourney`, `deleteJourney`).
  */
@@ -102,7 +102,7 @@ export class JourneyScreen {
       no.onclick = () => { this.confirming = null; this.render(); };
       actions.append(yes, no);
     } else {
-      // sempre para o mapa da jornada (0.24): a partida que ficou no meio já entrou nela
+      // sempre para a vila (0.29; na 0.24, o mapa): a partida que ficou no meio já entrou nela
       const play = create('button', 'menu-btn primary', 'Jogar');
       play.type = 'button';
       play.onclick = () => this.game.openJourney(journey.id);

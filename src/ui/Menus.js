@@ -548,12 +548,12 @@ export class Menus {
       });
 
     option(icon('hard-stone'), 'Tremor de tela',
-      'A tela treme em explosões, no Earthquake e nos golpes dos líderes.',
+      'A tela treme nos golpes dos líderes.',
       CONFIG.fx.screenShake ? 'Ligado' : 'Desligado',
       () => { CONFIG.fx.screenShake = !CONFIG.fx.screenShake; });
 
     option(icon('pokemon-box-link'), 'Autosave no navegador',
-      'Guarda o progresso local para o botão Continuar. O arquivo .json continua sendo o save oficial.',
+      'Guarda o progresso no navegador, para o botão Jornada. O arquivo .json continua sendo o save oficial.',
       CONFIG.save.useLocalStorage ? 'Ligado' : 'Desligado',
       () => { CONFIG.save.useLocalStorage = !CONFIG.save.useLocalStorage; });
 
