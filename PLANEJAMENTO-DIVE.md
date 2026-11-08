@@ -62,6 +62,10 @@
   posso deixar que isso aconteça com os próximos*. Então a animação de soltar um
   Pokémon voador (a definir), e ele diz: *a caminho do vulcão! O próximo lendário
   será meu!* Dando indícios de uma continuação do jogo."
+- "O NPC vai ser o **Maxie**; o voador pode ser um **Crobat** mesmo. O Endless
+  aquático rende **Shards por chefe e elite**. Vamos deixar **bloqueada a corrida**;
+  se ficar muito difícil, a gente repensa. Depois roda uma medição de tentativas
+  para a gente entender. Vamos bolar os prêmios por nível mais tarde."
 
 ---
 
@@ -135,8 +139,9 @@ pouco a cada nível.
 
 **O jogador.** Anda em tiles como na vila (`game/Hub.js`), mas **o passo sai no
 primeiro toque** (na vila, tocar numa direção nova só vira o jogador), porque cada
-fração de segundo conta. Segurando, continua andando. Padrão: 0,27 s por tile
-andando e 0,13 s correndo. Só anda dentro dos 10×6.
+fração de segundo conta. Segurando, continua andando. **Não dá para correr**
+(decisão do Fellipe; se ficar difícil demais, ele repensa): cada passo leva 0,27 s,
+o passo da vila andando. Só anda dentro dos 10×6.
 
 **O sprite.** No Emerald, o jogador submerso é um boneco azul-escuro sentado numa
 sombra escura, que é o Pokémon (`object_events/pics/people/brendan/underwater.png`,
@@ -173,9 +178,41 @@ A velocidade é em tiles por segundo. Na maquete, o Nível 1 dura ~56 s e os out
 **Sempre tem saída.** O sorteio só aceita uma horda (ou um grupo) se existir um
 tile livre que o jogador alcança **andando**, já descontando 0,25 s de reação e
 considerando as hordas que ainda estão passando. No Nível 6, isso quer dizer um
-tile livre a 1 passo (ou até 3, correndo). O jogador automático da maquete
-(endereço `#bot`) passou os 6 níveis 6 vezes cada, andando, sem nenhum acerto; e
-um jogador parado no Nível 3 tomou 15 acertos em 30 s.
+tile livre a 1 passo. O jogador automático da maquete (endereço `#bot`) passou os
+6 níveis 6 vezes cada, sem nenhum acerto; e um jogador parado no Nível 3 tomou 15
+acertos em 30 s.
+
+### A medição de tentativas (2026-11-08)
+
+O endereço `#medir` da maquete joga a descida inteira com cinco perfis de jogador
+automático, 30 descidas cada (a tabela soma duas rodadas, 60 por perfil). As
+regras são as do jogo: sem correr, 3 bolhas, o bolsão no Nível 3, e sempre a
+partir do Nível 1. O jogador automático só enxerga uma horda depois do seu tempo
+de reação e planeja o melhor caminho; nos dois últimos perfis, uma parte dos
+passos sai para o lado errado, como um erro de comando.
+
+| Perfil | Descidas completas | Tentativas por descida | Passam N1-N6 | Acertos por nível N1-N6 |
+|---|---|---|---|---|
+| reação de 0,25 s | 60/60 (100%) | ~1,0 | 100, 100, 100, 100, 100, 100% | 0; 0; 0; 0; 0; 0 |
+| reação de 0,35 s | 51/60 (85%) | ~1,2 | 100, 100, 97, 100, 98, 89% | 0; 0; 0,3; 0,1; 0,2; 0,5 |
+| reação de 0,5 s | 36/60 (60%) | ~1,7 | 100, 100, 100, 92, 87, 75% | 0; 0,1; 0,4; 0,3; 0,6; 0,7 |
+| 0,35 s, errando 5% dos passos | 27/60 (45%) | ~2,2 | 100, 98, 95, 82, 78, 75% | 0; 0,5; 0,8; 0,5; 0,7; 0,6 |
+| 0,5 s, errando 10% dos passos | 10/60 (17%) | ~6,0 | 100, 98, 86, 73, 49, 56% | 0; 0,7; 1,2; 0,7; 1,1; 0,7 |
+
+**O que dá para ler:**
+- **O tempo de reação puro quase não reprova.** Quem reage em 0,25 s passa sempre,
+  e mesmo com 0,5 s passa 60% das descidas. O aviso não é a parte difícil para
+  quem sempre escolhe o tile certo, porque o sorteio garante a saída e a horda
+  ainda leva um tempo para atravessar até o jogador.
+- **O que reprova é errar.** Com 5% dos passos errados, menos da metade completa;
+  com 10%, só uma em seis. Para uma pessoa de verdade, que também lê errado e
+  hesita, a descida deve ficar entre esses dois últimos perfis.
+- **O Nível 1 e o 2 quase não tiram bolhas**, e o perigo começa no 3 (o paredão).
+  Os níveis 4 a 6 são onde as descidas acabam, com o 5 e o 6 parecidos, porque o
+  bolsão do Nível 3 enche as bolhas antes deles.
+- O jogador automático é um modelo: ele planeja melhor que uma pessoa. Os números
+  servem para comparar níveis e mudanças, e o feel de verdade vem de o Fellipe
+  jogar.
 
 **Os desenhos.** Cada Pokémon da horda é o **ícone de caixa da 3ª geração** (32×32,
 dois quadros), virado para o lado em que a horda anda. Os de Kanto já estão em
@@ -300,11 +337,11 @@ Acontece **uma vez por jornada**, logo depois da captura:
   enfermeira).
 
 A sequência:
-1. Um NPC bem característico chega correndo e para na frente do jogador, com o
+1. O Maxie chega correndo e para na frente do jogador, com o
    **"!"** na cabeça (o balão do Emerald, `field_effects/pics/emotion_exclamation.png`).
 2. Ele fala, indignado: "Não acredito que cheguei tarde! Você capturou o lendário
    Kyogre! Não posso deixar que isso aconteça com os próximos..."
-3. Ele joga uma Poké Ball e solta um **Pokémon voador**. O Emerald tem essa
+3. Ele joga uma Poké Ball e solta o **Crobat**. O Emerald tem essa
    animação pronta, a do golpe Voar fora da batalha: o corte de tela com o Pokémon
    na frente das listras (`field_effects/pics/field_move_streaks.png`) e o pássaro
    que desce (`field_effects/pics/bird.png`).
@@ -314,34 +351,34 @@ A sequência:
 É o gancho para a **continuação do jogo**: o vulcão aponta para o **Groudon**, o
 lendário de Hoenn que faz par com o Kyogre.
 
-**O NPC** (a decidir). O Emerald tem dois que combinam, no mesmo formato de 9
-quadros de 16×32 do Red, e que ficam bem na vila:
-- **Archie** (`people/team_aqua/archie.png`, paleta `npc_1`), o líder da Equipe
-  Aqua, que no Emerald quer justamente o Kyogre. Padrão: é quem chega tarde e,
-  sem o Kyogre, corre atrás do próximo.
-- **Maxie** (`people/team_magma/maxie.png`, paleta `npc_2`), o líder da Equipe
-  Magma, o homem do vulcão e do Groudon.
+**O NPC: o Maxie** (decisão do Fellipe), o líder da Equipe Magma, o homem do
+vulcão e do Groudon. O sprite é o do Emerald (`object_events/pics/people/team_magma/maxie.png`,
+paleta `npc_2`), no mesmo formato de 9 quadros de 16×32 do Red, e fica bem na vila.
 
-**O Pokémon voador** (a decidir). Padrão: o **Crobat**, que o Archie e o Maxie usam
-no Emerald (e é da família do Zubat, conhecida de Kanto).
+**O Pokémon voador: o Crobat** (decisão do Fellipe), que o Maxie usa no Emerald.
 
 ### A fase Endless aquática
 
 Depois da captura, falar com o lugar onde o Kyogre dormia abre uma **fase Endless
 aquática**: a arena da caverna, com a chuva e as hordas de Água sem fim, **sem
-ganho de XP**. Padrão: o recorde de tempo vai para o Cartão de Treinador. Fala
-(rascunho): "O salão está quieto, mas as águas ainda se agitam. Enfrentar a maré
-sem fim?"
+ganho de XP**. Rende **Shards por chefe e elite** derrotado (decisão do Fellipe;
+os valores ficam para a etapa de capricho, na escala dos chefes de hoje). O
+recorde de tempo vai para o Cartão de Treinador (padrão). Fala (rascunho): "O
+salão está quieto, mas as águas ainda se agitam. Enfrentar a maré sem fim?"
 
 ---
 
-## 11. Os prêmios (padrão)
+## 11. Os prêmios
 
-- **Shards por nível concluído** na descida: 10, 15, 20, 30, 40 e 60 (175 numa
-  descida completa de uns 5 minutos, perto do que rende rejogar fases).
-- **A primeira vez em cada profundidade** paga em dobro.
-- **O recorde de profundidade** vai para o Cartão de Treinador.
-- **O Kyogre** e os Shards de chefe da luta (na escala dos líderes).
+**Os prêmios por nível da descida ficam para depois** (o Fellipe: "vamos bolar os
+prêmios por nível mais tarde"). Uma ideia de partida, para quando chegar a hora:
+- Shards por nível concluído (por exemplo 10, 15, 20, 30, 40 e 60: 175 numa descida
+  completa de uns 5 minutos, perto do que rende rejogar fases);
+- a primeira vez em cada profundidade pagando em dobro;
+- o recorde de profundidade no Cartão de Treinador.
+
+Já decidido: **o Kyogre** e os Shards de chefe da luta (na escala dos líderes), e
+os **Shards por chefe e elite** no Endless aquático.
 
 ---
 
@@ -423,9 +460,7 @@ Cada etapa é entregável sozinha, com `npm test` e screenshots.
 
 ## 14. Decisões em aberto
 
-1. **O NPC da cena:** Archie (padrão) ou Maxie, ou outro?
-2. **O Pokémon voador da cena:** Crobat (padrão) ou outro?
-3. **A fase Endless aquática:** além do recorde de tempo, rende alguma coisa
-   (Shards dos elites, por exemplo)?
-4. **Correr na descida:** vale correr (padrão) ou só andar?
-5. **Os prêmios** da seção 11.
+1. **Os prêmios por nível** da descida (seção 11): o Fellipe vai bolar mais tarde.
+2. **O tempo de cada nível:** a medição (seção 5) diz que o perigo começa no Nível
+   3 e que o erro pesa mais que a reação. O ajuste fino vem de o Fellipe jogar a
+   maquete; se ficar difícil demais, a corrida volta à mesa.
