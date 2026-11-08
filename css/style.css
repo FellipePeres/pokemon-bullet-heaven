@@ -2393,6 +2393,8 @@ button { font: inherit; color: inherit; }
   text-shadow: 2px 2px 0 rgba(0, 0, 0, .85);
   pointer-events: none;
 }
+/* a tecla é clara: sem a sombra preta do texto do rodapé (herdada, ela borrava as
+   letras), com o relevo das teclas da tela de título */
 .hub-hint kbd {
   display: inline-block;
   min-width: 20px;
@@ -2406,7 +2408,10 @@ button { font: inherit; color: inherit; }
   background: var(--gba-button);
   border: 2px solid var(--gba-frame);
   border-radius: 3px;
+  box-shadow: inset -1px -2px 0 var(--gba-button-shade);
+  text-shadow: none;
 }
+.hub-hint .dot { margin: 0 4px; }
 .hub-dialog:not(.hidden) ~ .hub-hint { display: none; }
 @media (max-width: 900px) {
   .hub-hint { display: none; }

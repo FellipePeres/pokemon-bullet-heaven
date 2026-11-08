@@ -1350,6 +1350,9 @@ Nenhum pedido do Fellipe em aberto. O que está planejado:
 - **Conquistas de saves antigos:** as da 0.10 (`unlocked`/`claimed`) ficaram no
   save só como histórico; as em níveis começam do zero (dá para coletar de novo
   os primeiros degraus, uma vez).
+- **Tecla com a sombra do texto (0.32.3):** o `text-shadow` de um rodapé passa para
+  as `<kbd>` de dentro, e na tecla clara a sombra preta borra as letras. Toda tecla
+  zera a sombra (`text-shadow: none`), como no título e na vila.
 - **Moldura borrada:** `border-image` ignora `image-rendering`. As molduras já vêm
   ampliadas no arquivo, e a largura da borda tem de ser igual à fatia (24 px na
   janela, 16 px no botão); outro valor reescala e borra.
@@ -1453,7 +1456,7 @@ Nenhum pedido do Fellipe em aberto. O que está planejado:
 | 40 | incentivar o jogador a explorar fraquezas e vantagens (com o Charmander ele passava fácil pelo Brock mesmo com a resistência); não diminuir a chance de captura de quem tem vantagem; medir antes de aplicar; o selo em cada Pokémon não precisa, só o "FRACO" do painel | 0.32: a tabela de tipos completa; queimadura e veneno pela tabela (Fogo não queima, Veneno e Metálico não envenenam); defesa por tipo suavizada e simétrica (`CONFIG.types.defense`); sem o `starterTuning` do Squirtle; Poliwag, Goldeen e Oddish de volta a 4% na Fase 1; o "Fraco" no banner do painel; "Super efetivo!" no líder e nos elites; `systems/matchup.js`; o bot `--tipos` no balance; medido antes e depois (seção 5) |
 | 41 | ler o HANDOFF e arrumar tudo o que estava desatualizado no projeto inteiro | 0.32.1: o HANDOFF conferido com o código (arquitetura com os arquivos que faltavam, contagens, Poké Balls, Shards, o Mart na vila, o Modo Livre e o Centro levando à vila, save, estado do conteúdo, próximos passos, histórico em ordem); README, PLANEJAMENTOs e PROVENIENCIA atualizados; comentários vencidos no código; nas Opções, o tremor (só os líderes) e o autosave (botão Jornada); a Ajuda com os controles da vila; a arte oficial (código morto) e o `.pyc` versionado saíram |
 | 42 | o "Sobre" do GitHub estava "IAzudo": humanizar e pôr os controles (setas e demais), com o Espaço como a tecla de ação | 0.32.2: a descrição do repositório reescrita (`gh repo edit`), com os controles; na Ajuda do jogo e no README, o Espaço como a ação da vila (Enter e Z também servem) |
-| 43 | o banner do README estava muito antigo (era o da primeira versão) | 0.32.3: `assets/banner.png`, o logo do jogo sobre a arte do título, gerado de `tools/banner.html` pelo roteiro `banner` (some o `banner.svg` da 0.4); na vila, o rodapé diz "Espaço ação" (era "Enter falar") |
+| 43 | o banner do README estava muito antigo (era o da primeira versão) | 0.32.3: `assets/banner.png`, o logo do jogo sobre a arte do título, gerado de `tools/banner.html` pelo roteiro `banner` (some o `banner.svg` da 0.4); na vila, o rodapé diz "Espaço ação" (era "Enter falar"), e as teclas dele perderam a sombra do texto, que borrava as letras ("a sombra dos controles no rodapé está deixando ruim de enxergar") |
 
 ---
 
