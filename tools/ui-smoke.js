@@ -143,8 +143,21 @@ for (const id of ['modal-pokedex', 'modal-achievements', 'modal-team', 'modal-op
   check(`janela ${id.replace('modal-', '')} fecha`, registry.get(id).classes.has('hidden'));
 }
 
-check('Pokédex lista as 151 espécies', registry.get('pokedex-grid').children.length === 151,
+check('Pokédex lista as 151 espécies e, no fim, o lendário secreto', registry.get('pokedex-grid').children.length === 152,
       `${registry.get('pokedex-grid').children.length} células`);
+{
+  // o "???" do fim (0.35): sem número nem silhueta até ser capturado, e fora da contagem
+  const last = () => registry.get('pokedex-grid').children.at(-1);
+  check('o lendário secreto aparece como "???", sem número e sem silhueta',
+        last().classes.has('mystery') && last().innerHTML.includes('???') && !last().innerHTML.includes('<img') && !/#\d/.test(last().innerHTML));
+  game.tracker.registerSecret('kyogre');
+  game.menus.showModal('modal-pokedex');
+  check('capturado, ele se revela: o Kyogre, ainda sem número',
+        last().classes.has('caught') && last().innerHTML.includes('Kyogre') && last().innerHTML.includes('<img') && !/#\d/.test(last().innerHTML));
+  check('...e não entra na contagem da Pokédex', registry.get('pokedex-progress').textContent.includes('de 151'));
+  game.menus.closeModal();
+  game.profile.pokedex.secret = [];
+}
 check('conquistas listadas sem quebrar', registry.get('achievements-list').children.length > 5,
       `${registry.get('achievements-list').children.length} conquistas`);
 

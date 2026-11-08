@@ -5,7 +5,7 @@
 > decisão foi tomada e o que falta fazer. O `README.md` é o manual de uso;
 > este aqui é o contexto de desenvolvimento.
 
-**Versão atual:** `0.34.0` · **Última atualização:** 2026-11-08
+**Versão atual:** `0.35.0` · **Última atualização:** 2026-11-08
 **Stack:** HTML + CSS + JavaScript puro (ES Modules). Sem backend, sem build, sem dependências.
 **Repositório:** https://github.com/FellipePeres/pokemon-bullet-heaven (público)
 **Jogo no ar:** https://fellipeperes.github.io/pokemon-bullet-heaven/
@@ -67,7 +67,7 @@ vencer, a duração da luta, desmaios, pico de inimigos, Poké Balls e quantos d
 equipe têm o Golpe Desperto ao vencer (coluna "despertos", 0.33).
 
 **Conferência visual (desde a 0.5).** `tools/screenshot.mjs` abre o jogo no Chrome
-(ou Edge) sem janela, executa um dos 39 roteiros (os mais usados: `vitrine`,
+(ou Edge) sem janela, executa um dos 40 roteiros (os mais usados: `vitrine`,
 `treinador`, `vila`, `jornada`, `partida`, `ux`, `efetivo`; um nome desconhecido lista
 todos), salva PNGs e lista os erros de JavaScript da página. Sai com código 1
 se a página tiver erro. A `vitrine.html` desenha os assets com o mesmo código da
@@ -139,7 +139,7 @@ src/
     capturePools.js   chances de captura por fase (as 9 tabelas do design)
     enemies.js        159 inimigos: selvagens, elites e Pokémon dos líderes
     stages.js         as 13 etapas de Kanto (ondas, elites, trechos, líder, força)
-    regions.js        regiões: Pokédex, iniciais, campanha e treinadores de cada uma
+    regions.js        regiões: Pokédex, iniciais, campanha, treinadores e o lendário secreto do fim da Pokédex (0.35)
     regionMap.js      o Town Map de Kanto (0.13): em que casa do mapa fica cada fase
     trainers.js       modelos de treinador (Red, Leaf), o mapa de quadros da folha e o nome do jogador (0.30)
     fx.js             qual sprite do FireRed cada golpe usa
@@ -582,6 +582,19 @@ Nunca voltar bônus globais para o pool de level up — foi pedido explícito.
   sempre mede quanto vale explorar as fraquezas (seção 5). Ele é um jogador fraco de
   tipos: escolhe só pelo líder da fase e não olha a horda (um Gastly capturado na
   Fase 6 não pega nos Normais da rota).
+
+### O lendário secreto da Pokédex (0.35)
+- Pedido do Fellipe: no fim da Pokédex, um Pokémon misterioso, "???", **sem
+  silhueta e sem número**, que o jogador vê desde o começo sem saber quem é, e
+  que só se revela ao ser capturado. É o **Kyogre**, do fundo da lagoa
+  (PLANEJAMENTO-DIVE.md).
+- Dados: `secret` em `data/regions.js` (`{ id: 'kyogre', dex: 382, name: 'Kyogre' }`).
+  Perfil: `profile.pokedex.secret` (os ids capturados), que o
+  `ProfileTracker.registerSecret(id)` preenche. Ele fica **fora da contagem** da
+  Pokédex (continua "de 151") e, revelado, também aparece sem número.
+- Hoje ninguém consegue capturá-lo (o modo aquático ainda não existe), então ele
+  fica como "???" para todos: é a isca. A captura vai chamar `registerSecret`
+  (etapa D-5 do PLANEJAMENTO-DIVE). Roteiro de screenshots: `pokedex`.
 
 ### Captura
 - Poké Ball dropa de inimigos derrotados, com **teto por fase** (`maxBalls`: 3 na
@@ -1505,6 +1518,7 @@ Nenhum pedido do Fellipe em aberto. O que está planejado:
 | 48 | os tiles jogáveis só os navegáveis no Emerald, nunca por cima das montanhas submersas; o bolsão só com a fala no Nível 3; 2 Dive Balls por tentativa; depois da captura, uma fase Endless aquática sem XP; perder depois de capturar leva ao Centro com o Kyogre; a maré final de 30 s; a cena da história depois da captura (no Centro ou na frente da lagoa), com o NPC indignado e o Pokémon voador, "a caminho do vulcão" | PLANEJAMENTO-DIVE.md refeito (seções 3 e 10 novas); a maquete "A Descida" refeita sobre as Rotas 126 e 127 submersas, com a grade de navegação do `map.bin` e o teste de que nenhum quadro das animações sai da água navegável |
 | 49 | o NPC da cena é o Maxie, com um Crobat; o Endless aquático rende Shards por chefe e elite; a corrida fica bloqueada na descida ("se ficar muito difícil a gente repensa"); rodar uma medição de tentativas; os prêmios por nível ficam para depois | PLANEJAMENTO-DIVE.md atualizado; a maquete sem corrida e com a medição (endereço `#medir`: cinco perfis de reação e erro, 60 descidas cada); a tabela da medição na seção 5 do plano |
 | 50 | achou fácil a descida? então dificultar; mostrar a cena do pós-captura num artifact | a segunda versão dos níveis (menos aviso, hordas mais rápidas, o sorteio contando 0,2 s de reação, o paredão de cinco e as três colunas; o Nível 6 virou barreira de reação), medida antes e depois na seção 5 do PLANEJAMENTO-DIVE; a maquete "Depois do Kyogre" com a cena nas duas versões (https://claude.ai/artifact/1CQ2os9bD5otGFJ78A62Bv) |
+| 51 | na maquete da descida o jogador estava muito rápido: andar por tiles, na velocidade do caminhar do FireRed; no fim da Pokédex, um Pokémon misterioso "???" (o Kyogre), sem sombra nem número, visível desde o começo, que só se revela ao ser capturado | a maquete tinha um bug meu (ao tirar a corrida, um comentário engoliu o fim do passo, e o mergulhador pulava um tile por quadro); corrigido para 16 quadros por tile e as duas medições refeitas (as de antes estavam erradas); 0.35: o lendário secreto da Pokédex (`secret` em `data/regions.js`, `profile.pokedex.secret`, `registerSecret`), com testes e o roteiro `pokedex` |
 
 ---
 

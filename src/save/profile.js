@@ -24,7 +24,8 @@ export function createProfile() {
     // Pokédex: só registra o que foi CAPTURADO. O que não foi aparece como silhueta.
     pokedex: {
       caught: [],
-      shiny: []       // espécies que você já teve shiny (0.13.1)
+      shiny: [],      // espécies que você já teve shiny (0.13.1)
+      secret: []      // os lendários secretos já capturados (0.35, `secret` em data/regions.js), fora da contagem
     },
     achievements: {
       // degraus coletados de cada conquista (data/achievements.js): { catcher: 2, ... }
@@ -253,6 +254,12 @@ export class ProfileTracker {
   registerShiny(dex) {
     const seen = (this.profile.pokedex.shiny ??= []);
     if (dex && !seen.includes(dex)) seen.push(dex);
+  }
+
+  /** O lendário secreto do fim da Pokédex (0.35) se revela ao ser capturado; não conta nas 151. */
+  registerSecret(id) {
+    const seen = (this.profile.pokedex.secret ??= []);
+    if (id && !seen.includes(id)) seen.push(id);
   }
 
   registerCaught(dex) {

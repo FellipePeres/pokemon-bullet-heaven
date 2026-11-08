@@ -16,6 +16,11 @@ import { KANTO_DEX } from './kanto.js';
  *   starters  os três iniciais oferecidos no começo da jornada
  *   campaign  as fases em ordem (e as que ainda estão "em breve")
  *   trainers  modelos de treinador que a região oferece (data/trainers.js)
+ *   secret    o lendário misterioso no fim da Pokédex (0.35, pedido do Fellipe):
+ *             aparece desde o começo como "???", sem número e sem silhueta, e
+ *             só se revela quando é capturado (`profile.pokedex.secret`). Fica
+ *             fora da contagem da Pokédex. Em Kanto é o Kyogre, do fundo da
+ *             lagoa (PLANEJAMENTO-DIVE.md).
  */
 export const REGIONS = {
   kanto: {
@@ -24,7 +29,8 @@ export const REGIONS = {
     dex: KANTO_DEX,
     starters: ['bulbasaur', 'charmander', 'squirtle'],
     campaign: KANTO_CAMPAIGN,
-    trainers: ['red', 'leaf']
+    trainers: ['red', 'leaf'],
+    secret: [{ id: 'kyogre', dex: 382, name: 'Kyogre' }]
   }
 };
 

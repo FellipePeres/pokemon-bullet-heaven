@@ -355,6 +355,14 @@ const ROTEIROS = {
            "for (let i = 0; i < 26; i++) { const a = i / 26 * Math.PI * 2, d = 150 + (i % 5) * 45; r.spawner.spawnAt('rattata', r.player.x + Math.cos(a) * d, r.player.y + Math.sin(a) * d, 14); }" },
     { wait: 900 }, { shot: 'dive-2', raw: true }, { wait: 450 }, { shot: 'dive-3', raw: true }, { wait: 450 }, { shot: 'dive-4', raw: true }
   ],
+  // o lendário secreto no fim da Pokédex (0.35): o "???" e, capturado, o Kyogre
+  pokedex: [
+    { open: 'index.html' }, { wait: 500 },
+    { run: "game.newGame(); game.chooseTrainer('red'); game.chooseStarter('squirtle'); [1, 4, 7, 25, 129, 130, 131, 150].forEach((d) => game.tracker.registerCaught(d)); game.menus.showModal('modal-pokedex'); document.querySelector('#pokedex-grid').lastElementChild.scrollIntoView({ block: 'center' })" },
+    { wait: 900 }, { shot: 'pokedex-1-misterio' },
+    { run: "game.tracker.registerSecret('kyogre'); game.menus.showModal('modal-pokedex'); document.querySelector('#pokedex-grid').lastElementChild.scrollIntoView({ block: 'center' })" },
+    { wait: 1500 }, { shot: 'pokedex-2-kyogre' }
+  ],
   // o tamanho em campo (fieldScale): as aves lendárias, sem inimigos nem golpes
   aves: [
     { open: 'index.html' }, { wait: 500 },

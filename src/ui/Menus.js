@@ -267,6 +267,18 @@ export class Menus {
       cell.title = isCaught ? `${name} — registrado` : 'Ainda não capturado';
       grid.appendChild(cell);
     });
+
+    // o lendário secreto (0.35): "???" desde o começo, sem número nem silhueta; capturado, se revela
+    const found = this.game.profile.pokedex.secret ?? [];
+    for (const secret of this.game.region.secret ?? []) {
+      const known = found.includes(secret.id);
+      const cell = create('div', `dex-cell secret ${known ? 'caught' : 'mystery'}`);
+      cell.innerHTML = known
+        ? `<div class="dex-num">&nbsp;</div><img src="${spriteUrl(secret.dex)}" alt="${secret.name}" loading="lazy" /><div class="dex-name">${secret.name}</div>`
+        : '<div class="dex-num">&nbsp;</div><div class="dex-mystery">?</div><div class="dex-name">???</div>';
+      cell.title = known ? `${secret.name} — registrado` : '???';
+      grid.appendChild(cell);
+    }
   }
 
   /* ============================ conquistas ============================ */

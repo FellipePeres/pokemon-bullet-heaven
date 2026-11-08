@@ -882,6 +882,9 @@ button { font: inherit; color: inherit; }
 /* não capturado = silhueta */
 .dex-cell.unknown img { filter: brightness(0) opacity(.28); }
 .dex-cell.unknown .dex-name { color: #9aa4b6; }
+/* o lendário secreto do fim da Pokédex (0.35): sem número e sem silhueta, só o "?" */
+.dex-cell.mystery .dex-mystery { height: 58px; display: grid; place-items: center; font-family: var(--font-arcade); font-size: 26px; color: #9aa4b6; }
+.dex-cell.mystery .dex-name { color: #9aa4b6; }
 .dex-cell.caught {
   color: var(--gba-ink);
   background: var(--gba-fill);

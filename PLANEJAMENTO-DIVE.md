@@ -194,8 +194,8 @@ do seu tempo de reação e planeja o melhor caminho; nos dois últimos perfis, u
 parte dos passos sai para o lado errado, como um erro de comando. Cada linha soma
 60 descidas.
 
-**A primeira versão estava fácil demais.** Quem reagia em 0,25 s passava sempre, e
-o Nível 6 não segurava quase ninguém. Mudou para a versão de agora:
+**A primeira versão estava fácil demais.** Quem reagia em 0,25 s passava sempre.
+Mudou para a versão de agora:
 - menos tempo de aviso;
 - hordas mais rápidas;
 - o sorteio conta 0,2 s de reação (era 0,25 s), o que deixa os padrões mais
@@ -203,19 +203,23 @@ o Nível 6 não segurava quase ninguém. Mudou para a versão de agora:
 - dois padrões novos: o paredão de cinco linhas (sobra uma) e três colunas juntas;
 - o Nível 1 mais curto.
 
-| Perfil | Antes: descidas completas | Agora: descidas completas | Agora: passam N1-N6 |
-|---|---|---|---|
-| reação de 0,25 s | 100% (~1,0 tentativa) | 93% (~1,1) | 100, 100, 100, 100, 100, 93% |
-| reação de 0,35 s | 85% (~1,2) | 63% (~1,6) | 100, 100, 100, 98, 92, 70% |
-| reação de 0,5 s | 60% (~1,7) | **0%** | 100, 100, 92, 80, 34, 0% |
-| 0,35 s, errando 5% dos passos | 45% (~2,2) | 28% (~3,5) | 100, 100, 97, 90, 60, 55% |
-| 0,5 s, errando 10% dos passos | 17% (~6) | 2% (~60) | 100, 98, 85, 46, 4, 100%* |
+**Uma correção na maquete.** Entre a versão sem corrida e a do passo corrigido, um
+comentário mal posto engolia o fim do passo, e o mergulhador pulava um tile por
+quadro. O Fellipe sentiu ("estava muito rápido"). As medições daquele intervalo
+estavam erradas; as de baixo foram refeitas com o passo do FireRed andando (16
+quadros por tile, 3,75 tiles por segundo).
 
-\* só 1 das 60 descidas chegou ao Nível 6.
+| Perfil | Versão original | Versão de agora | Agora: passam N1-N6 |
+|---|---|---|---|
+| reação de 0,25 s | 100% (~1,0 tentativa) | 98% (~1,0) | 100, 100, 100, 100, 98, 100% |
+| reação de 0,35 s | 93% (~1,1) | 67% (~1,5) | 100, 100, 100, 98, 86, 78% |
+| reação de 0,5 s | 8% (~12) | **0%** | 100, 100, 98, 81, 8, 0% |
+| 0,35 s, errando 5% dos passos | 68% (~1,5) | 28% (~3,5) | 100, 100, 100, 90, 72, 44% |
+| 0,5 s, errando 10% dos passos | 0% | 0% | 100, 98, 95, 59, 3, 0% |
 
 **O que dá para ler:**
-- **O Nível 6 virou uma barreira de reação.** Quem reage em 0,5 s não passa dele;
-  em 0,35 s, passa 70% das vezes. Para uma pessoa, que ainda precisa escolher a
+- **O Nível 6 virou uma barreira de reação.** Quem reage em 0,5 s já para no 5 e
+  no 6; em 0,35 s, passa o 6 em 78% das vezes. Para uma pessoa, que ainda precisa escolher a
   direção, isso o deixa muito difícil, como o Fellipe pediu.
 - **Os níveis 1 e 2 continuam de aquecimento**; o perigo começa no 3 e cresce até o 6.
 - **Errar continua pesando**: com 5% dos passos errados, ~3,5 tentativas por
@@ -335,7 +339,18 @@ contar nas 151, como um lendário de outra região. Precisa:
 - de um kit de lendário (`data/legendaries.js`) com um golpe exclusivo (padrão:
   Origin Pulse);
 - da tira animada do GIF da Gen 5 (já no Pokemon All);
-- de ajustes no `check-data` e nas contagens da Pokédex.
+- de ajustes no `check-data`.
+
+### O Kyogre na Pokédex (feito na 0.35)
+
+Pedido do Fellipe: no fim da Pokédex fica um Pokémon misterioso, **"???"**, sem
+silhueta e sem número. O jogador o vê desde o começo do jogo, sem saber que é o
+Kyogre, e ele só se revela quando é capturado. Já está no jogo:
+- `secret` em `data/regions.js`;
+- `profile.pokedex.secret`, preenchido por `ProfileTracker.registerSecret('kyogre')`;
+- fora da contagem das 151, e sem número também depois de revelado.
+
+A captura (etapa D-5) só precisa chamar `registerSecret`.
 
 ---
 
@@ -467,7 +482,8 @@ Cada etapa é entregável sozinha, com `npm test` e screenshots.
    - os ataques (de preferência com os comportamentos que já existem);
    - a chuva, as 2 Dive Balls e a maré final de 30 s;
    - a volta pela lagoa.
-5. **D-5 — O Kyogre na equipe:** a espécie especial, o kit, a Pokédex e o `check-data`.
+5. **D-5 — O Kyogre na equipe:** a espécie especial, o kit e o `check-data`; a captura
+   chama `registerSecret('kyogre')` (o "???" da Pokédex já existe desde a 0.35).
 6. **D-6 — A cena e o Endless:** a cena da história (na lagoa ou no Centro) e a
    fase Endless aquática sem XP.
 7. **D-7 — Capricho:** os sons (o mergulho, a bolha que estoura, o alarme do
