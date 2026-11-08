@@ -59,7 +59,7 @@ Na vila:
 |---|---|
 | Andar (um tile por passo; tocar só vira) | setas ou `WASD`, ou clique onde quer ir |
 | Correr | segure `Shift` (ou `X`) |
-| Falar, ler, entrar, avançar o texto | `Enter`, `Espaço` ou `Z`, ou clique na pessoa |
+| Ação: falar, ler, entrar, avançar o texto | `Espaço` (ou `Enter` e `Z`), ou clique na pessoa |
 | Responder NÃO / voltar | `X` ou `Backspace` |
 | Controle (gamepad) | direcional anda · A fala · B segurado corre · Start abre o mapa da jornada |
 

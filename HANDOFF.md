@@ -5,7 +5,7 @@
 > decisão foi tomada e o que falta fazer. O `README.md` é o manual de uso;
 > este aqui é o contexto de desenvolvimento.
 
-**Versão atual:** `0.32.1` · **Última atualização:** 2026-11-08
+**Versão atual:** `0.32.2` · **Última atualização:** 2026-11-08
 **Stack:** HTML + CSS + JavaScript puro (ES Modules). Sem backend, sem build, sem dependências.
 **Repositório:** https://github.com/FellipePeres/pokemon-bullet-heaven (público)
 **Jogo no ar:** https://fellipeperes.github.io/pokemon-bullet-heaven/
@@ -98,6 +98,11 @@ curl -s https://fellipeperes.github.io/pokemon-bullet-heaven/src/core/config.js 
 **todos os caminhos do projeto precisam continuar relativos** (`css/style.css`,
 `src/main.js`, `assets/...`). Nada de barra inicial — isso quebraria o deploy
 sem quebrar o ambiente local.
+
+O "Sobre" do repositório (a descrição, o site e as tags) muda com
+`gh repo edit FellipePeres/pokemon-bullet-heaven --description "..."` (até 350
+caracteres). Desde a 0.32.2 ele fala como gente, não como ficha técnica (pedido do
+Fellipe: estava "IAzudo"), e traz os controles, com o Espaço como a tecla de ação.
 
 A identidade de commit configurada no repositório local é
 `Fellipe Peres <130771865+FellipePeres@users.noreply.github.com>` (e-mail noreply
@@ -1444,6 +1449,7 @@ Nenhum pedido do Fellipe em aberto. O que está planejado:
 | 39 | melhoria de UX: a escolha do inicial e dos demais Pokémon em cards com o sprite em pixel na base de batalha e barras de vida, dano e alcance; o painel da fase com o cenário do ginásio, o líder em 2x, a faixa com as Poké Balls do time e o JOGAR vermelho; os banners dos ginásios no extrator; um artifact de antes e depois antes de subir | 0.31: `ui/pokemonCard.js` e `starterStats` (`CONFIG.cards`), a tela do inicial com véu, placa e Voltar no canto (ESC), o card na Poké Ball e na troca; `_panel` do `lobby.js` refeito; `tools/assets/gym_banners.py` (13 salões); roteiro `ux` no `screenshot.mjs`; testes do card e do painel; o check-data confere um banner por salão |
 | 40 | incentivar o jogador a explorar fraquezas e vantagens (com o Charmander ele passava fácil pelo Brock mesmo com a resistência); não diminuir a chance de captura de quem tem vantagem; medir antes de aplicar; o selo em cada Pokémon não precisa, só o "FRACO" do painel | 0.32: a tabela de tipos completa; queimadura e veneno pela tabela (Fogo não queima, Veneno e Metálico não envenenam); defesa por tipo suavizada e simétrica (`CONFIG.types.defense`); sem o `starterTuning` do Squirtle; Poliwag, Goldeen e Oddish de volta a 4% na Fase 1; o "Fraco" no banner do painel; "Super efetivo!" no líder e nos elites; `systems/matchup.js`; o bot `--tipos` no balance; medido antes e depois (seção 5) |
 | 41 | ler o HANDOFF e arrumar tudo o que estava desatualizado no projeto inteiro | 0.32.1: o HANDOFF conferido com o código (arquitetura com os arquivos que faltavam, contagens, Poké Balls, Shards, o Mart na vila, o Modo Livre e o Centro levando à vila, save, estado do conteúdo, próximos passos, histórico em ordem); README, PLANEJAMENTOs e PROVENIENCIA atualizados; comentários vencidos no código; nas Opções, o tremor (só os líderes) e o autosave (botão Jornada); a Ajuda com os controles da vila; a arte oficial (código morto) e o `.pyc` versionado saíram |
+| 42 | o "Sobre" do GitHub estava "IAzudo": humanizar e pôr os controles (setas e demais), com o Espaço como a tecla de ação | 0.32.2: a descrição do repositório reescrita (`gh repo edit`), com os controles; na Ajuda do jogo e no README, o Espaço como a ação da vila (Enter e Z também servem) |
 
 ---
 
