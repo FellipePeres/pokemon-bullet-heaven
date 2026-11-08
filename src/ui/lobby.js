@@ -5,6 +5,7 @@ import { getTrainerLook } from '../data/trainers.js';
 import { REGION_MAP, STAGE_CITY, HOME_CITY, cityName, cityPoint } from '../data/regionMap.js';
 import { emptyStageStats } from '../systems/stageStats.js';
 import { badgeUrl, spriteUrl } from '../render/sprites.js';
+import { typeColor, typeName } from '../data/types.js';
 import { assetUrl } from '../render/assets.js';
 import { iconHTML } from '../render/icons.js';
 import { formatTime } from '../core/utils.js';
@@ -23,7 +24,9 @@ const GEAR_SVG = '<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="t
  *   a próxima, o cursor do Town Map; bloqueada fica apagada. O rosto do
  *   treinador fica na fase escolhida e anda até a outra quando ela muda (0.30).
  *   Embaixo, o Voltar para a Vila.
- * - Ao lado, a fase escolhida: líder, trechos, métricas e Jogar.
+ * - Ao lado, a fase escolhida (0.31): o salão do líder com ele por cima e o tipo
+ *   do ginásio, o nome da fase, a faixa do líder (insígnia e uma Poké Ball por
+ *   Pokémon), o caminho com a duração, o nível recomendado e o JOGAR.
  * - Embaixo, a equipe com os ícones do PC; clicar abre o PC.
  */
 export class Lobby {
@@ -206,35 +209,62 @@ export class Lobby {
       panel.appendChild(row);
     }
 
+    // o cabeçalho (0.31): o salão do líder (tools/assets/gym_banners.py), o líder em
+    // 2x por cima, no canto de baixo, e a pílula do tipo do ginásio no canto de cima
+    const banner = create('div', 'panel-banner');
+    const hall = [...(stage.segments ?? [])].reverse().find((segment) => segment.scene)?.scene;
+    if (hall) banner.style.backgroundImage = `url(assets/ui/gym-banners/${hall}.png)`;
+    if (leader) {
+      const portrait = create('img', `panel-banner-leader${unlocked ? '' : ' silhouette'}`);
+      portrait.src = assetUrl(leader.portrait) ?? spriteUrl(leader.dex);
+      portrait.alt = leader.name;
+      banner.appendChild(portrait);
+      if (leader.type) {
+        const type = create('span', 'type-tag panel-type', typeName(leader.type));
+        type.style.background = typeColor(leader.type);
+        banner.appendChild(type);
+      }
+    }
+    panel.appendChild(banner);
+
     const head = create('div', 'panel-head');
     head.appendChild(create('span', 'panel-chapter', chapter ?? ''));
     head.appendChild(create('h3', '', title ?? stage.name));
     panel.appendChild(head);
 
+    // a faixa do líder: o nome, a insígnia, uma Poké Ball por Pokémon e a insígnia apagada até vencer
     if (leader) {
-      const who = create('div', 'panel-leader');
-      const portrait = create('img', `leader-portrait${unlocked ? '' : ' silhouette'}`);
-      portrait.src = assetUrl(leader.portrait) ?? spriteUrl(leader.dex);
-      portrait.alt = leader.name;
-      who.appendChild(portrait);
-      const info = create('div');
-      info.appendChild(create('b', '', unlocked ? leader.name : '???'));
-      const team = stage.bossTeam?.length ?? 0;
-      info.appendChild(create('span', '', unlocked && team ? `${team} Pokémon` : 'Vença a anterior para liberar'));
-      if (leader.badge) info.appendChild(create('span', 'panel-badge-name', leader.badge));
-      who.appendChild(info);
+      const strip = create('div', 'panel-strip');
+      const who = create('div', 'panel-strip-who');
+      // na Liga o título da fase já é o nome do líder (Lorelei): a faixa fica só com as Poké Balls
+      if (leader.name.toLowerCase() !== (title ?? '').toLowerCase()) who.appendChild(create('b', '', unlocked ? leader.name : '???'));
+      if (leader.badge) who.appendChild(create('span', 'panel-badge-name', leader.badge));
+      const team = (stage.bossTeamByStarter?.[this.campaign.starter] ?? stage.bossTeam ?? []).length;
+      if (team) {
+        const balls = create('span', 'panel-balls');
+        balls.title = `${team} Pokémon`;
+        for (let i = 0; i < team; i++) {
+          const ball = create('img');
+          ball.src = 'assets/items/poke-ball.png';
+          ball.alt = '';
+          balls.appendChild(ball);
+        }
+        who.appendChild(balls);
+      }
+      strip.appendChild(who);
       if (leader.badgeIndex) {
         const badge = create('img', `panel-badge${done ? '' : ' missing'}`);
         badge.src = badgeUrl(leader.badgeIndex);
-        badge.alt = '';
-        who.appendChild(badge);
+        badge.alt = done ? leader.badge : '';
+        badge.title = done ? leader.badge : 'Ainda não conquistada';
+        strip.appendChild(badge);
       }
-      panel.appendChild(who);
+      panel.appendChild(strip);
     }
 
+    // o caminho e a duração, numa linha só
     const trail = (stage.segments ?? []).map((seg) => seg.name).join(' → ');
-    panel.appendChild(create('p', 'panel-trail', `${trail}`));
-    panel.appendChild(create('p', 'panel-time', `${formatTime(stage.duration)} de travessia até o líder`));
+    panel.appendChild(create('p', 'panel-trail', `${trail} · ${formatTime(stage.duration)}`));
 
     // o nível recomendado (0.17): a derrota guarda o progresso e a próxima fase só
     // abre vencendo; aqui o jogador vê se é hora de fortalecer a equipe antes
@@ -251,23 +281,27 @@ export class Lobby {
       panel.appendChild(line);
     }
 
-    // as métricas da fase, as mesmas do estojo
+    // as métricas da fase, as mesmas do estojo: só depois da primeira tentativa (antes eram só "—")
     const stats = { ...emptyStageStats(), ...this.campaign.stageStats?.[stage.id] };
-    const rows = create('dl', 'panel-stats');
-    const add = (label, value) => { rows.appendChild(create('dt', '', label)); rows.appendChild(create('dd', '', value)); };
-    add('Vitórias', stats.attempts ? `${stats.wins} de ${stats.attempts}` : '—');
-    add('Melhor tempo', stats.bestTime !== null ? formatTime(stats.bestTime) : '—');
-    add('Menos desmaios', stats.fewestFaints !== null ? String(stats.fewestFaints) : '—');
-    panel.appendChild(rows);
+    if (stats.attempts) {
+      // numa linha só, para o JOGAR e o estojo caberem sem rolar
+      const line = create('p', 'panel-metrics');
+      const add = (label, value) => line.appendChild(create('span', '', `${label} <b>${value}</b>`));
+      add('Vitórias', `${stats.wins}/${stats.attempts}`);
+      add('Melhor', stats.bestTime !== null ? formatTime(stats.bestTime) : '—');
+      add('Desmaios', stats.fewestFaints !== null ? String(stats.fewestFaints) : '—');
+      panel.appendChild(line);
+    }
 
+    // JOGAR, grande e vermelho, com a Poké Ball; o estojo vira um link embaixo
     const actions = create('div', 'panel-actions');
-    const play = create('button', 'menu-btn primary panel-play');
+    const play = create('button', 'panel-play');
     play.type = 'button';
-    play.innerHTML = `<span class="btn-text">${!unlocked ? 'Bloqueada' : done ? 'Jogar de novo' : 'Jogar'}</span>`;
+    play.innerHTML = `<img src="assets/items/poke-ball.png" alt="" /><span>${!unlocked ? 'Bloqueada' : done ? 'Jogar de novo' : 'Jogar'}</span>`;
     play.disabled = !unlocked;
     play.onclick = () => this.game.startStage(stage.id);
     actions.appendChild(play);
-    const caseBtn = create('button', 'menu-btn ghost slim');
+    const caseBtn = create('button', 'panel-link');
     caseBtn.type = 'button';
     caseBtn.textContent = 'Ver no estojo';
     caseBtn.onclick = () => this.game.menus.showModal('modal-badges', { stageId: stage.id });

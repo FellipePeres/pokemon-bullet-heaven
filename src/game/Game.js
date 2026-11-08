@@ -624,6 +624,8 @@ export class Game {
     if (action === 'pause') {
       // fora da partida, ESC fecha a janela aberta (e, na vila, a conversa)
       if (this.menus.openModal) { this.menus.closeModal(); return; }
+      // na escolha do inicial, ESC é o Voltar: de volta ao laboratório (0.31)
+      if (document.getElementById('screen-starter')?.classList.contains('hidden') === false) { this.cancelStarter(); return; }
       if (this.hubOpen && this.hub.dialog) { this.hub.cancel(); return; }
       if (this.run && (this.run.state === 'running' || this.run.state === 'paused')) this.togglePause();
       return;

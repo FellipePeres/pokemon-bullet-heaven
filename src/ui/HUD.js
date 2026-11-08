@@ -2,6 +2,7 @@ import { el, create, clear, show, hide } from './dom.js';
 import { formatTime } from '../core/utils.js';
 import { getPokemon } from '../data/pokemon.js';
 import { pokemonImg, spriteUrl, animatedUrl } from '../render/sprites.js';
+import { choiceCard } from './pokemonCard.js';
 import { typeColor, typeName } from '../data/types.js';
 import { maxHpFor, xpRatio } from '../systems/stats.js';
 import { CONFIG } from '../core/config.js';
@@ -453,14 +454,14 @@ export class HUD {
 
   hideCapture() { hide(el('capture-overlay')); }
 
+  /**
+   * Um card da Poké Ball (e da troca com a equipe cheia): o mesmo card da escolha
+   * do inicial (0.31, ui/pokemonCard.js), com os selos de lendário e de shiny.
+   */
   _pokemonCard(pokemon, onClick, footer = '') {
-    const card = create('div', 'card');
-    const types = pokemon.types.map(
-      (t) => `<span class="type-tag" style="background:${typeColor(t)}">${typeName(t)}</span>`
-    ).join('');
-
-    const img = pokemonImg(pokemon.dex, { className: 'card-sprite', alt: pokemon.name, shiny: pokemon.shiny });
-    card.appendChild(img);
+    const card = choiceCard(pokemon, {
+      tag: 'div', className: 'card', shiny: pokemon.shiny, registered: pokemon.registered, footer
+    });
     if (pokemon.rarity === 'legendary') {
       // lendário (0.16): já chega com o golpe exclusivo, melhorias e o Golpe Desperto
       card.classList.add('legendary');
@@ -471,14 +472,6 @@ export class HUD {
       card.classList.add('shiny');
       card.appendChild(create('span', 'card-badge shiny', '✦ Shiny'));
     }
-    const body = create('div');
-    body.innerHTML = `
-      <h3>${pokemon.registered ? '<img class="caught-ball" src="assets/items/poke-ball.png" alt="" title="Já registrado na Pokédex">' : ''}${pokemon.name}</h3>
-      <div class="type-row" style="margin:6px 0">${types}</div>
-      <p>${pokemon.description ?? ''}</p>
-      <div class="stack-info">${footer || pokemon.role || ''}</div>
-    `;
-    card.appendChild(body);
     card.onclick = onClick;
     return card;
   }

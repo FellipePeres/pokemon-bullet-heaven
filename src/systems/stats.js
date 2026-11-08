@@ -1,5 +1,6 @@
 import { CONFIG } from '../core/config.js';
 import { getPokemon } from '../data/pokemon.js';
+import { getAbility } from '../data/abilities.js';
 
 /**
  * Stats derivadas de um Pokémon da equipe.
@@ -35,4 +36,28 @@ export function hpRatio(member, bonus = 0) {
 export function xpRatio(member) {
   const need = xpToNextLevel(member.level);
   return need > 0 ? Math.max(0, Math.min(1, member.xp / need)) : 0;
+}
+
+/**
+ * Os três números dos cards de escolha (o inicial e a Poké Ball; 0.31): a vida
+ * da espécie, o dano por segundo e o alcance do 1º golpe. Tudo sai dos dados
+ * (POKEMON e ABILITIES): rebalanceou, as barras acompanham.
+ *
+ * O dano por segundo é dano × projéteis ÷ recarga (as auras e órbitas usam o
+ * intervalo entre os acertos); não conta a queimadura nem o veneno, que vêm à
+ * parte em `extras` para o card dizer "+ queimadura". O alcance de quem não
+ * tem `range` (as ondas, as auras) é a área do golpe.
+ */
+export function starterStats(pokemonId) {
+  const pokemon = getPokemon(pokemonId);
+  const ability = getAbility(pokemon?.abilities?.[0]);
+  const base = ability?.base ?? {};
+  const rate = base.cooldown ?? base.tickRate ?? 1;
+  return {
+    hp: pokemon?.hp ?? CONFIG.pokemon.baseHp,
+    dps: Math.round(((base.damage ?? 0) * (base.count ?? 1)) / rate),
+    range: Math.round(base.range ?? base.area ?? 0),
+    extras: Object.keys(ability?.effects ?? {}),
+    ability
+  };
 }

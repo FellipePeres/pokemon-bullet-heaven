@@ -592,11 +592,9 @@ button { font: inherit; color: inherit; }
 .icon-btn:active { transform: translate(2px, 2px); box-shadow: var(--relief); }
 .icon-btn.close { position: absolute; top: 0; right: 0; }
 
-/* ======================= ESCOLHA DO INICIAL ======================= */
-.starter-grid { display: flex; gap: 18px; flex-wrap: wrap; justify-content: center; }
-
-/* cartões de escolha: a caixa de diálogo, que sobe ao apontar */
-.starter-card, .trainer-card, .card {
+/* cartões de escolha: a caixa de diálogo, que sobe ao apontar (o treinador, a
+   melhoria e a captura; o inicial tem o card de escolha, mais abaixo) */
+.trainer-card, .card {
   color: var(--gba-ink);
   background: none;
   border: 16px solid transparent;
@@ -605,34 +603,11 @@ button { font: inherit; color: inherit; }
   cursor: pointer;
   transition: transform .14s var(--ease), filter .14s var(--ease);
 }
-.starter-card:hover, .trainer-card:hover, .trainer-card:focus-visible, .card:hover {
+.trainer-card:hover, .trainer-card:focus-visible, .card:hover {
   transform: translateY(-6px);
   filter: drop-shadow(0 10px 10px rgba(0, 0, 0, .55));
   outline: none;
 }
-
-.starter-card {
-  width: 268px;
-  padding: 6px 6px 8px;
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-}
-.starter-card img { width: 150px; height: 150px; object-fit: contain; image-rendering: pixelated; }
-.starter-card h3 { font-family: var(--font-arcade); font-size: 15px; font-weight: 400; color: var(--gba-frame); text-shadow: 2px 2px 0 var(--gba-shade); }
-.starter-card .role { font-size: 15px; font-weight: 600; color: var(--poke-red); }
-.starter-card p { font-size: 14.5px; color: var(--gba-ink-soft); line-height: 1.4; }
-.starter-card .move-box {
-  width: 100%;
-  padding: 8px 10px;
-  text-align: left;
-  background: var(--gba-button);
-  border-top: 3px dotted var(--gba-shade);
-}
-.starter-card .move-box b { font-size: 15px; color: var(--gba-ink); }
-.starter-card .move-box span { display: block; font-size: 13.5px; color: var(--gba-ink-soft); margin-top: 3px; line-height: 1.35; }
 
 /* ======================= ESCOLHA DO TREINADOR ======================= */
 .oak-intro { display: flex; align-items: center; gap: 18px; max-width: 780px; }
@@ -1998,8 +1973,8 @@ button { font: inherit; color: inherit; }
 .lobby-panel {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  width: 360px;
+  gap: 8px;
+  width: 384px;
   flex: none;
   min-height: 0;
   overflow-y: auto;
@@ -2010,8 +1985,8 @@ button { font: inherit; color: inherit; }
 }
 .panel-league, .league-row { display: flex; gap: 6px; align-items: center; }
 .league-chip {
-  width: 52px;
-  height: 52px;
+  width: 40px;
+  height: 40px;
   padding: 2px;
   background: var(--gba-button);
   border: 2px solid var(--gba-shade);
@@ -2467,3 +2442,274 @@ button { font: inherit; color: inherit; }
 .name-input::placeholder { color: var(--gba-ink-soft); opacity: .7; }
 .name-input:focus-visible { outline: none; }
 .name-hint { margin: 0; font-family: var(--font-pixel); font-size: 15px; color: #dfe6f2; text-shadow: 2px 2px 0 rgba(0, 0, 0, .8); }
+
+/* ===================== ESCOLHA DO INICIAL (0.31) =====================
+   O cenário de sempre com um véu forte, o título na placa do FireRed, o Voltar
+   pequeno no canto (com o ESC) e três cards de 320 px da mesma altura. A barra
+   lateral sai desta tela. */
+#app[data-screen="screen-starter"] #side-rail,
+#app[data-screen="screen-starter"] .gear-float { display: none; }
+#app[data-screen="screen-starter"] #menu-scrim { background: rgba(8, 14, 26, .78); }
+
+.starter-screen { padding: 28px; }
+.starter-title {
+  margin: 0;
+  padding: 2px 14px;
+  font-family: var(--font-arcade);
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.7;
+  color: var(--gba-frame);
+}
+.corner-back {
+  position: absolute;
+  top: 18px;
+  left: 18px;
+  z-index: 5;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  font-family: var(--font-pixel);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--gba-ink);
+  background: var(--gba-button);
+  border: 2px solid var(--gba-frame);
+  border-radius: 3px;
+  box-shadow: var(--relief), 2px 2px 0 rgba(0, 0, 0, .45);
+  cursor: pointer;
+}
+.corner-back:hover, .corner-back:focus-visible, .corner-back.pad-focus { background: var(--gba-hover); outline: none; }
+.corner-back kbd {
+  padding: 3px 5px 2px;
+  font-family: var(--font-arcade);
+  font-size: 8px;
+  color: #fff;
+  background: var(--gba-frame);
+  border-radius: 2px;
+}
+.starter-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 320px);
+  gap: 24px;
+  align-items: stretch;
+  justify-content: center;
+  padding-top: 12px;
+}
+@media (max-width: 1100px) { .starter-grid { grid-template-columns: repeat(auto-fit, 320px); } }
+
+/* ===================== O CARD DE ESCOLHA (0.31) =====================
+   ui/pokemonCard.js: o Pokémon em pixel na base de batalha, o nome e o papel,
+   os tipos, as barras de vida, dano e alcance, e o golpe no pé do card. Serve ao
+   inicial (320 px) e à Poké Ball da fase (com os selos de lendário e de shiny). */
+.choice-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+  padding: 6px 8px 8px;
+  font: inherit;
+  text-align: left;
+  color: var(--gba-ink);
+  background: none;
+  border: 16px solid transparent;
+  border-image: url(../assets/ui/window-frame-button.png) 16 fill stretch;
+  filter: drop-shadow(0 6px 8px rgba(0, 0, 0, .45));
+  cursor: pointer;
+  transition: transform .14s var(--ease), filter .14s var(--ease);
+}
+.starter-card.choice-card { width: 320px; }
+/* o card apontado (mouse, teclado ou controle): sobe, ganha o contorno vermelho e a Poké Ball */
+.choice-card:hover, .choice-card:focus-visible, .choice-card.pad-focus {
+  transform: translateY(-10px);
+  outline: 4px solid #d8412f;
+  outline-offset: 2px;
+  filter: drop-shadow(0 12px 12px rgba(0, 0, 0, .55));
+}
+.choice-card:hover::after, .choice-card:focus-visible::after, .choice-card.pad-focus::after {
+  content: '';
+  position: absolute;
+  top: -30px;
+  right: -30px;
+  width: 32px;
+  height: 32px;
+  background: url(../assets/items/poke-ball.png) center / contain no-repeat;
+  image-rendering: pixelated;
+  transform: rotate(-24deg);
+}
+.choice-stage {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  height: 140px;
+}
+.battle-base {
+  position: absolute;
+  left: 50%;
+  bottom: 4px;
+  width: 210px;
+  height: 44px;
+  transform: translateX(-50%);
+  background: #a8d878;
+  border: 3px solid #5f9a3c;
+  border-radius: 50%;
+  box-shadow: inset 0 -7px 0 #84bc58;
+}
+.choice-sprite { position: relative; width: 128px; height: 128px; margin-bottom: 12px; image-rendering: pixelated; }
+/* o nome e o papel na mesma linha: o papel quebra dentro do canto dele, à direita */
+.choice-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+.choice-head h3 { flex: none; }
+.choice-head h3 {
+  margin: 0;
+  font-family: var(--font-arcade);
+  font-size: 16px;
+  font-weight: 400;
+  color: #4a73a4;
+  text-shadow: 2px 2px 0 var(--gba-shade);
+}
+.choice-head h3 .caught-ball { width: 16px; height: 16px; margin-right: 6px; vertical-align: -1px; image-rendering: pixelated; }
+.choice-role { padding-top: 2px; font-size: 13px; font-weight: 700; line-height: 1.25; text-align: right; color: var(--poke-red); }
+/* no inicial, o cabeçalho guarda duas linhas: o papel que quebra (Squirtle) não desalinha os tipos e as barras dos outros cards */
+.starter-card .choice-head { min-height: 36px; }
+.choice-card .type-row { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-start; margin: 0; }
+.choice-card .type-tag { padding: 4px 6px 3px; font-family: var(--font-arcade); font-size: 8px; font-weight: 400; letter-spacing: 0; }
+.choice-card .stack-info { font-size: 13px; color: var(--gba-ink-soft); }
+.choice-stats {
+  display: grid;
+  gap: 5px;
+  padding: 8px;
+  background: var(--gba-button);
+  border: 2px solid var(--gba-shade);
+  border-radius: 3px;
+}
+.stat-row { display: grid; grid-template-columns: 62px 1fr 36px; align-items: center; gap: 8px; }
+.stat-label { font-size: 13px; font-weight: 700; color: var(--gba-ink-soft); }
+.stat-blocks { display: flex; gap: 2px; padding: 2px; background: #283141; border-radius: 2px; }
+.stat-blocks i { flex: 1; height: 9px; background: #454f66; }
+.stat-blocks i.on { background: #48c868; box-shadow: inset 0 -2px 0 #2f9a4f; }
+.stat-value { font-family: var(--font-arcade); font-size: 9px; font-weight: 400; text-align: right; color: var(--gba-ink); }
+.stat-extras { margin: 2px 0 0; font-size: 12px; font-weight: 700; color: #d9662a; }
+.choice-card .move-box {
+  margin-top: auto;
+  padding: 8px 10px;
+  background: var(--gba-button);
+  border-top: 3px dotted var(--gba-shade);
+}
+.choice-card .move-box b { font-size: 15px; color: var(--gba-ink); }
+.choice-card .move-box span { display: block; margin-top: 3px; font-size: 13.5px; line-height: 1.35; color: var(--gba-ink-soft); }
+
+/* na Poké Ball da fase: quatro cards por fileira, mais baixos (o golpe só pelo nome,
+   para a janela caber na tela com o Ignorar); com a equipe cheia, sete compactos */
+#capture-choices .choice-card { width: 252px; gap: 6px; padding: 2px 6px 6px; }
+#capture-choices .choice-card .choice-stage { height: 110px; }
+#capture-choices .choice-card .choice-sprite { margin-bottom: 2px; }
+/* na Poké Ball o card é mais estreito: o papel desce para baixo do nome (ao lado de
+   um nome longo, como Kangaskhan, sobravam 40 px para ele) */
+#capture-choices .choice-head { flex-direction: column; gap: 3px; }
+#capture-choices .choice-card .choice-role { padding-top: 0; font-size: 12px; text-align: left; }
+#capture-choices .choice-card .choice-stats { gap: 3px; padding: 6px; }
+#capture-choices .choice-card .stat-extras { font-size: 11px; }
+#capture-choices .choice-card .move-box { padding: 4px 8px; }
+#capture-choices .choice-card .move-box b { font-size: 14px; }
+#capture-choices .choice-card .move-box span { display: none; }
+#capture-choices.compact .choice-card { width: 146px; flex: 0 1 146px; padding-top: 24px; }
+#capture-choices.compact .choice-card .choice-stats,
+#capture-choices.compact .choice-card .move-box,
+#capture-choices.compact .choice-card .choice-role { display: none; }
+#capture-choices.compact .choice-card .choice-stage { height: 80px; }
+#capture-choices.compact .choice-card .choice-sprite { width: 64px; height: 64px; margin-bottom: 8px; }
+#capture-choices.compact .choice-card .battle-base { width: 110px; height: 24px; box-shadow: inset 0 -4px 0 #84bc58; }
+#capture-choices.compact .choice-head h3 { font-size: 10px; }
+
+/* ===================== O PAINEL DA FASE (0.31) =====================
+   No mapa da jornada: o salão do líder em 2x (112 px; o retrato de 128 sobressai
+   por cima) com ele por cima (os banners de
+   tools/assets/gym_banners.py), o tipo do ginásio, o nome da fase, a faixa do
+   líder entre pontilhados, o caminho, o nível e o JOGAR vermelho. */
+.panel-banner {
+  position: relative;
+  flex: none;
+  height: 112px;
+  margin-top: 16px;
+  background: #1c2433 center bottom / auto 128px repeat-x;
+  image-rendering: pixelated;
+  border: 3px solid var(--gba-frame);
+  border-radius: 3px;
+}
+.panel-banner-leader {
+  position: absolute;
+  left: 4px;
+  bottom: 0;
+  width: 128px;
+  height: 128px;
+  image-rendering: pixelated;
+  filter: drop-shadow(2px 2px 0 rgba(0, 0, 0, .35));
+}
+.panel-banner-leader.silhouette { filter: brightness(0) opacity(.55); }
+.panel-type {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  padding: 4px 6px 3px;
+  font-family: var(--font-arcade);
+  font-size: 8px;
+  font-weight: 400;
+  letter-spacing: 0;
+  color: #fff;
+}
+.panel-head .panel-chapter { font-family: var(--font-arcade); font-size: 8px; letter-spacing: .06em; text-transform: uppercase; color: var(--gba-ink-soft); }
+.panel-head h3 { font-size: 16px; color: #4a73a4; }
+.panel-strip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0;
+  border-top: 3px dotted var(--gba-shade);
+  border-bottom: 3px dotted var(--gba-shade);
+}
+.panel-strip-who { display: flex; flex-direction: column; gap: 3px; flex: 1; min-width: 0; font-size: 14px; }
+.panel-strip-who b { font-family: var(--font-arcade); font-size: 11px; font-weight: 400; color: var(--gba-ink); }
+.panel-balls { display: flex; gap: 2px; }
+.panel-balls img { width: 16px; height: 16px; image-rendering: pixelated; }
+.panel-strip .panel-badge { flex: none; }
+.panel-trail { font-size: 14px; color: var(--gba-ink); }
+.panel-play {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
+  height: 56px;
+  font-family: var(--font-arcade);
+  font-size: 16px;
+  color: #fff;
+  text-shadow: 2px 2px 0 #7a1c12;
+  background: #d8412f;
+  border: 3px solid #7a1c12;
+  border-radius: 4px;
+  box-shadow: 0 5px 0 #7a1c12;
+  cursor: pointer;
+}
+.panel-play img { width: 24px; height: 24px; image-rendering: pixelated; }
+.panel-play span { text-transform: uppercase; }
+.panel-play:hover, .panel-play:focus-visible, .panel-play.pad-focus { background: #e9563f; outline: none; }
+.panel-play:active { transform: translateY(3px); box-shadow: 0 2px 0 #7a1c12; }
+.panel-play:disabled { color: #e8ecf3; text-shadow: none; background: #9aa3b5; border-color: #5b6273; box-shadow: 0 5px 0 #5b6273; cursor: not-allowed; }
+.panel-link {
+  align-self: center;
+  margin-top: 6px;
+  padding: 2px 6px;
+  font-family: var(--font-pixel);
+  font-size: 14px;
+  color: var(--gba-frame);
+  text-decoration: underline;
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+.panel-link:hover, .panel-link:focus-visible, .panel-link.pad-focus { color: var(--logo-blue-deep); outline: none; }
+.panel-metrics { display: flex; justify-content: space-between; gap: 8px; margin: 0; font-size: 13px; color: var(--gba-ink-soft); }
+.panel-metrics b { margin-left: 4px; font-family: var(--font-arcade); font-size: 9px; font-weight: 400; color: var(--gba-ink); }

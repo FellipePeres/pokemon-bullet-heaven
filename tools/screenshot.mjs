@@ -40,6 +40,32 @@ const ROTEIROS = {
     { run: "game.newGame(); game.chooseTrainer('leaf'); game.chooseStarter('charmander'); game.openCampaign()" },
     { wait: 1200 }, { shot: 'jornada' }
   ],
+  // a melhoria de UX da 0.31: o card de escolha (o inicial e a Poké Ball) e o painel da fase
+  ux: [
+    { open: 'index.html' }, { wait: 500 },
+    { run: "game.newGame(); game.chooseTrainer('red'); game.chooseName('Fellipe'); game.hub.awaitStarter = true; game.openStarterChoice()" },
+    { wait: 1500 }, { shot: 'ux-01-inicial' },
+    { run: "game.padNav.focus(document.querySelectorAll('#starter-choices .starter-card')[1])" }, { wait: 500 }, { shot: 'ux-02-inicial-apontado' },
+    { run: "game.chooseStarter('squirtle'); game.hub.dialog = null; game.startStage('gym_1_pewter')" }, { wait: 1200 },
+    { run: "import('./src/data/pokemon.js').then(({ getPokemon }) => { const list = ['pikachu', 'oddish', 'geodude', 'articuno'].map((id, i) => ({ ...getPokemon(id), shiny: i === 0 }));" +
+           " game.run.state = 'capture'; game.captureOpen = true; game.hud.showCapture(list, () => {}, undefined, { teamSize: 2, maxSize: 6 }); })" },
+    { wait: 1200 }, { shot: 'ux-03-pokebola', raw: true },
+    { run: "import('./src/data/pokemon.js').then(({ getPokemon }) => game.hud.showCapture(['kangaskhan', 'charmeleon', 'butterfree', 'electabuzz'].map(getPokemon), () => {}, undefined, { teamSize: 2, maxSize: 6 }))" },
+    { wait: 1200 }, { shot: 'ux-03b-nomes-longos', raw: true },
+    { run: "['pidgey', 'rattata', 'spearow', 'mankey', 'caterpie'].forEach((id) => game.run.team.add(id, 8));" +
+           "import('./src/data/pokemon.js').then(({ getPokemon }) => game.hud.showReplace(getPokemon('meowth'), game.run.team.members, () => {}, () => {}))" },
+    { wait: 1200 }, { shot: 'ux-04-equipe-cheia', raw: true },
+    { run: "game.hud.hideCapture(); game.captureOpen = false; game.run.state = 'running'; game.quitToMenu();" +
+           "['gym_1_pewter', 'gym_2_cerulean', 'gym_3_vermilion'].forEach((s) => game.campaign.clearedStages.push(s));" +
+           "game.campaign.badges.push('Insígnia Pedra', 'Insígnia Cascata', 'Insígnia Trovão');" +
+           "game.campaign.journey = { team: { members: [28, 30, 31, 33, 32, 32].map((lv, i) => ({ uid: 'u' + i, pokemonId: ['wartortle', 'pikachu', 'geodude', 'oddish', 'pidgeotto', 'meowth'][i], level: lv, xp: 0, hp: 50, abilities: [], upgrades: {} })), active: ['u0', 'u1', 'u2'] }, pc: [] };" +
+           "game.openCampaign(); game.menus.lobby.selected = 'gym_4_celadon'; game.menus.lobby.render(); document.getElementById('toast-container').innerHTML = ''" },
+    { wait: 1800 }, { shot: 'ux-05-painel-erika' },
+    { run: "game.campaign.stageStats.gym_1_pewter = { attempts: 3, wins: 2, bestTime: 212, fewestFaints: 1, bestLevel: 16, captures: 4, damage: 21000, firstWin: null };" +
+           "game.menus.lobby.selected = 'gym_1_pewter'; game.menus.lobby.render()" }, { wait: 1200 }, { shot: 'ux-06-painel-brock-vencido' },
+    { run: "['gym_4_celadon', 'gym_5_fuchsia', 'gym_6_saffron', 'gym_7_cinnabar', 'gym_8_viridian'].forEach((s) => game.campaign.clearedStages.push(s));" +
+           "game.menus.lobby.selected = 'e4_lorelei'; game.menus.lobby.render()" }, { wait: 1200 }, { shot: 'ux-07-painel-liga' }
+  ],
   // a vila (0.29, PLANEJAMENTO-LOBBY.md): o quarto, a mãe, a vila, a saída travada,
   // o Carvalho, a escolha do inicial, o Centro remodelado, a loja de Pokédolls e o sábio
   vila: [

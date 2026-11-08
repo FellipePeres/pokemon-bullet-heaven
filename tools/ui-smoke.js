@@ -228,6 +228,17 @@ check('o Carvalho conta a mini-história das hordas', hub.dialog?.name === 'Prof
 closeDialog();
 check('...e abre a escolha do inicial com 3 opções',
       !registry.get('screen-starter').classes.has('hidden') && registry.get('starter-choices').children.length === 3);
+{
+  // o card de escolha (0.31): as três barras com os números dos dados, o golpe no pé e o aviso do efeito
+  const cards = registry.get('starter-choices').children;
+  const bars = (card) => card?.children.find((c) => c.classes.has('choice-stats'));
+  const charmander = cards.find((card) => card.children.some((c) => c.classes.has('choice-head') && c.innerHTML.includes('Charmander')));
+  check('o card do inicial tem as barras de vida, dano e alcance e o golpe no pé',
+        cards.every((card) => bars(card)?.children.filter((c) => c.classes.has('stat-row')).length === 3
+          && card.children.at(-1)?.classes.has('move-box')));
+  check('...e avisa a queimadura do Ember, que o Dano/s não conta',
+        !!bars(charmander)?.children.some((c) => c.classes.has('stat-extras') && c.innerHTML.includes('queimadura')));
+}
 game.cancelStarter();
 check('o Voltar da escolha devolve ao laboratório, com o Carvalho esperando', hubVisible() && dialogText().includes('Pense com calma'));
 closeDialog();
@@ -306,12 +317,25 @@ check('o lobby mostra o Town Map com uma marca por cidade (8 ginásios e a Liga)
 check('ao entrar, a próxima fase já vem escolhida no painel',
       game.menus.lobby.selected === 'gym_1_pewter' && mapNodes().filter((c) => c.classes.has('next')).length === 1);
 const { STAGE_CITY } = await import('../src/data/regionMap.js');
+const { STAGES } = await import('../src/data/stages.js');
 check('no mapa, o rosto do treinador fica na fase atual (0.30)', game.menus.lobby.playerCity === STAGE_CITY.gym_1_pewter);
 game.menus.lobby.selected = 'gym_2_cerulean';
 game.menus.lobby.render();
 check('...e acompanha a fase escolhida no mapa', game.menus.lobby.playerCity === STAGE_CITY.gym_2_cerulean);
 game.menus.lobby.selected = 'gym_1_pewter';
 game.menus.lobby.render();
+{
+  // o painel da fase (0.31): o salão do líder, a faixa com uma Poké Ball por Pokémon dele e o JOGAR;
+  // as métricas só depois da primeira tentativa
+  const panel = registry.get('lobby-panel').children;
+  const strip = panel.find((c) => c.classes.has('panel-strip'));
+  const balls = strip?.children[0]?.children.find((c) => c.classes.has('panel-balls'));
+  check('o painel da fase mostra o salão do líder, a faixa dele e o JOGAR',
+        panel.some((c) => c.classes.has('panel-banner') && String(c.style.backgroundImage).includes('gym-banners/pewter_gym.png'))
+        && balls?.children.length === STAGES.gym_1_pewter.bossTeam.length
+        && panel.some((c) => c.classes.has('panel-actions')));
+  check('...e esconde as métricas até a primeira tentativa', !panel.some((c) => c.classes.has('panel-metrics')));
+}
 registry.get('btn-village').click();
 check('"Voltar para a Vila" fecha o mapa e volta para onde o jogador estava',
       hubVisible() && hub.mapId === 'vila' && hub.player.x === 17 && hub.player.y === 26);

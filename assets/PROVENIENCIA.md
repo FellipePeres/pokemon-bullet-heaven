@@ -57,6 +57,22 @@ O tamanho, a colisão de cada mapa, o catálogo das folhas e os móveis saem em
 `src/data/hubMaps.js`. As portas, as pessoas e as falas ficam em `src/data/hub.js`
 e `src/data/dialogue.js` (feitos à mão).
 
+## Gerados por `tools/assets/gym_banners.py` (o painel da fase, 0.31)
+
+Mesma fonte (o decomp no Pokemon All, só leitura). Cada banner é uma faixa de 12x4
+metatiles (192x64) do mapa do salão, recortada em volta de onde o líder fica (o
+`object_event` dele no `map.json`). O painel da fase mostra em 2x, com o retrato
+do líder por cima.
+
+```bash
+python tools/assets/gym_banners.py                   # procura ../Pokemon All
+```
+
+| Saída | Origem no decomp |
+|---|---|
+| `ui/gym-banners/{pewter,cerulean,vermilion,celadon,fuchsia,saffron,cinnabar,viridian}_gym.png` | `data/layouts/` dos 8 ginásios (`<Cidade>_Gym`); Pewter com o recorte 1 tile à direita e Vermilion 1 tile abaixo, onde pegava parede demais; o salão de Vermilion tem 11 de largura e repete a borda |
+| `ui/gym-banners/{lorelei,bruno,agatha,lance,champion}_room.png` | `PokemonLeague_LoreleisRoom`, `_BrunosRoom`, `_AgathasRoom`, `_LancesRoom` e `_ChampionsRoom` |
+
 ## Copiados do Pokemon All
 
 | Saída | Origem |

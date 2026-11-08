@@ -5,7 +5,7 @@
 > decisão foi tomada e o que falta fazer. O `README.md` é o manual de uso;
 > este aqui é o contexto de desenvolvimento.
 
-**Versão atual:** `0.30.0` · **Última atualização:** 2026-11-07
+**Versão atual:** `0.31.0` · **Última atualização:** 2026-11-07
 **Stack:** HTML + CSS + JavaScript puro (ES Modules). Sem backend, sem build, sem dependências.
 **Repositório:** https://github.com/FellipePeres/pokemon-bullet-heaven (público)
 **Jogo no ar:** https://fellipeperes.github.io/pokemon-bullet-heaven/
@@ -41,6 +41,7 @@ npm run smoke:ui             # interface: DOM simulado a partir do index.html re
 npm run screens -- <roteiro> --out <pasta>   # screenshots no Chrome sem janela
 npm run assets               # regera os sprites a partir do Pokemon All (Python + Pillow)
 python tools/assets/hub.py   # regera os mapas da vila (0.29) a partir do mesmo decomp
+python tools/assets/gym_banners.py   # regera os banners dos salões do painel da fase (0.31)
 npm run balance -- --runs 12 # joga a campanha com o bot: tentativas até passar cada fase, níveis e lutas
 npm run balance -- --runs 48 --jobs 12          # o mesmo, em 12 processos (0.28; a máquina tem 12 núcleos)
 npm run balance -- --load equipes.json --from gym_6_saffron --until gym_6_saffron --set gym_6_saffron.difficulty=0.8
@@ -62,7 +63,7 @@ vencer, a duração da luta, desmaios e pico de inimigos.
 
 **Conferência visual (desde a 0.5).** `tools/screenshot.mjs` abre o jogo no Chrome
 (ou Edge) sem janela, executa um roteiro (`vitrine`, `treinador`, `vila`, `jornada`,
-`partida`), salva PNGs e lista os erros de JavaScript da página. Sai com código 1
+`partida`, `ux`), salva PNGs e lista os erros de JavaScript da página. Sai com código 1
 se a página tiver erro. A `vitrine.html` desenha os assets com o mesmo código da
 partida: poses, andar e correr, as 8 direções, a proporção com os Pokémon e os
 retratos. **Olhe os screenshots antes de entregar mudança visual.** O feel
@@ -162,6 +163,7 @@ src/
     icons.js          ícones de item por chave semântica
   ui/
     HUD.js            HUD da partida e overlays (nível, captura, evolução, pausa)
+    pokemonCard.js    o card de escolha (0.31): o inicial e a Poké Ball, em pixel, com as barras
     Menus.js          menu, mapa, modais (Pokédex, conquistas, equipe, opções)
     pcScreen.js       a tela do PC (a do FireRed, portada do Pokemon All): caixas, equipe, pegar e soltar
     lobby.js          o mapa da jornada: o Town Map de Kanto, a fase escolhida, a equipe e a barra do topo
@@ -188,6 +190,7 @@ tools/
   assets/copy_pc_art.py   traz do Pokemon All a arte do PC, os sprites do FireRed e o Cartão de Treinador
   assets/extract_region_map.py  monta o Town Map de Kanto do decomp (o mapa do lobby)
   assets/hub.py       monta a vila e os interiores com pedaços de mapas do FireRed (0.29)
+  assets/gym_banners.py  recorta os salões dos líderes para o painel da fase (0.31)
 ```
 
 **Regra do projeto: `/data` é conteúdo, `/systems` é comportamento.**
@@ -514,6 +517,18 @@ Nunca voltar bônus globais para o pool de level up — foi pedido explícito.
   28 espécies, 96% do peso em formas básicas (Rotas 1, 2, 22 e 3, Floresta de
   Viridian e a pesca do começo) e 4% nos evoluídos. Água e Planta (Poliwag,
   Goldeen, Oddish) ficaram em 2% cada porque tiram 4x do Brock.
+- **O card de escolha** (0.31, `ui/pokemonCard.js`), o mesmo do inicial e da Poké
+  Ball: o sprite do FireRed em 2x na base de batalha, o nome e o papel, os tipos,
+  três barras de 10 blocos e o golpe no pé. As barras saem de `starterStats`
+  (`systems/stats.js`): Vida é o `hp`, Dano/s é dano × projéteis ÷ recarga do 1º
+  golpe e Alcance é o alcance (ou a área) dele. A escala é a do inicial
+  (`CONFIG.cards`: 150, 20 e 350), então um Pokémon forte enche a barra e o número
+  mostra a diferença. O efeito do golpe (queimadura, veneno, lentidão) vem escrito
+  embaixo, porque o Dano/s não conta. Na Poké Ball o card tem 252 px, o papel vai
+  para baixo do nome e a descrição do golpe sai; com a equipe cheia, 146 px só com
+  sprite, nome e tipos. Na escolha do inicial, três cards de 320 px com o cabeçalho
+  de duas linhas (o papel do Squirtle quebra), véu escuro, título na placa do
+  FireRed e o Voltar pequeno no canto, que também sai com ESC.
 
 ### Modo Livre (0.20)
 - Pedido do Fellipe: "quando ganhar do Brock, além dos botões de hoje, um botão
@@ -645,8 +660,14 @@ Nunca voltar bônus globais para o pool de level up — foi pedido explícito.
   Town Map; bloqueada fica apagada; o número da fase embaixo. O ícone do Red/Leaf
   fica na cidade da última vitória e anda até a nova ao voltar. Ao entrar, a
   próxima fase já vem escolhida.
-- **Ao lado, a fase escolhida**: o líder, a insígnia, os trechos, as métricas e
-  Jogar (na Liga, as cinco salas para escolher). **Embaixo, a equipe** com os
+- **Ao lado, a fase escolhida** (refeita na 0.31): o salão do líder
+  (`assets/ui/gym-banners`, do último trecho com cenário) com ele em 2x por cima e a
+  pílula do tipo; "FASE 4" e o nome da fase; a faixa do líder (nome, insígnia, uma
+  Poké Ball por Pokémon do `bossTeam` e a insígnia apagada até vencer); o caminho
+  com a duração; o nível recomendado; as métricas numa linha, só depois da
+  primeira tentativa; o JOGAR vermelho e o "Ver no estojo" como link. Na Liga, as
+  cinco salas para escolher em cima (ícones de 40 px), e a faixa não repete o nome
+  quando ele já é o título. **Embaixo, a equipe** com os
   ícones do PC (a bolinha marca os 3 em campo); clicar abre o PC.
 - **Barra do topo** com tudo: o treinador, o estojo em miniatura, Shards e
   Pokédex, os ícones (Pokédex, Conquistas com o aviso de "para coletar", Equipe,
@@ -1012,6 +1033,7 @@ Procedência e como regerar: `assets/PROVENIENCIA.md`.
 | Moldura das janelas e dos botões | `assets/ui/window-frame.png` (3x, fatia 24) e `window-frame-button.png` (2x, fatia 16): a `text_window` do FireRed, copiadas do Pokemon All |
 | Fontes | `assets/fonts/`: Press Start 2P e Pixelify Sans (licença OFL), as do Pokemon All |
 | Fundo da tela de título | `assets/ui/title-background.webp`: arte do Fellipe (a clareira à noite cercada pela horda) |
+| Banners dos salões (0.31) | `assets/ui/gym-banners/<cenário>.png`: 12x4 metatiles (192x64) do mapa de cada salão de líder, em volta de onde ele fica; o painel da fase mostra em 2x. Gerados por `tools/assets/gym_banners.py` |
 | A vila (0.29) | `assets/hub/<mapa>.png` e `-top.png` (o chão e o que cobre os personagens), `assets/hub/npc/<id>.png` (as pessoas e os bonecos), `assets/hub/decor/<id>.png` (os móveis do quarto); `src/data/hubMaps.js` diz o tamanho e a colisão de cada mapa. Gerados por `tools/assets/hub.py` |
 | Músicas | `assets/music/*.ogg`: 18 do FireRed, a vinheta de cura do Centro Pokémon (`tools/assets/render_music.py`) e o tema do lobby do Pokemon All; 7,5 MB ao todo, cada uma carregada quando toca |
 
@@ -1028,7 +1050,7 @@ Procedência e como regerar: `assets/PROVENIENCIA.md`.
 |---|---|
 | Canvas (jogo) | `sprites/pokemon/<dex>.png` — estático (canvas não anima GIF) |
 | Menus, HUD, cards | `.../versions/generation-v/black-white/animated/<dex>.gif` |
-| Escolha do inicial | `.../other/official-artwork/<dex>.png` |
+| Arte oficial (sem uso desde a 0.31, quando a escolha do inicial passou ao sprite do FireRed) | `.../other/official-artwork/<dex>.png` |
 | Ícones de interface | `sprites/items/<nome>.png` |
 | Insígnias de ginásio | `sprites/badges/<n>.png` (1 = Pedra, 2 = Cascata...) |
 
@@ -1257,6 +1279,7 @@ tipo, som e o polimento de troca e captura.
 | 20 | fases levemente mais rápidas: de 3:30 para 2:45 | 0.15: a linha do tempo das 13 fases comprimida (×165/210; levas ×√f mais densas, XP ×1/√f); a equipe chega ao líder no mesmo nível (medido) |
 | 35 | manter a fase do Brock como está e dificultar todas as outras; a escala de ganho de nível muito alta; o Golpe Desperto por chave: maximizar certas melhorias (Gyarados: velocidade, penetração e dano; Gloom: área, intervalo entre os danos e cooldown), com a melhoria da chave marcada na tela de nível ("maximize para despertar") | 0.28: `xpLateExponent` 2,2 → 3,4 (o bot chega ao Campeão no ~74, era ~115; o Brock igual); `stage.difficulty` recalibrada fase a fase, todas mais duras que na 0.27 em tentativas do bot (ver seção 5); `data/awakening.js`: 3 melhorias por golpe que despertam o 2º golpe na hora, selo dourado na tela de nível, progresso na equipe e no PC, quem chega tarde treina a chave primeiro; `balance.mjs --jobs` (paralelo) e `--set` (testar um valor) |
 | 36 | tirar a tag "Golpe Desperto" das melhorias, deixar só o aviso de maximizar embaixo | 0.28.1: sem o selo no canto da carta; ficam a moldura dourada e o aviso |
+| 39 | melhoria de UX: a escolha do inicial e dos demais Pokémon em cards com o sprite em pixel na base de batalha e barras de vida, dano e alcance; o painel da fase com o cenário do ginásio, o líder em 2x, a faixa com as Poké Balls do time e o JOGAR vermelho; os banners dos ginásios no extrator; um artifact de antes e depois antes de subir | 0.31: `ui/pokemonCard.js` e `starterStats` (`CONFIG.cards`), a tela do inicial com véu, placa e Voltar no canto (ESC), o card na Poké Ball e na troca; `_panel` do `lobby.js` refeito; `tools/assets/gym_banners.py` (13 salões); roteiro `ux` no `screenshot.mjs`; testes do card e do painel; o check-data confere um banner por salão |
 | 38 | refinar a loja de Pokédolls (o Lapras no meio atrapalhava, os 2 vasos da entrada bloqueavam); o Oak entrega o mapa junto com o inicial; "Voltar para a Vila" embaixo do mapa; o rosto do treinador acompanhando a fase atual no mapa; o nome do jogador no lugar de Red ou Leaf | 0.30: loja com um tapete livre e o Lapras no canto; `carvalho_inicial` com o Mapa da Jornada e o aviso no botão; `btn-village` embaixo do mapa (o Menu voltou para a barra); o ícone do mapa na fase escolhida; `screen-name`, `chooseName`, `cleanTrainerName` e `profile.trainerName` por jornada |
 | 37 | no lugar da tela do mapa, um lobby jogável: uma mini-vila com casas de NPC espalhadas, andar em tiles como no FireRed, o Centro com o balcão do PC (sem curar) e o do Mart, uma loja de Pokédolls, o quarto vazio decorável, o Oak dando o inicial com as saídas travadas até lá, o mato alto a oeste para um modo Endless, a lagoa com o easter egg do Dive, falas para todos (a do pescador é dele) | 0.29: `game/Hub.js`, `render/HubRenderer.js`, `ui/hubHud.js`, `data/hub.js`, `data/dialogue.js`, `data/decor.js` e `tools/assets/hub.py` (os mapas montados do FireRed, em duas camadas e com a colisão de origem); jornada começada = treinador escolhido; partida, Continuar e Centro voltam à vila; o Endless e o modo aquático ficam "em breve" (PLANEJAMENTO-LOBBY.md) |
 | 34 | Modo Livre no Campeão também | 0.27: depois do Hall da Fama, a tela de vitória de sempre, com o Modo Livre |

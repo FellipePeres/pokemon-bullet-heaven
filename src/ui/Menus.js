@@ -5,7 +5,7 @@ import { ACHIEVEMENTS, TOTAL_ACHIEVEMENT_TIERS } from '../data/achievements.js';
 import { roman } from '../save/profile.js';
 import { moveLineOf } from '../data/tms.js';
 import { getTrainerLook, TRAINER_NAME_MAX } from '../data/trainers.js';
-import { spriteUrl, artworkUrl, pokemonImg } from '../render/sprites.js';
+import { spriteUrl, pokemonImg } from '../render/sprites.js';
 import { assetUrl } from '../render/assets.js';
 import { saveOptions } from '../save/options.js';
 import { typeColor, typeName } from '../data/types.js';
@@ -21,6 +21,7 @@ import { BadgeCase } from './badgeCase.js';
 import { JourneyScreen } from './journeys.js';
 import { MART_ITEMS, evolvedBy } from '../data/items.js';
 import { DECOR, decorMax } from '../data/decor.js';
+import { choiceCard } from './pokemonCard.js';
 import { HUB_SPRITES, HUB_DECOR } from '../data/hubMaps.js';
 
 const SCREENS = ['screen-title', 'screen-journeys', 'screen-trainer', 'screen-name', 'screen-starter', 'screen-campaign', 'screen-hub'];
@@ -227,35 +228,10 @@ export class Menus {
 
   buildStarters() {
     const row = clear(el('starter-choices'));
+    // o card de escolha (0.31, ui/pokemonCard.js): o sprite do FireRed na base de
+    // batalha, as barras de vida, dano e alcance, e o golpe no pé
     for (const pokemon of this.game.region.starters.map(getPokemon)) {
-      const ability = getAbility(pokemon.abilities[0]);
-      const types = pokemon.types
-        .map((t) => `<span class="type-tag" style="background:${typeColor(t)}">${typeName(t)}</span>`)
-        .join('');
-
-      const card = create('div', 'starter-card');
-      card.style.borderColor = typeColor(pokemon.types[0]);
-      const img = create('img');
-      img.src = artworkUrl(pokemon.dex);
-      img.alt = pokemon.name;
-      img.onerror = () => { img.src = spriteUrl(pokemon.dex); };
-      card.appendChild(img);
-
-      const body = create('div');
-      body.innerHTML = `
-        <h3>${pokemon.name}</h3>
-        <div class="role">${pokemon.role}</div>
-        <div class="type-row" style="margin:8px 0">${types}</div>
-        <p>${pokemon.description}</p>
-        <div class="move-box">
-          <b>${ability.name}</b>
-          <span>${ability.description}</span>
-        </div>
-        <div class="stack-info" style="margin-top:8px;font-size:11px;color:#6b7cab">
-          ${pokemon.hp} de vida inicial
-        </div>
-      `;
-      card.appendChild(body);
+      const card = choiceCard(pokemon, { className: 'starter-card' });
       card.onclick = () => this.game.chooseStarter(pokemon.id);
       row.appendChild(card);
     }

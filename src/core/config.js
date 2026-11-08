@@ -3,7 +3,7 @@
  * Nada de número mágico espalhado pelo gameplay: se precisar ajustar, ajuste aqui.
  */
 export const CONFIG = {
-  version: '0.30.0',
+  version: '0.31.0',
 
   canvas: { width: 1280, height: 720 },
 
@@ -61,6 +61,12 @@ export const CONFIG = {
     lookEvery: [2, 5],     // quem olha em volta vira a cada 2 a 5 s
     view: { tilesWide: 20, tilesHigh: 12 }   // o mínimo que a tela mostra abaixo da barra (a escala fica inteira)
   },
+
+  /**
+   * Os cards de escolha (o inicial e a Poké Ball, 0.31; ui/pokemonCard.js): três
+   * barras de `blocks` blocos. Passar do máximo enche a barra; o número continua certo.
+   */
+  cards: { maxHp: 150, maxDps: 20, maxRange: 350, blocks: 10 },
 
   team: {
     maxSize: 6,

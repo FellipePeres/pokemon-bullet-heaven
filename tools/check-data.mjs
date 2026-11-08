@@ -221,6 +221,16 @@ badSegments.length ? fail(`trechos com cenário inexistente: ${badSegments.join(
   : crowded.length ? fail(`cenários com obstáculo demais (mais de 45% bloqueado): ${crowded.join(', ')}`)
   : ok(`${Object.keys(SCENES).length} cenários do FireRed (${usedScenes.size} usados nas fases), todas as metatiles extraídas`);
 
+// os banners dos salões (0.31): o painel da fase mostra o salão do último trecho com cenário
+{
+  const halls = [...new Set(Object.values(STAGES)
+    .map((stage) => [...(stage.segments ?? [])].reverse().find((seg) => seg.scene)?.scene).filter(Boolean))];
+  const noBanner = halls.filter((scene) => !existsSync(join(root, 'assets', 'ui', 'gym-banners', `${scene}.png`)));
+  noBanner.length
+    ? fail(`salões sem banner no painel da fase: ${noBanner.join(', ')} — rode tools/assets/gym_banners.py`)
+    : ok(`${halls.length} salões com banner no painel da fase`);
+}
+
 // a vila (0.29): mapas gerados, portas, saídas, pessoas, objetos e falas
 {
   const issues = [];
