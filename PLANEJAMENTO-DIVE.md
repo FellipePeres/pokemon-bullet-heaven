@@ -92,7 +92,7 @@ VILA ─ lagoa, com Dive na equipe ─► "Quer usar Dive?" ─ SIM
         │   perdeu as 3 bolhas ─► CENTRO POKÉMON (a enfermeira e o pescador)
         └─► passou o 6 ─► entrada submersa da Caverna Marinha ─► "Quer emergir?"
               └─► O SALÃO DO KYOGRE (andar em tiles) ─► falar com o Kyogre
-                    └─► A LUTA (Bullet Heaven, 90+), com 2 Dive Balls
+                    └─► A LUTA (Bullet Heaven, 90+), com 3 Dive Balls
                           ├─ derrotou o Kyogre ─► superfície, pela lagoa
                           ├─ capturou ─► maré final de 30 s
                           │     ├─ sobreviveu ─► lagoa ─► A CENA (na frente da lagoa)
@@ -361,7 +361,7 @@ opção de jogar ou voltar para a vila"). **Aprovado** ("achei bom demais pelo a
    (`kyogre_pt2.pal`, 68 quadros).
 6. **O card da fase**, o mesmo painel do mapa da jornada: o salão no banner, o
    Kyogre, Água e as fraquezas (Elétrico, Planta), "FASE SECRETA · Caverna
-   Marinha", as 2 Dive Balls de 10%, a chuva e a maré final, o nível recomendado
+   Marinha", as 3 Dive Balls de 10%, a chuva e a maré final, o nível recomendado
    90, **Jogar** e **Voltar para a Vila**. A pergunta "Acordar o Kyogre?" sai: o card
    faz esse papel. Padrão: voltando, a próxima chance exige descer os 6 níveis de novo.
 
@@ -386,7 +386,14 @@ jogo". O encontro e o card (seção 8) foram aprovados: "achei bom demais pelo
 artifact, vamos fazer isso mesmo". O que segue é a proposta; **(padrão)** marca o
 que o Fellipe ainda não decidiu.
 
-Já decidido antes: chuva o tempo todo, 2 Dive Balls de 10% por tentativa, a maré
+**A maquete "A Luta do Kyogre"** (https://claude.ai/artifact/XQXbpMG67jd1E5hd4Kqq1x)
+jogou o plano. O Fellipe (2026-11-09): "essa cura dele pós saída da Poké Ball eu
+achei muito alta, acho legal subir a vida dele um pouco, mas bem pouco, e vamos dar
+3 chances, 3 Dive Balls... e eu gostei do cenário, podemos construir assim mesmo".
+Ficou: **3 Dive Balls**, a volta a **25%** depois da fuga (eram 40%) e o cenário
+da maquete (o salão com o lago no meio e as 4 poças, com a chuva).
+
+Já decidido antes: chuva o tempo todo, as Dive Balls de 10% por tentativa, a maré
 final de 30 s depois da captura, perder depois de capturar fica com o Kyogre, nível
 recomendado 90.
 
@@ -456,13 +463,13 @@ como no jogo original. As fraquezas no card (Elétrico e Planta) são a dica.
 4. **Os 10%:** a bola balança até 3 vezes. Na falha, ela abre depois de 1, 2 ou 3
    balanços, como no jogo original: quanto mais balança, mais o coração aperta.
 5. **Falhou:** ele escapa com um grito e uma onda de choque que empurra a horda e
-   o treinador. Recupera **até 40%** e a luta continua. No vermelho de novo, vem a
-   segunda Dive Ball.
-6. **Não pegou a bola nos 8 s:** ele se recupera até 40% do mesmo jeito, mas
+   o treinador. Recupera **só um pouco, até 25%** (decisão do Fellipe; eram 40%), e
+   a luta continua. No vermelho de novo, vem a próxima Dive Ball: **são 3 por luta**.
+6. **Não pegou a bola nos 8 s:** ele se recupera até 25% do mesmo jeito, mas
    **a bola não conta como gasta** (padrão): volta na próxima exaustão.
 7. **Sem Dive Balls:** o piso de vida sai, e o Kyogre pode ser derrotado.
 
-Com 10% em cada bola, capturar numa luta é ~19%. Errar não perde a luta: dá para
+Com 10% em cada uma das 3 bolas, capturar numa luta é ~27%. Errar não perde a luta: dá para
 vencer, ganhar a recompensa e tentar a captura numa próxima descida.
 
 ### O fim da luta
@@ -664,7 +671,7 @@ Cada etapa é entregável sozinha, com `npm test` e screenshots.
 4. **D-4 — A luta:**
    - a fase do Kyogre em `data/stages.js` e o chefe em `data/enemies.js`;
    - os ataques (de preferência com os comportamentos que já existem);
-   - a chuva, as 2 Dive Balls e a maré final de 30 s;
+   - a chuva, as 3 Dive Balls e a maré final de 30 s;
    - a volta pela lagoa.
 5. **D-5 — O Kyogre na equipe:** a espécie especial, o kit e o `check-data`; a captura
    chama `registerSecret('kyogre')` (o "???" da Pokédex já existe desde a 0.35).

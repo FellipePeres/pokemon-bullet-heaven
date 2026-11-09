@@ -1049,6 +1049,7 @@ o Brock como está, todas as outras mais duras, menos níveis.
 | Fase 5 (Koga) | 1 → 0,85 | 2,3 | 2,7 | 46 | 58 → 49 |
 | Fase 6 (Sabrina) | 1 → 0,82 | 4,5 | 4,1–5,1 ² | 50 | 66 → 53 |
 | Fase 7 (Blaine) | 1 → 0,82 | 2,4 | 3,2 | 55 | 74 → 58 |
+| 56 | o encontro do Kyogre no estilo Sapphire, depois um card de fase com Jogar ou Voltar para a Vila; planejar a luta e a captura e ver numa maquete; a cura depois da fuga alta demais, 3 Dive Balls, o cenário aprovado | as maquetes "O Salão do Kyogre" (aprovada) e "A Luta do Kyogre"; 3 Dive Balls de 10% (~27% por luta), a fuga volta a 25% (eram 40%); o cenário da maquete; PLANEJAMENTO-DIVE seções 8 e 9 |
 | Fase 8 (Giovanni) | 1 → 0,8 | 4,0 | 4,5 | 60 | 84 → 62 |
 | Lorelei | 1,05 → 0,8 | 3,5 | 3,1–4,7 | 64 | 92 → 66 |
 | Bruno | 1,12 → 0,97 | 3,7 | 3,5–6,3 ² | 66 | 99 → 68 |
@@ -1371,7 +1372,7 @@ Nenhum pedido do Fellipe em aberto. O que está planejado:
   6 tabuleiros são áreas 10×6 inteiramente navegáveis das Rotas 126 e 127
   submersas. São 6 níveis com 3 bolhas de vida (o bolsão de ar no Nível 3) e o
   resgate no Centro ao perder. Depois do 6, a caverna do Kyogre e uma luta de
-  Bullet Heaven para nível 90+, com 2 Dive Balls (10% cada) e uma maré final de
+  Bullet Heaven para nível 90+, com 3 Dive Balls (10% cada; eram 2) e uma maré final de
   30 s depois da captura. A captura dispara uma cena de história (o Maxie,
   indignado, solta o Crobat e parte "a caminho do vulcão"), e o salão vira uma fase Endless
   aquática sem XP, que rende Shards por chefe e elite. Na descida não se corre. O decomp do Emerald está em `D:\fellipe\Dev\pokeemerald`
