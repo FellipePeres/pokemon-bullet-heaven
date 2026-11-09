@@ -918,12 +918,13 @@ MUSIC = {
     'mus_hall_of_fame': 'o Hall da Fama',
     'mus_poke_center': 'o Centro Pokémon, depois de uma derrota',
     'mus_vs_legend': 'a luta contra o Kyogre, no salão da Caverna Marinha (0.37)',
-    'mus_pallet': 'a vila e o mapa da jornada (0.37.6): o tema de Pallet, calmo',
+    'mus_sevii_123': 'a vila e o mapa da jornada (0.37.7): o tema das Ilhas 1, 2 e 3, calmo',
 }
 #: As músicas do Emerald (0.37.6): a partitura e os instrumentos do decomp pret/pokeemerald
 #: (o clone parcial em ../pokeemerald, com a pasta sound). O motor é o mesmo m4a.
 EMERALD_MUSIC = {
-    'mus_underwater': 'a descida do Dive (0.37.6): a música do mergulho do Emerald',
+    'mus_underwater': 'a descida do Dive, Níveis 1 a 3 (0.37.6): a música do mergulho do Emerald',
+    'mus_abnormal_weather': 'a descida do Dive, Níveis 4 e 5 (0.37.7): a de quando o Kyogre desperta',
 }
 #: As vinhetas: tocam uma vez, sem loop (não entram em musicTracks.js).
 JINGLES = {

@@ -105,8 +105,9 @@ python tools/assets/dive.py      # procura ../pokeemerald e ../Pokemon All
 | `pokemon/<dex>.png` de Hoenn e o Kyogre (318-321, 340, 342, 350, 365, 367-369, 382; e `pokemon/shiny/382.png`) | os GIFs da Gen 5 do Pokemon All (`assets/pokemon/battle`), no mesmo corte do extract.py |
 | `pokemon/gen3/front/382.png`, `items/dive-ball.png`, `sound/cries/382.ogg` | do Pokemon All: o Kyogre da Gen 3, a Dive Ball (PokeAPI) e o grito do Kyogre |
 
-A música da vila e do mapa da jornada, `music/mus_pallet.ogg` (0.37.6), é o tema de Pallet do FireRed; a da
-descida do Dive, `music/mus_underwater.ogg`, é a "Underwater" do Emerald, pelo mesmo `render_music.py`
+A música da vila e do mapa da jornada, `music/mus_sevii_123.ogg` (0.37.7), é o tema das Ilhas 1, 2 e 3 do
+FireRed; as da descida do Dive, `music/mus_underwater.ogg` (Níveis 1 a 3) e `music/mus_abnormal_weather.ogg`
+(Níveis 4 e 5), são a "Underwater" e a "Abnormal Weather" do Emerald, pelo mesmo `render_music.py`
 com os instrumentos e a partitura do decomp pret/pokeemerald (`EMERALD_MUSIC`, o clone em `../pokeemerald`).
 
 A música da luta do Kyogre, `music/mus_vs_legend.ogg` (0.37), é a "Vs. Lendário" do FireRed, pelo

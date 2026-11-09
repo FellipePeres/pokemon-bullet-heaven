@@ -56,8 +56,8 @@ import { maxHpFor } from '../systems/stats.js';
 const HUB_RESCUE_SPOT = { map: 'centro', x: 4, y: 5, dir: 'up' };
 /** A volta à superfície (o salão do Kyogre): na frente da lagoa da vila. */
 const LAKE_SPOT = SCENE_SPOTS.lagoa;
-/** A música calma da vila e do mapa da jornada (0.37.6): o tema de Pallet, do FireRed. */
-const VILLAGE_MUSIC = 'mus_pallet';
+/** A música calma da vila e do mapa da jornada (0.37.7, escolha do Fellipe): as Ilhas 1, 2 e 3, do FireRed. */
+const VILLAGE_MUSIC = 'mus_sevii_123';
 const MAX_CATCH_UP = 60;
 
 export class Game {
@@ -236,21 +236,22 @@ export class Game {
   }
 
   /**
-   * A música que deveria tocar agora: o tema do lobby só nos menus; o de Pallet na vila
-   * e no mapa da jornada (ou a do lugar: o Centro Pokémon tem a dele); a do mergulho na
-   * descida e a das cavernas no salão do Kyogre; a da fase na partida, a do líder
+   * A música que deveria tocar agora: o tema do lobby só nos menus; o das Ilhas 1, 2 e 3
+   * na vila e no mapa da jornada (ou a do lugar: o Centro Pokémon tem a dele); na descida,
+   * a do mergulho até o Nível 3 e a Abnormal Weather no 4 e no 5; a das cavernas no salão do Kyogre; a da fase na partida, a do líder
    * quando ele entra, a da vitória no resultado, a do Hall da Fama e a do Centro
    * Pokémon depois de uma derrota. A pausa só abaixa o volume.
    */
   _updateMusic() {
     const run = this.run;
     // 0.37.6 (o Fellipe): o tema do lobby só no menu; a vila e o mapa da jornada com uma
-    // música calma (Pallet); a descida com a do mergulho do Emerald
+    // música calma (as Ilhas 1, 2 e 3); a descida com as do Emerald
     const screen = typeof document !== 'undefined' ? document.getElementById('app')?.dataset.screen : null;
     let track = 'lobby-theme';
     if (this.hubOpen) track = this.hub.place?.music ?? VILLAGE_MUSIC;
     else if (screen === 'screen-campaign' || screen === 'screen-starter') track = VILLAGE_MUSIC;
-    if (this.diveOpen) track = this.hall.active ? 'mus_sevii_dungeon' : 'mus_underwater';   // o salão do Kyogre (0.37) e a descida
+    // a descida: a Underwater nos Níveis 1 a 3 e, depois do bolsão de ar, a Abnormal Weather (0.37.7); o salão do Kyogre
+    if (this.diveOpen) track = this.hall.active ? 'mus_sevii_dungeon' : this.dive.level >= DIVE.airPocketLevel ? 'mus_abnormal_weather' : 'mus_underwater';
     if (this.hallOpen) track = 'mus_hall_of_fame';
     else if (this.centerOpen) track = 'mus_poke_center';
     else if (run?.state === 'victory') track = 'mus_victory_gym_leader';
