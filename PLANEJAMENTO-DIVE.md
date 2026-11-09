@@ -342,6 +342,29 @@ para emergir." e "Quer emergir?".
 
 ## 8. A caverna do Kyogre
 
+**O encontro e o card** (pedido do Fellipe, 2026-11-09: "ao passar do nível 6 eu
+gostaria de uma animação, estilo encontro do Kyogre no Sapphire, e após o encontro
+abre um card mostrando que é uma fase, assim como os cards do mapa da jornada, com
+opção de jogar ou voltar para a vila"). A maquete "O Salão do Kyogre"
+(https://claude.ai/artifact/SHbVCDRVhieNLQUaAJiACn) mostra a proposta:
+1. **Emergir** no alto do `MarineCave_End` (o warp do Emerald, em 20,4), com a névoa
+   horizontal do mapa original. O jogador anda pelo salão só pelos tiles de colisão 0.
+2. **A margem do lago:** ao pisar nela, ele vai até a frente do Kyogre (9,26), olha
+   para cima, e "Um Pokémon gigante dorme no fundo do salão...".
+3. **O despertar, no estilo do Sapphire:** o chão treme, a tela pisca em branco
+   três vezes e o Kyogre se acende a cada piscada.
+4. **A aproximação e o grito, do Emerald** (`MarineCave_End_EventScript_Kyogre`):
+   o Kyogre anda três tiles balançando (o affine `GoSouthStart`/`GoSouth`), o grito
+   de encontro e a pausa de 40 quadros.
+5. **A transição de batalha do Kyogre** (`B_TRANSITION_KYOGRE`): as marcas vermelhas
+   pulsando sobre o preto (`kyogre_pt1.pal`, 58 quadros) e tomando a tela
+   (`kyogre_pt2.pal`, 68 quadros).
+6. **O card da fase**, o mesmo painel do mapa da jornada: o salão no banner, o
+   Kyogre, Água e as fraquezas (Elétrico, Planta), "FASE SECRETA · Caverna
+   Marinha", as 2 Dive Balls de 10%, a chuva e a maré final, o nível recomendado
+   90, **Jogar** e **Voltar para a Vila**. A pergunta "Acordar o Kyogre?" sai: o card
+   faz esse papel. Padrão: voltando, a próxima chance exige descer os 6 níveis de novo.
+
 **O salão.** É o `MarineCave_End` do Emerald (27×30, tileset Cave), onde o Kyogre
 fica no jogo original. O jogador anda em tiles, como na vila, só pelos tiles
 navegáveis do mapa, até o Kyogre, que dorme no fundo.
