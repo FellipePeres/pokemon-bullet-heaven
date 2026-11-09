@@ -77,6 +77,8 @@
 - "Essa parte de novas hordas saírem só quando o jogador está salvo deixa muito
   fácil. O que precisa é só de **um espaço para ele ir**; deixar dinâmico, **hordas
   sobre hordas**, é muito bom, principalmente para os últimos níveis."
+- (Com hordas sobre hordas) "Tá muito difícil agora, kkkkk. Tenta **equilibrar** de
+  algum jeito."
 
 ---
 
@@ -180,7 +182,7 @@ tempo entre o aviso e a horda entrar é o que **encurta a cada nível**.
 | 2 | 1,0 s | 10 | colunas; duas linhas ao mesmo tempo | 15 | **Kanto:** Shellder, Staryu, Tentacool, Krabby |
 | 3 | 0,85 s | 11 | paredão: quatro linhas de uma vez, sobram duas | 18 | **Kanto:** Seel, Seadra, Kingler, Tentacruel, Seaking |
 | 4 | 0,65 s | 12 | linha e coluna cruzadas | 22 | **misturado:** Cloyster, Starmie, Carvanha, Wailmer, Corphish, Clamperl |
-| 5 | 0,5 s | 13 | em sequência na mesma linha; paredão de cinco, sobra uma | 26 | **Hoenn:** Sharpedo, Crawdaunt, Huntail, Gorebyss, Relicanth, Whiscash |
+| 5 | 0,55 s | 13 | em sequência na mesma linha; paredão de cinco, sobra uma (mais raro) | 26 | **Hoenn:** Sharpedo, Crawdaunt, Huntail, Gorebyss, Relicanth, Whiscash |
 | 6 | 0,35 s | 15 | até três ao mesmo tempo; três colunas juntas | 32 | **Hoenn:** Wailord, Walrein, Sharpedo, Milotic, Relicanth |
 
 A velocidade é em tiles por segundo. Na maquete, o Nível 1 dura ~40 s e os outros
@@ -192,8 +194,8 @@ Fellipe). A horda nova não espera o jogador ficar a salvo: ela sai assim que o
 tempo do nível manda, por cima das que ainda estão passando. O sorteio só a
 aceita se o jogador tiver para onde ir:
 
-1. **Do tile dele existe saída andando**, depois de 0,2 s de reação (mais 0,05 s de
-   folga para os quadros de 17 ms): ou ficar parado, ou um caminho até um tile que
+1. **Do tile dele existe saída andando**, depois de 0,25 s de reação (mais 0,05 s
+   de folga para os quadros de 17 ms): ou ficar parado, ou um caminho até um tile que
    fica livre até a horda passar. Os tiles do caminho também não podem ser pegos
    enquanto ele passa. No exemplo do Fellipe: se a fileira 2 é a única livre e a
    próxima horda cobre a 2, ela só sai se a 1 ou a 3 (ou outro tile alcançável)
@@ -211,12 +213,12 @@ com a primeira, e a fileira fica marcada até as duas passarem.
 **A prova** (o endereço `#prova` da maquete) é um jogador perfeito que só enxerga
 o que está na tela: a horda existe para ele a partir do aviso, mais o tempo de
 reação. Ele anda, sem correr, com bolhas infinitas, 50 partidas por nível. Com
-reação de 0,2 s, tomou **zero acertos em 12.300 hordas** (duas rodadas). A prova
+reação de 0,25 s, tomou **zero acertos em 12.300 hordas** (duas rodadas). A prova
 também mede quantas hordas ficam ativas ao mesmo tempo:
 
 | Nível | 1 | 2 | 3 | 4 | 5 | 6 |
 |---|---|---|---|---|---|---|
-| Hordas ativas, em média | 0,9 | 2,7 | 4,4 | 4,2 | 5,7 | 5,7 |
+| Hordas ativas, em média | 0,9 | 2,7 | 4,4 | 4,2 | 5,5 | 5,7 |
 | Duração do nível | 40 s | 21 s | 22 s | 23 s | 22 s | 22 s |
 
 **Como se chegou a isso.** Antes das duas regras, o jogador perfeito com 0,2 s de
@@ -256,29 +258,44 @@ quadro. O Fellipe sentiu ("estava muito rápido"). As medições daquele interva
 estavam erradas; as de baixo foram refeitas com o passo do FireRed andando (16
 quadros por tile, 3,75 tiles por segundo).
 
-| Perfil | Versão original | Versão de agora | Agora: passam N1-N6 |
-|---|---|---|---|
-| reação de 0,25 s | 100% (~1,0 tentativa) | 100% (~1,0) | 100, 100, 100, 100, 100, 100% |
-| reação de 0,35 s | 93% (~1,1) | **17%** (~6) | 100, 100, 100, 98, 93, 18% |
-| reação de 0,5 s | 8% (~12) | 0% | 100, 100, 100, 93, 5, 0% |
-| 0,35 s, errando 5% dos passos | 68% (~1,5) | 7% (~15) | 100, 98, 100, 83, 57, 14% |
-| 0,5 s, errando 10% dos passos | 0% | 0% | 100, 100, 88, 43, 4, 0% |
+**O equilíbrio** (o Fellipe achou a versão com hordas sobre hordas difícil
+demais). O botão mais justo é o tempo de reação para o qual o sorteio **garante**
+saída: com mais folga, os padrões ficam menos apertados sem diminuir as hordas.
+Para medir isso entrou um perfil **típico**, mais parecido com uma pessoa: a
+reação muda a cada horda (sorteada entre 0,25 e 0,45 s) e ele erra 3% dos passos.
 
-A "versão de agora" tem as regras de nunca ser impossível e de hordas sobre
-hordas.
+| Saída garantida para | Típico | Reação de 0,35 s | 0,35 s, errando 5% | Reação de 0,5 s |
+|---|---|---|---|---|
+| 0,2 s | 2% (~60 tentativas) | 8% | 5% | 0% |
+| 0,24 s | 5% (~20) | 32% | 5% | 0% |
+| **0,25 s (a escolhida)** | **23% (~4)** | 90% | 50% | 0% |
+| 0,27 s | 15% (~7) | 97% | 60% | 2% |
+
+Cada célula é a parte das 60 descidas (sempre do Nível 1, sem correr, com o
+bolsão no 3) que chegou até o fim; a margem de erro é de uns 10 pontos. Na
+escolhida, o Nível 5 também ficou um pouco mais leve (aviso de 0,55 s, o paredão
+de cinco mais raro), para os mais lentos chegarem ao 6.
+
+**A escolhida, nível a nível** (quantos passam de cada nível, entre os que chegaram):
+
+| Perfil | N1 | N2 | N3 | N4 | N5 | N6 |
+|---|---|---|---|---|---|---|
+| típico | 100% | 100% | 100% | 98% | 71% | 33% |
+| reação de 0,35 s | 100% | 100% | 100% | 97% | 98% | 95% |
+| reação de 0,5 s | 100% | 100% | 100% | 88% | 30% | 0% |
 
 **O que dá para ler:**
-- **O Nível 6 é muito difícil**, como o Fellipe pediu: quem reage em 0,35 s passa
-  dele 18% das vezes, e quem reage em 0,5 s já para no 5.
-- **Os níveis 1 a 4 seguram pouco**; o 5 começa a cobrar e o 6 é o paredão final.
-- **Quem reage em 0,25 s passa tudo**: com as hordas sobrepostas, o tempo de
-  reação virou a habilidade que decide.
-- **O sorteio continua justo:** o jogador perfeito com 0,2 s de reação nunca é
+- **O jogador típico precisa de umas 4 tentativas** para descer tudo. O Nível 6
+  continua o paredão: ele passa dele 1 em cada 3 vezes.
+- **Os níveis 1 a 4 aquecem; o 5 começa a cobrar e o 6 decide.**
+- **Quem reage em 0,5 s não passa do 6**: é o "pouco tempo de reação" que o Fellipe
+  pediu para o último nível.
+- **O sorteio continua justo:** o jogador perfeito com 0,25 s de reação nunca é
   pego (a prova acima).
 - O jogador automático planeja melhor que uma pessoa: os números servem para
-  comparar níveis e mudanças, e o feel de verdade vem de o Fellipe jogar. Se o
-  Nível 6 ficar difícil demais, os botões são o aviso dele (hoje 0,35 s), o
-  intervalo entre as hordas ou a corrida (decisão do Fellipe).
+  comparar níveis e mudanças, e o feel de verdade vem de o Fellipe jogar. Os
+  botões, se precisar: o tempo de reação garantido (hoje 0,25 s), o aviso de cada
+  nível, o intervalo entre as hordas ou a corrida (decisão do Fellipe).
 
 **Os desenhos.** Cada Pokémon da horda é o **ícone de caixa da 3ª geração** (32×32,
 dois quadros), virado para o lado em que a horda anda. Os de Kanto já estão em
