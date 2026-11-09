@@ -67,7 +67,7 @@ vencer, a duração da luta, desmaios, pico de inimigos, Poké Balls e quantos d
 equipe têm o Golpe Desperto ao vencer (coluna "despertos", 0.33).
 
 **Conferência visual (desde a 0.5).** `tools/screenshot.mjs` abre o jogo no Chrome
-(ou Edge) sem janela, executa um dos 42 roteiros (os mais usados: `vitrine`,
+(ou Edge) sem janela, executa um dos 44 roteiros (os mais usados: `vitrine`,
 `treinador`, `vila`, `jornada`, `partida`, `ux`, `efetivo`; um nome desconhecido lista
 todos), salva PNGs e lista os erros de JavaScript da página. Sai com código 1
 se a página tiver erro. A `vitrine.html` desenha os assets com o mesmo código da

@@ -27,6 +27,16 @@ const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 /** Começa a jornada até a fase, pulando as telas de escolha. */
 const START_RUN = "game.newGame(); game.chooseTrainer('red'); game.chooseStarter('bulbasaur'); game.startStage('gym_1_pewter')";
 
+/**
+ * Os clipes (0.37.5): o laço do navegador fica parado e o jogo anda `ms` milissegundos
+ * por quadro, uma foto a cada passo. O clipe sai liso, no tempo do jogo.
+ */
+const HOLD_CLOCK = "window.__frame = game._frame.bind(game); game._frame = () => {}; window.__t = performance.now(); game.lastTime = window.__t";
+const clip = (name, n, ms = 70) => Array.from({ length: n }, (_, i) => [
+  { run: `window.__t += ${ms}; window.__frame(window.__t)` }, { shot: `${name}-${String(i).padStart(3, '0')}`, raw: true }
+]).flat();
+const FIGHT = "{ const f = game.run.fight; f.boss.hp = f.boss.maxHp; f.attackTimer = 99; f.summonTimer = 99; f.diveTimer = 99; f.ultimates = []; }";
+
 const ROTEIROS = {
   vitrine: [
     { open: 'vitrine.html' }, { wait: 1500 }, { shot: 'vitrine' }
@@ -429,6 +439,28 @@ const ROTEIROS = {
     { wait: 400 }, { shot: 'kfx-9-bola-caindo', raw: true }, { wait: 1000 }, { shot: 'kfx-10-bola', raw: true },
     { run: "{ const r = game.run; r.fight.t = 0; r.fight.rng = () => 0.01; r.player.x = r.fight.ball.x; r.player.y = r.fight.ball.y; }" },
     { wait: 2300 }, { shot: 'kfx-11-faixa', raw: true }, { wait: 3300 }, { shot: 'kfx-12-gotcha', raw: true }
+  ],
+  // os clipes dos ataques do Kyogre e da captura (0.37.5), para o artifact
+  kyogreclip: [
+    { open: 'index.html' }, { wait: 500 },
+    { run: "game.newGame(); game.chooseTrainer('red'); game.chooseStarter('squirtle');" +
+           "game.campaign.journey = { team: { members: [{ uid: 'a', pokemonId: 'blastoise', level: 90, xp: 0, hp: 0, abilities: ['hydro_pump', 'dive'], upgrades: {} }," +
+           "{ uid: 'b', pokemonId: 'zapdos', level: 90, xp: 0, hp: 0, abilities: ['zap_cannon'], upgrades: {} }], active: ['a', 'b'] }, pc: [] };" +
+           "document.getElementById('toast-container').style.display = 'none'; game.startStage('kyogre'); game.run.time = 44.6;" +
+           "import('./src/systems/combat.js').then((m) => { window.__dmg = m.damageEnemy; })" },
+    { wait: 2500 }, { run: "game.closeLeaderIntro()" }, { wait: 2800 },
+    { run: "{ const r = game.run; r.damageCompanion = () => {}; r.spawner.update = () => {}; r.enemies.forEach((e) => { if (!e.boss) e.dead = true; });" +
+           " r.player.y = r.fight.lake.y + 250; r.player.x = r.fight.lake.x; }" },
+    { wait: 600 }, { run: FIGHT }, { run: HOLD_CLOCK },
+    { run: "{ const f = game.run.fight; f._set('charge'); }" }, ...clip('clip-pulso', 34, 70),
+    { run: FIGHT }, { run: "{ const f = game.run.fight; f.rng = () => 0.4; f._attack(f.boss, 0.8); f.rng = Math.random; f.attackTimer = 99; }" }, ...clip('clip-colunas', 38, 70),
+    { run: FIGHT }, { run: "{ const f = game.run.fight; f.rng = () => 0.7; f._attack(f.boss, 0.4); f.rng = Math.random; f.attackTimer = 99; }" }, ...clip('clip-raios', 34, 70),
+    { run: FIGHT }, { run: "{ const f = game.run.fight; f._tsunami(f.boss); f.attackTimer = 99; }" }, ...clip('clip-maremoto', 66, 80),
+    { run: FIGHT }, { run: "{ const f = game.run.fight; f.spot = f._randomSpot(240, 320); f._set('dive'); }" }, ...clip('clip-mergulho', 40, 70),
+    { run: FIGHT }, { run: "{ const r = game.run, f = r.fight; window.__dmg(r, f.boss, 1e9); f.ball.x = r.player.x + 230; f.ball.y = r.player.y - 40; }" }, ...clip('clip-bola', 30, 70),
+    { run: "{ const r = game.run, f = r.fight; f.t = 0; f.rng = () => 0.99; r.player.x = f.ball.x; r.player.y = f.ball.y; }" }, ...clip('clip-escapou', 86, 80),
+    { run: "{ const r = game.run, f = r.fight; f.attackTimer = 99; window.__dmg(r, f.boss, 1e9); f.ball.t = f.ball.fall + 0.5; f.ball.landed = true; f.t = 0; f.rng = () => 0.01; r.player.x = f.ball.x; r.player.y = f.ball.y; }" },
+    ...clip('clip-gotcha', 92, 80)
   ],
   // o lendário secreto no fim da Pokédex (0.35): o "???" e, capturado, o Kyogre
   pokedex: [
