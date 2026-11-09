@@ -5,7 +5,7 @@
 > decisão foi tomada e o que falta fazer. O `README.md` é o manual de uso;
 > este aqui é o contexto de desenvolvimento.
 
-**Versão atual:** `0.37.0` · **Última atualização:** 2026-11-09
+**Versão atual:** `0.37.1` · **Última atualização:** 2026-11-09
 **Stack:** HTML + CSS + JavaScript puro (ES Modules). Sem backend, sem build, sem dependências.
 **Repositório:** https://github.com/FellipePeres/pokemon-bullet-heaven (público)
 **Jogo no ar:** https://fellipeperes.github.io/pokemon-bullet-heaven/
@@ -1115,6 +1115,7 @@ o Brock como está, todas as outras mais duras, menos níveis.
 | Fase 7 (Blaine) | 1 → 0,82 | 2,4 | 3,2 | 55 | 74 → 58 |
 | 56 | o encontro do Kyogre no estilo Sapphire, depois um card de fase com Jogar ou Voltar para a Vila; planejar a luta e a captura e ver numa maquete; a cura depois da fuga alta demais, 3 Dive Balls, o cenário aprovado | as maquetes "O Salão do Kyogre" (aprovada) e "A Luta do Kyogre"; 3 Dive Balls de 10% (~27% por luta), a fuga volta a 25% (eram 40%); o cenário da maquete; PLANEJAMENTO-DIVE seções 8 e 9 |
 | 57 | "pode fazer tudo como planejamos desde o início, e vamos ver como ficaria" | 0.37: o modo aquático completo: o salão com o encontro (Sapphire e Emerald) e o card, a luta do Kyogre (a arena aprovada, a chuva, os ataques, o mergulho, as 3 Dive Balls, a volta a 25%, a maré final), o Kyogre na equipe (Origin Pulse e Water Spout, o "???" revelado), a cena do Maxie (lagoa ou Centro) e o Endless aquático sem XP; a força da fase medida com `tools/kyogre.mjs` (nível 80 vence 1 em 3, nível 90 2 em 3) |
+| 58 | ao usar Dive na lagoa, uma transição escurecendo; a descida em tela cheia, como a vila (não um recorte quadrado); o bolsão ao passar o Nível 3, indo para o 4; "achei muito difícil, facilite bem pouco" | 0.37.1: a vila escurece e a descida clareia; a descida e o salão em tela cheia (o mapa do Emerald continua em volta do tabuleiro, mais escuro, e a barra das bolhas por cima); o bolsão na chegada ao Nível 4; a garantia de saída para 0,28 s, um pouco mais de intervalo nos níveis 5 e 6 e o 6 um pouco mais lento (14 tiles/s, 30 hordas). Medido com o novo `tools/descida.mjs`: o jogador típico descia tudo em ~10% (~10 tentativas) e agora em ~26% (~4), como a maquete aprovada; quem reage em 0,5 s ainda para no 6 |
 | Fase 8 (Giovanni) | 1 → 0,8 | 4,0 | 4,5 | 60 | 84 → 62 |
 | Lorelei | 1,05 → 0,8 | 3,5 | 3,1–4,7 | 64 | 92 → 66 |
 | Bruno | 1,12 → 0,97 | 3,7 | 3,5–6,3 ² | 66 | 99 → 68 |
@@ -1435,7 +1436,7 @@ Nenhum pedido do Fellipe em aberto. O que está planejado:
   hordas que ocupam linhas inteiras. **Regra do Fellipe: só os tiles navegáveis do
   Emerald** (colisão 0 e elevação 3 no `map.bin`), na partida e nas animações; os
   6 tabuleiros são áreas 10×6 inteiramente navegáveis das Rotas 126 e 127
-  submersas. São 6 níveis com 3 bolhas de vida (o bolsão de ar no Nível 3) e o
+  submersas. São 6 níveis com 3 bolhas de vida (o bolsão de ar ao passar o Nível 3) e o
   resgate no Centro ao perder. Depois do 6, a caverna do Kyogre e uma luta de
   Bullet Heaven para nível 90+, com 3 Dive Balls (10% cada; eram 2) e uma maré final de
   30 s depois da captura. A captura dispara uma cena de história (o Maxie,

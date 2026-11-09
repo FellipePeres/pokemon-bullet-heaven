@@ -985,8 +985,10 @@ export class Game {
   /** O tabuleiro na maior escala inteira que cabe, com a barra em cima e a caixa de texto embaixo. */
   _resizeDive() {
     if (typeof window === 'undefined') return;
-    this.diveRenderer.resize(window.innerWidth - 32, window.innerHeight - 120);
-    this.hallRenderer.resize(window.innerWidth - 32, window.innerHeight - 90);   // o salão do Kyogre (0.37)
+    // em tela cheia, como a vila (0.37.1); o tabuleiro fica abaixo da barra das bolhas
+    const bar = document.getElementById('dive-bar');
+    this.diveRenderer.resize(window.innerWidth, window.innerHeight, bar?.getBoundingClientRect?.().bottom ?? 0);
+    this.hallRenderer.resize(window.innerWidth, window.innerHeight);   // o salão do Kyogre (0.37)
   }
 
   /** A direção segurada: na diagonal, a do passo de agora continua (como na vila). */

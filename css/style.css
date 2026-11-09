@@ -2811,3 +2811,16 @@ button { font: inherit; color: inherit; }
 .hall-back { width: 100%; justify-content: center; }
 .hall-back .btn-text { text-align: center; }
 .hall-note { margin: 0; font-size: 13px; color: var(--gba-ink-soft); text-align: center; }
+
+/* 0.37.1: a descida e o salão em tela cheia, como a vila (pedido do Fellipe); a barra das bolhas por cima */
+.screen.dive { display: block; padding: 0; }
+.dive-console { position: absolute; inset: 0; border: 0; box-shadow: none; background: #0a0620; }
+.dive-console .dive-screen { position: absolute; inset: 0; }
+.dive-console .dive-canvas, .hall-stage .dive-canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+.dive-bar {
+  position: absolute; z-index: 2; top: 12px; left: 50%; transform: translateX(-50%);
+  width: min(760px, calc(100% - 28px)); border: 3px solid #3a3580; border-radius: 4px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, .5);
+}
+.hall-stage { position: absolute; inset: 0; border: 0; box-shadow: none; }
+.screen.dive .hub-hint { z-index: 2; }

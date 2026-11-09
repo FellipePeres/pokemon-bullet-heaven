@@ -711,6 +711,8 @@ check('depois da escolha, o Continuar segue para a jornada (na vila); sem nome, 
   for (let i = 0; i < 10 && !hub._onAsk(); i++) hub.confirm();
   check('com Dive na equipe, a lagoa pergunta "Quer usar Dive?"', hub._onAsk() && dialogText().includes('Dive'));
   hub.confirm();
+  check('o SIM escurece a vila antes da descida', !!hub.fade && !game.diveOpen);
+  for (let i = 0; i < 120 && !game.diveOpen; i++) hub.update(1 / 60);
   const diveVisible = () => !registry.get('screen-dive').classes.has('hidden');
   check('o SIM abre a descida, no Nível 1', diveVisible() && game.diveOpen && !game.hubOpen && game.dive.mode === 'play' && game.dive.level === 0);
   game._frame(1000); game._frame(1016);

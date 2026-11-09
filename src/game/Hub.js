@@ -434,7 +434,7 @@ export class Hub {
       case 'campaign': game.openCampaign(); break;
       case 'pokedoll': game.menus.showModal('modal-decor'); break;
       case 'badges': game.menus.showModal('modal-badges'); break;
-      case 'aquatic': game.openDive(); break;
+      case 'aquatic': this._fadeOut(() => game.openDive()); break;   // escurece e aparece lá embaixo (0.37.1)
       default: break;
     }
   }

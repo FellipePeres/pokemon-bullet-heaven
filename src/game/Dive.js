@@ -81,7 +81,7 @@ const smooth = (x) => { x = Math.max(0, Math.min(1, x)); return x * x * (3 - 2 *
  * A DESCIDA DO DIVE (PLANEJAMENTO-DIVE.md) — o modo aquático: 6 níveis em
  * tabuleiros de 10x6 tiles de água navegável do Emerald. O jogador anda em tiles
  * (o passo do FireRed, sem correr) e desvia das hordas que atravessam linhas e
- * colunas inteiras. São 3 bolhas de vida, com o bolsão de ar na chegada ao Nível 3;
+ * colunas inteiras. São 3 bolhas de vida, com o bolsão de ar ao passar o Nível 3 (na chegada ao 4);
  * entre os níveis, a animação obrigatória nada pelo caminho de verdade.
  *
  * Só a regra: o desenho está em render/DiveRenderer.js e a barra em ui/diveHud.js.
@@ -117,6 +117,7 @@ export class Dive {
     this.mode = 'play'; this.alpha = 1; this.script = []; this.paused = false;
     this.dark = this.darkTarget = DIVE.dark[level];
     this.dialog = null; this.shake = 0; this.downT = 0; this.fx = []; this.best = 0;
+    this.alpha = 0; this.fadeIn = true;   // chega da lagoa no escuro e clareia (0.37.1)
     this.showBanner(`NÍVEL ${level + 1} · ${DIVE.levels[level].depth} m`, 1.4);
   }
 
@@ -424,6 +425,7 @@ export class Dive {
     if (this.banner) { this.banner.t -= dt; if (this.banner.t <= 0) this.banner = null; }
     if (this.popped) { this.popped.t -= dt; if (this.popped.t <= 0) this.popped = null; }
     if (this.refilled) this.refilled = Math.max(0, this.refilled - dt);
+    if (this.fadeIn) { this.alpha = Math.min(1, this.alpha + dt / 0.8); if (this.alpha >= 1) this.fadeIn = false; }
     if (this.paused || this.mode === 'idle' || this.mode === 'over') return;
     this.elapsed += dt;
 

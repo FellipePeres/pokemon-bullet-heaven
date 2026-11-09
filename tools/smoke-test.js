@@ -1245,11 +1245,11 @@ console.log('\n[a descida do Dive — nunca é impossível, só água navegável
         if (!isNav(d.map, Math.round(d.p.wx / 32), Math.round(d.p.wy / 32))) bad++;
       }
     }
-    if (lv === 1) pocket = { level: d.level, lives: d.lives, mode: d.mode };
+    if (lv === 2) pocket = { level: d.level, lives: d.lives, mode: d.mode };
   }
   check('as animações entre os níveis só passam por água navegável', frames > 1000 && bad === 0, `${frames} quadros, ${bad} fora`);
-  check('na chegada ao Nível 3, o bolsão de ar enche as 3 bolhas',
-        pocket?.level === 2 && pocket.lives === DIVE.lives && pocket.mode === 'play', JSON.stringify(pocket));
+  check('ao passar o Nível 3, na chegada ao 4, o bolsão de ar enche as 3 bolhas',
+        pocket?.level === 3 && pocket.lives === DIVE.lives && pocket.mode === 'play', JSON.stringify(pocket));
   check('depois do Nível 6, ele chega à entrada da Caverna Marinha', last === 'cave');
 
   // o passo é o do FireRed andando: 16 quadros por tile, sem correr

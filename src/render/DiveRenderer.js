@@ -5,18 +5,20 @@ const MAPS = ['r126', 'r127', 'cave'];
 
 /**
  * DESENHO DA DESCIDA — o fundo do mapa submerso do Emerald (metatiles em 2x), o
- * aviso e as hordas, o mergulhador e as bolhas. A tela lógica é a do tabuleiro,
- * 320x192 (10x6 tiles de 32 px), ampliada na maior escala inteira que cabe. A
- * regra está em game/Dive.js.
+ * aviso e as hordas, o mergulhador e as bolhas. Em tela cheia, como a vila (0.37.1,
+ * pedido do Fellipe): o tabuleiro de 10x6 tiles fica no meio, na maior escala
+ * inteira que cabe, e o mapa de verdade continua em volta dele até a borda da tela,
+ * um pouco mais escuro (só o tabuleiro é jogável). A regra está em game/Dive.js.
  */
 export class DiveRenderer {
   constructor(canvas) {
     this.canvas = canvas;
     this.ctx = canvas?.getContext?.('2d') ?? null;
     this.scale = 3;
+    this.view = { w: VW, h: VH, bx: 0, by: 0 };   // a tela lógica inteira e onde o tabuleiro começa nela
     this.img = { maps: {}, icons: {} };
     this.ambient = [];
-    for (let i = 0; i < 22; i++) this.ambient.push({ x: Math.random() * VW, y: Math.random() * VH, v: 6 + Math.random() * 12, ph: Math.random() * 6, s: Math.random() < 0.3 });
+    for (let i = 0; i < 48; i++) this.ambient.push({ x: Math.random() * VW * 2 - VW / 2, y: Math.random() * VH * 2 - VH / 2, v: 6 + Math.random() * 12, ph: Math.random() * 6, s: Math.random() < 0.3 });
   }
 
   _load(src) {
@@ -34,16 +36,22 @@ export class DiveRenderer {
     for (const n of species) this.img.icons[n] ??= this._load(`assets/pokemon/gen3/icons/${n}.png`);
   }
 
-  /** O canvas na maior escala inteira que cabe em (maxW, maxH) px de CSS. */
-  resize(maxW, maxH) {
+  /**
+   * O canvas ocupa a tela toda (o CSS estica; aqui só os pixels). O tabuleiro fica na
+   * maior escala inteira que cabe com folga para a barra de cima, centralizado na área
+   * abaixo dela.
+   */
+  resize(width, height, barBottom = 0) {
     const canvas = this.canvas;
     if (!canvas) return;
     const dpr = (typeof window !== 'undefined' && window.devicePixelRatio) || 1;
-    this.scale = Math.max(1, Math.floor(Math.min((maxW * dpr) / VW, (maxH * dpr) / VH)));
-    canvas.width = VW * this.scale;
-    canvas.height = VH * this.scale;
-    canvas.style.width = `${(VW * this.scale) / dpr}px`;
-    canvas.style.height = `${(VH * this.scale) / dpr}px`;
+    const W = Math.max(320, Math.round(width * dpr)), H = Math.max(240, Math.round(height * dpr));
+    if (canvas.width !== W) canvas.width = W;
+    if (canvas.height !== H) canvas.height = H;
+    const top = barBottom * dpr;
+    this.scale = Math.max(1, Math.floor(Math.min(W / (VW + 48), (H - top) / (VH + 56))));
+    const w = W / this.scale, h = H / this.scale, t = top / this.scale;
+    this.view = { w, h, bx: Math.round((w - VW) / 2), by: Math.round(t + (h - t - VH) / 2) };
   }
 
   _ready(im) { return im && im.complete && im.naturalWidth > 0; }
@@ -52,38 +60,56 @@ export class DiveRenderer {
     const ctx = this.ctx;
     if (!ctx || dive.mode === 'idle') return;
     const now = performance.now();
+    // as bolhas do fundo sobem pela tela toda
+    const { w, h, bx, by } = this.view;
     for (const b of this.ambient) {
       b.y -= b.v * dt;
       b.x += Math.sin(now / 600 + b.ph) * 4 * dt;
-      if (b.y < -8) { b.y = VH + 6; b.x = Math.random() * VW; }
+      if (b.y < -by - 8) { b.y = h - by + 6; b.x = Math.random() * w - bx; }
     }
-    ctx.setTransform(this.scale, 0, 0, this.scale, 0, 0);
+    // tudo em coordenadas do tabuleiro: (0, 0) é o canto dele, no meio da tela
+    ctx.setTransform(this.scale, 0, 0, this.scale, bx * this.scale, by * this.scale);
     ctx.imageSmoothingEnabled = false;
     if (dive.shake > 0) ctx.translate((Math.random() - 0.5) * 4, (Math.random() - 0.5) * 4);
     this._floor(dive, now);
     if (dive.mode === 'play' || dive.mode === 'down') for (const l of dive.lanes) this._lane(l, dive.clock);
     this._player(dive, now);
     this._bubbles(dive);
-    // a vinheta e o escurecer
-    const v = ctx.createRadialGradient(VW / 2, VH / 2, VH * 0.35, VW / 2, VH / 2, VW * 0.7);
+    // a vinheta e o escurecer, na tela toda
+    const v = ctx.createRadialGradient(VW / 2, VH / 2, VH * 0.45, VW / 2, VH / 2, Math.max(w, h) * 0.75);
     v.addColorStop(0, 'rgba(0,0,0,0)');
-    v.addColorStop(1, 'rgba(0,0,10,.5)');
+    v.addColorStop(1, 'rgba(0,0,10,.55)');
     ctx.fillStyle = v;
-    ctx.fillRect(-4, -4, VW + 8, VH + 8);
-    if (dive.alpha < 1) { ctx.fillStyle = `rgba(0,0,0,${1 - dive.alpha})`; ctx.fillRect(-4, -4, VW + 8, VH + 8); }
+    ctx.fillRect(-bx - 4, -by - 4, w + 8, h + 8);
+    if (dive.alpha < 1) { ctx.fillStyle = `rgba(0,0,0,${1 - dive.alpha})`; ctx.fillRect(-bx - 4, -by - 4, w + 8, h + 8); }
   }
 
   _floor(dive, now) {
     const ctx = this.ctx;
     const m = this.img.maps[dive.map];
+    const { w, h, bx, by } = this.view;
     ctx.fillStyle = '#0a0620';
-    ctx.fillRect(0, 0, VW, VH);
+    ctx.fillRect(-bx - 4, -by - 4, w + 8, h + 8);
     if (!this._ready(m)) return;
-    // o mapa está em 1x (metatiles de 16 px) e a tela em 2x
+    // o mapa está em 1x (metatiles de 16 px) e a tela em 2x; em volta do tabuleiro, até a borda da tela
     const cx = Math.round(dive.cam.x / 2), cy = Math.round(dive.cam.y / 2);
-    ctx.drawImage(m, cx, cy, VW / 2, VH / 2, 0, 0, VW, VH);
+    const sx = cx - bx / 2, sy = cy - by / 2;
+    const x0 = Math.max(0, sx), y0 = Math.max(0, sy);
+    const x1 = Math.min(m.naturalWidth, sx + w / 2), y1 = Math.min(m.naturalHeight, sy + h / 2);
+    if (x1 > x0 && y1 > y0) ctx.drawImage(m, x0, y0, x1 - x0, y1 - y0, (x0 - cx) * 2, (y0 - cy) * 2, (x1 - x0) * 2, (y1 - y0) * 2);
     ctx.fillStyle = `rgba(4,2,26,${dive.dark})`;
-    ctx.fillRect(0, 0, VW, VH);
+    ctx.fillRect(-bx - 4, -by - 4, w + 8, h + 8);
+    // durante as hordas, fora do tabuleiro fica mais escuro: só ele é jogável
+    if (dive.mode === 'play' || dive.mode === 'down') {
+      ctx.fillStyle = 'rgba(2,2,16,.42)';
+      ctx.fillRect(-bx - 4, -by - 4, w + 8, by + 4);
+      ctx.fillRect(-bx - 4, VH, w + 8, h - by - VH + 4);
+      ctx.fillRect(-bx - 4, 0, bx + 4, VH);
+      ctx.fillRect(VW, 0, w - bx - VW + 4, VH);
+      ctx.strokeStyle = 'rgba(143,227,255,.35)';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(-0.5, -0.5, VW + 1, VH + 1);
+    }
     if (dive.map === 'cave') {
       // a luz do ponto de emergir (o warp do Emerald, em 9,8)
       const gx = 9 * T + T / 2 - cx * 2, gy = 8 * T + T / 2 - cy * 2;

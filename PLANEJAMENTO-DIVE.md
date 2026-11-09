@@ -86,7 +86,7 @@
 
 ```
 VILA ─ lagoa, com Dive na equipe ─► "Quer usar Dive?" ─ SIM
-  └─► A DESCIDA (Rota 126): Nível 1 ─► 2 ─► 3 (bolsão de ar) ─► 4
+  └─► A DESCIDA (Rota 126): Nível 1 ─► 2 ─► 3 ─► (bolsão de ar) ─► 4
         │   ─► "Mais fundo..." ─► (Rota 127): Nível 5 ─► 6
         │   cada fim de nível: a animação obrigatória, nadando pela água de verdade
         │   perdeu as 3 bolhas ─► CENTRO POKÉMON (a enfermeira e o pescador)
@@ -306,6 +306,27 @@ Cada tile do tabuleiro tem 32 px (o metatile do Emerald em 2x) e o ícone entra 
 
 ---
 
+**No jogo (0.37.1)** o Fellipe achou a descida muito difícil ("facilite bem pouco"):
+- o bolsão foi para a passagem do Nível 3 para o 4;
+- a saída passou a ser garantida para quem reage em 0,28 s (era 0,25 s);
+- os níveis 5 e 6 ganharam um pouco mais de intervalo entre as hordas;
+- o Nível 6 ficou um pouco mais lento (14 tiles/s, eram 15), com 30 hordas (eram 32).
+
+O aviso de cada nível ficou como estava: com mais aviso, cada horda fica mais tempo
+na tela e mais delas se sobrepõem, e a medição piorou.
+
+A medição no jogo (`node tools/descida.mjs`, 80 a 100 descidas por perfil):
+
+| Perfil | Antes | Agora |
+|---|---|---|
+| típico (0,25 a 0,45 s, erra 3%) | 10% (~10 tentativas) | **26% (~4)**; o Nível 6 passa 39% |
+| reação de 0,35 s | 100% | 100% |
+| reação de 0,5 s | 0% | 3%; ainda para no 6 |
+
+É o ponto da maquete "equilibrada", que o jogo tinha passado. A descida e o salão
+ficaram em tela cheia, como a vila: o mapa do Emerald continua em volta do
+tabuleiro, mais escuro, e só o tabuleiro é jogável.
+
 ## 6. A animação entre os níveis
 
 Obrigatória e sem pular:
@@ -318,7 +339,7 @@ Obrigatória e sem pular:
    aparece "Mais fundo...", a tela escurece e ele entra pelo vale da Rota 127.
 4. "Nível N · X m", e as hordas recomeçam.
 
-**O bolsão de ar** fica na chegada ao **Nível 3**: bolhas grandes sobem, as 3
+**O bolsão de ar** fica ao passar o **Nível 3**, na chegada ao 4 (0.37.1, pedido do Fellipe; era na chegada ao 3): bolhas grandes sobem, as 3
 bolhas de vida enchem de novo e a caixa de texto diz "Parece que você encontrou um
 bolsão de ar no caminho!".
 
@@ -333,7 +354,7 @@ para emergir." e "Quer emergir?".
 
 - **3 bolhas de vida.** Cada horda que pega o jogador estoura uma. Depois de um
   acerto, ele pisca e fica intocável por 1 s (padrão).
-- **O bolsão de ar** enche as 3 de novo, uma vez por mergulho, na chegada ao Nível 3.
+- **O bolsão de ar** enche as 3 de novo, uma vez por mergulho, ao passar o Nível 3 (na chegada ao 4).
 - **Perdeu as 3:** a tela escurece e o jogador acorda no **Centro Pokémon** da vila,
   na frente da enfermeira, que conta que o pescador o pescou desmaiado (seção 11).
   O próximo mergulho começa do Nível 1.
