@@ -345,7 +345,7 @@ para emergir." e "Quer emergir?".
 **O encontro e o card** (pedido do Fellipe, 2026-11-09: "ao passar do nível 6 eu
 gostaria de uma animação, estilo encontro do Kyogre no Sapphire, e após o encontro
 abre um card mostrando que é uma fase, assim como os cards do mapa da jornada, com
-opção de jogar ou voltar para a vila"). A maquete "O Salão do Kyogre"
+opção de jogar ou voltar para a vila"). **Aprovado** ("achei bom demais pelo artifact, vamos fazer isso mesmo"). A maquete "O Salão do Kyogre"
 (https://claude.ai/artifact/SHbVCDRVhieNLQUaAJiACn) mostra a proposta:
 1. **Emergir** no alto do `MarineCave_End` (o warp do Emerald, em 20,4), com a névoa
    horizontal do mapa original. O jogador anda pelo salão só pelos tiles de colisão 0.
@@ -380,56 +380,131 @@ Kyogre por jornada.
 
 ## 9. A luta do Kyogre (Bullet Heaven)
 
-Uma fase única, na arena da caverna (com os tiles do Emerald; padrão), com a
-equipe de sempre. A força dos inimigos vem na escala do nível 90+; para comparar,
-hoje o bot chega ao Campeão por volta do nível 74.
+**O pedido** (2026-11-09): "agora bora planejar o cenário da fase e o funcionamento
+completo de captura e etc... Aí a gente depois disso constrói e leva tudo para o
+jogo". O encontro e o card (seção 8) foram aprovados: "achei bom demais pelo
+artifact, vamos fazer isso mesmo". O que segue é a proposta; **(padrão)** marca o
+que o Fellipe ainda não decidiu.
 
-- **Chuva o tempo todo** (a habilidade Drizzle do Kyogre): os golpes de Água ficam
-  mais fortes, os do jogador também, e os de Fogo mais fracos.
-- **Os ataques do Kyogre:**
-  - Origin Pulse: anéis de ondas que se abrem;
-  - Water Spout: colunas d'água que caem depois de um aviso no chão;
-  - Thunder: raios em corrente;
-  - hordas de Pokémon de Água o tempo todo (os de Hoenn dos níveis 5 e 6).
-- **Fases de vida:** abaixo de 50% e de 20%, ele fica mais rápido e os ataques
-  ficam mais densos.
+Já decidido antes: chuva o tempo todo, 2 Dive Balls de 10% por tentativa, a maré
+final de 30 s depois da captura, perder depois de capturar fica com o Kyogre, nível
+recomendado 90.
 
-### A captura: a Dive Ball (o método B)
+### O cenário: o salão do Kyogre
 
-1. Com a vida do Kyogre no vermelho (padrão: 15%), ele fica **exausto** por uns
-   8 segundos, e uma **Dive Ball** aparece no campo, longe do treinador.
-2. O jogador vai até ela; pegar é jogar, e a bola voa até o Kyogre.
-3. A captura tem **10% de chance**.
-4. Se falhar, ele escapa, recupera vida (padrão: até 40%) e a luta continua.
-   Quando ele volta ao vermelho, aparece a segunda Dive Ball: **2 por tentativa**.
-   Com 10% em cada, a chance de capturar numa luta fica em ~19%.
-5. Sem mais bolas, a luta segue até o fim, e o Kyogre pode ser derrotado.
+- **A arena é o próprio salão**, montada com o tileset `cave` do Emerald (o mesmo
+  do `MarineCave_End` do encontro), num cenário novo do tipo `room` em
+  `data/scenery.js`: o chão de areia da caverna, as paredes de rocha nas bordas e,
+  **no meio, o lago do Kyogre**, maior que o do mapa (padrão: 2.400 × 1.600 px de
+  arena, o lago com ~1/5 dela). Como em todas as arenas, o cenário é só chão
+  desenhado: o treinador anda por cima do lago.
+- **Poças menores** espalhadas pela arena (padrão: 4), de onde o Kyogre volta à
+  tona (ver "O mergulho", abaixo).
+- **A chuva do Emerald** (`graphics/weather/rain.png`) caindo por cima de tudo, a
+  tela um pouco mais escura e, a cada trovão, um clarão.
+- **A música** (padrão): a "Vs. Lendário" do FireRed, se o `render_music.py`
+  conseguir tirá-la do Pokemon All; se não, a do Campeão.
 
-A Dive Ball usa a arte do FireRed (`graphics/interface/ball/dive.png`).
+### A linha do tempo da luta
+
+1. **A maré (0:00 a 0:45):** a caverna se enche de hordas de Hoenn (as dos níveis
+   5 e 6 da descida, no nível ~85), com elites de Sharpedo e Wailord. É o
+   aquecimento: a equipe ganha níveis e o jogador sente a chuva.
+2. **O Kyogre (0:45):** o lago ferve, o grito e a apresentação do chefe (o mesmo
+   letreiro dos líderes: "KYOGRE · Pokémon lendário"). Ele sai do lago gigante
+   (o maior chefe do jogo) e a luta é contra ele, com as hordas continuando por
+   cima.
+3. **A captura**, quando ele chega no vermelho (abaixo).
+4. **O fim:** derrotado, capturado e a maré final, ou o desmaio (seção "O fim da
+   luta").
+
+Padrão de duração: ~4 minutos até o Kyogre cair, medido com o `balance.mjs` numa
+equipe de nível 90.
+
+### Os ataques do Kyogre
+
+Todos com aviso no chão antes do dano, como os golpes que já existem:
+
+| Ataque | O que faz | De onde vem no jogo |
+|---|---|---|
+| **Origin Pulse** | três anéis de onda saindo dele, um atrás do outro | o `nova` dos chefes (`boss_shockwave`), em sequência |
+| **Water Spout** | 6 a 10 colunas d'água caem em volta do treinador, depois de um círculo de aviso. Como no jogo original, **é mais forte quanto mais vida ele tem** | o `rain` (Hail, Bolt Strike) virado contra o jogador |
+| **Thunder** | raios caem perto do treinador; **na chuva, sempre acertam o lugar marcado** (como no jogo original) | o `rain`, com o raio |
+| **Chamar a horda** | traz Sharpedo, Carvanha e Wailmer em volta dele | o `summons` dos chefes |
+| **O mergulho** | ele afunda no lago (não leva dano) e volta à tona numa das poças, com uma onda de choque na saída. A poça escolhida borbulha 1 s antes | novo, simples: some e aparece |
+
+**As fases de vida:**
+- **acima de 50%:** Origin Pulse, Water Spout e a horda;
+- **abaixo de 50%:** entra o Thunder e o mergulho, e ele fica mais rápido;
+- **abaixo de 20%:** fúria, como os líderes (o `enrage` que já existe): ataques
+  mais densos.
+
+**A chuva (Drizzle)** vale para todos: golpes de Água ×1,5 e de Fogo ×0,5,
+inclusive os da equipe. Uma equipe de Água sai ganhando, e uma de Fogo sofre,
+como no jogo original. As fraquezas no card (Elétrico e Planta) são a dica.
+
+### A captura: a Dive Ball (o método B), em detalhe
+
+1. **O piso de vida:** enquanto houver Dive Ball, a vida do Kyogre **não passa de
+   15%**. Chegando lá, ele fica **exausto**: para de atacar, boia de lado no lugar
+   e a horda para de vir por 8 segundos.
+2. **A Dive Ball** cai no campo, a uns 450 px do treinador, com uma seta na borda
+   da tela apontando para ela. Ela usa a arte do FireRed.
+3. **Pegar é jogar:** ao passar por cima, a bola voa em arco até o Kyogre, abre e
+   o puxa para dentro (a animação da Poké Ball do FireRed). Tudo para enquanto a bola
+   balança.
+4. **Os 10%:** a bola balança até 3 vezes. Na falha, ela abre depois de 1, 2 ou 3
+   balanços, como no jogo original: quanto mais balança, mais o coração aperta.
+5. **Falhou:** ele escapa com um grito e uma onda de choque que empurra a horda e
+   o treinador. Recupera **até 40%** e a luta continua. No vermelho de novo, vem a
+   segunda Dive Ball.
+6. **Não pegou a bola nos 8 s:** ele se recupera até 40% do mesmo jeito, mas
+   **a bola não conta como gasta** (padrão): volta na próxima exaustão.
+7. **Sem Dive Balls:** o piso de vida sai, e o Kyogre pode ser derrotado.
+
+Com 10% em cada bola, capturar numa luta é ~19%. Errar não perde a luta: dá para
+vencer, ganhar a recompensa e tentar a captura numa próxima descida.
 
 ### O fim da luta
 
-- **O Kyogre derrotado:** ele afunda de volta no abismo, "A água fica calma.", a
-  tela de vitória e o jogador volta à **superfície pela lagoa**. Sem captura, ele
-  volta a dormir no salão, e outra chance exige descer os 6 níveis de novo.
-- **O Kyogre capturado:** ele entra para a equipe (ou vai para o PC, se a equipe
-  estiver cheia), e a luta **continua até o fim da fase**: sem o Kyogre, a caverna
-  se enche com uma **maré final de 30 segundos** de hordas em fúria. Sobreviver
-  fecha a fase, "A maré baixou.", e o jogador volta à superfície pela lagoa, onde
-  acontece **a cena** (seção 10).
-- **Perdeu depois de capturar:** acorda no Centro Pokémon, **com o Kyogre**, e a
-  cena acontece ali.
-- **Perdeu sem capturar:** acorda no Centro Pokémon, como na descida.
+- **Capturou:**
+  - aparece a tela de captura com o Kyogre (a mesma das Poké Balls: com a equipe
+    cheia, escolhe quem vai para o PC);
+  - ele entra no **nível da equipe**, como os outros lendários;
+  - entra na Pokédex (`registerSecret('kyogre')`: o "???" se revela).
+
+  Começa **a maré final de 30 s**: um relógio na tela, o lago transborda e a
+  caverna se enche de hordas em fúria, sem o Kyogre.
+  - Sobreviveu: "A maré baixou.", a tela de vitória e a volta pela lagoa, com **a
+    cena do Maxie** (seção 10).
+  - Caiu: acorda no Centro **com o Kyogre**, e a cena acontece ali.
+- **Derrotou sem capturar:** "O Kyogre afundou de volta no abismo. A água fica
+  calma.", a tela de vitória e a volta pela lagoa. Ele volta a dormir no salão, e
+  outra chance exige descer os 6 níveis de novo.
+- **Caiu sem capturar:** acorda no Centro, com as falas da enfermeira e do pescador.
+- **A recompensa** (padrão): **500 Shards** na primeira vez que vence a luta,
+  capturando ou não. O Campeão paga 300. Rejogar não paga de novo, como nas
+  outras fases.
+- **O que fica:** como em toda fase, a equipe guarda os níveis e as melhorias que
+  ganhou, vencendo ou não.
 
 ### O Kyogre na equipe
 
 Ele fica **fora da Pokédex de Kanto**: entra como espécie especial (dex 382), sem
 contar nas 151, como um lendário de outra região. Precisa:
 - de uma entrada em `data/pokemon.js`;
-- de um kit de lendário (`data/legendaries.js`) com um golpe exclusivo (padrão:
-  Origin Pulse);
 - da tira animada do GIF da Gen 5 (já no Pokemon All);
-- de ajustes no `check-data`.
+- de ajustes no `check-data`;
+- de um **kit de lendário** (`data/legendaries.js`), como as aves, o Mewtwo e o
+  Mew:
+
+  | | O kit (padrão) |
+  |---|---|
+  | **Golpe exclusivo** | Origin Pulse: anéis de onda que se abrem em volta dele, empurrando a horda |
+  | **Golpe Desperto** | Water Spout: colunas d'água sobre a horda, mais fortes com a vida cheia |
+  | **Melhorias de saída** | dano 2, recarga 1, área 1 (as mesmas das aves) |
+
+  **No campo**, ele é grande, como as aves no `fieldScale`.
 
 ### O Kyogre na Pokédex (feito na 0.35)
 
@@ -441,6 +516,25 @@ Kyogre, e ele só se revela quando é capturado. Já está no jogo:
 - fora da contagem das 151, e sem número também depois de revelado.
 
 A captura (etapa D-5) só precisa chamar `registerSecret`.
+
+### Como construir (as etapas D-3 a D-5, revistas)
+
+- **D-3, o encontro:**
+  - `tools/assets/dive.py` gera o salão, o Kyogre do mapa, a névoa e a transição;
+  - a cena da maquete aprovada vai para `game/Dive.js` (depois do Nível 6);
+  - o card da fase reaproveita o painel do mapa da jornada (`ui/lobby.js`).
+- **D-4, a luta:**
+  - o cenário `kyogre_hall` (o tileset `cave` do Emerald), a chuva e a música;
+  - a fase `kyogre` em `data/stages.js`, fora da campanha, e o chefe em
+    `data/enemies.js`;
+  - os ataques novos em `systems/` (o mergulho, o piso de vida, a exaustão);
+  - a Drizzle no cálculo de dano.
+- **D-5, a captura:**
+  - a Dive Ball no campo, o arremesso e os balanços;
+  - a espécie e o kit do Kyogre, e a maré final;
+  - os testes: a chance (10% em mil sorteios), o piso, a bola perdida e os fins da
+    luta;
+  - a medição com o `balance.mjs`.
 
 ---
 
