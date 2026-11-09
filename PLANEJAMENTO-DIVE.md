@@ -323,6 +323,10 @@ A medição no jogo (`node tools/descida.mjs`, 80 a 100 descidas por perfil):
 | reação de 0,35 s | 100% | 100% |
 | reação de 0,5 s | 0% | 3%; ainda para no 6 |
 
+Depois, "deixe menos desvios para passar": cada nível ficou com ~20% menos hordas (8,
+12, 15, 18, 21 e 25; eram 10, 15, 18, 22, 26 e 30). O típico passou a descer tudo em
+**37% (~2,7 tentativas)**, com o Nível 6 em 42%. Quem reage em 0,5 s ainda para no 6 (2%).
+
 É o ponto da maquete "equilibrada", que o jogo tinha passado. A descida e o salão
 ficaram em tela cheia, como a vila: o mapa do Emerald continua em volta do
 tabuleiro, mais escuro, e só o tabuleiro é jogável.

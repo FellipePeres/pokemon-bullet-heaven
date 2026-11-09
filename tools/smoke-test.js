@@ -1211,7 +1211,7 @@ console.log('\n[a descida do Dive — nunca é impossível, só água navegável
   check('com 0,25 s de reação, o jogador perfeito nunca é pego (toda horda tem saída)',
         hits.every((h) => h === 0), `${hits.reduce((s, n) => s + n, 0)} acertos em ${total} hordas`);
   check('cada nível solta todas as hordas dele', events.every((e, i) => e === DIVE.levels[i].count * 12), events.join(', '));
-  check('hordas sobre hordas: mais de 5 ao mesmo tempo nos níveis 5 e 6', active[4] > 5 && active[5] > 5,
+  check('hordas sobre hordas: mais de 4,5 ao mesmo tempo nos níveis 5 e 6', active[4] > 4.5 && active[5] > 4.5,
         active.map((n) => n.toFixed(1)).join(', '));
 
   // e o contrário: parado no meio do tabuleiro, as hordas pegam (o modo tem desafio)
