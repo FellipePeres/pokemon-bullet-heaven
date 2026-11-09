@@ -361,6 +361,13 @@ para emergir." e "Quer emergir?".
 
 ## 7. As vidas e o resgate
 
+**O checkpoint** (0.37.4, o Fellipe: "o começo das tentativas é entediante e o final
+muito difícil"): o bolsão de ar, no início do Nível 4, vira checkpoint. Perdendo as 3
+bolhas dali em diante, aparece "Você desmaiou!" com **Continuar do bolsão de ar
+(Nível 4)**, com as 3 bolhas, ou **Voltar para a vila** (o resgate de sempre, no
+Centro). O checkpoint vale para o mergulho atual: a próxima descida, depois de voltar
+à vila, começa do Nível 1. Antes do bolsão, perder leva ao Centro como sempre.
+
 - **3 bolhas de vida.** Cada horda que pega o jogador estoura uma. Depois de um
   acerto, ele pisca e fica intocável por 1 s (padrão).
 - **O bolsão de ar** enche as 3 de novo, uma vez por mergulho, ao passar o Nível 3 (na chegada ao 4).

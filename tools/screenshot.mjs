@@ -368,8 +368,8 @@ const ROTEIROS = {
     { run: "game.dive.start(1); game.dive.levelDone()" }, { wait: 1600 }, { shot: 'descida-4-passagem', raw: true },
     { run: "for (let i = 0; i < 600 && !game.dive.dialog; i++) game.dive.update(1 / 60)" }, { wait: 500 }, { shot: 'descida-5-bolsao', raw: true },
     { run: "game.dive.start(4)" }, { wait: 3200 }, { shot: 'descida-6-nivel5', raw: true },
-    { run: "game.dive.lives = 1; game.dive.p.c = 4; game.dive.p.r = 3; game.dive.inv = 0" }, { wait: 4500 },
-    { run: "game.hub.dialog && (game.hub.dialog.shown = 999)" }, { wait: 300 }, { shot: 'descida-7-resgate' }
+    { run: "game.dive.lives = 1; game.dive.p.c = 4; game.dive.p.r = 3; game.dive.inv = 0" }, { wait: 4500 }, { shot: 'descida-7-checkpoint' },
+    { run: "game.diveGiveUp(); game.hub.dialog && (game.hub.dialog.shown = 999)" }, { wait: 300 }, { shot: 'descida-8-resgate' }
   ],
   // o salão do Kyogre (0.37): o encontro, o card, a luta, a captura, a maré final e a cena do Maxie
   kyogre: [

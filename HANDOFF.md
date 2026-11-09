@@ -5,7 +5,7 @@
 > decisão foi tomada e o que falta fazer. O `README.md` é o manual de uso;
 > este aqui é o contexto de desenvolvimento.
 
-**Versão atual:** `0.37.3` · **Última atualização:** 2026-11-09
+**Versão atual:** `0.37.4` · **Última atualização:** 2026-11-09
 **Stack:** HTML + CSS + JavaScript puro (ES Modules). Sem backend, sem build, sem dependências.
 **Repositório:** https://github.com/FellipePeres/pokemon-bullet-heaven (público)
 **Jogo no ar:** https://fellipeperes.github.io/pokemon-bullet-heaven/
@@ -1118,6 +1118,7 @@ o Brock como está, todas as outras mais duras, menos níveis.
 | 58 | ao usar Dive na lagoa, uma transição escurecendo; a descida em tela cheia, como a vila (não um recorte quadrado); o bolsão ao passar o Nível 3, indo para o 4; "achei muito difícil, facilite bem pouco" | 0.37.1: a vila escurece e a descida clareia; a descida e o salão em tela cheia (o mapa do Emerald continua em volta do tabuleiro, mais escuro, e a barra das bolhas por cima); o bolsão na chegada ao Nível 4; a garantia de saída para 0,28 s, um pouco mais de intervalo nos níveis 5 e 6 e o 6 um pouco mais lento (14 tiles/s, 30 hordas). Medido com o novo `tools/descida.mjs`: o jogador típico descia tudo em ~10% (~10 tentativas) e agora em ~26% (~4), como a maquete aprovada; quem reage em 0,5 s ainda para no 6 |
 | 59 | "deixe menos desvios para passar" | 0.37.2: ~20% menos hordas em cada nível da descida (8, 12, 15, 18, 21 e 25); o típico desce tudo em ~37% (~2,7 tentativas; era ~26%), e as hordas continuam umas sobre as outras (média de 5 ativas nos níveis 5 e 6) |
 | 60 | "deixe o nível 5 sendo o último, vamos tirar o nível 6, e facilite levemente o tempo entre hordas somente do nível 5" | 0.37.3: a descida tem 5 níveis (o 5 leva direto à Caverna Marinha; o 6º tabuleiro continua no mundo, sem uso) e o Nível 5 tem um pouco mais de intervalo entre as hordas (0,74 a 1,0 s; era 0,66 a 0,92). O típico desce tudo em ~84% (~1,2 tentativa); quem reage em 0,5 s, em ~52% |
+| 61 | o começo das tentativas entediante e o final muito difícil: o bolsão de ar (o início do Nível 4) vira checkpoint; morrendo adiante, a derrota oferece voltar para a vila ou continuar do bolsão | 0.37.4: depois do bolsão, perder as 3 bolhas abre "Você desmaiou!" com Continuar do bolsão de ar (Nível 4, com as 3 bolhas) ou Voltar para a vila (o resgate de sempre, no Centro); A continua e B volta. Vale para o mergulho atual: a próxima descida começa do Nível 1. Antes do bolsão, nada muda |
 | Fase 8 (Giovanni) | 1 → 0,8 | 4,0 | 4,5 | 60 | 84 → 62 |
 | Lorelei | 1,05 → 0,8 | 3,5 | 3,1–4,7 | 64 | 92 → 66 |
 | Bruno | 1,12 → 0,97 | 3,7 | 3,5–6,3 ² | 66 | 99 → 68 |

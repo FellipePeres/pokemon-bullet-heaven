@@ -1221,6 +1221,13 @@ console.log('\n[a descida do Dive — nunca é impossível, só água navegável
   still.p.c = 4; still.p.r = 3;
   for (let i = 0; i < 60 * 60 && still.mode !== 'over'; i++) still.update(1 / 60, null);
   check('parado, ele perde as 3 bolhas e vai para o resgate', ended === 'rescued' && still.lives === 0);
+  // o checkpoint (0.37.4): perder depois do bolsão de ar oferece continuar do Nível 4
+  let late = null;
+  const after = new Dive({ onEnd: (r) => { late = r; } });
+  after.start(DIVE.airPocketLevel);
+  after.p.c = 4; after.p.r = 3;
+  for (let i = 0; i < 60 * 60 && after.mode !== 'over'; i++) after.update(1 / 60, null);
+  check('depois do bolsão de ar, perder as bolhas é o checkpoint (continuar do Nível 4)', late === 'checkpoint' && after.checkpoint);
 
   // os tabuleiros: 10x6 tiles, todos navegáveis no Emerald (colisão 0, elevação 3)
   const boardsOk = DIVE_WORLD.boards.every(([map, x, y]) => {

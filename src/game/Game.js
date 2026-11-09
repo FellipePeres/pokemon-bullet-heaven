@@ -681,7 +681,11 @@ export class Game {
     if (action.startsWith('pad:')) { this.handlePad(action.slice(4)); return; }
     // o A e o B da vila (Enter/Espaço/Z e X/Backspace)
     if (action === 'confirm' || action === 'cancel') {
-      if (this.diveOpen) { if (action === 'confirm') (this.hall.active ? this.hall : this.dive).confirm(); return; }
+      if (this.diveOpen) {
+        if (this.diveHud.defeatOpen) { if (action === 'confirm') this.diveContinue(); else this.diveGiveUp(); return; }
+        if (action === 'confirm') (this.hall.active ? this.hall : this.dive).confirm();
+        return;
+      }
       if (this.hubOpen && !this.menus.openModal) {
         if (action === 'confirm') this.hub.confirm();
         else this.hub.cancel();
@@ -720,6 +724,7 @@ export class Game {
    */
   handlePad(button) {
     if (this.diveOpen) {
+      if (this.diveHud.defeatOpen) { if (button === 'a') this.diveContinue(); else if (button === 'b') this.diveGiveUp(); return; }
       if (button === 'a') (this.hall.active ? this.hall : this.dive).confirm();
       else if (button === 'start') this.dive.togglePause();
       return;
@@ -1019,6 +1024,12 @@ export class Game {
   _diveEnded(result) {
     const record = this.diveRecord;
     record.best = Math.max(record.best ?? 0, this.dive.best);
+    // depois do bolsão de ar (0.37.4): a derrota oferece continuar do Nível 4
+    if (result === 'checkpoint') {
+      this.autosave();
+      this.diveHud.showDefeat(this.dive.level);
+      return;
+    }
     if (result === 'rescued') {
       record.rescues = (record.rescues ?? 0) + 1;
       this.autosave();
@@ -1031,6 +1042,20 @@ export class Game {
     record.reachedCave = (record.reachedCave ?? 0) + 1;
     this.autosave();
     this._openHall();
+  }
+
+  /** A derrota depois do bolsão: continuar do Nível 4, com as 3 bolhas. */
+  diveContinue() {
+    this.diveHud.hideDefeat();
+    this.dive.start(DIVE.airPocketLevel);
+    this.diveHud.reset();
+    this.input.clear();
+  }
+
+  /** A derrota depois do bolsão: desistir e voltar (o pescador o tira da água, como sempre). */
+  diveGiveUp() {
+    this.diveHud.hideDefeat();
+    this._diveEnded('rescued');
   }
 
   /* ====================== O salão do Kyogre (0.37) ====================== */

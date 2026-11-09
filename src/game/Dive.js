@@ -86,7 +86,8 @@ const smooth = (x) => { x = Math.max(0, Math.min(1, x)); return x * x * (3 - 2 *
  *
  * Só a regra: o desenho está em render/DiveRenderer.js e a barra em ui/diveHud.js.
  * Roda sem navegador (os testes do smoke-test). `onEnd(result)` avisa o fim:
- * 'rescued' (perdeu as 3 bolhas) ou 'cave' (passou o último nível, o 5).
+ * 'rescued' (perdeu as 3 bolhas antes do bolsão de ar), 'checkpoint' (perdeu depois
+ * dele: dá para continuar do Nível 4, 0.37.4) ou 'cave' (passou o último nível, o 5).
  *
  * Os modos: play (as hordas) · transition (a animação entre os níveis) ·
  * down (perdeu as bolhas: a tela escurece) · over (acabou; esperando o Game).
@@ -105,9 +106,14 @@ export class Dive {
   get levelData() { return DIVE.levels[this.level]; }
   get mapData() { return WORLD.maps[this.map]; }
 
-  /** Começa a descida no nível `level` (0 a 5; o jogo começa sempre do 0). */
+  /**
+   * Começa a descida no nível `level` (o jogo começa do 0). Do bolsão de ar em diante
+   * (o Nível 4) o mergulho tem um checkpoint (0.37.4, pedido do Fellipe: "o começo é
+   * entediante e o final muito difícil"): perder lá oferece continuar do Nível 4.
+   */
   start(level = 0) {
     this.level = level;
+    this.checkpoint = level >= DIVE.airPocketLevel;
     this.lives = DIVE.lives;
     this.inv = 0; this.hits = 0; this.lanes = []; this.spawned = 0;
     this.clock = 0; this.nextAt = 1.2; this.elapsed = 0;
@@ -340,7 +346,7 @@ export class Dive {
           for (let i = 0; i < 40; i++) {
             this.fx.push({ x: pos.x + 16 + (this.rng() - 0.5) * 120, y: VH + this.rng() * 30, vx: (this.rng() - 0.5) * 20, vy: -60 - this.rng() * 80, t: 0, life: 2.2, big: this.rng() < 0.4 });
           }
-        } }, { kind: 'say', lines: DIVE.lines.airPocket, after: () => { this.lives = DIVE.lives; this.refilled = 0.4; } });
+        } }, { kind: 'say', lines: DIVE.lines.airPocket, after: () => { this.lives = DIVE.lives; this.refilled = 0.4; this.checkpoint = true; } });
       }
       S.push({ kind: 'banner', text: `NÍVEL ${from + 2} · ${DIVE.levels[from + 1].depth} m`, dur: 1.3 }, { kind: 'wait', dur: 1.1 },
         { kind: 'call', fn: () => { this.mode = 'play'; this.clock = 0; this.nextAt = 0.6; this.spawned = 0; this.lanes = []; } });
@@ -450,7 +456,7 @@ export class Dive {
     } else if (this.mode === 'down') {
       this.downT += dt;
       this.alpha = Math.max(0, 1 - this.downT / 1.4);
-      if (this.downT > 1.6) this._finish('rescued');
+      if (this.downT > 1.6) this._finish(this.checkpoint ? 'checkpoint' : 'rescued');
     }
     this.dark += (this.darkTarget - this.dark) * Math.min(1, dt * 1.5);
   }

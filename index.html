@@ -218,6 +218,13 @@
       <div class="dive-screen">
         <canvas id="dive-canvas" class="dive-canvas" aria-label="O tabuleiro da descida, 10 por 6 tiles"></canvas>
         <div id="dive-banner" class="dive-banner hidden"></div>
+        <!-- a derrota depois do bolsão de ar (0.37.4): o checkpoint -->
+        <div id="dive-defeat" class="dive-pause dive-defeat hidden">
+          <b>Você desmaiou!</b>
+          <p id="dive-defeat-text"></p>
+          <button id="dive-continue" class="menu-btn primary" type="button"><span class="btn-text">Continuar do bolsão de ar (Nível 4)</span></button>
+          <button id="dive-giveup" class="menu-btn ghost" type="button"><span class="btn-text">Voltar para a vila</span></button>
+        </div>
         <div id="dive-pause" class="dive-pause hidden">
           <b>Pausa</b>
           <button id="dive-resume" class="menu-btn slim" type="button">Continuar</button>

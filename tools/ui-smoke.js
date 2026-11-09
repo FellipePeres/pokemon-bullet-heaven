@@ -737,6 +737,22 @@ const DIVE_LAST = (await import('../src/data/dive.js')).DIVE.levels.length - 1; 
   hub.say('pescador');
   check('...e depois volta à fala de sempre', !dialogText().includes('peixão'));
   closeDialog();
+  // o checkpoint (0.37.4): perder no Nível 5, depois do bolsão, oferece continuar do Nível 4
+  game.openHub('home');
+  game.openDive();
+  game.dive.start(DIVE_LAST);
+  game.dive.p.c = 4; game.dive.p.r = 3;
+  for (let i = 0; i < 60 * 120 && !game.diveHud.defeatOpen; i++) game.dive.update(1 / 60, null);
+  check('depois do bolsão, a derrota mostra continuar do Nível 4 ou voltar', game.diveOpen && game.diveHud.defeatOpen
+        && !registry.get('dive-defeat').classes.has('hidden') && registry.get('dive-defeat-text').textContent.includes('Nível 5'));
+  game.handleAction('confirm');
+  check('Continuar: volta ao Nível 4 com as 3 bolhas', game.diveOpen && !game.diveHud.defeatOpen && game.dive.level === 3
+        && game.dive.lives === 3 && game.dive.mode === 'play' && game.dive.checkpoint);
+  game.dive.p.c = 4; game.dive.p.r = 3;
+  for (let i = 0; i < 60 * 120 && !game.diveHud.defeatOpen; i++) game.dive.update(1 / 60, null);
+  game.handleAction('cancel');
+  check('Voltar para a vila: acorda no Centro, como no resgate', !game.diveOpen && hubVisible() && hub.mapId === 'centro' && hub.dialog?.name === 'Enfermeira');
+  closeDialog();
   // a descida inteira: depois do último nível (o 5), a entrada da Caverna Marinha e o salão
   game.openHub('home');
   game.openDive();

@@ -13,6 +13,21 @@ export class DiveHUD {
     this.shown = {};
     el('dive-dialog-box').onclick = () => (game.hall?.active ? game.hall : game.dive).confirm();
     el('dive-resume').onclick = () => game.dive.togglePause(false);
+    el('dive-continue').onclick = () => game.diveContinue();
+    el('dive-giveup').onclick = () => game.diveGiveUp();
+    this.defeatOpen = false;
+  }
+
+  /** A derrota depois do bolsão de ar (0.37.4): continuar do Nível 4 ou voltar para a vila. */
+  showDefeat(level) {
+    this.defeatOpen = true;
+    el('dive-defeat-text').textContent = `Você perdeu as 3 bolhas no Nível ${level + 1}. O bolsão de ar guardou o seu caminho.`;
+    show(el('dive-defeat'));
+  }
+
+  hideDefeat() {
+    this.defeatOpen = false;
+    hide(el('dive-defeat'));
   }
 
   reset() { this.shown = {}; }
