@@ -583,6 +583,25 @@ export const ABILITIES = {
     base: { damage: 12, cooldown: 3.4, count: 5, spread: 0.24, speed: 250, size: 14, duration: 3.4 },
     hostile: true
   },
+  // o Kyogre (0.37, systems/kyogreFight.js): os três anéis do Origin Pulse e a onda da volta à tona
+  kyogre_origin_pulse: {
+    id: 'kyogre_origin_pulse',
+    name: 'Origin Pulse',
+    type: 'water',
+    behavior: 'nova',
+    description: 'Anel de onda do Kyogre.',
+    base: { damage: 14, cooldown: 99, area: 560, speed: 300, knockback: 160, size: 18 },
+    hostile: true
+  },
+  kyogre_resurface: {
+    id: 'kyogre_resurface',
+    name: 'Onda',
+    type: 'water',
+    behavior: 'nova',
+    description: 'A onda de quando o Kyogre volta à tona.',
+    base: { damage: 16, cooldown: 99, area: 380, speed: 420, knockback: 300, size: 18 },
+    hostile: true
+  },
   boss_shockwave: {
     id: 'boss_shockwave',
     name: 'Investida',

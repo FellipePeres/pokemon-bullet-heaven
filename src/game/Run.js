@@ -19,6 +19,8 @@ import { bus, EVENTS } from '../core/events.js';
 import { typeColor, defenseMultiplier } from '../data/types.js';
 import { getPokemon } from '../data/pokemon.js';
 import { maxHpFor } from '../systems/stats.js';
+import { KyogreFight } from '../systems/kyogreFight.js';
+import { weatherMultiplier } from '../systems/combat.js';
 
 /**
  * RUN — uma partida em uma fase.
@@ -89,6 +91,8 @@ export class Run {
 
     this.spawner = new SpawnSystem(this);
     this.refreshStats();
+    // a luta do Kyogre (0.37): o que só ela tem, por cima da fase de sempre
+    this.fight = this.stage.legendaryFight ? new KyogreFight(this) : null;
 
     this.pendingBall = false;
     this.pendingGift = null;     // presente da fase esperando a escolha (ver stage.gifts)
@@ -218,11 +222,12 @@ export class Run {
    * do inimigo, no contato e nos golpes do líder): desde a 0.32 ele passa pela
    * tabela contra os tipos do Pokémon, suavizada (CONFIG.types.defense).
    */
-  damageCompanion(companion, amount, type = null) {
+  damageCompanion(companion, amount, type = null, { weather = true } = {}) {
     if (!companion) return;
     if (this.buffs?.reflect > 0) amount *= 0.6;   // a barreira do Reflect
     const mult = type ? defenseMultiplier(type, getPokemon(companion.member.pokemonId)?.types ?? [], CONFIG.types.defense) : 1;
-    amount *= mult;
+    // a chuva do Kyogre (0.37) vale para os golpes, não para a trombada
+    amount *= mult * (weather ? weatherMultiplier(this, type) : 1);
     const result = companion.takeDamage(amount);
     if (!result) return;
 
@@ -241,6 +246,13 @@ export class Run {
   /* ========================= loop ========================= */
 
   update(dt, move) {
+    // a Dive Ball balançando (0.37): tudo para, menos a bola e os efeitos
+    if (this.state === 'legendary') {
+      this.fight?.updateThrow(dt);
+      this._updateEffects(dt);
+      this._cleanup();
+      return;
+    }
     if (this.state !== 'running') return;
 
     this.time += dt;
@@ -258,6 +270,7 @@ export class Run {
 
     this.abilitySystem.update(dt);
     this.spawner.update(dt);
+    this.fight?.update(dt);
 
     // trecho atual da jornada (muda o cenário e o texto do HUD)
     const segment = segmentAt(this.stage, this.time);
@@ -402,7 +415,7 @@ export class Run {
 
     if (!victim || !enemy.tryAttack()) return;
 
-    this.damageCompanion(victim, enemy.damage, enemy.types[0]);
+    this.damageCompanion(victim, enemy.damage, enemy.types[0], { weather: false });
     const dx = victim.x - enemy.x;
     const dy = victim.y - enemy.y;
     const d = Math.hypot(dx, dy) || 1;
@@ -645,7 +658,8 @@ export class Run {
       bus.emit(EVENTS.STAGE_FAILED, { stage: this.stage });
       return;
     }
-    if (this.spawner.leaderDefeated && !this.endless) {
+    // capturou o Kyogre: a vitória espera a maré final (0.37)
+    if (this.spawner.leaderDefeated && !this.endless && !this.fight?.holding) {
       this.state = 'victory';
       bus.emit(EVENTS.STAGE_CLEARED, { stage: this.stage });
       return;

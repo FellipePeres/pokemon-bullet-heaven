@@ -17,6 +17,10 @@ import { Dive } from './Dive.js';
 import { DiveRenderer } from '../render/DiveRenderer.js';
 import { DiveHUD } from '../ui/diveHud.js';
 import { DIVE } from '../data/dive.js';
+import { KyogreHall } from './KyogreHall.js';
+import { KyogreHallRenderer } from '../render/KyogreHallRenderer.js';
+import { MaxieScene, SCENE_SPOTS } from './MaxieScene.js';
+import { showHallCard, hideHallCard } from '../ui/hallCard.js';
 import { HubRenderer } from '../render/HubRenderer.js';
 import { HubHUD } from '../ui/hubHud.js';
 
@@ -50,6 +54,8 @@ import { maxHpFor } from '../systems/stats.js';
 /** O máximo de tempo que um toque do relógio recupera (a aba escondida pode ficar sem toques). */
 /** Onde o jogador acorda depois de perder as bolhas: na frente da enfermeira do Centro. */
 const HUB_RESCUE_SPOT = { map: 'centro', x: 4, y: 5, dir: 'up' };
+/** A volta à superfície (o salão do Kyogre): na frente da lagoa da vila. */
+const LAKE_SPOT = SCENE_SPOTS.lagoa;
 const MAX_CATCH_UP = 60;
 
 export class Game {
@@ -88,6 +94,9 @@ export class Game {
     this.dive = new Dive({ onEnd: (result) => this._diveEnded(result) });
     this.diveRenderer = new DiveRenderer(document.getElementById('dive-canvas'));
     this.diveHud = new DiveHUD(this);
+    // o salão do Kyogre (0.37): o encontro e o card da fase, na mesma tela da descida
+    this.hall = new KyogreHall({ onCard: (stageId) => this._hallCard(stageId) });
+    this.hallRenderer = new KyogreHallRenderer(document.getElementById('hall-canvas'));
     if (typeof window !== 'undefined') window.addEventListener('resize', () => { if (this.diveOpen) this._resizeDive(); });
 
     this.run = null;
@@ -174,6 +183,19 @@ export class Game {
         this.hubRenderer.render(this.hub);
         this.hubHud.update(this.hub);
       }
+    } else if (this.diveOpen && this.hall.active) {
+      // o salão do Kyogre (0.37): andar em tiles até a margem, o encontro e o card
+      const move = this._hallDir(this.input.getMoveVector());
+      const running = this.input.isRunHeld();
+      do {
+        const dt = Math.min(0.05, elapsed);
+        elapsed -= dt;
+        this.hall.update(dt, move, running);
+      } while (elapsed > 0 && this.diveOpen && this.hall.active);
+      if (this.diveOpen && !hidden) {
+        this.hallRenderer.render(this.hall, this.profile.trainer);
+        this.diveHud.update(this.dive, this.hall);
+      }
     } else if (this.diveOpen) {
       // a descida: na pausa (ou com a aba escondida) as hordas param
       if (hidden) this.dive.togglePause(true);
@@ -220,6 +242,7 @@ export class Game {
   _updateMusic() {
     const run = this.run;
     let track = this.hubOpen ? (this.hub.place?.music ?? 'lobby-theme') : 'lobby-theme';
+    if (this.diveOpen && this.hall.active) track = 'mus_sevii_dungeon';   // o salão do Kyogre (0.37)
     if (this.hallOpen) track = 'mus_hall_of_fame';
     else if (this.centerOpen) track = 'mus_poke_center';
     else if (run?.state === 'victory') track = 'mus_victory_gym_leader';
@@ -252,6 +275,7 @@ export class Game {
       case 'defeat':
         // no Modo Livre, cair é só o fim dele: o que a equipe ganhou fica
         if (this.run.endless) this.leaveEndless();
+        else if (this.run.stage.returnTo === 'lake') this._legendaryDefeat();
         else this.endRun(false);
         break;
     }
@@ -573,6 +597,11 @@ export class Game {
     options.campaignStarter = this.campaign.starter;
 
     this.run = new Run(stageId, options);
+    // o Endless aquático (0.37): a fase já começa sem fim, sem líder
+    if (stage.endlessOnly) {
+      this.endlessBasePc = [...(journey?.pc ?? [])];
+      this.run.startEndless();
+    }
     this.preloadStage(stage);
     this.runEnded = false;
     this.levelUpOpen = false;
@@ -635,6 +664,12 @@ export class Game {
     this.runEnded = false;
     this.centerOpen = false;
     this.hud.hideAllOverlays();
+    // do salão do Kyogre, a volta é pela lagoa (0.37), com a cena do Maxie depois da captura
+    if (run?.stage.returnTo === 'lake') {
+      this.openHub(LAKE_SPOT);
+      this._maybeMaxieScene('lagoa');
+      return;
+    }
     // de volta para a vila, na frente de casa (0.29); de lá, o mapa está a um botão
     if (this.profile.trainer) this.openHub('home');
     else this.menus.show('screen-title');
@@ -646,7 +681,7 @@ export class Game {
     if (action.startsWith('pad:')) { this.handlePad(action.slice(4)); return; }
     // o A e o B da vila (Enter/Espaço/Z e X/Backspace)
     if (action === 'confirm' || action === 'cancel') {
-      if (this.diveOpen) { if (action === 'confirm') this.dive.confirm(); return; }
+      if (this.diveOpen) { if (action === 'confirm') (this.hall.active ? this.hall : this.dive).confirm(); return; }
       if (this.hubOpen && !this.menus.openModal) {
         if (action === 'confirm') this.hub.confirm();
         else this.hub.cancel();
@@ -654,7 +689,7 @@ export class Game {
       return;
     }
     if (action === 'pause') {
-      if (this.diveOpen) { this.dive.togglePause(); this.input.clear(); return; }
+      if (this.diveOpen) { if (!this.hall.active) this.dive.togglePause(); this.input.clear(); return; }
       // fora da partida, ESC fecha a janela aberta (e, na vila, a conversa)
       if (this.menus.openModal) { this.menus.closeModal(); return; }
       // na escolha do inicial, ESC é o Voltar: de volta ao laboratório (0.31)
@@ -685,7 +720,7 @@ export class Game {
    */
   handlePad(button) {
     if (this.diveOpen) {
-      if (button === 'a') this.dive.confirm();
+      if (button === 'a') (this.hall.active ? this.hall : this.dive).confirm();
       else if (button === 'start') this.dive.togglePause();
       return;
     }
@@ -856,6 +891,7 @@ export class Game {
 
   pickCapture(pokemonId, shiny = false) {
     const run = this.run;
+    if (pokemonId === 'kyogre') this.diveRecord.captured = true;   // o Kyogre (0.37): a cena do Maxie vem depois
     if (run.team.isFull) {
       // equipe cheia: quem sai vai para o PC — ou o novo vai direto para lá
       this.hud.showReplace({ ...getPokemon(pokemonId), shiny }, run.team.members, (memberUid) => {
@@ -950,6 +986,7 @@ export class Game {
   _resizeDive() {
     if (typeof window === 'undefined') return;
     this.diveRenderer.resize(window.innerWidth - 32, window.innerHeight - 120);
+    this.hallRenderer.resize(window.innerWidth - 32, window.innerHeight - 90);   // o salão do Kyogre (0.37)
   }
 
   /** A direção segurada: na diagonal, a do passo de agora continua (como na vila). */
@@ -991,13 +1028,84 @@ export class Game {
     }
     record.reachedCave = (record.reachedCave ?? 0) + 1;
     this.autosave();
-    this.dive.mode = 'transition';
-    this.dive.say(DIVE.lines.caveSoon, () => {
-      this.dive.mode = 'over';
-      this.diveOpen = false;
-      this.openHub();
-      toast(`A descida inteira: ${DIVE.levels.at(-1).depth} m! A Caverna Marinha espera você.`, '🌊');
+    this._openHall();
+  }
+
+  /* ====================== O salão do Kyogre (0.37) ====================== */
+
+  /** Passou o Nível 6: emerge no salão da Caverna Marinha (game/KyogreHall.js). */
+  _openHall() {
+    this.hallRenderer.preload();
+    this.hall.start({ captured: !!this.diveRecord.captured });
+    document.getElementById('dive-console')?.classList.add('hidden');
+    document.getElementById('hall-stage')?.classList.remove('hidden');
+    this._resizeDive();
+    this.diveHud.reset();
+    this.input.clear();
+  }
+
+  /** O salão de volta para a descida (a tela some ao sair). */
+  _closeHall() {
+    this.hall.stop();
+    hideHallCard();
+    document.getElementById('dive-console')?.classList.remove('hidden');
+    document.getElementById('hall-stage')?.classList.add('hidden');
+  }
+
+  /** A direção segurada no salão (o passo em tiles, como na vila). */
+  _hallDir(move) {
+    if (!move || (!move.x && !move.y)) return null;
+    const horizontal = move.x > 0 ? 'right' : 'left';
+    const vertical = move.y > 0 ? 'down' : 'up';
+    if (move.x && move.y) {
+      const face = this.hall.p?.dir;
+      if (face === horizontal || face === vertical) return face;
+      return Math.abs(move.x) >= Math.abs(move.y) ? horizontal : vertical;
+    }
+    return move.x ? horizontal : vertical;
+  }
+
+  /** O card da fase, depois do encontro (ou, com o Kyogre na jornada, o do Endless). */
+  _hallCard(stageId) {
+    showHallCard(this, stageId, {
+      onPlay: () => {
+        this._closeHall();
+        this.diveOpen = false;
+        this.startStage(stageId);
+      },
+      onBack: () => {
+        this._closeHall();
+        this.diveOpen = false;
+        this.openHub(LAKE_SPOT);
+        toast('Você nada de volta e sai pela lagoa.', '🌊');
+      }
     });
+  }
+
+  /**
+   * Caiu na luta do Kyogre: acorda no Centro, na frente da enfermeira (a luta não
+   * recomeça: outra chance exige descer de novo). Se já tinha capturado, o Kyogre
+   * ficou na equipe, e a cena do Maxie acontece ali.
+   */
+  _legendaryDefeat() {
+    this.endRun(false);   // guarda a jornada (com o Kyogre, se ele já foi capturado) e as métricas
+    this.hud.hideAllOverlays();
+    this.run = null;
+    this.runEnded = false;
+    this.diveRecord.rescues = (this.diveRecord.rescues ?? 0) + 1;
+    this.autosave();
+    this.openHub(HUB_RESCUE_SPOT);
+    if (!this._maybeMaxieScene('centro')) this.hub.say('enfermeira_resgate');
+  }
+
+  /** A cena do Maxie, uma vez por jornada, logo depois da captura. Devolve se começou. */
+  _maybeMaxieScene(version) {
+    const record = this.diveRecord;
+    if (!record.captured || record.sceneSeen) return false;
+    record.sceneSeen = true;
+    this.autosave();
+    this.hub.scene = new MaxieScene(this.hub, version, { playerName: this.playerName });
+    return true;
   }
 
   /* ============================ Modo Livre (0.20) ============================ */

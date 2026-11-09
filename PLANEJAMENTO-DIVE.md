@@ -469,7 +469,20 @@ como no jogo original. As fraquezas no card (Elétrico e Planta) são a dica.
    **a bola não conta como gasta** (padrão): volta na próxima exaustão.
 7. **Sem Dive Balls:** o piso de vida sai, e o Kyogre pode ser derrotado.
 
-Com 10% em cada uma das 3 bolas, capturar numa luta é ~27%. Errar não perde a luta: dá para
+Com 10% em cada uma das 3 bolas, capturar numa luta é ~27%.
+
+**A medição no jogo** (0.37, `node tools/kyogre.mjs`): a equipe de pós-jogo do Fellipe
+(os 5 lendários de Kanto e o Blastoise, com todas as melhorias):
+- **nível 80:** vence 1 de 3;
+- **nível 90:** vence 2 de 3, com 3 a 5 desmaios;
+- no Campeão, a mesma equipe no nível 80 vence sem desmaio.
+
+É o "extremamente difícil, recomendado 90+" do pedido. Para o equilíbrio:
+- As hordas ficam no nível 68 a 72, a mesma distância do recomendado que as do
+  Campeão (o 90 menos ~20).
+- Com o Kyogre em campo, a maré fica leve, como nas lutas dos líderes.
+- A chuva vale para os golpes, não para a trombada.
+- A alavanca é a `difficulty` da fase (hoje 1; com 0,8, a de 80 vencia todas). Errar não perde a luta: dá para
 vencer, ganhar a recompensa e tentar a captura numa próxima descida.
 
 ### O fim da luta
@@ -666,16 +679,16 @@ Cada etapa é entregável sozinha, com `npm test` e screenshots.
    - o gatilho da lagoa e o resgate no Centro;
    - os testes de que toda horda sorteada tem saída e de que nenhum passo sai da
      água navegável.
-3. **D-3 — A caverna:** o salão como um lugar da vila (o mesmo motor do
+3. **D-3 — A caverna** (feita na 0.37, como a maquete aprovada): o salão como um lugar da vila (o mesmo motor do
    `game/Hub.js`), o Kyogre e as falas.
-4. **D-4 — A luta:**
+4. **D-4 — A luta** (feita na 0.37; a medição na seção 9):
    - a fase do Kyogre em `data/stages.js` e o chefe em `data/enemies.js`;
    - os ataques (de preferência com os comportamentos que já existem);
    - a chuva, as 3 Dive Balls e a maré final de 30 s;
    - a volta pela lagoa.
-5. **D-5 — O Kyogre na equipe:** a espécie especial, o kit e o `check-data`; a captura
+5. **D-5 — O Kyogre na equipe** (feita na 0.37): a espécie especial, o kit e o `check-data`; a captura
    chama `registerSecret('kyogre')` (o "???" da Pokédex já existe desde a 0.35).
-6. **D-6 — A cena e o Endless:** a cena da história (na lagoa ou no Centro) e a
+6. **D-6 — A cena e o Endless** (feita na 0.37): a cena da história (na lagoa ou no Centro) e a
    fase Endless aquática sem XP.
 7. **D-7 — Capricho:** os sons (o mergulho, a bolha que estoura, o alarme do
    aviso), as falas e os prêmios; medir a luta com o `balance.mjs` numa equipe

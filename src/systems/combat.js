@@ -18,7 +18,7 @@ export function nearestEnemy(run, x, y, maxRange, exclude = null) {
   let best = null;
   let bestScore = Infinity;
   for (const e of candidates) {
-    if (e.dead || e === exclude) continue;
+    if (e.dead || e.hidden || e === exclude) continue;
     const dx = e.x - x, dy = e.y - y;
     const d2 = dx * dx + dy * dy;
     if (d2 > maxD2) continue;
@@ -33,7 +33,7 @@ export function enemiesInRadius(run, x, y, radius) {
   const out = [];
   const r2 = radius * radius;
   for (const e of run.grid.query(x, y, radius)) {
-    if (e.dead) continue;
+    if (e.dead || e.hidden) continue;
     const dx = e.x - x, dy = e.y - y;
     if (dx * dx + dy * dy <= r2 + e.radius * e.radius) out.push(e);
   }
@@ -89,16 +89,30 @@ export function bonusHeal(run, companion, amount) {
 }
 
 /**
+ * O tempo da fase (0.37): na chuva do Kyogre (Drizzle), Água ×1,5 e Fogo ×0,5,
+ * para todos — os golpes da equipe e os dos inimigos.
+ */
+export function weatherMultiplier(run, type) {
+  if (run?.stage?.weather !== 'rain' || !type) return 1;
+  return type === 'water' ? 1.5 : type === 'fire' ? 0.5 : 1;
+}
+
+/**
  * Causa dano a um inimigo.
  * opts: { type, effects, knockback, from:{x,y}, silent (sem número), source }
  */
 export function damageEnemy(run, enemy, amount, opts = {}) {
-  if (enemy.dead) return 0;
+  if (enemy.dead || enemy.untouchable) return 0;   // o Kyogre submerso (0.37) não leva dano
 
   const mult = opts.type ? typeMultiplier(opts.type, enemy.types) : 1;
   const weak = enemy.status?.weak ? 1 + enemy.status.weak.amount : 1;   // Acid Spray
-  const dealt = amount * mult * weak;
+  const dealt = amount * mult * weak * weatherMultiplier(run, opts.type);
   enemy.hp -= dealt;
+  // o piso de vida do Kyogre (0.37): enquanto houver Dive Ball, ele fica exausto em vez de cair
+  if (enemy.hpFloor != null && enemy.hp < enemy.hpFloor) {
+    enemy.hp = enemy.hpFloor;
+    run.fight?.onFloor(enemy);
+  }
   enemy.hitFlash = 0.08;
   run.stats.damageDealt += dealt;
 

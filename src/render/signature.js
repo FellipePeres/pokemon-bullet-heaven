@@ -512,5 +512,25 @@ const DRAW = {
       }
       ctx.globalAlpha = 1;
     }
+  },
+
+  /** Kyogre: anéis de onda azuis, com a espuma clara na borda e as marcas do Kyogre girando. */
+  origin_pulse(ctx, sig) {
+    for (const ring of sig.rings) {
+      if (sig.age < ring.start || ring.done || ring.radius <= 0) continue;
+      const k = ring.radius / sig.maxRadius;
+      ctx.globalAlpha = 1 - k * 0.6;
+      outlinedRing(ctx, sig.x, sig.y, ring.radius, 9 * (1 - k * 0.5), 'rgba(10,30,90,.8)', '#3d8bff', '#d8f2ff');
+      // as marcas vermelhas do Kyogre na onda
+      ctx.strokeStyle = 'rgba(255,90,80,.85)';
+      ctx.lineWidth = 3;
+      for (let i = 0; i < 6; i++) {
+        const a = sig.seed + i * (TAU / 6) + sig.age * 1.5;
+        ctx.beginPath();
+        ctx.arc(sig.x, sig.y, ring.radius - 10, a, a + 0.32);
+        ctx.stroke();
+      }
+    }
+    ctx.globalAlpha = 1;
   }
 };

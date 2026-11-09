@@ -371,6 +371,41 @@ const ROTEIROS = {
     { run: "game.dive.lives = 1; game.dive.p.c = 4; game.dive.p.r = 3; game.dive.inv = 0" }, { wait: 4500 },
     { run: "game.hub.dialog && (game.hub.dialog.shown = 999)" }, { wait: 300 }, { shot: 'descida-7-resgate' }
   ],
+  // o salão do Kyogre (0.37): o encontro, o card, a luta, a captura, a maré final e a cena do Maxie
+  kyogre: [
+    { open: 'index.html' }, { wait: 500 },
+    { run: "game.newGame(); game.chooseTrainer('red'); game.chooseStarter('squirtle');" +
+           "game.campaign.journey = { team: { members: [" +
+           "{ uid: 'a', pokemonId: 'blastoise', level: 90, xp: 0, hp: 0, abilities: ['hydro_pump', 'dive'], upgrades: {} }," +
+           "{ uid: 'b', pokemonId: 'zapdos', level: 90, xp: 0, hp: 0, abilities: ['zap_cannon'], upgrades: {} }," +
+           "{ uid: 'c', pokemonId: 'mewtwo', level: 90, xp: 0, hp: 0, abilities: ['psystrike'], upgrades: {} }], active: ['a', 'b', 'c'] }, pc: [] };" +
+           "document.getElementById('toast-container').style.display = 'none';" +
+           "window.autoText = setInterval(() => { const h = game.hub; if (h?.dialog && h.dialog.shown >= h.dialog.pages[h.dialog.index].length) h.dialog.t2 = (h.dialog.t2 ?? 0) + 1; if (h?.dialog?.t2 > 12) { h.dialog.t2 = 0; h.confirm(); } const k = game.hall; if (k?.dialog && k.dialog.shown >= k.dialog.pages[k.dialog.index].length) { k.dialog.t2 = (k.dialog.t2 ?? 0) + 1; if (k.dialog.t2 > 12) k.confirm(); } }, 100);" +
+           "game.openHub('home'); game.openDive(); game.dive.start(5); game.dive.levelDone();" +
+           "for (let i = 0; i < 3600 && !game.hall.active; i++) { if (game.dive.dialog) { game.dive.dialog.shown = 999; game.dive.confirm(); } game.dive.update(1 / 60); }" },
+    { wait: 1400 }, { shot: 'kyogre-1-emergir' },
+    { run: "game.hall.skipWalk()" }, { wait: 4200 }, { shot: 'kyogre-2-margem' },
+    { run: "{ const h = game.hall; for (let i = 0; i < 600 && h.script[0]?.kind !== 'awaken'; i++) { if (h.dialog) { h.dialog.shown = 999; h.confirm(); } h.update(1 / 60); } }" },
+    { wait: 250 }, { shot: 'kyogre-3-despertar' },
+    { run: "{ const h = game.hall; for (let i = 0; i < 600 && h.script[0]?.kind !== 'approach'; i++) h.update(1 / 60); for (let i = 0; i < 70; i++) h.update(1 / 60); }" },
+    { wait: 100 }, { shot: 'kyogre-4-aproxima' },
+    { run: "{ const h = game.hall; for (let i = 0; i < 600 && h.script[0]?.kind !== 'transition'; i++) h.update(1 / 60); for (let i = 0; i < 75; i++) h.update(1 / 60); }" },
+    { wait: 100 }, { shot: 'kyogre-5-transicao' },
+    { run: "{ const h = game.hall; for (let i = 0; i < 600 && h.mode !== 'card'; i++) h.update(1 / 60); }" },
+    { wait: 900 }, { shot: 'kyogre-6-card' },
+    { run: "document.getElementById('hall-play').click(); game.run.time = 20" }, { wait: 3500 }, { shot: 'kyogre-7-mare', raw: true },
+    { run: "game.run.time = 44.6" }, { wait: 1400 }, { shot: 'kyogre-8-apresentacao' },
+    { run: "game.closeLeaderIntro()" }, { wait: 2600 }, { shot: 'kyogre-9-kyogre', raw: true },
+    { run: "{ const f = game.run.fight; f.rng = () => 0.4; f._attack(game.run.boss, 0.4); f.rng = Math.random; }" }, { wait: 700 }, { shot: 'kyogre-10-ataque', raw: true },
+    { run: "import('./src/systems/combat.js').then(({ damageEnemy }) => { game.run.player.x -= 300; damageEnemy(game.run, game.run.boss, 1e9); })" }, { wait: 500 }, { shot: 'kyogre-11-exausto', raw: true },
+    { run: "{ const r = game.run; r.fight.t = 0; r.fight.rng = () => 0.01; r.player.x = r.fight.ball.x; r.player.y = r.fight.ball.y }" }, { wait: 2200 }, { shot: 'kyogre-12-balanco', raw: true },
+    { wait: 3000 }, { shot: 'kyogre-13-captura' },
+    { run: "game.pickCapture('kyogre')" }, { wait: 2500 }, { shot: 'kyogre-14-mare-final', raw: true },
+    { run: "game.run.fight.final.t = 0.05" }, { wait: 1500 }, { shot: 'kyogre-15-vitoria' },
+    { run: "game.quitToMenu()" }, { wait: 6500 }, { shot: 'kyogre-16-maxie' },
+    { wait: 5200 }, { shot: 'kyogre-17-crobat' },
+    { wait: 2600 }, { shot: 'kyogre-18-voar' }
+  ],
   // o lendário secreto no fim da Pokédex (0.35): o "???" e, capturado, o Kyogre
   pokedex: [
     { open: 'index.html' }, { wait: 500 },

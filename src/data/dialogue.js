@@ -20,6 +20,7 @@
  *            dive      alguém da equipe sabe Dive (seção 8 do planejamento)
  *            diveTm    a TM Dive está na loja: alguém da jornada pode aprender (0.34)
  *            diveRescued  o pescador já o tirou da água desmaiado (a descida, 0.36)
+ *            kyogre    o Kyogre já foi capturado nesta jornada (0.37)
  *            locked    a saída que este guarda está travada (a fala da trava)
  *            once      só uma vez por jornada: a chave fica guardada depois de mostrar
  *                      ({badges} vira o número de insígnias: uma vez por insígnia)
@@ -248,6 +249,7 @@ export const DIALOGUE = {
   pescador: {
     name: 'Pescador',
     lines: [
+      { when: { kyogre: true }, say: ['Então era ISSO que vivia lá embaixo?! E eu jogando minhoca...'] },
       { when: { diveRescued: true, once: 'pescador_resgate' }, say: ['Ô, peixão! Quase arrebentou a minha linha. Da próxima vez, avisa antes de afundar!'] },
       { when: { dive: true }, say: ['Esse seu Pokémon... ele sabe mergulhar, não sabe? Vai lá e me conta o que tem no fundo!'] },
       { say: ['Às vezes fico imaginando o que tem lá embaixo... Se eu soubesse mergulhar, descobriria.'] }

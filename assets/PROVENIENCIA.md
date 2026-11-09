@@ -91,7 +91,22 @@ python tools/assets/dive.py      # procura ../pokeemerald e ../Pokemon All
 | `dive/cave.png` | `data/layouts/Underwater_MarineCave` (a entrada submersa da Caverna Marinha) |
 | `dive/red.png`, `dive/leaf.png` | o Red e a Leaf do jogo (`trainers/`), pintados com os 4 tons de `graphics/object_events/palettes/player_underwater.pal` e sentados na sombra do Pokémon de `object_events/pics/people/brendan/underwater.png` (o Emerald só tem o Brendan e a May submersos) |
 | `pokemon/gen3/icons/<n>.png` de Hoenn (318-321, 340-342, 350, 365-369, 382) | os ícones de caixa do Emerald, via `assets/pokemon/gen3/icons/` do Pokemon All, de 4x para 1x |
-| `src/data/diveWorld.js` | o catálogo: o recorte, a grade navegável, os tabuleiros, a saída e a entrada de cada mapa |
+| `src/data/diveWorld.js` | o catálogo: o recorte, a grade navegável, os tabuleiros, a saída e a entrada de cada mapa; o salão, a arena e as folhas do modo aquático |
+| `dive/hall.png` (0.37) | `data/layouts/MarineCave_End` (o salão do Kyogre), com o tileset `cave`; a colisão vai para o catálogo |
+| `dive/kyogre_ow.png` | `graphics/object_events/pics/pokemon/kyogre.png`, com a paleta `npc_4.pal` (a do `OBJ_EVENT_PAL_TAG_NPC_4`) |
+| `dive/fog.png` | `graphics/weather/fog_horizontal.png` com `fog.pal` (o tempo `WEATHER_FOG_HORIZONTAL` do salão) |
+| `dive/transition.png` | a transição `B_TRANSITION_KYOGRE`: `graphics/battle_transitions/kyogre.png` e `kyogre.bin`, um quadro por paleta de `kyogre_pt1.pal` (10) e `kyogre_pt2.pal` (14) |
+| `scenes/marine_cave.png` | as metatiles da arena da luta (o chão, a rocha e o lago do `MarineCave_End`); o layout da arena vai para o catálogo |
+| `ui/gym-banners/kyogre_hall.png` | o lago do `MarineCave_End`, o banner do card da fase |
+| `dive/maxie.png` | `graphics/object_events/pics/people/team_magma/maxie.png`, com a paleta `npc_2.pal` |
+| `dive/exclam.png`, `dive/bird.png` | `graphics/field_effects/pics/emotion_exclamation.png` e `bird.png` |
+| `dive/band_out.png`, `dive/band_in.png` | o corte de tela do Voar: `field_move_streaks` e `field_move_streaks_indoors` (tiles e tilemap) |
+| `dive/crobat.png` | o Crobat da Gen 3 (`assets/pokemon/gen3/front/169.png` do Pokemon All), reduzido a 64x64 |
+| `pokemon/<dex>.png` de Hoenn e o Kyogre (318-321, 340, 342, 350, 365, 367-369, 382; e `pokemon/shiny/382.png`) | os GIFs da Gen 5 do Pokemon All (`assets/pokemon/battle`), no mesmo corte do extract.py |
+| `pokemon/gen3/front/382.png`, `items/dive-ball.png`, `sound/cries/382.ogg` | do Pokemon All: o Kyogre da Gen 3, a Dive Ball (PokeAPI) e o grito do Kyogre |
+
+A música da luta do Kyogre, `music/mus_vs_legend.ogg` (0.37), é a "Vs. Lendário" do FireRed, pelo
+`tools/assets/render_music.py` (a partitura do decomp pret/pokefirered).
 
 ## Copiados do Pokemon All
 

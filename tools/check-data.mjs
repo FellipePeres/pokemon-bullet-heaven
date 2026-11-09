@@ -21,7 +21,8 @@ import { TRAINER_LOOKS } from '../src/data/trainers.js';
 import { REGIONS } from '../src/data/regions.js';
 import { FX, ABILITY_FX, BOSS_WAVE_FX, STATUS_FX } from '../src/data/fx.js';
 import { SCENES, stageScenes } from '../src/data/scenery.js';
-import { SCENE_TILES } from '../src/data/sceneManifest.js';
+import { ALL_SCENE_TILES as SCENE_TILES } from '../src/data/sceneTiles.js';
+import { DIVE_WORLD } from '../src/data/diveWorld.js';
 import { buildSceneGrid, TILE } from '../src/systems/terrain.js';
 import { HUB } from '../src/data/hub.js';
 import { HUB_MAPS, HUB_SPRITES, HUB_DECOR } from '../src/data/hubMaps.js';
@@ -101,7 +102,8 @@ const encounterStages = Object.keys(LEGENDARY_ENCOUNTERS);
 const badEncounter = encounterStages.filter((id) => !STAGES[id] || !(STAGES[id].maxBalls > 0) ||
   LEGENDARY_ENCOUNTERS[id].pool.some((p) => !LEGENDARY_KITS[p]));
 const inPools = Object.values(CAPTURE_POOLS).flatMap((pool) => Object.keys(pool.species)).filter((id) => LEGENDARY_KITS[id]);
-const nowhere = Object.keys(LEGENDARY_KITS).filter((id) => !encounterStages.some((s) => LEGENDARY_ENCOUNTERS[s].pool.includes(id)));
+// o lendário secreto (o Kyogre, 0.37) vem da luta do salão, não do sorteio da Poké Ball
+const nowhere = Object.keys(LEGENDARY_KITS).filter((id) => !POKEMON[id]?.secret && !encounterStages.some((s) => LEGENDARY_ENCOUNTERS[s].pool.includes(id)));
 badEncounter.length || inPools.length || nowhere.length
   ? fail(`encontros de lendário: fase inválida ou sem Poké Ball (${badEncounter.join(', ')}), lendário na tabela comum ` +
          `(${inPools.join(', ')}), lendário sem onde aparecer (${nowhere.join(', ')})`)
@@ -193,7 +195,7 @@ noFx.length ? fail(`golpes sem efeito visual: ${noFx.map((a) => a.id).join(', ')
 const badSegments = Object.values(STAGES).flatMap((stage) =>
   (stage.segments ?? []).filter((seg) => seg.scene && !SCENES[seg.scene]).map((seg) => `${stage.id}/${seg.name}=${seg.scene}`));
 const badSheets = Object.entries(SCENES)
-  .filter(([, recipe]) => !SCENE_TILES[recipe.sheet] || !ASSET_MANIFEST[`scene/${recipe.sheet}`]).map(([id]) => id);
+  .filter(([, recipe]) => !SCENE_TILES[recipe.sheet] || !(ASSET_MANIFEST[`scene/${recipe.sheet}`] ?? DIVE_WORLD.sprites[`scene/${recipe.sheet}`])).map(([id]) => id);
 // recortes dos salões dentro do mapa original
 const rectsOf = (r) => [r.floor, r.center, r.block, r.top?.door, ...(r.props ?? [])].filter(Boolean);
 const badRects = Object.entries(SCENES).filter(([, r]) => SCENE_TILES[r.sheet]?.grid).flatMap(([id, r]) => {
@@ -252,7 +254,7 @@ badSegments.length ? fail(`trechos com cenário inexistente: ${badSegments.join(
 // a vila (0.29): mapas gerados, portas, saídas, pessoas, objetos e falas
 {
   const issues = [];
-  const KNOWN_WHEN = new Set(['starter', 'starterIs', 'shiny', 'badges', 'champion', 'dex', 'veteran', 'dive', 'diveTm', 'diveRescued', 'locked', 'once']);
+  const KNOWN_WHEN = new Set(['starter', 'starterIs', 'shiny', 'badges', 'champion', 'dex', 'veteran', 'dive', 'diveTm', 'diveRescued', 'kyogre', 'locked', 'once']);
   const KNOWN_ACTIONS = new Set(['starter', 'pc', 'mart', 'save', 'campaign', 'pokedoll', 'badges', 'aquatic']);
   const floor = (mapId, x, y) => {
     const map = HUB_MAPS[mapId];

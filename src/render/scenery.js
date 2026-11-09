@@ -1,5 +1,5 @@
 import { SCENES } from '../data/scenery.js';
-import { SCENE_TILES } from '../data/sceneManifest.js';
+import { ALL_SCENE_TILES as SCENE_TILES } from '../data/sceneTiles.js';
 import { getSheet, preloadAssets } from './assets.js';
 
 /**

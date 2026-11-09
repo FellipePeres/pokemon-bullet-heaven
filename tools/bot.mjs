@@ -47,7 +47,7 @@ export function spendLevel(run, member) {
  * dos líderes, e vai atrás da Poké Ball quando ela aparece. Fugir de tudo
  * deixava a equipe sem alcançar ninguém.
  */
-function steer(run) {
+export function steer(run) {
   const { player } = run;
   const angle = run.time * 0.9;
   let mx = Math.cos(angle), my = Math.sin(angle);
@@ -63,7 +63,9 @@ function steer(run) {
   for (const z of run.zones) if (z.hostile && !z.dead) flee(z.x, z.y, (z.maxRadius ?? 200) + 50, 3);
   for (const p of run.projectiles) if (p.hostile && !p.dead) flee(p.x, p.y, 90, 2.5);
 
-  const ball = run.pickups.find((p) => p.kind === 'ball' && !p.dead);
+  // a luta do Kyogre (0.37): foge dos avisos no chão e vai até a Dive Ball
+  for (const h of run.fight?.hazards ?? []) if (!h.fired) flee(h.x, h.y, h.r + 60, 3);
+  const ball = run.fight?.ball ?? run.pickups.find((p) => p.kind === 'ball' && !p.dead);
   if (ball) {
     const dx = ball.x - player.x, dy = ball.y - player.y;
     const d = Math.hypot(dx, dy) || 1;

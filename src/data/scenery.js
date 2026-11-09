@@ -11,6 +11,7 @@
  *   cave    chão de caverna, crateras, pedras e paredões do Monte Lua
  *   room    salão: piso, paredes e enfeites recortados do mapa do ginásio
  *   repeat  um bloco do mapa repetido na arena toda (as salas de Saffron)
+ *   fixed   o layout pronto da tira (o salão do Kyogre, 0.37: tools/assets/dive.py)
  *
  * O andar continua livre: o cenário é só chão desenhado, nada bloqueia.
  *
@@ -135,7 +136,9 @@ export const SCENES = {
     center: [5, 7, 3, 4],
     props: [[3, 6, 7, 1], [3, 11, 7, 1], [5, 7, 3, 4]],
     spacing: 10
-  }
+  },
+  // o salão do Kyogre (0.37): a arena aprovada na maquete, com o tileset cave do Emerald
+  kyogre_hall: { sheet: 'marine_cave', kind: 'fixed' }
 };
 
 function leagueRoom(sheet) {

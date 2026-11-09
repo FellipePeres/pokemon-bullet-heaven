@@ -113,7 +113,7 @@ numa derrota), da **primeira** vitória de cada fase e das conquistas. Gaste no
 **Poké Mart** (o balcão do Centro Pokémon, na vila, ou o botão no mapa da jornada):
 Novo Sorteio (300) e Reviver (600) vão para a mochila; a TM (1.500) ensina o
 próximo golpe na hora; a TM Dive (1.500), que só aparece quando um Pokémon de
-Água já tem o Golpe Desperto, troca esse golpe por Dive para sempre (e, com Dive na equipe, a lagoa da vila leva a uma descida pelo fundo do mar); as pedras e o Cabo de Troca (2.500) são a única forma de
+Água já tem o Golpe Desperto, troca esse golpe por Dive para sempre (e, com Dive na equipe, a lagoa da vila leva a uma descida pelo fundo do mar e a um segredo lá embaixo); as pedras e o Cabo de Troca (2.500) são a única forma de
 evoluir quem evolui por item (Pikachu, Eevee, Kadabra, Gloom...). E na loja de
 Pokédolls, nos enfeites do quarto.
 

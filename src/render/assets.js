@@ -1,12 +1,14 @@
 import { ASSET_MANIFEST } from '../data/assetManifest.js';
 import { HUB_MAPS, HUB_SPRITES, HUB_DECOR } from '../data/hubMaps.js';
+import { DIVE_WORLD } from '../data/diveWorld.js';
 
 /**
  * O catálogo inteiro: o do extract.py e o da vila (tools/assets/hub.py). Cada
  * mapa da vila entra como uma folha de um quadro só: `hub/<mapa>` (o chão) e
  * `hub/<mapa>-top` (o que cobre os personagens).
  */
-const MANIFEST = { ...ASSET_MANIFEST, ...HUB_SPRITES };
+// e as do modo aquático (tools/assets/dive.py): Hoenn, o Kyogre, o salão, a cena do Maxie
+const MANIFEST = { ...ASSET_MANIFEST, ...HUB_SPRITES, ...DIVE_WORLD.sprites };
 for (const [id, map] of Object.entries(HUB_MAPS)) {
   const size = { frameWidth: map.width * 16, frameHeight: map.height * 16, frames: 1 };
   MANIFEST[`hub/${id}`] = { src: map.src, ...size };

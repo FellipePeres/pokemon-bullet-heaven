@@ -41,6 +41,7 @@ export class Hub {
     this.path = null;       // os passos de um clique (andar até o tile)
     this.pending = null;    // o que fazer ao chegar (falar, entrar na porta, sair)
     this.awaitStarter = false;
+    this.scene = null;      // a cena do Maxie (0.37, game/MaxieScene.js): enquanto dura, o jogador não anda
   }
 
   /* ============================== lugares ============================== */
@@ -149,6 +150,13 @@ export class Hub {
     if (!this.map) return;
     if (this.banner && (this.banner.t -= dt) <= 0) this.banner = null;
     if (this.fade) { this._updateFade(dt); return; }
+    // a cena do Maxie (0.37): o roteiro anda, e a caixa de texto é a da vila
+    if (this.scene) {
+      this.scene.update(dt);
+      if (this.dialog) this._updateDialog(dt);
+      if (this.scene?.done) this.scene = null;
+      return;
+    }
     this._updateNpcs(dt);
     if (this.dialog) { this._updateDialog(dt); return; }
 
@@ -318,7 +326,7 @@ export class Hub {
   confirm() {
     if (this.fade || !this.map) return;
     if (this.dialog) { this._advance(); return; }
-    if (this.player.moving) return;
+    if (this.player.moving || this.scene) return;
     this.interact();
   }
 
@@ -471,6 +479,7 @@ export class Hub {
       dex: game.tracker.dexProgress.caught,
       veteran: game.listJourneys().some((j) => !j.active && j.progress?.starter),
       dive: members.some((m) => m.abilities?.includes('dive')),
+      kyogre: !!campaign.dive?.captured,
       diveTm: game.martTargets('tm_dive').length > 0,
       diveRescued: (campaign.dive?.rescues ?? 0) > 0,
       locked: !!extra.locked,
@@ -485,7 +494,7 @@ export class Hub {
     if (!when) return true;
     for (const [key, value] of Object.entries(when)) {
       switch (key) {
-        case 'starter': case 'shiny': case 'champion': case 'veteran': case 'dive': case 'diveTm': case 'diveRescued': case 'locked':
+        case 'starter': case 'shiny': case 'champion': case 'veteran': case 'dive': case 'diveTm': case 'diveRescued': case 'kyogre': case 'locked':
           if (ctx[key] !== value) return false;
           break;
         case 'starterIs': if (ctx.starterId !== value) return false; break;
@@ -515,6 +524,7 @@ export class Hub {
    * alguém, numa placa ou numa porta: anda até o lado, vira e fala (ou entra).
    */
   clickTile(tx, ty) {
+    if (this.scene) { if (this.dialog) this.confirm(); return; }
     if (this.fade || !this.map) return;
     if (this.dialog) { this.confirm(); return; }
     const p = this.player;

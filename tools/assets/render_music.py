@@ -917,6 +917,7 @@ MUSIC = {
     'mus_victory_gym_leader': 'a vitória sobre o líder',
     'mus_hall_of_fame': 'o Hall da Fama',
     'mus_poke_center': 'o Centro Pokémon, depois de uma derrota',
+    'mus_vs_legend': 'a luta contra o Kyogre, no salão da Caverna Marinha (0.37)',
 }
 #: As vinhetas: tocam uma vez, sem loop (não entram em musicTracks.js).
 JINGLES = {

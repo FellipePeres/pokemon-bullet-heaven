@@ -1101,8 +1101,11 @@ console.log('\n[conteúdo]');
         `${Math.round(plain.maxHp)} → ${Math.round(leveled.maxHp)} de vida`);
 
   // Kanto inteira: 151 espécies e as 13 etapas jogáveis
-  check('os 151 de Kanto são jogáveis', Object.keys(POKEMON).length === 151, `${Object.keys(POKEMON).length}`);
-  check('as 13 etapas de Kanto existem', Object.keys(STAGES).length === 13, `${Object.keys(STAGES).length}`);
+  // (o Kyogre, 0.37, é o lendário secreto: fora das 151, como as 2 fases do salão estão fora da campanha)
+  const kanto = Object.values(POKEMON).filter((p) => !p.secret);
+  check('os 151 de Kanto são jogáveis', kanto.length === 151, `${kanto.length}`);
+  const campaign = Object.values(STAGES).filter((st) => !st.secret);
+  check('as 13 etapas de Kanto existem', campaign.length === 13, `${campaign.length}`);
 }
 
 // ----------------------------------------------------------- 6b. treinador
@@ -1259,6 +1262,48 @@ console.log('\n[a descida do Dive — nunca é impossível, só água navegável
   const at = walk.p.c;
   walk.update(1 / 60, 'r');
   check('o passo sai no primeiro toque (sem o "só virar" da vila)', walk.p.c === at + 1);
+}
+
+// ------------------------------------------- o salão do Kyogre (0.37, PLANEJAMENTO-DIVE seções 8 a 10)
+console.log('\n[o salão do Kyogre — a luta, a captura e o Kyogre na equipe]');
+{
+  const { weatherMultiplier } = await import('../src/systems/combat.js');
+  const fight = new Run('kyogre', { starter: 'squirtle' });
+  check('a arena é o salão aprovado (o layout pronto do tileset cave), com a chuva',
+        fight.world.scene === 'kyogre_hall' && fight.stage.weather === 'rain' && !!fight.fight && fight.terrain.grid('kyogre_hall').cells.length === 75 * 50);
+  check('a chuva (Drizzle): Água x1,5 e Fogo x0,5, só nesta fase',
+        weatherMultiplier(fight, 'water') === 1.5 && weatherMultiplier(fight, 'fire') === 0.5 && weatherMultiplier(fight, 'grass') === 1
+        && weatherMultiplier(new Run('champion', { starter: 'squirtle' }), 'water') === 1);
+  check('3 Dive Balls de 10%, o piso de 15% e a volta a 25% (decisão do Fellipe)',
+        fight.fight.balls === 3 && fight.stage.legendaryFight.chance === 0.1 && fight.stage.legendaryFight.floor === 0.15 && fight.stage.legendaryFight.recover === 0.25);
+  // o Kyogre sai do lago aos 0:45
+  fight.time = fight.stage.duration;
+  fight.damageCompanion = () => {};   // só a chegada dele importa aqui
+  for (let i = 0; i < 60 * 3; i++) { fight.update(DT, { x: 0, y: 0 }); if (fight.state === 'intro') { fight.pendingIntro = null; fight.state = 'running'; } }
+  const lake = fight.fight.lake;
+  check('aos 0:45, o Kyogre sai do lago, no meio do salão', fight.boss?.data.id === 'kyogre_boss' && ['rise', 'fight'].includes(fight.fight.state)
+        && Math.hypot(fight.boss.x - lake.x, fight.boss.y - lake.y) < 200 && lake.x > 1000 && lake.x < 1400);
+  check('o Kyogre não traz a rajada dos líderes: os ataques dele são outros', !fight.boss.abilities.some((a) => a.abilityId === 'leader_barrage'));
+
+  // o Kyogre na equipe: fora das 151, com o golpe exclusivo e o Water Spout
+  const team = new Run('gym_1_pewter', { starter: 'squirtle' });
+  const kyogre = team.team.add('kyogre', 60);
+  check('o Kyogre entra com o Origin Pulse (exclusivo) e o Water Spout (o 2º golpe)',
+        kyogre.abilities[0] === 'origin_pulse' && kyogre.abilities.includes('water_spout') && (kyogre.upgrades.origin_pulse_damage ?? 0) >= 2);
+  let pulses = 0;
+  for (let i = 0; i < 60 * 8; i++) {
+    team.update(DT, { x: 0, y: 0 });
+    if (team.enemies.length < 6) team.spawner.spawn('rattata', 160, 5);
+    pulses += team.signatures.filter((sig) => sig.kind === 'origin_pulse' && sig.age === 0).length;
+    if (team.state === 'levelup') resolveLevelUp(team);
+    if (team.state !== 'running') team.state = 'running';
+  }
+  check('o Origin Pulse sai e acerta a horda', team.stats.damageDealt > 0 && team.stats.kills > 0);
+  const { ProfileTracker } = await import('../src/save/profile.js');
+  const tracker = new ProfileTracker(createProfile());
+  tracker.registerCaught(382);
+  check('capturar o Kyogre revela o "???" da Pokédex e não conta nas 151',
+        tracker.profile.pokedex.secret.includes('kyogre') && !tracker.profile.pokedex.caught.includes(382));
 }
 
 console.log(`\n=== ${failures === 0 ? 'TUDO OK' : failures + ' FALHA(S)'} ===\n`);

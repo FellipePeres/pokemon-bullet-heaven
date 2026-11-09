@@ -48,8 +48,7 @@ export const DIVE = {
   // as falas da descida (as do resgate ficam com a enfermeira, em data/dialogue.js)
   lines: {
     airPocket: ['Parece que você encontrou um bolsão de ar no caminho!'],
-    cave: ['Você chegou à entrada submersa da Caverna Marinha.', 'Uma luz fraca vem lá de cima. Dá para emergir.'],
-    // o salão do Kyogre é a próxima etapa (D-3): por enquanto, a volta à superfície
-    caveSoon: ['Mas a correnteza ainda não deixa passar... (O salão do Kyogre chega em breve.)', 'Você volta nadando para a superfície.']
+    // depois, o salão do Kyogre (game/KyogreHall.js)
+    cave: ['Você chegou à entrada submersa da Caverna Marinha.', 'Uma luz fraca vem lá de cima. Dá para emergir.']
   }
 };

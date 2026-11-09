@@ -481,7 +481,7 @@ export class AbilitySystem {
   }
 
   /** Habilidades hostis (usadas por chefes). */
-  fireHostile(enemy, abilityId) {
+  fireHostile(enemy, abilityId, { extraDelay = 0 } = {}) {
     const ability = getAbility(abilityId);
     if (!ability) return;
     const s = ability.base;
@@ -509,7 +509,7 @@ export class AbilitySystem {
         damage: s.damage * damageMult,
         knockback: s.knockback,
         type: ability.type, color: '#ff6b6b', hostile: true, abilityId,
-        delay: CONFIG.fx.bossTelegraph, visualType: enemy.types[0]
+        delay: CONFIG.fx.bossTelegraph + extraDelay, visualType: enemy.types[0]
       }));
     }
   }

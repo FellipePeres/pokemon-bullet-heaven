@@ -400,6 +400,8 @@ export class HUD {
     row.classList.remove('compact');
     el('capture-subtitle').textContent = subtitle;
     el('capture-skip').textContent = 'Ignorar';
+    // a captura do Kyogre (0.37) não se ignora: ele já está na Dive Ball
+    el('capture-skip').classList.toggle('hidden', !!this.game.run?.pendingGift?.mandatory);
     // nada se perde: com a equipe cheia, o PC guarda (0.12, os testes mostraram
     // jogadores deixando de capturar por achar que alguém seria descartado)
     this._captureNote(teamSize >= maxSize
@@ -423,6 +425,7 @@ export class HUD {
     row.classList.add('compact');   // 7 cards: sem a descrição, para caber na tela
     el('capture-subtitle').textContent = `Equipe cheia — ninguém se perde. Onde fica o ${pokemon.name}?`;
     el('capture-skip').textContent = 'Desistir da captura';
+    el('capture-skip').classList.toggle('hidden', !!this.game.run?.pendingGift?.mandatory);
     this._captureNote('Quem sair da equipe vai para o PC e volta quando você quiser, pelo PC do mapa da jornada ou do Centro Pokémon.', true);
     if (onSendToPC) {
       // o novo vai direto para o PC: a equipe fica como está e ele espera no lobby
@@ -493,6 +496,7 @@ export class HUD {
       : 'Todos os seus Pokémon desmaiaram, mas o que eles ganharam fica. A próxima fase só abre quando você vencer esta.';
 
     el('result-victory').classList.toggle('hidden', !victory);
+    el('btn-result-endless')?.classList.toggle('hidden', !!run.stage.returnTo);
     el('result-defeat').classList.toggle('hidden', victory);
 
     clear(el('result-team')).append(...this._teamSummary(run.team.members));

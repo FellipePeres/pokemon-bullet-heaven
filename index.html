@@ -209,7 +209,7 @@
   <!-- O tabuleiro de 10x6 tiles da água navegável do Emerald, com a barra das
        bolhas em cima (game/Dive.js, render/DiveRenderer.js, ui/diveHud.js) -->
   <section id="screen-dive" class="screen hidden dive">
-    <div class="dive-console">
+    <div class="dive-console" id="dive-console">
       <div class="dive-bar">
         <span id="dive-lives" class="dive-lives" aria-label="Bolhas de vida"><i></i><i></i><i></i></span>
         <span id="dive-depth" class="dive-depth">NÍVEL 1 · 10 m</span>
@@ -223,6 +223,12 @@
           <button id="dive-resume" class="menu-btn slim" type="button">Continuar</button>
         </div>
       </div>
+    </div>
+
+    <!-- o salão do Kyogre (0.37): o encontro na tela do GBA e o card da fase por cima -->
+    <div id="hall-stage" class="hall-stage hidden">
+      <canvas id="hall-canvas" class="dive-canvas" aria-label="O salão da Caverna Marinha"></canvas>
+      <aside id="hall-card" class="lobby-panel hall-card hidden" aria-label="A fase do salão"></aside>
     </div>
 
     <div id="dive-dialog" class="hub-dialog dive-dialog hidden">

@@ -2799,3 +2799,15 @@ button { font: inherit; color: inherit; }
   font-family: var(--font-pixel); font-weight: 700; font-size: 28px; color: #eceaff;
 }
 .dive-dialog { bottom: 44px; }
+
+/* o salão do Kyogre (0.37): a tela do GBA e o card da fase por cima, como o painel do mapa */
+.hall-stage { position: relative; border: 4px solid #3a3580; background: #000; box-shadow: 0 10px 30px rgba(0, 0, 0, .6); }
+.hall-card { position: fixed; z-index: 4; top: 50%; left: 50%; transform: translate(-50%, -50%); max-height: calc(100vh - 24px); animation: hall-card-in .3s steps(6); }
+@keyframes hall-card-in { from { transform: translate(-50%, calc(-50% + 24px)); opacity: 0; } }
+.hall-card .panel-banner { background-position: center bottom; background-size: auto 128px; }
+.hall-card .panel-banner-leader { bottom: -8px; }
+.hall-card .panel-balls { align-items: center; gap: 4px; }
+.panel-balls-text { margin-left: 4px; font-size: 13px; color: var(--gba-ink-soft); }
+.hall-back { width: 100%; justify-content: center; }
+.hall-back .btn-text { text-align: center; }
+.hall-note { margin: 0; font-size: 13px; color: var(--gba-ink-soft); text-align: center; }

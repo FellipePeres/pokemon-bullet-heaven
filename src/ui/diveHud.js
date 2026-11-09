@@ -11,13 +11,13 @@ export class DiveHUD {
   constructor(game) {
     this.game = game;
     this.shown = {};
-    el('dive-dialog-box').onclick = () => game.dive.confirm();
+    el('dive-dialog-box').onclick = () => (game.hall?.active ? game.hall : game.dive).confirm();
     el('dive-resume').onclick = () => game.dive.togglePause(false);
   }
 
   reset() { this.shown = {}; }
 
-  update(dive) {
+  update(dive, hall = null) {
     const lives = el('dive-lives').children;
     for (let i = 0; i < lives.length; i++) {
       lives[i].classList.toggle('gone', i >= dive.lives);
@@ -35,7 +35,7 @@ export class DiveHUD {
       (banner ? show : hide)(el('dive-banner'));
     }
 
-    const d = dive.dialog;
+    const d = hall?.active ? hall.dialog : dive.dialog;
     const page = d ? d.pages[d.index] : null;
     if (this._changed('open', !!d)) (d ? show : hide)(el('dive-dialog'));
     if (d) {

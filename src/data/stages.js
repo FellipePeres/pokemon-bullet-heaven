@@ -826,6 +826,102 @@ export const STAGES = {
     ballChance: 1,
     maxBalls: 1,   // 0.18: uma, para o lendário (era 0)
     reward: { shards: 300 }
+  },
+
+  /* ============================================================
+     FASE SECRETA — o salão do Kyogre (0.37, PLANEJAMENTO-DIVE.md seção 9)
+     ============================================================
+     Fora da campanha: só pela descida do Dive (game/Dive.js) e pelo card do
+     salão. A arena é o salão aprovado na maquete (o tileset cave do Emerald),
+     com a chuva do Kyogre o tempo todo. 45 s de maré de Hoenn e o Kyogre sai do
+     lago; o que só esta luta tem (os ataques, o mergulho, a captura com as Dive
+     Balls e a maré final) está em systems/kyogreFight.js. */
+  kyogre: {
+    id: 'kyogre',
+    name: 'Fase secreta — Caverna Marinha',
+    region: 'Hoenn',
+    type: 'legendary',
+    icon: 'boss',
+    secret: true,
+    description: 'O salão do Kyogre, no fundo da lagoa.',
+    music: 'mus_sevii_dungeon', leaderMusic: 'mus_vs_legend',
+    duration: 45,
+    xpScale: 1.15,
+    world: { width: 2400, height: 1600, theme: 'cave' },
+    weather: 'rain',
+    scaling: { hp: 0.6, speed: 0.25, damage: 0.3 },
+    difficulty: 1,
+    segments: [{ from: 0, name: 'Salão do Kyogre', theme: 'cave', scene: 'kyogre_hall' }],
+    waves: [
+      // a maré (0:00 a 0:45): o aquecimento
+      { from: 0, to: 44, interval: 0.7, batch: 5, maxAlive: 150, level: [68, 72], enemies: [{ id: 'sharpedo', weight: 3 }, { id: 'carvanha', weight: 3 }, { id: 'wailmer', weight: 2 }, { id: 'crawdaunt', weight: 2 }, { id: 'whiscash', weight: 1 }, { id: 'walrein', weight: 1 }] },
+      // com o Kyogre em campo, a horda continua, mais leve (como os líderes, ele chama a dele)
+      { from: 45, to: 9999, interval: 2, batch: 3, maxAlive: 30, level: [68, 72], enemies: [{ id: 'sharpedo', weight: 3 }, { id: 'carvanha', weight: 3 }, { id: 'wailmer', weight: 2 }, { id: 'crawdaunt', weight: 2 }] }
+    ],
+    elites: [
+      { at: 14, id: 'sharpedo_elite', count: 2, level: 72 },
+      { at: 30, id: 'wailord_elite', count: 1, level: 72 }
+    ],
+    leader: {
+      name: 'KYOGRE',
+      title: 'Pokémon lendário',
+      type: 'water',
+      dex: 382,
+      portrait: null,
+      quote: 'Um rugido sacode o salão. O lago transborda!'
+    },
+    bossTuning: { hp: 1.3, damage: 1.2 },
+    recommendedLevel: 90,
+    bossTeam: ['kyogre_boss'],
+    legendaryFight: {
+      balls: 3,           // 3 Dive Balls por luta (decisão do Fellipe; eram 2)
+      chance: 0.1,        // 10% em cada uma: ~27% numa luta
+      floor: 0.15,        // enquanto houver Dive Ball, a vida não passa daqui
+      recover: 0.25,      // escapou (ou a bola não foi pega): volta só um pouco (eram 40%)
+      exhaust: 8,         // segundos exausto, com a bola no campo
+      finalTide: 30,      // a maré final depois da captura
+      finalLevel: 72,
+      summons: [{ id: 'sharpedo', weight: 3 }, { id: 'carvanha', weight: 3 }, { id: 'wailmer', weight: 2 }, { id: 'relicanth', weight: 1 }, { id: 'huntail', weight: 1 }]
+    },
+    // a fuga e a volta são pela lagoa da vila, não pelo mapa (Game.js)
+    returnTo: 'lake',
+    capturePool: 'phase9',
+    ballChance: 0,
+    maxBalls: 0,
+    reward: { shards: 500 }
+  },
+
+  /* O Endless aquático (0.37, seção 10): depois da captura, o salão vazio com a
+     maré sem fim. Sem XP; rende os Shards de cada elite e chefe derrotado. */
+  kyogre_endless: {
+    id: 'kyogre_endless',
+    name: 'Fase secreta — A maré sem fim',
+    region: 'Hoenn',
+    type: 'legendary',
+    icon: 'boss',
+    secret: true,
+    description: 'O salão vazio, com a maré sem fim.',
+    music: 'mus_sevii_dungeon',
+    duration: 60,
+    noXp: true,
+    endlessOnly: true,
+    world: { width: 2400, height: 1600, theme: 'cave' },
+    weather: 'rain',
+    scaling: { hp: 0.6, speed: 0.25, damage: 0.3 },
+    difficulty: 0.8,
+    segments: [{ from: 0, name: 'Salão do Kyogre', theme: 'cave', scene: 'kyogre_hall' }],
+    waves: [
+      { from: 0, to: 60, interval: 0.7, batch: 5, maxAlive: 150, level: [68, 72], enemies: [{ id: 'sharpedo', weight: 3 }, { id: 'carvanha', weight: 3 }, { id: 'wailmer', weight: 2 }, { id: 'crawdaunt', weight: 2 }, { id: 'whiscash', weight: 1 }, { id: 'walrein', weight: 1 }, { id: 'relicanth', weight: 1 }, { id: 'milotic', weight: 1 }] }
+    ],
+    elites: [
+      { at: 20, id: 'sharpedo_elite', count: 2, level: 72 },
+      { at: 40, id: 'wailord_elite', count: 1, level: 82 }
+    ],
+    returnTo: 'lake',
+    capturePool: 'phase9',
+    ballChance: 0,
+    maxBalls: 0,
+    reward: { shards: 0 }
   }
 };
 

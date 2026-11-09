@@ -125,6 +125,13 @@ const CASTS = {
     });
     return { x: c.x, y: c.y, bubbles, pops: [], speed: s.speed, size: s.size, life: s.duration,
              area: s.area, range: s.range, knockback: s.knockback };
+  },
+
+  /** Kyogre (0.37): três anéis de onda saem dele, um atrás do outro. */
+  origin_pulse(run, c, s) {
+    if (!nearestEnemy(run, c.x, c.y, s.area)) return null;
+    const rings = Array.from({ length: s.count }, (_, i) => ({ start: i * s.gap, radius: 0, hits: new Set(), done: false }));
+    return { x: c.x, y: c.y, rings, maxRadius: s.area, speed: s.speed, knockback: s.knockback };
   }
 };
 
@@ -287,5 +294,24 @@ const UPDATES = {
       }
     }
     if (!alive && !sig.pops.length) sig.dead = true;
+  },
+
+  origin_pulse(run, sig, dt) {
+    // os anéis saem do Kyogre: o centro acompanha ele até o primeiro sair
+    if (sig.age < (sig.rings[0]?.start ?? 0) + 0.05 && sig.owner && !sig.owner.dead) { sig.x = sig.owner.x; sig.y = sig.owner.y; }
+    let alive = false;
+    for (const ring of sig.rings) {
+      if (ring.done) continue;
+      alive = true;
+      if (sig.age < ring.start) continue;
+      ring.radius = Math.min(sig.maxRadius, ring.radius + sig.speed * dt);
+      touch(run, sig.x, sig.y, ring.radius, ring.hits, (enemy) => {
+        if (enemy.boss || Math.hypot(enemy.x - sig.x, enemy.y - sig.y) > ring.radius - 46) {
+          hit(run, sig, enemy, sig.damage, { knockback: sig.knockback });
+        } else ring.hits.delete(enemy);   // só a borda do anel acerta
+      });
+      if (ring.radius >= sig.maxRadius) ring.done = true;
+    }
+    if (!alive) sig.dead = true;
   }
 };

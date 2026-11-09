@@ -51,7 +51,7 @@ export class Enemy {
 
     // habilidades hostis (chefes): as do líder mais as que todo líder tem
     const hostile = [...(data.abilities ?? [])];
-    if (data.boss) for (const id of CONFIG.enemies.boss.extraAbilities) if (!hostile.includes(id)) hostile.push(id);
+    if (data.boss && !data.legendary) for (const id of CONFIG.enemies.boss.extraAbilities) if (!hostile.includes(id)) hostile.push(id);
     this.enraged = false;
     this.abilities = hostile.map((abilityId) => ({
       abilityId,

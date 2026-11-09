@@ -5,7 +5,7 @@
 > decisão foi tomada e o que falta fazer. O `README.md` é o manual de uso;
 > este aqui é o contexto de desenvolvimento.
 
-**Versão atual:** `0.36.0` · **Última atualização:** 2026-11-09
+**Versão atual:** `0.37.0` · **Última atualização:** 2026-11-09
 **Stack:** HTML + CSS + JavaScript puro (ES Modules). Sem backend, sem build, sem dependências.
 **Repositório:** https://github.com/FellipePeres/pokemon-bullet-heaven (público)
 **Jogo no ar:** https://fellipeperes.github.io/pokemon-bullet-heaven/
@@ -67,7 +67,7 @@ vencer, a duração da luta, desmaios, pico de inimigos, Poké Balls e quantos d
 equipe têm o Golpe Desperto ao vencer (coluna "despertos", 0.33).
 
 **Conferência visual (desde a 0.5).** `tools/screenshot.mjs` abre o jogo no Chrome
-(ou Edge) sem janela, executa um dos 41 roteiros (os mais usados: `vitrine`,
+(ou Edge) sem janela, executa um dos 42 roteiros (os mais usados: `vitrine`,
 `treinador`, `vila`, `jornada`, `partida`, `ux`, `efetivo`; um nome desconhecido lista
 todos), salva PNGs e lista os erros de JavaScript da página. Sai com código 1
 se a página tiver erro. A `vitrine.html` desenha os assets com o mesmo código da
@@ -150,7 +150,8 @@ src/
     hub.js            a vila (0.29): portas, saídas, pessoas, objetos e a decoração fixa de cada lugar
     hubMaps.js        GERADO por tools/assets/hub.py: os mapas da vila (camadas e colisão), as folhas e os móveis
     dive.js           a descida do Dive (0.36): os 6 níveis (aviso, velocidade, hordas, padrões, espécies) e as falas
-    diveWorld.js      GERADO por tools/assets/dive.py: os mapas submersos do Emerald, a grade do que é navegável e os tabuleiros
+    diveWorld.js      GERADO por tools/assets/dive.py: os mapas submersos do Emerald, a grade do que é navegável, os tabuleiros, o salão do Kyogre, a arena da luta e as folhas do modo aquático
+    sceneTiles.js     as tiras de metatiles de todos os cenários: as do FireRed e a do salão do Kyogre (0.37)
     dialogue.js       as falas da vila, com as condições (inicial, insígnias, Campeão, uma vez só)
     decor.js          a loja de Pokédolls: os enfeites do quarto, o preço e o lugar de cada um
     types.js          tipos, cores, a tabela de efetividade completa e a defesa (0.32)
@@ -598,6 +599,69 @@ Nunca voltar bônus globais para o pool de level up — foi pedido explícito.
   a luta ainda não), então ele fica como "???" para todos: é a isca. A captura vai
   chamar `registerSecret` (etapa D-5 do PLANEJAMENTO-DIVE). Roteiro de
   screenshots: `pokedex`.
+
+### O salão do Kyogre — o encontro, a luta, a captura e a cena (0.37)
+- O resto do modo aquático, como as maquetes aprovadas (PLANEJAMENTO-DIVE.md,
+  seções 8 a 10): "O Salão do Kyogre", "A Luta do Kyogre" (com 3 Dive Balls e a
+  volta a 25%) e "Depois do Kyogre".
+- **O encontro** (`game/KyogreHall.js`, `render/KyogreHallRenderer.js`): depois do
+  Nível 6, o jogador emerge no `MarineCave_End` do Emerald e anda pelo salão (só
+  colisão 0). Na margem do lago:
+  - "Um Pokémon gigante dorme no fundo do salão...";
+  - o despertar no estilo do Sapphire (o tremor e três clarões);
+  - a aproximação e o grito do Emerald (o script `MarineCave_End_EventScript_Kyogre`,
+    com o balanço do affine);
+  - a transição de batalha do Kyogre (`B_TRANSITION_KYOGRE`).
+- **O card da fase** (`ui/hallCard.js`): o painel do mapa da jornada, com Jogar e
+  Voltar para a Vila. Voltar sai pela lagoa, e outra chance exige descer de novo.
+- **A luta**:
+  - A fase `kyogre` (secreta, fora da campanha) e `systems/kyogreFight.js` por cima
+    dela, com o desenho em `render/kyogreFight.js`.
+  - A arena é o salão aprovado: o cenário `fixed` `kyogre_hall`, o tileset cave do
+    Emerald.
+  - A chuva o tempo todo (Drizzle: golpes de Água ×1,5 e de Fogo ×0,5, para todos;
+    a trombada não conta).
+  - 45 s de maré de Hoenn; depois o Kyogre sai do lago, com a música "Vs. Lendário"
+    do FireRed.
+  - Os ataques dele: o Origin Pulse (três anéis), o Water Spout (mais forte com a
+    vida cheia), o Thunder (abaixo de 50%), a horda chamada e o mergulho (abaixo de
+    50%, volta pela poça mais perto do treinador). Fúria abaixo de 20%.
+- **A captura**:
+  - Enquanto houver Dive Ball, a vida não passa de 15% (`hpFloor`, em
+    `combat.js`). Lá ele fica exausto 8 s, a horda para e a bola cai no campo, com
+    uma seta na borda.
+  - Pegar é jogar (o estado `legendary` do Run): até 3 balanços, 10% de captura.
+  - Na falha, ele volta a 25%. Não pegou a bola a tempo: ele volta do mesmo jeito,
+    mas a bola não conta.
+  - 3 Dive Balls por luta. Sem bolas, ele pode ser derrotado.
+- **Capturou**:
+  - a tela de captura de sempre, sem "Ignorar" (o presente `mandatory`);
+  - o Kyogre entra no nível da equipe, com o Origin Pulse exclusivo e o Water
+    Spout;
+  - o "???" da Pokédex se revela (`registerCaught(382)` vai para o `secret`, fora
+    das 151);
+  - a maré final de 30 s, e só depois a vitória.
+- **O fim**: a volta é sempre pela lagoa. Caiu na luta: acorda no Centro, com a
+  enfermeira (a luta não recomeça). Primeira vitória: 500 Shards.
+- **A cena do Maxie** (`game/MaxieScene.js`, desenhada pelo `HubRenderer`): uma vez
+  por jornada, depois da captura, na frente da lagoa ou no Centro. O Maxie chega,
+  o "!", a fala, o Crobat no corte de tela do Voar, "A caminho do vulcão!" e o
+  pássaro do Voar (ou a porta, no Centro).
+- **O Endless aquático** (a fase `kyogre_endless`): com o Kyogre na jornada, o
+  salão está vazio e o card é o da maré sem fim. Sem XP (`stage.noXp`); cada elite
+  rende os Shards de sempre.
+- **O registro**: `campaign.dive.captured` e `sceneSeen`. O pescador comenta a
+  captura (a condição `kyogre`).
+- **A medição** (`node tools/kyogre.mjs [nível] [lutas]`), com a equipe de pós-jogo
+  do Fellipe (os 5 lendários de Kanto e o Blastoise, tudo no máximo):
+  - nível 80: vence 1 de 3;
+  - nível 90: vence 2 de 3, com 3 a 5 desmaios;
+  - no Campeão, a mesma equipe no nível 80 vence sem desmaio.
+
+  A alavanca é a `difficulty` da fase (1). Com 0,8, a de 80 vencia todas.
+- **Os testes**: o `smoke-test` (a arena, a chuva, a chegada do Kyogre, o kit e a
+  Pokédex) e o `ui-smoke` (o fluxo inteiro, do Nível 6 à cena e ao Endless). O
+  roteiro de screenshots é `kyogre`.
 
 ### A descida do Dive — o modo aquático (0.36)
 - Pedido do Fellipe, desenhado e medido numa maquete jogável que ele aprovou
@@ -1050,6 +1114,7 @@ o Brock como está, todas as outras mais duras, menos níveis.
 | Fase 6 (Sabrina) | 1 → 0,82 | 4,5 | 4,1–5,1 ² | 50 | 66 → 53 |
 | Fase 7 (Blaine) | 1 → 0,82 | 2,4 | 3,2 | 55 | 74 → 58 |
 | 56 | o encontro do Kyogre no estilo Sapphire, depois um card de fase com Jogar ou Voltar para a Vila; planejar a luta e a captura e ver numa maquete; a cura depois da fuga alta demais, 3 Dive Balls, o cenário aprovado | as maquetes "O Salão do Kyogre" (aprovada) e "A Luta do Kyogre"; 3 Dive Balls de 10% (~27% por luta), a fuga volta a 25% (eram 40%); o cenário da maquete; PLANEJAMENTO-DIVE seções 8 e 9 |
+| 57 | "pode fazer tudo como planejamos desde o início, e vamos ver como ficaria" | 0.37: o modo aquático completo: o salão com o encontro (Sapphire e Emerald) e o card, a luta do Kyogre (a arena aprovada, a chuva, os ataques, o mergulho, as 3 Dive Balls, a volta a 25%, a maré final), o Kyogre na equipe (Origin Pulse e Water Spout, o "???" revelado), a cena do Maxie (lagoa ou Centro) e o Endless aquático sem XP; a força da fase medida com `tools/kyogre.mjs` (nível 80 vence 1 em 3, nível 90 2 em 3) |
 | Fase 8 (Giovanni) | 1 → 0,8 | 4,0 | 4,5 | 60 | 84 → 62 |
 | Lorelei | 1,05 → 0,8 | 3,5 | 3,1–4,7 | 64 | 92 → 66 |
 | Bruno | 1,12 → 0,97 | 3,7 | 3,5–6,3 ² | 66 | 99 → 68 |
@@ -1376,11 +1441,17 @@ Nenhum pedido do Fellipe em aberto. O que está planejado:
   30 s depois da captura. A captura dispara uma cena de história (o Maxie,
   indignado, solta o Crobat e parte "a caminho do vulcão"), e o salão vira uma fase Endless
   aquática sem XP, que rende Shards por chefe e elite. Na descida não se corre. O decomp do Emerald está em `D:\fellipe\Dev\pokeemerald`
-  (pret/pokeemerald, commit `731ad5b`, clone parcial). **A descida está no jogo
-  desde a 0.36** (D-1 da descida e D-2, como a maquete aprovada, o artifact
-  https://claude.ai/artifact/WYVxGMgQ7DUCmofe4geVRv). Próximos passos: a D-3 (o
-  salão do Kyogre), a D-4 (a luta), a D-5 (o Kyogre na equipe) e a D-6 (a cena do
-  Maxie, já aprovada na maquete "Depois do Kyogre", e o Endless aquático).
+  (pret/pokeemerald, commit `731ad5b`, clone parcial). **Está todo no jogo desde a
+  0.37**:
+  - a descida (0.36);
+  - o salão com o encontro e o card;
+  - a luta com as 3 Dive Balls e a maré final;
+  - o Kyogre na equipe;
+  - a cena do Maxie;
+  - o Endless aquático.
+
+  O que falta é a D-7: os sons da descida, os prêmios por nível (o Fellipe vai bolar)
+  e o ajuste fino da luta depois de ele jogar (`node tools/kyogre.mjs`).
 - **O roteiro geral** ([PLANEJAMENTO.md](PLANEJAMENTO.md), combinado em
   2026-11-02): o som que falta (gritos e efeitos, Etapa 5), o celular e os assets
   locais da interface (Etapa 6), o pós-jogo além do Modo Livre (a revanche dos

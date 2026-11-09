@@ -174,6 +174,7 @@ export const ABILITY_FX = {
   aqua_ring:      { body: 'bubble' },
   surf:           { body: 'water_impact', hit: 'bubble_pop' },
   dive:           { ring: 'bubble', count: 10, strike: 'water_impact' },   // a TM Dive (0.34)
+  water_spout:    { ring: 'bubble', count: 6, strike: 'water_impact' },    // o 2º golpe do Kyogre (0.37)
   petal_spiral:   { body: 'leaf', hit: 'razor_leaf' },
   leech_seed:     { ring: 'green_sparkle', count: 10 },
   grassy_terrain: { ring: 'leaf' },
@@ -223,7 +224,9 @@ export const ABILITY_FX = {
   // ---- golpes dos líderes (chegam com aviso no chão) ----
   leader_rock_barrage: { ring: 'boulder', count: 10, shake: 6 },
   leader_whirlpool:    { ring: 'water_orb', count: 14, shake: 3 },
-  boss_shockwave:      { ring: 'flying_dirt', count: 12, shake: 5 }
+  boss_shockwave:      { ring: 'flying_dirt', count: 12, shake: 5 },
+  kyogre_origin_pulse: { ring: 'bubble', count: 14, shake: 4 },
+  kyogre_resurface:    { ring: 'bubble', count: 12, shake: 6 }
 };
 
 /**

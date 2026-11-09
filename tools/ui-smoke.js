@@ -739,12 +739,107 @@ check('depois da escolha, o Continuar segue para a jornada (na vila); sem nome, 
   game.openDive();
   game.dive.start(5);
   game.dive.levelDone();
-  for (let i = 0; i < 60 * 60 && game.diveOpen; i++) {
+  for (let i = 0; i < 60 * 60 && game.diveOpen && !game.hall.active; i++) {
     if (game.dive.dialog) { game.dive.dialog.shown = 999; game.dive.confirm(); }
     game.dive.update(1 / 60, null);
   }
-  check('passou o Nível 6: a Caverna Marinha, e ele volta à vila pela lagoa', !game.diveOpen && hubVisible() && hub.mapId === 'vila'
+  check('passou o Nível 6: emerge no salão do Kyogre (a descida guarda o recorde)', game.diveOpen && game.hall.active
+        && !registry.get('hall-stage').classes.has('hidden') && registry.get('dive-console').classes.has('hidden')
         && game.campaign.dive.best === 6 && game.campaign.dive.reachedCave === 1);
+  check('o salão: ele emerge no warp do Emerald e só anda por onde dá para pisar',
+        game.hall.p.x === 20 && game.hall.p.y === 4 && game.hall.constructor.walkable(20, 4) && !game.hall.constructor.walkable(9, 22));
+  // a cena até o card (pulando a caminhada, como o botão de teste)
+  const playHall = () => {
+    game.hall.skipWalk();
+    for (let i = 0; i < 60 * 30 && game.hall.mode !== 'card'; i++) {
+      if (game.hall.dialog) { game.hall.dialog.shown = 999; game.hall.confirm(); }
+      game.hall.update(1 / 60);
+    }
+  };
+  playHall();
+  check('o encontro: o Kyogre desperta, avança três tiles e vem a transição dele', game.hall.k.awake && game.hall.k.y === 25 && !!game.hall.trans);
+  check('...e abre o card da fase: Caverna Marinha, com Jogar e Voltar para a Vila',
+        !registry.get('hall-card').classes.has('hidden') && registry.get('hall-card').children.some((c) => c.children?.some((d) => d.innerHTML === 'Caverna Marinha')));
+  registry.get('hall-card').children.at(-1).children[1].onclick();
+  check('Voltar para a Vila: sai pela lagoa', !game.diveOpen && hubVisible() && hub.mapId === 'vila' && hub.player.x === 30 && hub.player.y === 11);
+
+  // a luta: Jogar no card
+  game.openDive(); game.dive.start(5); game.dive.levelDone();
+  for (let i = 0; i < 60 * 60 && !game.hall.active; i++) { if (game.dive.dialog) { game.dive.dialog.shown = 999; game.dive.confirm(); } game.dive.update(1 / 60, null); }
+  playHall();
+  registry.get('hall-card').children.at(-1).children[0].onclick();
+  const run = game.run;
+  check('Jogar: a fase do salão, na chuva, com a luta do Kyogre', run?.stage.id === 'kyogre' && run.stage.weather === 'rain' && !!run.fight
+        && run.world.scene === 'kyogre_hall');
+  run.time = run.stage.duration;
+  for (let i = 0; i < 60 * 3; i++) { run.update(1 / 60, { x: 0, y: 0 }); if (run.state === 'intro') { game.closeLeaderIntro?.(); run.pendingIntro = null; run.state = 'running'; } }
+  const boss = run.boss;
+  check('aos 0:45, o Kyogre sai do lago (o chefe da fase)', boss?.data.id === 'kyogre_boss' && run.fight.state === 'fight' && boss.rise === 1);
+  // no vermelho: o piso de vida, a exaustão e a Dive Ball
+  const { damageEnemy } = await import('../src/systems/combat.js');
+  boss.hp = boss.maxHp * 0.2;
+  damageEnemy(run, boss, boss.maxHp);
+  check('com Dive Ball sobrando, a vida não passa de 15%: ele fica exausto e a bola cai no campo',
+        Math.abs(boss.hp / boss.maxHp - 0.15) < 1e-9 && !boss.dead && run.fight.state === 'exhausted' && !!run.fight.ball);
+  run.player.x = run.fight.ball.x; run.player.y = run.fight.ball.y;
+  run.fight.rng = () => 0.99;   // a primeira falha
+  run.update(1 / 60, { x: 0, y: 0 });
+  check('passar por cima joga a bola: tudo para enquanto ela balança', run.state === 'legendary' && !!run.fight.throwing);
+  for (let i = 0; i < 60 * 6 && run.state === 'legendary'; i++) run.update(1 / 60, { x: 0, y: 0 });
+  check('falhou: ele escapa, volta só a 25% e gasta uma das 3 Dive Balls', run.fight.balls === 2 && Math.abs(boss.hp / boss.maxHp - 0.25) < 1e-9
+        && run.fight.state === 'fight');
+  damageEnemy(run, boss, boss.maxHp);
+  run.fight.t = run.fight.cfg.exhaust;
+  run.update(1 / 60, { x: 0, y: 0 });
+  check('sem pegar a bola a tempo: ele se recupera, mas a bola não conta como gasta', run.fight.balls === 2 && run.fight.state === 'fight');
+  damageEnemy(run, boss, boss.maxHp);
+  run.player.x = run.fight.ball.x; run.player.y = run.fight.ball.y;
+  run.fight.rng = () => 0.01;   // os 10%
+  run.update(1 / 60, { x: 0, y: 0 });
+  for (let i = 0; i < 60 * 8 && run.state === 'legendary'; i++) run.update(1 / 60, { x: 0, y: 0 });
+  run.update(1 / 60, { x: 0, y: 0 });
+  game._handleRunState();
+  check('capturou: a tela de captura do Kyogre, sem Ignorar', game.captureOpen && registry.get('capture-skip').classes.has('hidden'));
+  game.pickCapture('kyogre');
+  const where = game.run.team.has('kyogre') || game.run.pc.some((m) => m.pokemonId === 'kyogre');
+  check('...o Kyogre entra (na equipe ou no PC), revela o "???" e fica fora das 151',
+        where && game.profile.pokedex.secret.includes('kyogre') && !game.profile.pokedex.caught.includes(382) && game.campaign.dive.captured);
+  check('a maré final: a vitória espera os 30 s', run.fight.final && run.fight.holding && run.state === 'running');
+  run.fight.final.t = 0.01;
+  for (let i = 0; i < 10; i++) run.update(1 / 60, { x: 0, y: 0 });
+  game._handleRunState();
+  check('a maré baixou: a vitória, sem o Modo Livre', run.state === 'victory' && registry.get('btn-result-endless').classes.has('hidden'));
+  game.quitToMenu();
+  check('a volta é pela lagoa, e a cena do Maxie começa', hubVisible() && hub.mapId === 'vila' && hub.player.x === 30 && !!hub.scene
+        && game.campaign.dive.sceneSeen);
+  for (let i = 0; i < 60 * 60 && hub.scene; i++) { if (hub.dialog) { hub.dialog.shown = 999; hub.confirm(); } hub.update(1 / 60); }
+  check('a cena acaba e devolve o controle (uma vez por jornada)', !hub.scene && !hub.dialog);
+  hub.say('pescador');
+  check('o pescador depois da captura', dialogText().includes('minhoca'));
+  closeDialog();
+
+  // depois da captura, o salão vazio: o card do Endless aquático (sem XP)
+  game.openDive(); game.dive.start(5); game.dive.levelDone();
+  for (let i = 0; i < 60 * 60 && !game.hall.active; i++) { if (game.dive.dialog) { game.dive.dialog.shown = 999; game.dive.confirm(); } game.dive.update(1 / 60, null); }
+  playHall();
+  check('com o Kyogre na jornada, o salão está vazio e o card é o da maré sem fim', game.hall.k.hidden
+        && registry.get('hall-card').children.some((c) => c.children?.some((d) => d.innerHTML === 'A maré sem fim')));
+  registry.get('hall-card').children.at(-1).children[0].onclick();
+  const endless = game.run;
+  const before = endless.team.members.map((m) => m.xp).join();
+  endless.progression.addXp(5000);
+  check('o Endless aquático já começa sem fim e não dá XP', endless.stage.id === 'kyogre_endless' && endless.endless && endless.team.members.map((m) => m.xp).join() === before);
+  game.quitToMenu();
+  check('sair do Endless também volta pela lagoa', hubVisible() && hub.mapId === 'vila' && hub.player.x === 30 && !hub.scene);
+
+  // caiu na luta: acorda no Centro (a luta não recomeça)
+  game.campaign.dive.captured = false; game.campaign.dive.sceneSeen = false;
+  game.startStage('kyogre');
+  game.run.team.members.forEach((m) => { m.fainted = true; m.hp = 0; });
+  game.run.update(1 / 60, { x: 0, y: 0 });
+  game._handleRunState();
+  check('caiu na luta do Kyogre: acorda no Centro, com a enfermeira', !game.run && hubVisible() && hub.mapId === 'centro' && hub.dialog?.name === 'Enfermeira');
+  closeDialog();
   member.abilities = saved;
 }
 

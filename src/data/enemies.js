@@ -993,6 +993,77 @@ export const ENEMIES = {
     leader: 'Rival',
     abilities: ['boss_shockwave'],
     summons: { enemy: 'golduck', count: 4, interval: 9 }
+  },
+
+  /* ============== O SALÃO DO KYOGRE (0.37, PLANEJAMENTO-DIVE seção 9) ==============
+     As hordas de Hoenn (as dos níveis 5 e 6 da descida), os elites e o Kyogre. */
+  carvanha: {
+    id: 'carvanha', dex: 318, name: 'Carvanha', types: ['water', 'dark'],
+    hp: 54, speed: 112, damage: 6, xp: 13, dropChance: 0.012,
+    behavior: 'chaser', radius: 13, scale: 1
+  },
+  sharpedo: {
+    id: 'sharpedo', dex: 319, name: 'Sharpedo', types: ['water', 'dark'],
+    hp: 74, speed: 118, damage: 7, xp: 15, dropChance: 0.012,
+    behavior: 'chaser', radius: 15, scale: 1.15
+  },
+  wailmer: {
+    id: 'wailmer', dex: 320, name: 'Wailmer', types: ['water'],
+    hp: 120, speed: 62, damage: 6, xp: 16, dropChance: 0.012,
+    behavior: 'tank', radius: 18, scale: 1.2
+  },
+  crawdaunt: {
+    id: 'crawdaunt', dex: 342, name: 'Crawdaunt', types: ['water', 'dark'],
+    hp: 84, speed: 92, damage: 7, xp: 15, dropChance: 0.012,
+    behavior: 'chaser', radius: 15, scale: 1.15
+  },
+  whiscash: {
+    id: 'whiscash', dex: 340, name: 'Whiscash', types: ['water', 'ground'],
+    hp: 104, speed: 74, damage: 6, xp: 15, dropChance: 0.012,
+    behavior: 'tank', radius: 16, scale: 1.15
+  },
+  walrein: {
+    id: 'walrein', dex: 365, name: 'Walrein', types: ['ice', 'water'],
+    hp: 118, speed: 70, damage: 6, xp: 16, dropChance: 0.012,
+    behavior: 'tank', radius: 17, scale: 1.2
+  },
+  huntail: {
+    id: 'huntail', dex: 367, name: 'Huntail', types: ['water'],
+    hp: 76, speed: 104, damage: 7, xp: 15, dropChance: 0.012,
+    behavior: 'chaser', radius: 15, scale: 1.15
+  },
+  gorebyss: {
+    id: 'gorebyss', dex: 368, name: 'Gorebyss', types: ['water'],
+    hp: 72, speed: 104, damage: 6, xp: 15, dropChance: 0.012,
+    behavior: 'chaser', radius: 15, scale: 1.15
+  },
+  relicanth: {
+    id: 'relicanth', dex: 369, name: 'Relicanth', types: ['water', 'rock'],
+    hp: 110, speed: 66, damage: 6, xp: 16, dropChance: 0.012,
+    behavior: 'tank', radius: 16, scale: 1.15
+  },
+  milotic: {
+    id: 'milotic', dex: 350, name: 'Milotic', types: ['water'],
+    hp: 96, speed: 96, damage: 6, xp: 16, dropChance: 0.012,
+    behavior: 'wanderer', radius: 16, scale: 1.2
+  },
+  sharpedo_elite: {
+    id: 'sharpedo_elite', dex: 319, name: 'Sharpedo', types: ['water', 'dark'],
+    hp: 760, speed: 124, damage: 11, xp: 55, dropChance: 0,
+    behavior: 'swooper', radius: 20, scale: 1.6, elite: true
+  },
+  wailord_elite: {
+    id: 'wailord_elite', dex: 321, name: 'Wailord', types: ['water'],
+    hp: 1400, speed: 56, damage: 12, xp: 70, dropChance: 0,
+    behavior: 'tank', radius: 30, scale: 2.2, elite: true
+  },
+  // o Kyogre: os ataques dele (Origin Pulse, Water Spout, Thunder, o mergulho, a horda)
+  // são do systems/kyogreFight.js; `legendary` tira a rajada que todo líder tem
+  kyogre_boss: {
+    id: 'kyogre_boss', dex: 382, name: 'Kyogre', types: ['water'], level: 90,
+    hp: 400000, speed: 50, damage: 55, xp: 2400, dropChance: 0,
+    behavior: 'boss', radius: 56, scale: 3, boss: true, ace: true, legendary: true, enrageAt: 0.2,
+    leader: 'Kyogre', abilities: []
   }
 };
 

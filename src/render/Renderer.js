@@ -11,6 +11,7 @@ import { getTrainerLook } from '../data/trainers.js';
 
 import { drawFx } from './fx.js';
 import { SceneryCache } from './scenery.js';
+import { drawKyogreWorld, drawKyogreScreen, drawKyogreBossBar } from './kyogreFight.js';
 import { stageScenes } from '../data/scenery.js';
 import { abilityFx, zoneFx, STATUS_FX } from '../data/fx.js';
 import { getAbility } from '../data/abilities.js';
@@ -137,10 +138,12 @@ export class Renderer {
     this._drawOrbs(ctx, run);
     this._drawProjectiles(ctx, run);
     drawSignatures(ctx, run);      // golpes exclusivos dos lendários
+    drawKyogreWorld(ctx, run);     // a luta do Kyogre (0.37): os avisos, a Dive Ball, os balanços
     this._drawEffects(ctx, run);
     this._drawParticles(ctx, run);
     ctx.restore();
 
+    drawKyogreScreen(ctx, run, this);   // a chuva, a seta da Dive Ball e a maré final (0.37)
     this._drawBossBar(ctx, run);
   }
 
@@ -383,8 +386,10 @@ export class Renderer {
       if (actor === run.player) { this._drawTrainer(ctx, run.player, run); continue; }
 
       if (actor.kind === 'enemy') {
-        // inimigo
-        const size = 42 * (actor.scale ?? 1);
+        // inimigo (o Kyogre submerso não aparece; saindo da água, cresce: 0.37)
+        if (actor.hidden) continue;
+        const size = 42 * (actor.scale ?? 1) * (actor.rise ?? 1);
+        if (size <= 1) continue;
         if (actor.enraged) {
           // fúria do líder: brilho vermelho pulsando embaixo dele
           ctx.globalAlpha = 0.25 + Math.sin(run.time * 8) * 0.1;
@@ -394,9 +399,11 @@ export class Renderer {
           ctx.fill();
           ctx.globalAlpha = 1;
         }
+        if (actor.sway) { ctx.save(); ctx.translate(actor.x, actor.y); ctx.rotate(actor.sway); ctx.translate(-actor.x, -actor.y); }
         drawPokemon(ctx, actor.data.dex, actor.x, actor.y, size, {
           facing: actor.facing, types: actor.types, flash: actor.hitFlash, time: run.time + actor.animPhase
         });
+        if (actor.sway) ctx.restore();
         this._drawStatusMarks(ctx, actor, size);
         if (actor.elite || actor.boss) this._drawEnemyHp(ctx, actor, size);
       } else {
@@ -756,11 +763,12 @@ export class Renderer {
     ctx.strokeStyle = typeColor(boss.types[0]);
     ctx.lineWidth = 2;
     ctx.strokeRect(x, y, w, 14);
-    // marca da fúria (metade da vida)
-    const rageX = x + w * CONFIG.enemies.boss.enrageAt;
+    // marca da fúria (metade da vida; o Kyogre, 20%)
+    const rageX = x + w * (boss.data.enrageAt ?? CONFIG.enemies.boss.enrageAt);
     ctx.fillStyle = 'rgba(255,255,255,.75)';
     ctx.fillRect(rageX - 1, y - 2, 2, 18);
 
+    drawKyogreBossBar(ctx, run, x, y, w);   // a marca dos 15% e as Dive Balls (0.37)
     ctx.font = `11px ${ARCADE_FONT}`;
     ctx.textAlign = 'center';
     ctx.fillStyle = '#fff';

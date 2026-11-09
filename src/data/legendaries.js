@@ -74,6 +74,15 @@ export const LEGENDARY_MOVES = {
       { type: 'poison', hue: 285, effects: { poison: { dps: 18, duration: 3.5 } } },
       { type: 'psychic', hue: 330, effects: { weak: { amount: 0.25, duration: 3 } } }
     ]
+  },
+
+  /* Kyogre (0.37): três anéis de onda saem dele, um atrás do outro, empurrando a horda. */
+  origin_pulse: {
+    id: 'origin_pulse', name: 'Origin Pulse', type: 'water', behavior: 'signature', signature: 'origin_pulse',
+    exclusive: 'kyogre',
+    description: 'Exclusivo do Kyogre. Três anéis de onda saem dele, um atrás do outro, e empurram a horda.',
+    base: { damage: 58, cooldown: 2.8, area: 270, speed: 520, count: 3, gap: 0.22, knockback: 200 },
+    effects: { slow: { factor: 0.6, duration: 1.2 } }
   }
 };
 
@@ -87,7 +96,8 @@ export const LEGENDARY_KITS = {
   zapdos: { move: 'zap_cannon', bonusMove: 'bolt_strike', upgrades: { damage: 2, cooldown: 1, area: 1 } },
   moltres: { move: 'sacred_fire', bonusMove: 'heat_wave', upgrades: { damage: 2, cooldown: 1, count: 1 } },
   mewtwo: { move: 'psystrike', bonusMove: 'future_sight', upgrades: { damage: 2, cooldown: 1, area: 1 } },
-  mew: { move: 'metronome', bonusMove: 'psyshock', upgrades: { damage: 2, cooldown: 1, count: 1 } }
+  mew: { move: 'metronome', bonusMove: 'psyshock', upgrades: { damage: 2, cooldown: 1, count: 1 } },
+  kyogre: { move: 'origin_pulse', bonusMove: 'water_spout', upgrades: { damage: 2, cooldown: 1, area: 1 } }
 };
 
 /**

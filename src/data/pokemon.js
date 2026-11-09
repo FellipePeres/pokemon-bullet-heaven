@@ -974,6 +974,18 @@ export const POKEMON = {
     abilities: ['metronome'], moveLine: ['metronome'], role: 'Lendário · golpe ao acaso', rarity: 'legendary',
     power: 2.65, hp: 305,
     description: 'Lendário: dizem que guarda o código de todos.'
+  },
+
+  /* ===================== O LENDÁRIO SECRETO (0.37) =====================
+     O Kyogre do fundo da lagoa (PLANEJAMENTO-DIVE.md): só pela descida do Dive e
+     pela luta no salão da Caverna Marinha. Fica fora das 151: na Pokédex ele é o
+     "???" do fim (data/regions.js, `secret`), revelado na captura. */
+  kyogre: {
+    id: 'kyogre', dex: 382, name: 'Kyogre', types: ['water'],
+    abilities: ['origin_pulse'], moveLine: ['origin_pulse'], role: 'Lendário · ondas em volta', rarity: 'legendary',
+    power: 2.7, hp: 340, secret: true,
+    fieldScale: 1.4,
+    description: 'Lendário de Hoenn: o senhor dos mares, que traz a chuva.'
   }
 };
 

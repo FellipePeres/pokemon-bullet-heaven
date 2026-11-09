@@ -1,6 +1,6 @@
 import { CONFIG } from '../core/config.js';
 import { SCENES } from '../data/scenery.js';
-import { SCENE_TILES } from '../data/sceneManifest.js';
+import { ALL_SCENE_TILES as SCENE_TILES } from '../data/sceneTiles.js';
 
 /**
  * TERRENO DA ARENA — o chão da fase em metatiles do FireRed e o que bloqueia.
@@ -380,6 +380,14 @@ function buildRepeat(grid, recipe, map) {
   }
 }
 
+/** O layout pronto da tira (o salão do Kyogre): copiado como está; o que sobrar fica com a 1ª metatile. */
+function buildFixed(grid, map) {
+  const { cols, rows, cells } = map.layout;
+  for (let y = 0; y < grid.rows; y++) for (let x = 0; x < grid.cols; x++) {
+    grid.set(x, y, x < cols && y < rows ? cells[y * cols + x] : map.ids[0]);
+  }
+}
+
 /**
  * Monta o grid de um cenário: `cells` (ID da metatile do FireRed, linha a
  * linha) e `solid` (1 onde bloqueia). `seed` deixa o desenho igual toda vez
@@ -396,6 +404,7 @@ export function buildSceneGrid(sceneId, cols, rows, seed = sceneId) {
   else if (recipe.kind === 'cave') buildCave(grid, rng);
   else if (recipe.kind === 'room') buildRoom(grid, rng, recipe, map);
   else if (recipe.kind === 'repeat') buildRepeat(grid, recipe, map);
+  else if (recipe.kind === 'fixed') buildFixed(grid, map);
   const solidIds = new Set(map.solid);
   grid.solid = Uint8Array.from(grid.cells, (id) => (solidIds.has(id) ? 1 : 0));
   return grid;

@@ -120,8 +120,9 @@ export class SpawnSystem {
     if (this.endless) { this._updateEndless(dt); return; }
 
     // ---- ondas normais ----
+    const quiet = run.fight?.quiet;   // o Kyogre exausto: a horda para (0.37)
     this.stage.waves.forEach((wave, i) => {
-      if (t < wave.from || t > wave.to) return;
+      if (quiet || t < wave.from || t > wave.to) return;
       this.waveTimers[i] -= dt;
       if (this.waveTimers[i] > 0) return;
       this.waveTimers[i] = wave.interval / CONFIG.enemies.spawnMult;
@@ -214,7 +215,7 @@ export class SpawnSystem {
     const tuning = CONFIG.enemies.boss;
 
     // fúria: abaixo da metade da vida, o líder acelera e ataca mais seguido
-    if (!enemy.enraged && enemy.hp <= enemy.maxHp * tuning.enrageAt) {
+    if (!enemy.enraged && enemy.hp <= enemy.maxHp * (enemy.data.enrageAt ?? tuning.enrageAt)) {
       enemy.enraged = true;
       enemy.speed *= tuning.enrage.speed;
       bus.emit(EVENTS.TOAST, { text: `${enemy.data.name} ficou furioso!`, icon: 'boss' });

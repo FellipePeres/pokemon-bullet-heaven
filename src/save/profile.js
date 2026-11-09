@@ -266,6 +266,9 @@ export class ProfileTracker {
 
   registerCaught(dex) {
     if (!dex) return;
+    // o lendário secreto (o Kyogre, 0.37) revela o "???" do fim e fica fora da contagem
+    const secret = Object.values(REGIONS).flatMap((r) => r.secret ?? []).find((s) => s.dex === dex);
+    if (secret) { this.registerSecret(secret.id); return; }
     const caught = this.profile.pokedex.caught;
     if (!caught.includes(dex)) {
       caught.push(dex);

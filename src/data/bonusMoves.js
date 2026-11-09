@@ -88,6 +88,13 @@ export const BONUS_MOVES = {
             hitScale: 2.2, ownerBlink: true }
   },
 
+  // fora do sorteio (tmOnly): o 2º golpe do Kyogre (0.37), que já chega com ele
+  water_spout: {
+    id: 'water_spout', name: 'Water Spout', type: 'water', behavior: 'rain', tmOnly: true,
+    description: 'Colunas d\'água caem do alto sobre a horda.',
+    base: { cooldown: 3.2, count: 6, area: 70, delay: 0.55, range: 520, target: 'random', knockback: 120, hitScale: 1.1 }
+  },
+
   /* =============================== Planta =============================== */
   petal_spiral: {
     id: 'petal_spiral', name: 'Petal Dance', type: 'grass', behavior: 'projectile',

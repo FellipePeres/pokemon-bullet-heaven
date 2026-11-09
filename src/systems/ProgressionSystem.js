@@ -51,6 +51,7 @@ export class ProgressionSystem {
   /** Distribui o XP de um inimigo entre todos os Pokémon que ainda estão de pé. */
   addXp(amount) {
     const run = this.run;
+    if (run.stage.noXp) return;   // o Endless aquático (0.37): sem XP, só Shards
     // no Modo Livre o XP é reduzido (0.20, CONFIG.endless.xpMult)
     const total = amount * run.playerStats.xpGain * (run.endless ? CONFIG.endless.xpMult : 1);
     const members = run.team.members.filter((m) => !m.fainted);
