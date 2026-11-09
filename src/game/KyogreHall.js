@@ -7,7 +7,7 @@ const DIRS = { up: [0, -1], down: [0, 1], left: [-1, 0], right: [1, 0] };
 
 /**
  * O SALÃO DO KYOGRE (0.37, PLANEJAMENTO-DIVE.md seção 8) — a cena aprovada na
- * maquete "O Salão do Kyogre", depois do Nível 6 da descida:
+ * maquete "O Salão do Kyogre", depois do último nível da descida (o 5):
  *
  * 1. emergir no alto do MarineCave_End do Emerald (o warp, em 20,4);
  * 2. andar pelo salão (só por colisão 0) até a margem do lago;

@@ -78,7 +78,7 @@ const boardCam = (b) => ({ x: b.x * T, y: b.y * T });
 const smooth = (x) => { x = Math.max(0, Math.min(1, x)); return x * x * (3 - 2 * x); };
 
 /**
- * A DESCIDA DO DIVE (PLANEJAMENTO-DIVE.md) — o modo aquático: 6 níveis em
+ * A DESCIDA DO DIVE (PLANEJAMENTO-DIVE.md) — o modo aquático: 5 níveis em
  * tabuleiros de 10x6 tiles de água navegável do Emerald. O jogador anda em tiles
  * (o passo do FireRed, sem correr) e desvia das hordas que atravessam linhas e
  * colunas inteiras. São 3 bolhas de vida, com o bolsão de ar ao passar o Nível 3 (na chegada ao 4);
@@ -86,7 +86,7 @@ const smooth = (x) => { x = Math.max(0, Math.min(1, x)); return x * x * (3 - 2 *
  *
  * Só a regra: o desenho está em render/DiveRenderer.js e a barra em ui/diveHud.js.
  * Roda sem navegador (os testes do smoke-test). `onEnd(result)` avisa o fim:
- * 'rescued' (perdeu as 3 bolhas) ou 'cave' (passou o Nível 6).
+ * 'rescued' (perdeu as 3 bolhas) ou 'cave' (passou o último nível, o 5).
  *
  * Os modos: play (as hordas) · transition (a animação entre os níveis) ·
  * down (perdeu as bolhas: a tela escurece) · over (acabou; esperando o Game).

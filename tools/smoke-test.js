@@ -1211,7 +1211,7 @@ console.log('\n[a descida do Dive — nunca é impossível, só água navegável
   check('com 0,25 s de reação, o jogador perfeito nunca é pego (toda horda tem saída)',
         hits.every((h) => h === 0), `${hits.reduce((s, n) => s + n, 0)} acertos em ${total} hordas`);
   check('cada nível solta todas as hordas dele', events.every((e, i) => e === DIVE.levels[i].count * 12), events.join(', '));
-  check('hordas sobre hordas: mais de 4,5 ao mesmo tempo nos níveis 5 e 6', active[4] > 4.5 && active[5] > 4.5,
+  check('hordas sobre hordas: mais de 4 ao mesmo tempo no Nível 5, o último', active[4] > 4,
         active.map((n) => n.toFixed(1)).join(', '));
 
   // e o contrário: parado no meio do tabuleiro, as hordas pegam (o modo tem desafio)
@@ -1228,7 +1228,7 @@ console.log('\n[a descida do Dive — nunca é impossível, só água navegável
     for (let r = 0; r < 6; r++) for (let c = 0; c < 10; c++) if (!isNav(map, x - m.ox + c, y - m.oy + r)) return false;
     return true;
   });
-  check('os 6 tabuleiros são inteiramente de água navegável', DIVE_WORLD.boards.length === 6 && boardsOk);
+  check('os tabuleiros (um por nível) são inteiramente de água navegável', DIVE_WORLD.boards.length >= DIVE.levels.length && boardsOk);
 
   // as animações entre os níveis: o mergulhador nunca passa por cima da rocha
   let bad = 0, frames = 0, pocket = null, last = null;
@@ -1250,7 +1250,7 @@ console.log('\n[a descida do Dive — nunca é impossível, só água navegável
   check('as animações entre os níveis só passam por água navegável', frames > 1000 && bad === 0, `${frames} quadros, ${bad} fora`);
   check('ao passar o Nível 3, na chegada ao 4, o bolsão de ar enche as 3 bolhas',
         pocket?.level === 3 && pocket.lives === DIVE.lives && pocket.mode === 'play', JSON.stringify(pocket));
-  check('depois do Nível 6, ele chega à entrada da Caverna Marinha', last === 'cave');
+  check('depois do último nível (o 5), ele chega à entrada da Caverna Marinha', DIVE.levels.length === 5 && last === 'cave');
 
   // o passo é o do FireRed andando: 16 quadros por tile, sem correr
   const walk = new Dive();

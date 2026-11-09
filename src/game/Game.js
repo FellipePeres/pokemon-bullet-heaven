@@ -1013,7 +1013,7 @@ export class Game {
   /**
    * O fim da descida. Perdeu as 3 bolhas: acorda no Centro Pokémon, na frente da
    * enfermeira, que conta que o pescador o pescou desmaiado (seção 7). Passou o
-   * Nível 6: a entrada da Caverna Marinha; o salão do Kyogre é a próxima etapa, e
+   * último nível (o 5): a entrada da Caverna Marinha; o salão do Kyogre é a próxima etapa, e
    * por enquanto ele volta à superfície, pela lagoa.
    */
   _diveEnded(result) {
@@ -1035,7 +1035,7 @@ export class Game {
 
   /* ====================== O salão do Kyogre (0.37) ====================== */
 
-  /** Passou o Nível 6: emerge no salão da Caverna Marinha (game/KyogreHall.js). */
+  /** Passou o último nível (o 5): emerge no salão da Caverna Marinha (game/KyogreHall.js). */
   _openHall() {
     this.hallRenderer.preload();
     this.hall.start({ captured: !!this.diveRecord.captured });

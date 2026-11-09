@@ -1,6 +1,6 @@
 /**
  * A MEDIÇÃO DA DESCIDA DO DIVE (PLANEJAMENTO-DIVE.md seção 5): jogadores automáticos
- * descem os 6 níveis, sempre do Nível 1, com as 3 bolhas e o bolsão de ar, como no
+ * descem os níveis da descida, sempre do Nível 1, com as 3 bolhas e o bolsão de ar, como no
  * jogo. Cada perfil tem um tempo de reação (só enxerga a horda R segundos depois do
  * aviso) e uma chance de errar o passo. O "típico" sorteia a reação a cada horda.
  *
@@ -42,7 +42,7 @@ function decide(d, R, err) {
 
 const PROFILES = [['típico (0,25 a 0,45 s, erra 3%)', -1, 0.03], ['reação de 0,35 s', 0.35, 0], ['reação de 0,5 s', 0.5, 0]];
 for (const [name, R, err] of PROFILES) {
-  const reached = Array(6).fill(0), cleared = Array(6).fill(0);
+  const reached = Array(DIVE.levels.length).fill(0), cleared = Array(DIVE.levels.length).fill(0);
   let wins = 0;
   for (let run = 0; run < N; run++) {
     let ended = null;
@@ -55,7 +55,7 @@ for (const [name, R, err] of PROFILES) {
       d.update(1 / 60, decide(d, R, err));
       if (d.level !== lv) { cleared[lv]++; lv = d.level; reached[lv]++; }
     }
-    if (ended === 'cave') { cleared[5]++; wins++; }
+    if (ended === 'cave') { cleared[DIVE.levels.length - 1]++; wins++; }
   }
   const per = reached.map((n, i) => `N${i + 1} ${n ? Math.round((100 * cleared[i]) / n) : 0}%`).join(' ');
   console.log(`${name.padEnd(32)} desce tudo ${String(Math.round((100 * wins) / N)).padStart(3)}% (~${wins ? (N / wins).toFixed(1) : '+' + N} tentativas) · passam: ${per}`);

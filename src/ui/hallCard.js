@@ -1,6 +1,7 @@
 import { el, create, clear, show, hide } from './dom.js';
 import { STAGES } from '../data/stages.js';
 import { typeName, typeColor } from '../data/types.js';
+import { DIVE } from '../data/dive.js';
 
 /**
  * O CARD DA FASE NO SALÃO DO KYOGRE (0.37, aprovado na maquete "O Salão do
@@ -91,7 +92,7 @@ export function showHallCard(game, stageId, { onPlay, onBack }) {
   back.innerHTML = '<span class="btn-text">Voltar para a Vila</span>';
   back.onclick = () => onBack();
   actions.appendChild(back);
-  if (!endless) actions.appendChild(create('p', 'hall-note', 'Voltando agora, a próxima chance exige descer os 6 níveis de novo.'));
+  if (!endless) actions.appendChild(create('p', 'hall-note', `Voltando agora, a próxima chance exige descer os ${DIVE.levels.length} níveis de novo.`));
   panel.appendChild(actions);
   show(panel);
 }

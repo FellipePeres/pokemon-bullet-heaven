@@ -701,6 +701,7 @@ check('depois da escolha, o Continuar segue para a jornada (na vila); sem nome, 
   game.quitToMenu();
 }
 
+const DIVE_LAST = (await import('../src/data/dive.js')).DIVE.levels.length - 1;   // o último nível (0.37.3: o 5)
 // ---- a descida do Dive (0.36): a lagoa abre a descida; perder as bolhas leva à enfermeira; o fim volta à lagoa ----
 {
   const member = game.campaign.journey.team.members[0];
@@ -736,18 +737,18 @@ check('depois da escolha, o Continuar segue para a jornada (na vila); sem nome, 
   hub.say('pescador');
   check('...e depois volta à fala de sempre', !dialogText().includes('peixão'));
   closeDialog();
-  // a descida inteira: depois do Nível 6, a entrada da Caverna Marinha, e a volta pela lagoa
+  // a descida inteira: depois do último nível (o 5), a entrada da Caverna Marinha e o salão
   game.openHub('home');
   game.openDive();
-  game.dive.start(5);
+  game.dive.start(DIVE_LAST);
   game.dive.levelDone();
   for (let i = 0; i < 60 * 60 && game.diveOpen && !game.hall.active; i++) {
     if (game.dive.dialog) { game.dive.dialog.shown = 999; game.dive.confirm(); }
     game.dive.update(1 / 60, null);
   }
-  check('passou o Nível 6: emerge no salão do Kyogre (a descida guarda o recorde)', game.diveOpen && game.hall.active
+  check('passou o último nível: emerge no salão do Kyogre (a descida guarda o recorde)', game.diveOpen && game.hall.active
         && !registry.get('hall-stage').classes.has('hidden') && registry.get('dive-console').classes.has('hidden')
-        && game.campaign.dive.best === 6 && game.campaign.dive.reachedCave === 1);
+        && game.campaign.dive.best === 5 && game.campaign.dive.reachedCave === 1);
   check('o salão: ele emerge no warp do Emerald e só anda por onde dá para pisar',
         game.hall.p.x === 20 && game.hall.p.y === 4 && game.hall.constructor.walkable(20, 4) && !game.hall.constructor.walkable(9, 22));
   // a cena até o card (pulando a caminhada, como o botão de teste)
@@ -766,7 +767,7 @@ check('depois da escolha, o Continuar segue para a jornada (na vila); sem nome, 
   check('Voltar para a Vila: sai pela lagoa', !game.diveOpen && hubVisible() && hub.mapId === 'vila' && hub.player.x === 30 && hub.player.y === 11);
 
   // a luta: Jogar no card
-  game.openDive(); game.dive.start(5); game.dive.levelDone();
+  game.openDive(); game.dive.start(DIVE_LAST); game.dive.levelDone();
   for (let i = 0; i < 60 * 60 && !game.hall.active; i++) { if (game.dive.dialog) { game.dive.dialog.shown = 999; game.dive.confirm(); } game.dive.update(1 / 60, null); }
   playHall();
   registry.get('hall-card').children.at(-1).children[0].onclick();
@@ -822,7 +823,7 @@ check('depois da escolha, o Continuar segue para a jornada (na vila); sem nome, 
   closeDialog();
 
   // depois da captura, o salão vazio: o card do Endless aquático (sem XP)
-  game.openDive(); game.dive.start(5); game.dive.levelDone();
+  game.openDive(); game.dive.start(DIVE_LAST); game.dive.levelDone();
   for (let i = 0; i < 60 * 60 && !game.hall.active; i++) { if (game.dive.dialog) { game.dive.dialog.shown = 999; game.dive.confirm(); } game.dive.update(1 / 60, null); }
   playHall();
   check('com o Kyogre na jornada, o salão está vazio e o card é o da maré sem fim', game.hall.k.hidden

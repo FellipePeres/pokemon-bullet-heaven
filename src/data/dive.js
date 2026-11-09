@@ -22,7 +22,11 @@
  *            row/col uma linha ou coluna · row2 duas linhas · wall quatro linhas (sobram duas)
  *            wall5 cinco linhas (sobra uma) · cross linha e coluna · chain duas em sequência
  *            na mesma linha · triple até três · cols3 três colunas
- *   species  os números da Pokédex das hordas (Kanto até o 3, misturado no 4, Hoenn no 5 e no 6)
+ *   species  os números da Pokédex das hordas (Kanto até o 3, misturado no 4, Hoenn no 5)
+ *
+ * Desde a 0.37.3 são 5 níveis (o Fellipe: "deixe o nível 5 sendo o último, vamos
+ * tirar o nível 6"); o 5 leva direto à Caverna Marinha e ganhou um pouco mais de
+ * intervalo entre as hordas. O 6º tabuleiro continua no mundo (diveWorld.js), sem uso.
  */
 export const DIVE = {
   cols: 10,
@@ -40,14 +44,13 @@ export const DIVE = {
   // o bolsão de ar enche as bolhas na chegada a este nível (o índice: 3 = Nível 4, ao passar o 3)
   airPocketLevel: 3,
   // o escuro por cima do fundo, nível a nível (a Rota 127 já é mais escura)
-  dark: [0, 0.05, 0.1, 0.15, 0.12, 0.2],
+  dark: [0, 0.05, 0.1, 0.15, 0.2],
   levels: [
     { depth: 10, warn: 1.3, speed: 9, count: 8, gap: [0.2, 0.4], overlap: false, kinds: { row: 1 }, species: [129, 118, 116] },
     { depth: 25, warn: 1.0, speed: 10, count: 12, gap: [1.0, 1.4], overlap: true, kinds: { row: 3, col: 2, row2: 2 }, species: [90, 120, 72, 98] },
     { depth: 45, warn: 0.85, speed: 11, count: 15, gap: [0.9, 1.25], overlap: true, kinds: { row: 2, col: 2, row2: 2, wall: 3 }, species: [86, 117, 99, 73, 119] },
     { depth: 70, warn: 0.65, speed: 12, count: 18, gap: [0.75, 1.05], overlap: true, kinds: { row: 1, col: 2, row2: 2, wall: 2, cross: 3 }, species: [91, 121, 318, 320, 341, 366] },
-    { depth: 100, warn: 0.55, speed: 13, count: 21, gap: [0.66, 0.92], overlap: true, kinds: { row: 1, col: 1, row2: 1, wall: 1, wall5: 1, cross: 2, chain: 3 }, species: [319, 342, 367, 368, 369, 340] },
-    { depth: 140, warn: 0.35, speed: 14, count: 25, gap: [0.56, 0.78], overlap: true, kinds: { row: 1, col: 1, wall: 1, wall5: 2, cross: 2, chain: 2, triple: 3, cols3: 2 }, species: [321, 365, 319, 350, 369] }
+    { depth: 100, warn: 0.55, speed: 13, count: 21, gap: [0.74, 1.0], overlap: true, kinds: { row: 1, col: 1, row2: 1, wall: 1, wall5: 1, cross: 2, chain: 3 }, species: [319, 342, 367, 368, 369, 340] }
   ],
   // as falas da descida (as do resgate ficam com a enfermeira, em data/dialogue.js)
   lines: {

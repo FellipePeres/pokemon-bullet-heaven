@@ -355,7 +355,7 @@ const ROTEIROS = {
            "for (let i = 0; i < 26; i++) { const a = i / 26 * Math.PI * 2, d = 150 + (i % 5) * 45; r.spawner.spawnAt('rattata', r.player.x + Math.cos(a) * d, r.player.y + Math.sin(a) * d, 14); }" },
     { wait: 900 }, { shot: 'dive-2', raw: true }, { wait: 450 }, { shot: 'dive-3', raw: true }, { wait: 450 }, { shot: 'dive-4', raw: true }
   ],
-  // a descida do Dive (0.36): a pergunta da lagoa, o aviso e as hordas, o bolsão de ar, o Nível 6 e o resgate
+  // a descida do Dive (0.36): a pergunta da lagoa, o aviso e as hordas, o bolsão de ar, o último nível e o resgate
   descida: [
     { open: 'index.html' }, { wait: 500 },
     { run: "game.newGame(); game.chooseTrainer('red'); game.chooseStarter('squirtle');" +
@@ -367,7 +367,7 @@ const ROTEIROS = {
     { wait: 2400 }, { shot: 'descida-3-aviso', raw: true },
     { run: "game.dive.start(1); game.dive.levelDone()" }, { wait: 1600 }, { shot: 'descida-4-passagem', raw: true },
     { run: "for (let i = 0; i < 600 && !game.dive.dialog; i++) game.dive.update(1 / 60)" }, { wait: 500 }, { shot: 'descida-5-bolsao', raw: true },
-    { run: "game.dive.start(5)" }, { wait: 3200 }, { shot: 'descida-6-nivel6', raw: true },
+    { run: "game.dive.start(4)" }, { wait: 3200 }, { shot: 'descida-6-nivel5', raw: true },
     { run: "game.dive.lives = 1; game.dive.p.c = 4; game.dive.p.r = 3; game.dive.inv = 0" }, { wait: 4500 },
     { run: "game.hub.dialog && (game.hub.dialog.shown = 999)" }, { wait: 300 }, { shot: 'descida-7-resgate' }
   ],
@@ -381,7 +381,7 @@ const ROTEIROS = {
            "{ uid: 'c', pokemonId: 'mewtwo', level: 90, xp: 0, hp: 0, abilities: ['psystrike'], upgrades: {} }], active: ['a', 'b', 'c'] }, pc: [] };" +
            "document.getElementById('toast-container').style.display = 'none';" +
            "window.autoText = setInterval(() => { const h = game.hub; if (h?.dialog && h.dialog.shown >= h.dialog.pages[h.dialog.index].length) h.dialog.t2 = (h.dialog.t2 ?? 0) + 1; if (h?.dialog?.t2 > 12) { h.dialog.t2 = 0; h.confirm(); } const k = game.hall; if (k?.dialog && k.dialog.shown >= k.dialog.pages[k.dialog.index].length) { k.dialog.t2 = (k.dialog.t2 ?? 0) + 1; if (k.dialog.t2 > 12) k.confirm(); } }, 100);" +
-           "game.openHub('home'); game.openDive(); game.dive.start(5); game.dive.levelDone();" +
+           "game.openHub('home'); game.openDive(); game.dive.start(4); game.dive.levelDone();" +
            "for (let i = 0; i < 3600 && !game.hall.active; i++) { if (game.dive.dialog) { game.dive.dialog.shown = 999; game.dive.confirm(); } game.dive.update(1 / 60); }" },
     { wait: 1400 }, { shot: 'kyogre-1-emergir' },
     { run: "game.hall.skipWalk()" }, { wait: 4200 }, { shot: 'kyogre-2-margem' },

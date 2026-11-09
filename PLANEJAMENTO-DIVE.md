@@ -323,7 +323,12 @@ A medição no jogo (`node tools/descida.mjs`, 80 a 100 descidas por perfil):
 | reação de 0,35 s | 100% | 100% |
 | reação de 0,5 s | 0% | 3%; ainda para no 6 |
 
-Depois, "deixe menos desvios para passar": cada nível ficou com ~20% menos hordas (8,
+Na 0.37.3 ("deixe o nível 5 sendo o último, vamos tirar o nível 6"), a descida passou
+a ter **5 níveis**: o 5 leva direto à Caverna Marinha e ganhou um pouco mais de
+intervalo entre as hordas (0,74 a 1,0 s). O típico desce tudo em **84% (~1,2
+tentativa)**; quem reage em 0,5 s, em 52%. O 6º tabuleiro continua no mundo, sem uso.
+
+Antes disso, "deixe menos desvios para passar": cada nível ficou com ~20% menos hordas (8,
 12, 15, 18, 21 e 25; eram 10, 15, 18, 22, 26 e 30). O típico passou a descer tudo em
 **37% (~2,7 tentativas)**, com o Nível 6 em 42%. Quem reage em 0,5 s ainda para no 6 (2%).
 
