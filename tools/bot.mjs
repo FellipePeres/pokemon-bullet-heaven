@@ -65,6 +65,13 @@ export function steer(run) {
 
   // a luta do Kyogre (0.37): foge dos avisos no chão e vai até a Dive Ball
   for (const h of run.fight?.hazards ?? []) if (!h.fired) flee(h.x, h.y, h.r + 60, 3);
+  // o maremoto: corre para a bolha de ar e fica lá dentro
+  const ts = run.fight?.tsunami;
+  if (ts && ts.phase !== 'after') {
+    const dx = ts.safe.x - player.x, dy = ts.safe.y - player.y, d = Math.hypot(dx, dy) || 1;
+    if (d < ts.safe.r * 0.5) return { x: 0, y: 0 };
+    return { x: dx / d, y: dy / d };
+  }
   const ball = run.fight?.ball ?? run.pickups.find((p) => p.kind === 'ball' && !p.dead);
   if (ball) {
     const dx = ball.x - player.x, dy = ball.y - player.y;

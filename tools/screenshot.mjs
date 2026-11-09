@@ -406,6 +406,30 @@ const ROTEIROS = {
     { wait: 5200 }, { shot: 'kyogre-17-crobat' },
     { wait: 2600 }, { shot: 'kyogre-18-voar' }
   ],
+  // os ataques do Kyogre (0.37.5): a carga e os anéis, as colunas, os raios, o maremoto, o mergulho, a Dive Ball e a faixa da captura
+  kyogrefx: [
+    { open: 'index.html' }, { wait: 500 },
+    { run: "game.newGame(); game.chooseTrainer('red'); game.chooseStarter('squirtle');" +
+           "game.campaign.journey = { team: { members: [{ uid: 'a', pokemonId: 'blastoise', level: 90, xp: 0, hp: 0, abilities: ['hydro_pump', 'dive'], upgrades: {} }," +
+           "{ uid: 'b', pokemonId: 'zapdos', level: 90, xp: 0, hp: 0, abilities: ['zap_cannon'], upgrades: {} }], active: ['a', 'b'] }, pc: [] };" +
+           "document.getElementById('toast-container').style.display = 'none'; game.startStage('kyogre'); game.run.time = 44.6" },
+    { wait: 2500 }, { run: "game.closeLeaderIntro()" }, { wait: 2600 },
+    { run: "{ const r = game.run; r.damageCompanion = () => {}; r.spawner.update = () => {}; r.enemies.forEach((e) => { if (!e.boss) e.dead = true; }); r.fight.attackTimer = 99; r.fight.summonTimer = 99; r.fight._set('charge'); }" },
+    { wait: 650 }, { shot: 'kfx-1-carga', raw: true }, { wait: 700 }, { shot: 'kfx-2-aneis', raw: true },
+    { run: "{ const f = game.run.fight; f.rng = () => 0.4; f._attack(f.boss, 0.8); f.rng = Math.random; f.attackTimer = 99; }" },
+    { wait: 1350 }, { shot: 'kfx-3-colunas', raw: true },
+    { run: "{ const f = game.run.fight; f.rng = () => 0.7; f._attack(f.boss, 0.4); f.rng = Math.random; f.attackTimer = 99; }" },
+    { wait: 700 }, { shot: 'kfx-4-ceu', raw: true }, { wait: 450 }, { shot: 'kfx-5-raio', raw: true },
+    { run: "{ const f = game.run.fight; f._tsunami(f.boss); }" }, { wait: 1500 }, { shot: 'kfx-6-maremoto-aviso', raw: true },
+    { wait: 2100 }, { shot: 'kfx-7-maremoto', raw: true },
+    { wait: 2500 },
+    { run: "{ const f = game.run.fight; f.spot = f._randomSpot(280, 400); f._set('dive'); }" }, { wait: 1300 }, { shot: 'kfx-8-mergulho', raw: true },
+    { wait: 1500 },
+    { run: "import('./src/systems/combat.js').then(({ damageEnemy }) => damageEnemy(game.run, game.run.boss, 1e9))" },
+    { wait: 400 }, { shot: 'kfx-9-bola-caindo', raw: true }, { wait: 1000 }, { shot: 'kfx-10-bola', raw: true },
+    { run: "{ const r = game.run; r.fight.t = 0; r.fight.rng = () => 0.01; r.player.x = r.fight.ball.x; r.player.y = r.fight.ball.y; }" },
+    { wait: 2300 }, { shot: 'kfx-11-faixa', raw: true }, { wait: 3300 }, { shot: 'kfx-12-gotcha', raw: true }
+  ],
   // o lendário secreto no fim da Pokédex (0.35): o "???" e, capturado, o Kyogre
   pokedex: [
     { open: 'index.html' }, { wait: 500 },

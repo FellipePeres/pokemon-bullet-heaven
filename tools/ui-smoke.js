@@ -801,11 +801,13 @@ const DIVE_LAST = (await import('../src/data/dive.js')).DIVE.levels.length - 1; 
   damageEnemy(run, boss, boss.maxHp);
   check('com Dive Ball sobrando, a vida não passa de 15%: ele fica exausto e a bola cai no campo',
         Math.abs(boss.hp / boss.maxHp - 0.15) < 1e-9 && !boss.dead && run.fight.state === 'exhausted' && !!run.fight.ball);
+  run.fight.ball.t = run.fight.ball.fall;   // a bola já tocou o chão
+  run.update(1 / 60, { x: 0, y: 0 });
   run.player.x = run.fight.ball.x; run.player.y = run.fight.ball.y;
   run.fight.rng = () => 0.99;   // a primeira falha
   run.update(1 / 60, { x: 0, y: 0 });
   check('passar por cima joga a bola: tudo para enquanto ela balança', run.state === 'legendary' && !!run.fight.throwing);
-  for (let i = 0; i < 60 * 6 && run.state === 'legendary'; i++) run.update(1 / 60, { x: 0, y: 0 });
+  for (let i = 0; i < 60 * 10 && run.state === 'legendary'; i++) run.update(1 / 60, { x: 0, y: 0 });
   check('falhou: ele escapa, volta só a 25% e gasta uma das 3 Dive Balls', run.fight.balls === 2 && Math.abs(boss.hp / boss.maxHp - 0.25) < 1e-9
         && run.fight.state === 'fight');
   damageEnemy(run, boss, boss.maxHp);
@@ -813,10 +815,12 @@ const DIVE_LAST = (await import('../src/data/dive.js')).DIVE.levels.length - 1; 
   run.update(1 / 60, { x: 0, y: 0 });
   check('sem pegar a bola a tempo: ele se recupera, mas a bola não conta como gasta', run.fight.balls === 2 && run.fight.state === 'fight');
   damageEnemy(run, boss, boss.maxHp);
+  run.fight.ball.t = run.fight.ball.fall;
+  run.update(1 / 60, { x: 0, y: 0 });
   run.player.x = run.fight.ball.x; run.player.y = run.fight.ball.y;
   run.fight.rng = () => 0.01;   // os 10%
   run.update(1 / 60, { x: 0, y: 0 });
-  for (let i = 0; i < 60 * 8 && run.state === 'legendary'; i++) run.update(1 / 60, { x: 0, y: 0 });
+  for (let i = 0; i < 60 * 10 && run.state === 'legendary'; i++) run.update(1 / 60, { x: 0, y: 0 });
   run.update(1 / 60, { x: 0, y: 0 });
   game._handleRunState();
   check('capturou: a tela de captura do Kyogre, sem Ignorar', game.captureOpen && registry.get('capture-skip').classes.has('hidden'));

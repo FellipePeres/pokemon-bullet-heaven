@@ -487,6 +487,25 @@ Todos com aviso no chão antes do dano, como os golpes que já existem:
 inclusive os da equipe. Uma equipe de Água sai ganhando, e uma de Fogo sofre,
 como no jogo original. As fraquezas no card (Elétrico e Planta) são a dica.
 
+**Na 0.37.5** (o Fellipe, depois de jogar: "os ataques do Kyogre mais destrutivos e
+cinematográficos, ele é um lendário com muita importância"):
+- **A arena sem as poças.** O mergulho é no chão: ele afunda e volta num lugar ao
+  acaso, perto do treinador, com um redemoinho antes.
+- **Origin Pulse:** ele para 0,9 s, as marcas vermelhas acendem e três anéis grossos
+  explodem dele, com clarão e tremor.
+- **Water Spout:** colunas d'água que estouram do chão.
+- **Thunder:** o céu escurece, e os raios caem ramificados, com clarão e uma marca
+  queimada no chão.
+- **O Maremoto** (novo): aos 66% e aos 33% da vida, e de tempos em tempos na fúria.
+  O grito, a bolha de ar marcada no chão e, 3 s depois, uma onda gigante varre a
+  arena inteira. Só a bolha protege.
+- **A Dive Ball** cai do alto num feixe de luz, com um estouro no chão e o brilho
+  pulsando.
+- **A faixa da captura:** ao pegá-la, sobe uma faixa na tela, como a do Voar, com a
+  bola grande balançando, e o "Gotcha!" ou a bola se abrindo.
+- **O Kyogre ficou com 15% mais vida.** A medição: o nível 80 vence 1 de 3 e o 90,
+  3 de 3, com 2 a 3 desmaios.
+
 ### A captura: a Dive Ball (o método B), em detalhe
 
 1. **O piso de vida:** enquanto houver Dive Ball, a vida do Kyogre **não passa de

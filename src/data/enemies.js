@@ -1061,7 +1061,7 @@ export const ENEMIES = {
   // são do systems/kyogreFight.js; `legendary` tira a rajada que todo líder tem
   kyogre_boss: {
     id: 'kyogre_boss', dex: 382, name: 'Kyogre', types: ['water'], level: 90,
-    hp: 400000, speed: 50, damage: 55, xp: 2400, dropChance: 0,
+    hp: 460000, speed: 50, damage: 55, xp: 2400, dropChance: 0,
     behavior: 'boss', radius: 56, scale: 3, boss: true, ace: true, legendary: true, enrageAt: 0.2,
     leader: 'Kyogre', abilities: []
   }

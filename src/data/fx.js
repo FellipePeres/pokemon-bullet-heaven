@@ -224,9 +224,7 @@ export const ABILITY_FX = {
   // ---- golpes dos líderes (chegam com aviso no chão) ----
   leader_rock_barrage: { ring: 'boulder', count: 10, shake: 6 },
   leader_whirlpool:    { ring: 'water_orb', count: 14, shake: 3 },
-  boss_shockwave:      { ring: 'flying_dirt', count: 12, shake: 5 },
-  kyogre_origin_pulse: { ring: 'bubble', count: 14, shake: 4 },
-  kyogre_resurface:    { ring: 'bubble', count: 12, shake: 6 }
+  boss_shockwave:      { ring: 'flying_dirt', count: 12, shake: 5 }
 };
 
 /**

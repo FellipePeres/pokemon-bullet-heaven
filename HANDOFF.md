@@ -5,7 +5,7 @@
 > decisão foi tomada e o que falta fazer. O `README.md` é o manual de uso;
 > este aqui é o contexto de desenvolvimento.
 
-**Versão atual:** `0.37.4` · **Última atualização:** 2026-11-09
+**Versão atual:** `0.37.5` · **Última atualização:** 2026-11-09
 **Stack:** HTML + CSS + JavaScript puro (ES Modules). Sem backend, sem build, sem dependências.
 **Repositório:** https://github.com/FellipePeres/pokemon-bullet-heaven (público)
 **Jogo no ar:** https://fellipeperes.github.io/pokemon-bullet-heaven/
@@ -1119,6 +1119,7 @@ o Brock como está, todas as outras mais duras, menos níveis.
 | 59 | "deixe menos desvios para passar" | 0.37.2: ~20% menos hordas em cada nível da descida (8, 12, 15, 18, 21 e 25); o típico desce tudo em ~37% (~2,7 tentativas; era ~26%), e as hordas continuam umas sobre as outras (média de 5 ativas nos níveis 5 e 6) |
 | 60 | "deixe o nível 5 sendo o último, vamos tirar o nível 6, e facilite levemente o tempo entre hordas somente do nível 5" | 0.37.3: a descida tem 5 níveis (o 5 leva direto à Caverna Marinha; o 6º tabuleiro continua no mundo, sem uso) e o Nível 5 tem um pouco mais de intervalo entre as hordas (0,74 a 1,0 s; era 0,66 a 0,92). O típico desce tudo em ~84% (~1,2 tentativa); quem reage em 0,5 s, em ~52% |
 | 61 | o começo das tentativas entediante e o final muito difícil: o bolsão de ar (o início do Nível 4) vira checkpoint; morrendo adiante, a derrota oferece voltar para a vila ou continuar do bolsão | 0.37.4: depois do bolsão, perder as 3 bolhas abre "Você desmaiou!" com Continuar do bolsão de ar (Nível 4, com as 3 bolhas) ou Voltar para a vila (o resgate de sempre, no Centro); A continua e B volta. Vale para o mergulho atual: a próxima descida começa do Nível 1. Antes do bolsão, nada muda |
+| 62 | a arena do Kyogre sem as poças (o mergulho no chão, aparecendo ao acaso); os ataques mais destrutivos e cinematográficos; mais ênfase na queda da Dive Ball; ao passar pela bola, a faixa como a do Voar com a bola balançando; o Kyogre levemente mais resistente | 0.37.5: a arena sem as poças; o mergulho afunda no chão e volta num lugar ao acaso, com um redemoinho antes. Os ataques: o Origin Pulse carrega (as marcas vermelhas acendem) e solta três anéis grossos com clarão; o Water Spout em colunas que estouram do chão; o Thunder com o céu escurecendo, raios ramificados e a marca queimada; o novo Maremoto (aos 66% e 33% da vida e de tempos em tempos na fúria), em que só a bolha de ar marcada no chão protege. A Dive Ball cai num feixe de luz, com o estouro no chão e o brilho pulsando; ao pegá-la, a faixa da captura mostra a bola balançando e o resultado. O Kyogre tem 15% mais vida. Medido com `tools/kyogre.mjs`: nível 80 vence 1 de 3, nível 90 vence 3 de 3 (2 a 3 desmaios) |
 | Fase 8 (Giovanni) | 1 → 0,8 | 4,0 | 4,5 | 60 | 84 → 62 |
 | Lorelei | 1,05 → 0,8 | 3,5 | 3,1–4,7 | 64 | 92 → 66 |
 | Bruno | 1,12 → 0,97 | 3,7 | 3,5–6,3 ² | 66 | 99 → 68 |

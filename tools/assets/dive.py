@@ -280,9 +280,9 @@ def animated(pa, dex, shiny=False):
 
 # A ARENA DA LUTA (o cenário aprovado na maquete "A Luta do Kyogre"): o chão de areia do
 # salão, a rocha nas bordas, o lago do Kyogre no meio (o do MarineCave_End, com as margens)
-# e 4 poças de onde ele volta à tona. Em metatiles de 16 px; o jogo mostra em 2x.
+# (0.37.5: sem as poças; o mergulho dele é no chão). Em metatiles de 16 px; o jogo mostra em 2x.
 ARENA_COLS, ARENA_ROWS = 75, 50
-ARENA_POOLS = [(12, 10), (60, 10), (12, 38), (60, 38)]
+ARENA_POOLS = []   # 0.37.5: sem as poças (o Fellipe: "meio sem sentido"); o mergulho é no chão
 
 
 def kyogre_hall(em, out_dir, world):

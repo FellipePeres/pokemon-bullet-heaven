@@ -49,7 +49,8 @@ for (let n = 1; n <= fights; n++) {
   const hurt = run.damageCompanion.bind(run);
   run.damageCompanion = (c, amount, type, opts) => {
     const caller = new Error().stack.split('\n')[2] ?? '';
-    const key = caller.includes('_strike') ? `Kyogre (${type})` : caller.includes('_updateZones') ? 'anéis e ondas'
+    const key = caller.includes('_strike') ? `Kyogre (${type})` : caller.includes('_updateRings') ? 'anéis'
+      : caller.includes('_updateTsunami') ? 'maremoto' : caller.includes('_updateZones') ? 'ondas'
       : attacker ? (attacker.boss ? 'contato do Kyogre' : 'contato da horda') : 'outros';
     taken[key] = (taken[key] ?? 0) + amount;
     return hurt(c, amount, type, opts);

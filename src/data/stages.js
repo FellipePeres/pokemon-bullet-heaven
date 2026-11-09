@@ -881,6 +881,10 @@ export const STAGES = {
       exhaust: 8,         // segundos exausto, com a bola no campo
       finalTide: 30,      // a maré final depois da captura
       finalLevel: 72,
+      pulseCharge: 0.9,   // o Origin Pulse: segundos parado, carregando, antes dos anéis
+      tsunamiAt: [0.66, 0.33],   // o maremoto: aos 66% e aos 33% da vida (e de tempos em tempos na fúria)
+      tsunamiWarn: 3,     // o aviso: a bolha de ar marcada no chão antes da onda
+      tsunamiDamage: 30,
       summons: [{ id: 'sharpedo', weight: 3 }, { id: 'carvanha', weight: 3 }, { id: 'wailmer', weight: 2 }, { id: 'relicanth', weight: 1 }, { id: 'huntail', weight: 1 }]
     },
     // a fuga e a volta são pela lagoa da vila, não pelo mapa (Game.js)
