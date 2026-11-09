@@ -769,6 +769,7 @@ check('depois da escolha, o Continuar segue para a jornada (na vila); sem nome, 
   playHall();
   registry.get('hall-card').children.at(-1).children[0].onclick();
   const run = game.run;
+  run.damageCompanion = () => {};   // a equipe do teste é fraca: aqui só importa a captura
   check('Jogar: a fase do salão, na chuva, com a luta do Kyogre', run?.stage.id === 'kyogre' && run.stage.weather === 'rain' && !!run.fight
         && run.world.scene === 'kyogre_hall');
   run.time = run.stage.duration;
