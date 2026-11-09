@@ -15,6 +15,9 @@ import { SaveManager } from '../src/save/SaveManager.js';
 import { createProfile, normalizeProfile, regionProgress } from '../src/save/profile.js';
 import { Player, facingDir, FEET_BOX } from '../src/entities/Player.js';
 import { CONFIG } from '../src/core/config.js';
+import { Dive, isNav, laneEnd } from '../src/game/Dive.js';
+import { DIVE } from '../src/data/dive.js';
+import { DIVE_WORLD } from '../src/data/diveWorld.js';
 import { maxHpFor } from '../src/systems/stats.js';
 import { hpRatio } from '../src/systems/stats.js';
 import { nextMoveFor, moveLineOf } from '../src/data/tms.js';
@@ -1177,6 +1180,85 @@ console.log('\n[save]');
   let bad = null;
   try { SaveManager.parse({ foo: 'bar' }); } catch (e) { bad = e.message; }
   check('save inválido é rejeitado', !!bad, bad ?? '');
+}
+
+// ------------------------------------------- a descida do Dive (0.36, PLANEJAMENTO-DIVE.md)
+console.log('\n[a descida do Dive — nunca é impossível, só água navegável]');
+{
+  // a prova: um jogador perfeito que só enxerga a horda depois do aviso mais 0,25 s de reação,
+  // andando, com bolhas infinitas, não pode ser pego nunca (hordas sobre hordas, e sempre uma saída)
+  const hits = [], events = [], active = [];
+  for (let lv = 0; lv < DIVE.levels.length; lv++) {
+    let h = 0, e = 0, a = 0, f = 0;
+    for (let run = 0; run < 12; run++) {
+      const d = new Dive();
+      d.start(lv);
+      d.lives = 999;
+      for (let g = 0; d.mode === 'play' && d.level === lv && g < 60 * 400; g++) {
+        d.update(1 / 60, d.botDir(DIVE.react));
+        a += d.lanes.filter((l) => d.clock >= l.t0 && d.clock < laneEnd(l)).length;
+        f++;
+      }
+      h += 999 - d.lives;
+      e += d.spawned;
+    }
+    hits.push(h); events.push(e); active.push(a / f);
+  }
+  const total = events.reduce((s, n) => s + n, 0);
+  check('com 0,25 s de reação, o jogador perfeito nunca é pego (toda horda tem saída)',
+        hits.every((h) => h === 0), `${hits.reduce((s, n) => s + n, 0)} acertos em ${total} hordas`);
+  check('cada nível solta todas as hordas dele', events.every((e, i) => e === DIVE.levels[i].count * 12), events.join(', '));
+  check('hordas sobre hordas: mais de 5 ao mesmo tempo nos níveis 5 e 6', active[4] > 5 && active[5] > 5,
+        active.map((n) => n.toFixed(1)).join(', '));
+
+  // e o contrário: parado no meio do tabuleiro, as hordas pegam (o modo tem desafio)
+  let ended = null;
+  const still = new Dive({ onEnd: (r) => { ended = r; } });
+  still.start(2);
+  still.p.c = 4; still.p.r = 3;
+  for (let i = 0; i < 60 * 60 && still.mode !== 'over'; i++) still.update(1 / 60, null);
+  check('parado, ele perde as 3 bolhas e vai para o resgate', ended === 'rescued' && still.lives === 0);
+
+  // os tabuleiros: 10x6 tiles, todos navegáveis no Emerald (colisão 0, elevação 3)
+  const boardsOk = DIVE_WORLD.boards.every(([map, x, y]) => {
+    const m = DIVE_WORLD.maps[map];
+    for (let r = 0; r < 6; r++) for (let c = 0; c < 10; c++) if (!isNav(map, x - m.ox + c, y - m.oy + r)) return false;
+    return true;
+  });
+  check('os 6 tabuleiros são inteiramente de água navegável', DIVE_WORLD.boards.length === 6 && boardsOk);
+
+  // as animações entre os níveis: o mergulhador nunca passa por cima da rocha
+  let bad = 0, frames = 0, pocket = null, last = null;
+  for (let lv = 0; lv < DIVE.levels.length; lv++) {
+    const d = new Dive({ onEnd: (r) => { last = r; } });
+    d.start(lv);
+    d.lives = 1;
+    d.levelDone();
+    for (let g = 0; d.mode === 'transition' && g < 60 * 30; g++) {
+      if (d.dialog) { d.dialog.shown = 999; d.confirm(); }
+      d.update(1 / 60);
+      if (d.p.wx != null) {
+        frames++;
+        if (!isNav(d.map, Math.round(d.p.wx / 32), Math.round(d.p.wy / 32))) bad++;
+      }
+    }
+    if (lv === 1) pocket = { level: d.level, lives: d.lives, mode: d.mode };
+  }
+  check('as animações entre os níveis só passam por água navegável', frames > 1000 && bad === 0, `${frames} quadros, ${bad} fora`);
+  check('na chegada ao Nível 3, o bolsão de ar enche as 3 bolhas',
+        pocket?.level === 2 && pocket.lives === DIVE.lives && pocket.mode === 'play', JSON.stringify(pocket));
+  check('depois do Nível 6, ele chega à entrada da Caverna Marinha', last === 'cave');
+
+  // o passo é o do FireRed andando: 16 quadros por tile, sem correr
+  const walk = new Dive();
+  walk.start(0);
+  walk.nextAt = 999;
+  for (let i = 0; i < 60; i++) walk.update(1 / 60, 'r');
+  check('segurando, ele anda 3,75 tiles por segundo (o passo da vila andando)', walk.p.c === 4 || walk.p.c === 5, `tile ${walk.p.c}`);
+  for (let i = 0; i < 30; i++) walk.update(1 / 60, null);
+  const at = walk.p.c;
+  walk.update(1 / 60, 'r');
+  check('o passo sai no primeiro toque (sem o "só virar" da vila)', walk.p.c === at + 1);
 }
 
 console.log(`\n=== ${failures === 0 ? 'TUDO OK' : failures + ' FALHA(S)'} ===\n`);

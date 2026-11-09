@@ -252,7 +252,7 @@ badSegments.length ? fail(`trechos com cenário inexistente: ${badSegments.join(
 // a vila (0.29): mapas gerados, portas, saídas, pessoas, objetos e falas
 {
   const issues = [];
-  const KNOWN_WHEN = new Set(['starter', 'starterIs', 'shiny', 'badges', 'champion', 'dex', 'veteran', 'dive', 'diveTm', 'locked', 'once']);
+  const KNOWN_WHEN = new Set(['starter', 'starterIs', 'shiny', 'badges', 'champion', 'dex', 'veteran', 'dive', 'diveTm', 'diveRescued', 'locked', 'once']);
   const KNOWN_ACTIONS = new Set(['starter', 'pc', 'mart', 'save', 'campaign', 'pokedoll', 'badges', 'aquatic']);
   const floor = (mapId, x, y) => {
     const map = HUB_MAPS[mapId];

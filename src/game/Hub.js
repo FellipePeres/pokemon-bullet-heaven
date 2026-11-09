@@ -426,7 +426,7 @@ export class Hub {
       case 'campaign': game.openCampaign(); break;
       case 'pokedoll': game.menus.showModal('modal-decor'); break;
       case 'badges': game.menus.showModal('modal-badges'); break;
-      case 'aquatic': this.say('aquatico_breve'); break;
+      case 'aquatic': game.openDive(); break;
       default: break;
     }
   }
@@ -472,6 +472,7 @@ export class Hub {
       veteran: game.listJourneys().some((j) => !j.active && j.progress?.starter),
       dive: members.some((m) => m.abilities?.includes('dive')),
       diveTm: game.martTargets('tm_dive').length > 0,
+      diveRescued: (campaign.dive?.rescues ?? 0) > 0,
       locked: !!extra.locked,
       item: extra.item ?? '',
       player: game.playerName,
@@ -484,7 +485,7 @@ export class Hub {
     if (!when) return true;
     for (const [key, value] of Object.entries(when)) {
       switch (key) {
-        case 'starter': case 'shiny': case 'champion': case 'veteran': case 'dive': case 'diveTm': case 'locked':
+        case 'starter': case 'shiny': case 'champion': case 'veteran': case 'dive': case 'diveTm': case 'diveRescued': case 'locked':
           if (ctx[key] !== value) return false;
           break;
         case 'starterIs': if (ctx.starterId !== value) return false; break;

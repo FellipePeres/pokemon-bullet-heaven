@@ -19,6 +19,7 @@
  *            veteran   já começou outra jornada antes desta
  *            dive      alguém da equipe sabe Dive (seção 8 do planejamento)
  *            diveTm    a TM Dive está na loja: alguém da jornada pode aprender (0.34)
+ *            diveRescued  o pescador já o tirou da água desmaiado (a descida, 0.36)
  *            locked    a saída que este guarda está travada (a fala da trava)
  *            once      só uma vez por jornada: a chave fica guardada depois de mostrar
  *                      ({badges} vira o número de insígnias: uma vez por insígnia)
@@ -247,13 +248,14 @@ export const DIALOGUE = {
   pescador: {
     name: 'Pescador',
     lines: [
+      { when: { diveRescued: true, once: 'pescador_resgate' }, say: ['Ô, peixão! Quase arrebentou a minha linha. Da próxima vez, avisa antes de afundar!'] },
       { when: { dive: true }, say: ['Esse seu Pokémon... ele sabe mergulhar, não sabe? Vai lá e me conta o que tem no fundo!'] },
       { say: ['Às vezes fico imaginando o que tem lá embaixo... Se eu soubesse mergulhar, descobriria.'] }
     ]
   },
   lagoa: {
     lines: [
-      // com Dive, a pergunta leva ao modo aquático (seção 8 do planejamento; ainda em breve)
+      // com Dive, a pergunta leva à descida (game/Dive.js, PLANEJAMENTO-DIVE.md)
       { when: { dive: true }, say: ['A água é escura e funda. Não dá para ver o fundo.'], ask: { text: 'Quer usar Dive?', yes: 'aquatic', no: [] } },
       { say: ['A água é escura e funda. Não dá para ver o fundo.'] }
     ]
@@ -293,7 +295,14 @@ export const DIALOGUE = {
   endless_breve: {
     lines: [{ say: ['O mato fica cada vez mais alto e fechado...', 'A Trilha Sem Fim ainda não abriu. (O modo Endless chega em breve.)'] }]
   },
-  aquatico_breve: {
-    lines: [{ say: ['Ainda não dá para descer. (O modo aquático chega em breve.)'] }]
+
+  /* ============================ a descida do Dive ============================ */
+  // depois de perder as 3 bolhas: ele acorda no Centro, na frente da enfermeira (seção 7)
+  enfermeira_resgate: {
+    name: 'Enfermeira',
+    lines: [{ say: [
+      'Ah, você acordou! O pescador da lagoa trouxe você até aqui.',
+      'Disse que fisgou você desmaiado lá no fundo... e que foi o maior peixe da vida dele.'
+    ] }]
   },
 };

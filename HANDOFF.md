@@ -5,7 +5,7 @@
 > decisão foi tomada e o que falta fazer. O `README.md` é o manual de uso;
 > este aqui é o contexto de desenvolvimento.
 
-**Versão atual:** `0.35.0` · **Última atualização:** 2026-11-08
+**Versão atual:** `0.36.0` · **Última atualização:** 2026-11-09
 **Stack:** HTML + CSS + JavaScript puro (ES Modules). Sem backend, sem build, sem dependências.
 **Repositório:** https://github.com/FellipePeres/pokemon-bullet-heaven (público)
 **Jogo no ar:** https://fellipeperes.github.io/pokemon-bullet-heaven/
@@ -67,7 +67,7 @@ vencer, a duração da luta, desmaios, pico de inimigos, Poké Balls e quantos d
 equipe têm o Golpe Desperto ao vencer (coluna "despertos", 0.33).
 
 **Conferência visual (desde a 0.5).** `tools/screenshot.mjs` abre o jogo no Chrome
-(ou Edge) sem janela, executa um dos 40 roteiros (os mais usados: `vitrine`,
+(ou Edge) sem janela, executa um dos 41 roteiros (os mais usados: `vitrine`,
 `treinador`, `vila`, `jornada`, `partida`, `ux`, `efetivo`; um nome desconhecido lista
 todos), salva PNGs e lista os erros de JavaScript da página. Sai com código 1
 se a página tiver erro. A `vitrine.html` desenha os assets com o mesmo código da
@@ -149,6 +149,8 @@ src/
     musicTracks.js    GERADO por render_music.py: onde começa e acaba o loop de cada música
     hub.js            a vila (0.29): portas, saídas, pessoas, objetos e a decoração fixa de cada lugar
     hubMaps.js        GERADO por tools/assets/hub.py: os mapas da vila (camadas e colisão), as folhas e os móveis
+    dive.js           a descida do Dive (0.36): os 6 níveis (aviso, velocidade, hordas, padrões, espécies) e as falas
+    diveWorld.js      GERADO por tools/assets/dive.py: os mapas submersos do Emerald, a grade do que é navegável e os tabuleiros
     dialogue.js       as falas da vila, com as condições (inicial, insígnias, Campeão, uma vez só)
     decor.js          a loja de Pokédolls: os enfeites do quarto, o preço e o lugar de cada um
     types.js          tipos, cores, a tabela de efetividade completa e a defesa (0.32)
@@ -592,9 +594,35 @@ Nunca voltar bônus globais para o pool de level up — foi pedido explícito.
   Perfil: `profile.pokedex.secret` (os ids capturados), que o
   `ProfileTracker.registerSecret(id)` preenche. Ele fica **fora da contagem** da
   Pokédex (continua "de 151") e, revelado, também aparece sem número.
-- Hoje ninguém consegue capturá-lo (o modo aquático ainda não existe), então ele
-  fica como "???" para todos: é a isca. A captura vai chamar `registerSecret`
-  (etapa D-5 do PLANEJAMENTO-DIVE). Roteiro de screenshots: `pokedex`.
+- Hoje ninguém consegue capturá-lo (a descida existe desde a 0.36, mas o salão e
+  a luta ainda não), então ele fica como "???" para todos: é a isca. A captura vai
+  chamar `registerSecret` (etapa D-5 do PLANEJAMENTO-DIVE). Roteiro de
+  screenshots: `pokedex`.
+
+### A descida do Dive — o modo aquático (0.36)
+- Pedido do Fellipe, desenhado e medido numa maquete jogável que ele aprovou
+  (PLANEJAMENTO-DIVE.md, seções 3 a 7). Na lagoa da vila, com alguém da equipe
+  sabendo **Dive**, a pergunta "Quer usar Dive?" abre a descida (`Game.openDive`).
+- **O tabuleiro:** 10×6 tiles de água navegável de verdade do Emerald (as Rotas
+  126 e 127 submersas). **Regra do Fellipe: só os tiles navegáveis** (colisão 0 e
+  elevação 3 no `map.bin`), na partida e nas animações. O mundo sai de
+  `tools/assets/dive.py` (lê o decomp em `D:\fellipe\Dev\pokeemerald`) para
+  `assets/dive/` e `data/diveWorld.js`.
+- **O jogador** anda em tiles no passo do FireRed andando (16 quadros por tile), sem
+  correr; o passo sai no primeiro toque. São **3 bolhas de vida**; o **bolsão de ar**
+  enche as 3 na chegada ao Nível 3.
+- **As hordas** atravessam linhas e colunas inteiras, depois de um aviso que
+  encurta a cada nível (de 1,3 s a 0,35 s). Elas vêm **umas sobre as outras**, mas o
+  sorteio só solta uma horda se houver saída andando para quem reage em 0,25 s
+  (`Dive.solvable`). O `smoke-test` prova: o jogador perfeito com 0,25 s nunca é
+  pego, e o mergulhador nunca sai da água navegável nas animações.
+- **Perdeu as 3 bolhas:** acorda no Centro Pokémon, na frente da enfermeira
+  (`enfermeira_resgate`), e o pescador comenta uma vez (`diveRescued`). **Passou o
+  6:** a entrada submersa da Caverna Marinha; por enquanto ele volta à superfície
+  pela lagoa (o salão do Kyogre é a etapa D-3).
+- O registro fica na campanha: `campaign.dive = { best, rescues, reachedCave }`.
+- Código: `game/Dive.js` (a regra, roda sem navegador), `render/DiveRenderer.js`,
+  `ui/diveHud.js`, `data/dive.js`; a tela é `screen-dive`. Roteiro: `descida`.
 
 ### Captura
 - Poké Ball dropa de inimigos derrotados, com **teto por fase** (`maxBalls`: 3 na
@@ -1347,10 +1375,11 @@ Nenhum pedido do Fellipe em aberto. O que está planejado:
   30 s depois da captura. A captura dispara uma cena de história (o Maxie,
   indignado, solta o Crobat e parte "a caminho do vulcão"), e o salão vira uma fase Endless
   aquática sem XP, que rende Shards por chefe e elite. Na descida não se corre. O decomp do Emerald está em `D:\fellipe\Dev\pokeemerald`
-  (pret/pokeemerald, commit `731ad5b`, clone parcial). A descida tem uma maquete
-  jogável (o artifact "A Descida",
-  https://claude.ai/artifact/WYVxGMgQ7DUCmofe4geVRv). Próximo passo: o Fellipe
-  jogar e acertar o tempo de cada nível; depois, a etapa D-1 (os assets).
+  (pret/pokeemerald, commit `731ad5b`, clone parcial). **A descida está no jogo
+  desde a 0.36** (D-1 da descida e D-2, como a maquete aprovada, o artifact
+  https://claude.ai/artifact/WYVxGMgQ7DUCmofe4geVRv). Próximos passos: a D-3 (o
+  salão do Kyogre), a D-4 (a luta), a D-5 (o Kyogre na equipe) e a D-6 (a cena do
+  Maxie, já aprovada na maquete "Depois do Kyogre", e o Endless aquático).
 - **O roteiro geral** ([PLANEJAMENTO.md](PLANEJAMENTO.md), combinado em
   2026-11-02): o som que falta (gritos e efeitos, Etapa 5), o celular e os assets
   locais da interface (Etapa 6), o pós-jogo além do Modo Livre (a revanche dos
@@ -1522,6 +1551,7 @@ Nenhum pedido do Fellipe em aberto. O que está planejado:
 | 52 | a descida e as fases não podem ser impossíveis: se só a fileira 2 está livre, a próxima horda precisa deixar a 1 ou a 3 livre a tempo | o sorteio da maquete com três condições (a horda nova só sai com o jogador a salvo; saída andando do tile dele, com 0,2 s de reação e 0,05 s de folga; o passo antes do aviso não cai numa horda) e a segunda horda da sequência avisando junto; a prova `#prova` (um jogador perfeito que só vê a tela, reagindo em 0,2 s): zero acertos em 12.300 hordas; PLANEJAMENTO-DIVE seção 5 |
 | 53 | esperar o jogador ficar a salvo deixou fácil: basta um espaço para ele ir, com hordas sobre hordas (principalmente nos últimos níveis) | a horda nova não espera mais; a saída é conferida do tile dele e, se ele está fugindo, também dos vizinhos; a regra do passo para o lado só vale quando ele foge (era ela que segurava as hordas); a prova: zero acertos em 12.300 hordas, com ~5,7 hordas ativas nos níveis 5 e 6; a medição: quem reage em 0,35 s passa a descida 17% das vezes |
 | 54 | ficou muito difícil com hordas sobre hordas: equilibrar | a saída garantida para quem reage em 0,25 s (era 0,2 s) e o Nível 5 mais leve (aviso de 0,55 s, o paredão de cinco mais raro); um perfil típico na medição (reação de 0,25 a 0,45 s por horda, 3% de erro): ~4 tentativas para descer tudo, o Nível 6 passa 1 em 3; a prova continua sem acertos; PLANEJAMENTO-DIVE seção 5 |
+| 55 | "você fez praticamente completo nos artifacts, eu aprovei a versão final que montou, pode rodar ela" | 0.36: a descida no jogo, igual à maquete aprovada: `tools/assets/dive.py` gera do decomp do Emerald os mapas, a grade do que é navegável (idêntica à da maquete) e o mergulhador; `game/Dive.js` com o sorteio que nunca é impossível; a lagoa abre a descida, perder leva à enfermeira do Centro, e passar o 6 chega à Caverna Marinha (o salão é a D-3); a prova no smoke-test (zero acertos com 0,25 s de reação, nenhum passo fora da água navegável) e o roteiro `descida` |
 
 ---
 

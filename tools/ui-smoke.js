@@ -701,6 +701,53 @@ check('depois da escolha, o Continuar segue para a jornada (na vila); sem nome, 
   game.quitToMenu();
 }
 
+// ---- a descida do Dive (0.36): a lagoa abre a descida; perder as bolhas leva à enfermeira; o fim volta à lagoa ----
+{
+  const member = game.campaign.journey.team.members[0];
+  const saved = [...member.abilities];
+  member.abilities = [saved[0], 'dive'];
+  game.openHub('home');
+  hub.say('lagoa');
+  for (let i = 0; i < 10 && !hub._onAsk(); i++) hub.confirm();
+  check('com Dive na equipe, a lagoa pergunta "Quer usar Dive?"', hub._onAsk() && dialogText().includes('Dive'));
+  hub.confirm();
+  const diveVisible = () => !registry.get('screen-dive').classes.has('hidden');
+  check('o SIM abre a descida, no Nível 1', diveVisible() && game.diveOpen && !game.hubOpen && game.dive.mode === 'play' && game.dive.level === 0);
+  game._frame(1000); game._frame(1016);
+  check('a barra mostra o nível e a profundidade', registry.get('dive-depth').textContent === 'NÍVEL 1 · 10 m');
+  game.handleAction('pause');
+  game._frame(1032);
+  check('ESC pausa a descida', game.dive.paused && !registry.get('dive-pause').classes.has('hidden'));
+  game.handleAction('pause');
+  // parado no meio, as hordas o pegam: acorda no Centro, na frente da enfermeira
+  game.dive.p.c = 4; game.dive.p.r = 3;
+  for (let i = 0; i < 60 * 120 && game.diveOpen; i++) game.dive.update(1 / 60, null);
+  check('perdeu as 3 bolhas: acorda no Centro, e a enfermeira conta do pescador',
+        !game.diveOpen && hubVisible() && hub.mapId === 'centro' && hub.dialog?.name === 'Enfermeira' && dialogText().includes('pescador'),
+        `${hub.mapId} ${hub.player.x},${hub.player.y}`);
+  check('...em pé, num tile do Centro', hub.walkable(hub.player.x, hub.player.y));
+  closeDialog();
+  check('o resgate fica guardado na jornada', game.campaign.dive?.rescues === 1);
+  hub.say('pescador');
+  check('o pescador comenta o resgate (uma vez)', dialogText().includes('peixão'));
+  closeDialog();
+  hub.say('pescador');
+  check('...e depois volta à fala de sempre', !dialogText().includes('peixão'));
+  closeDialog();
+  // a descida inteira: depois do Nível 6, a entrada da Caverna Marinha, e a volta pela lagoa
+  game.openHub('home');
+  game.openDive();
+  game.dive.start(5);
+  game.dive.levelDone();
+  for (let i = 0; i < 60 * 60 && game.diveOpen; i++) {
+    if (game.dive.dialog) { game.dive.dialog.shown = 999; game.dive.confirm(); }
+    game.dive.update(1 / 60, null);
+  }
+  check('passou o Nível 6: a Caverna Marinha, e ele volta à vila pela lagoa', !game.diveOpen && hubVisible() && hub.mapId === 'vila'
+        && game.campaign.dive.best === 6 && game.campaign.dive.reachedCave === 1);
+  member.abilities = saved;
+}
+
 // ---- 0.25: a partida anda com toques espaçados (aba escondida), a luta começa sozinha e os Shards no canto ----
 {
   game.startStage('gym_1_pewter');

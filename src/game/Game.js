@@ -13,6 +13,10 @@ import { stageScenes } from '../data/scenery.js';
 import { loadOptions } from '../save/options.js';
 import { PadNavigator } from '../ui/pad.js';
 import { Hub } from './Hub.js';
+import { Dive } from './Dive.js';
+import { DiveRenderer } from '../render/DiveRenderer.js';
+import { DiveHUD } from '../ui/diveHud.js';
+import { DIVE } from '../data/dive.js';
 import { HubRenderer } from '../render/HubRenderer.js';
 import { HubHUD } from '../ui/hubHud.js';
 
@@ -44,6 +48,8 @@ import { maxHpFor } from '../systems/stats.js';
  * sabendo apenas do seu próprio assunto.
  */
 /** O máximo de tempo que um toque do relógio recupera (a aba escondida pode ficar sem toques). */
+/** Onde o jogador acorda depois de perder as bolhas: na frente da enfermeira do Centro. */
+const HUB_RESCUE_SPOT = { map: 'centro', x: 4, y: 5, dir: 'up' };
 const MAX_CATCH_UP = 60;
 
 export class Game {
@@ -76,6 +82,13 @@ export class Game {
     if (typeof window !== 'undefined') window.addEventListener('resize', () => { if (this.hubOpen) this._resizeHub(); });
     this.hallOpen = false;
     this.centerOpen = false;   // o Centro Pokémon, depois de uma derrota
+
+    // a descida do Dive, o modo aquático (PLANEJAMENTO-DIVE.md): a regra, o desenho e a barra
+    this.diveOpen = false;
+    this.dive = new Dive({ onEnd: (result) => this._diveEnded(result) });
+    this.diveRenderer = new DiveRenderer(document.getElementById('dive-canvas'));
+    this.diveHud = new DiveHUD(this);
+    if (typeof window !== 'undefined') window.addEventListener('resize', () => { if (this.diveOpen) this._resizeDive(); });
 
     this.run = null;
     this.runEnded = false;
@@ -160,6 +173,20 @@ export class Game {
       if (!hidden) {
         this.hubRenderer.render(this.hub);
         this.hubHud.update(this.hub);
+      }
+    } else if (this.diveOpen) {
+      // a descida: na pausa (ou com a aba escondida) as hordas param
+      if (hidden) this.dive.togglePause(true);
+      const dir = this._diveDir(this.input.getMoveVector());
+      const frame = elapsed;
+      do {
+        const dt = Math.min(0.05, elapsed);
+        elapsed -= dt;
+        this.dive.update(dt, dir);
+      } while (elapsed > 0 && this.diveOpen);
+      if (this.diveOpen && !hidden) {
+        this.diveRenderer.render(this.dive, frame);
+        this.diveHud.update(this.dive);
       }
     }
 
@@ -619,6 +646,7 @@ export class Game {
     if (action.startsWith('pad:')) { this.handlePad(action.slice(4)); return; }
     // o A e o B da vila (Enter/Espaço/Z e X/Backspace)
     if (action === 'confirm' || action === 'cancel') {
+      if (this.diveOpen) { if (action === 'confirm') this.dive.confirm(); return; }
       if (this.hubOpen && !this.menus.openModal) {
         if (action === 'confirm') this.hub.confirm();
         else this.hub.cancel();
@@ -626,6 +654,7 @@ export class Game {
       return;
     }
     if (action === 'pause') {
+      if (this.diveOpen) { this.dive.togglePause(); this.input.clear(); return; }
       // fora da partida, ESC fecha a janela aberta (e, na vila, a conversa)
       if (this.menus.openModal) { this.menus.closeModal(); return; }
       // na escolha do inicial, ESC é o Voltar: de volta ao laboratório (0.31)
@@ -655,6 +684,11 @@ export class Game {
    * move o foco e o A confirma, em qualquer tela ou janela (ui/pad.js).
    */
   handlePad(button) {
+    if (this.diveOpen) {
+      if (button === 'a') this.dive.confirm();
+      else if (button === 'start') this.dive.togglePause();
+      return;
+    }
     if (this.run?.state === 'running') {
       if (button === 'start') this.handleAction('pause');
       else if (button === 'lb' || button === 'rb') this.handleAction('cycleSlot');
@@ -894,6 +928,76 @@ export class Game {
       const next = this._nextStage();
       if (next) toast(`Próxima etapa liberada: ${next.name}`, '🗺️');
     }
+  }
+
+  /* ====================== A descida do Dive (o modo aquático) ====================== */
+
+  /**
+   * O SIM da lagoa, com alguém da equipe sabendo Dive: a descida, sempre do Nível 1
+   * (PLANEJAMENTO-DIVE.md, seção 2). O treinador submerso é o do jogador.
+   */
+  openDive() {
+    const look = this.profile.trainer === 'leaf' ? 'leaf' : 'red';
+    this.diveRenderer.preload(look, [...new Set(DIVE.levels.flatMap((l) => l.species))]);
+    this.dive.start(0);
+    this.menus.show('screen-dive');
+    this._resizeDive();
+    this.diveHud.reset();
+    this.input.clear();
+  }
+
+  /** O tabuleiro na maior escala inteira que cabe, com a barra em cima e a caixa de texto embaixo. */
+  _resizeDive() {
+    if (typeof window === 'undefined') return;
+    this.diveRenderer.resize(window.innerWidth - 32, window.innerHeight - 120);
+  }
+
+  /** A direção segurada: na diagonal, a do passo de agora continua (como na vila). */
+  _diveDir(move) {
+    if (!move || (!move.x && !move.y)) return null;
+    const horizontal = move.x > 0 ? 'r' : 'l';
+    const vertical = move.y > 0 ? 'd' : 'u';
+    if (move.x && move.y) {
+      const face = this.dive.p?.face;
+      if (face === horizontal || face === vertical) return face;
+      return Math.abs(move.x) >= Math.abs(move.y) ? horizontal : vertical;
+    }
+    return move.x ? horizontal : vertical;
+  }
+
+  /** O registro da descida na campanha: o recorde de profundidade e os resgates. */
+  get diveRecord() {
+    this.campaign.dive ??= { best: 0, rescues: 0, reachedCave: 0 };
+    return this.campaign.dive;
+  }
+
+  /**
+   * O fim da descida. Perdeu as 3 bolhas: acorda no Centro Pokémon, na frente da
+   * enfermeira, que conta que o pescador o pescou desmaiado (seção 7). Passou o
+   * Nível 6: a entrada da Caverna Marinha; o salão do Kyogre é a próxima etapa, e
+   * por enquanto ele volta à superfície, pela lagoa.
+   */
+  _diveEnded(result) {
+    const record = this.diveRecord;
+    record.best = Math.max(record.best ?? 0, this.dive.best);
+    if (result === 'rescued') {
+      record.rescues = (record.rescues ?? 0) + 1;
+      this.autosave();
+      this.diveOpen = false;
+      this.openHub(HUB_RESCUE_SPOT);
+      this.hub.say('enfermeira_resgate');
+      toast(`Você chegou ao Nível ${this.dive.level + 1} (${DIVE.levels[this.dive.level].depth} m). O próximo mergulho começa do Nível 1.`, '🫧');
+      return;
+    }
+    record.reachedCave = (record.reachedCave ?? 0) + 1;
+    this.autosave();
+    this.dive.mode = 'transition';
+    this.dive.say(DIVE.lines.caveSoon, () => {
+      this.dive.mode = 'over';
+      this.diveOpen = false;
+      this.openHub();
+      toast(`A descida inteira: ${DIVE.levels.at(-1).depth} m! A Caverna Marinha espera você.`, '🌊');
+    });
   }
 
   /* ============================ Modo Livre (0.20) ============================ */

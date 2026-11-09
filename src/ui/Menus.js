@@ -24,7 +24,7 @@ import { DECOR, decorMax } from '../data/decor.js';
 import { choiceCard } from './pokemonCard.js';
 import { HUB_SPRITES, HUB_DECOR } from '../data/hubMaps.js';
 
-const SCREENS = ['screen-title', 'screen-journeys', 'screen-trainer', 'screen-name', 'screen-starter', 'screen-campaign', 'screen-hub'];
+const SCREENS = ['screen-title', 'screen-journeys', 'screen-trainer', 'screen-name', 'screen-starter', 'screen-campaign', 'screen-hub', 'screen-dive'];
 const MODALS = ['modal-pokedex', 'modal-achievements', 'modal-team', 'modal-mart', 'modal-decor', 'modal-options', 'modal-help', 'modal-pc', 'modal-badges'];
 
 /**
@@ -94,6 +94,7 @@ export class Menus {
     el('app').dataset.screen = screenId ?? '';
     // a vila só anda e desenha enquanto está na tela (Game._frame)
     this.game.hubOpen = screenId === 'screen-hub';
+    this.game.diveOpen = screenId === 'screen-dive';
     if (screenId === 'screen-title') this.refreshTitle();
     if (screenId === 'screen-campaign') {
       // ao entrar no lobby, a próxima fase já vem escolhida; o mapa mede o espaço depois de aparecer

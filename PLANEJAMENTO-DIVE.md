@@ -523,7 +523,7 @@ Cada etapa é entregável sozinha, com `npm test` e screenshots.
    pela água navegável, o resgate e a chegada à caverna. Na primeira versão, os
    tabuleiros ficavam numa faixa montada sobre a rocha lilás; o Fellipe barrou
    ("só os tiles navegáveis"), e ela foi refeita sobre os mapas.
-1. **D-1 — Assets:** um extrator `tools/assets/dive.py` que lê o decomp do
+1. **D-1 — Assets** (a parte da descida feita na 0.36: os mapas, a grade, o mergulhador e os ícones de Hoenn): um extrator `tools/assets/dive.py` que lê o decomp do
    Emerald (`D:\fellipe\Dev\pokeemerald`, pret/pokeemerald commit `731ad5b`, clone
    parcial) e gera:
    - as Rotas 126 e 127 submersas, recortadas na região usada, **com a grade do
@@ -535,7 +535,7 @@ Cada etapa é entregável sozinha, com `npm test` e screenshots.
 
    Também traz do Pokemon All os ícones de Hoenn, a tira do Kyogre e o grito.
    Tudo registrado no `assets/PROVENIENCIA.md`.
-2. **D-2 — A descida:**
+2. **D-2 — A descida** (feita na 0.36, igual à maquete aprovada):
    - `game/Dive.js` (o tabuleiro, o passo, as hordas, as bolhas, as animações);
    - `data/dive.js` (os níveis, os tabuleiros, os padrões e as espécies:
      conteúdo, sem lógica);

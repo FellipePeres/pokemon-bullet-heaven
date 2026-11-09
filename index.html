@@ -204,6 +204,38 @@
   </section>
 
   <!-- ============================================================
+       A DESCIDA DO DIVE (o modo aquático, PLANEJAMENTO-DIVE.md)
+       ============================================================ -->
+  <!-- O tabuleiro de 10x6 tiles da água navegável do Emerald, com a barra das
+       bolhas em cima (game/Dive.js, render/DiveRenderer.js, ui/diveHud.js) -->
+  <section id="screen-dive" class="screen hidden dive">
+    <div class="dive-console">
+      <div class="dive-bar">
+        <span id="dive-lives" class="dive-lives" aria-label="Bolhas de vida"><i></i><i></i><i></i></span>
+        <span id="dive-depth" class="dive-depth">NÍVEL 1 · 10 m</span>
+        <span class="dive-prog" aria-label="Hordas do nível"><i id="dive-prog"></i></span>
+      </div>
+      <div class="dive-screen">
+        <canvas id="dive-canvas" class="dive-canvas" aria-label="O tabuleiro da descida, 10 por 6 tiles"></canvas>
+        <div id="dive-banner" class="dive-banner hidden"></div>
+        <div id="dive-pause" class="dive-pause hidden">
+          <b>Pausa</b>
+          <button id="dive-resume" class="menu-btn slim" type="button">Continuar</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="dive-dialog" class="hub-dialog dive-dialog hidden">
+      <div id="dive-dialog-box" class="fr-window hub-dialog-box">
+        <p id="dive-dialog-text"></p>
+        <span id="dive-dialog-next" class="hub-dialog-next" aria-hidden="true"></span>
+      </div>
+    </div>
+
+    <p class="hub-hint"><kbd>↑</kbd><kbd>↓</kbd><kbd>←</kbd><kbd>→</kbd> nadar um tile <span class="dot">·</span> na descida não se corre <span class="dot">·</span> <kbd>Espaço</kbd> passa o texto <span class="dot">·</span> <kbd>ESC</kbd> pausa</p>
+  </section>
+
+  <!-- ============================================================
        MAPA DA JORNADA
        ============================================================ -->
   <!-- O lobby (0.13): o Town Map de Kanto, a fase escolhida ao lado, a equipe

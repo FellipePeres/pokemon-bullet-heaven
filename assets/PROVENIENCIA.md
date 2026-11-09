@@ -73,6 +73,26 @@ python tools/assets/gym_banners.py                   # procura ../Pokemon All
 | `ui/gym-banners/{pewter,cerulean,vermilion,celadon,fuchsia,saffron,cinnabar,viridian}_gym.png` | `data/layouts/` dos 8 ginásios (`<Cidade>_Gym`); Pewter com o recorte 1 tile à direita e Vermilion 1 tile abaixo, onde pegava parede demais; o salão de Vermilion tem 11 de largura e repete a borda |
 | `ui/gym-banners/{lorelei,bruno,agatha,lance,champion}_room.png` | `PokemonLeague_LoreleisRoom`, `_BrunosRoom`, `_AgathasRoom`, `_LancesRoom` e `_ChampionsRoom` |
 
+## Gerados por `tools/assets/dive.py` (a descida do Dive, 0.36)
+
+Do decomp do **Emerald** (pret/pokeemerald, commit `731ad5b`, clone parcial em
+`D:\fellipe\Dev\pokeemerald`, só leitura). Os mapas são montados com os metatiles do
+tileset primário `general` e do secundário `underwater`, com as paletas do `.pal`
+(0-5 do primário, 6-12 do secundário). A grade do que é navegável vem do `map.bin`:
+colisão 0 (bits 10-11) e elevação 3 (bits 12-15).
+
+```bash
+python tools/assets/dive.py      # procura ../pokeemerald e ../Pokemon All
+```
+
+| Saída | Origem |
+|---|---|
+| `dive/r126.png`, `dive/r127.png` | `data/layouts/Underwater_Route126` e `Underwater_Route127`, recortados na região dos tabuleiros e dos caminhos entre eles |
+| `dive/cave.png` | `data/layouts/Underwater_MarineCave` (a entrada submersa da Caverna Marinha) |
+| `dive/red.png`, `dive/leaf.png` | o Red e a Leaf do jogo (`trainers/`), pintados com os 4 tons de `graphics/object_events/palettes/player_underwater.pal` e sentados na sombra do Pokémon de `object_events/pics/people/brendan/underwater.png` (o Emerald só tem o Brendan e a May submersos) |
+| `pokemon/gen3/icons/<n>.png` de Hoenn (318-321, 340-342, 350, 365-369, 382) | os ícones de caixa do Emerald, via `assets/pokemon/gen3/icons/` do Pokemon All, de 4x para 1x |
+| `src/data/diveWorld.js` | o catálogo: o recorte, a grade navegável, os tabuleiros, a saída e a entrada de cada mapa |
+
 ## Copiados do Pokemon All
 
 | Saída | Origem |

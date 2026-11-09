@@ -355,6 +355,22 @@ const ROTEIROS = {
            "for (let i = 0; i < 26; i++) { const a = i / 26 * Math.PI * 2, d = 150 + (i % 5) * 45; r.spawner.spawnAt('rattata', r.player.x + Math.cos(a) * d, r.player.y + Math.sin(a) * d, 14); }" },
     { wait: 900 }, { shot: 'dive-2', raw: true }, { wait: 450 }, { shot: 'dive-3', raw: true }, { wait: 450 }, { shot: 'dive-4', raw: true }
   ],
+  // a descida do Dive (0.36): a pergunta da lagoa, o aviso e as hordas, o bolsão de ar, o Nível 6 e o resgate
+  descida: [
+    { open: 'index.html' }, { wait: 500 },
+    { run: "game.newGame(); game.chooseTrainer('red'); game.chooseStarter('squirtle');" +
+           "game.campaign.journey = { team: { members: [{ uid: 'a', pokemonId: 'blastoise', level: 80, xp: 0, hp: 300, abilities: ['hydro_pump', 'dive'], upgrades: {} }], active: ['a'] }, pc: [] };" +
+           "game.openHub({ map: 'vila', x: 28, y: 11, dir: 'up' }); document.getElementById('toast-container').style.display = 'none'; game.hub.say('lagoa'); game.hub.confirm(); game.hub.dialog.shown = 999" },
+    { wait: 700 }, { shot: 'descida-1-lagoa' },
+    { run: "for (let i = 0; i < 6 && !game.diveOpen; i++) { if (game.hub.dialog) game.hub.dialog.shown = 999; game.hub.confirm(); } game.dive.rng = (() => { let x = 7; return () => (x = (x * 16807) % 2147483647) / 2147483647; })()" },
+    { wait: 600 }, { shot: 'descida-2-nivel1', raw: true },
+    { wait: 2400 }, { shot: 'descida-3-aviso', raw: true },
+    { run: "game.dive.start(1); game.dive.levelDone()" }, { wait: 1600 }, { shot: 'descida-4-passagem', raw: true },
+    { run: "for (let i = 0; i < 600 && !game.dive.dialog; i++) game.dive.update(1 / 60)" }, { wait: 500 }, { shot: 'descida-5-bolsao', raw: true },
+    { run: "game.dive.start(5)" }, { wait: 3200 }, { shot: 'descida-6-nivel6', raw: true },
+    { run: "game.dive.lives = 1; game.dive.p.c = 4; game.dive.p.r = 3; game.dive.inv = 0" }, { wait: 4500 },
+    { run: "game.hub.dialog && (game.hub.dialog.shown = 999)" }, { wait: 300 }, { shot: 'descida-7-resgate' }
+  ],
   // o lendário secreto no fim da Pokédex (0.35): o "???" e, capturado, o Kyogre
   pokedex: [
     { open: 'index.html' }, { wait: 500 },
