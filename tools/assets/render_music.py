@@ -283,7 +283,7 @@ def wave(label: str) -> Wave:
 def resolve(group: str, program: int, key: int):
     """O instrumento da nota: o do programa, ou o da divisao por tecla. Na bateria, a tecla e a do instrumento."""
     voices = VOICEGROUPS[group]
-    if program >= len(voices):
+    if program >= len(voices) or voices[program] is None:
         return None, key
     kind, args = voices[program]
     if kind == 'voice_keysplit':
@@ -292,7 +292,7 @@ def resolve(group: str, program: int, key: int):
         return (sub[index] if index < len(sub) else None), key
     if kind == 'voice_keysplit_all':
         sub = VOICEGROUPS[args[0]]
-        if key >= len(sub):
+        if key >= len(sub) or sub[key] is None:   # (no Emerald, a bateria começa numa tecla)
             return None, key
         drum = sub[key]
         return drum, int(drum[1][0])
@@ -918,6 +918,12 @@ MUSIC = {
     'mus_hall_of_fame': 'o Hall da Fama',
     'mus_poke_center': 'o Centro Pokémon, depois de uma derrota',
     'mus_vs_legend': 'a luta contra o Kyogre, no salão da Caverna Marinha (0.37)',
+    'mus_pallet': 'a vila e o mapa da jornada (0.37.6): o tema de Pallet, calmo',
+}
+#: As músicas do Emerald (0.37.6): a partitura e os instrumentos do decomp pret/pokeemerald
+#: (o clone parcial em ../pokeemerald, com a pasta sound). O motor é o mesmo m4a.
+EMERALD_MUSIC = {
+    'mus_underwater': 'a descida do Dive (0.37.6): a música do mergulho do Emerald',
 }
 #: As vinhetas: tocam uma vez, sem loop (não entram em musicTracks.js).
 JINGLES = {
@@ -941,6 +947,63 @@ def midi_for(name: str, cache: pathlib.Path) -> pathlib.Path:
     return target
 
 
+def use_emerald(root: pathlib.Path) -> dict:
+    """
+    Troca o motor para os instrumentos do Emerald. Os arquivos são os mesmos do FireRed, com
+    duas diferenças de formato: os grupos vêm em `voicegroups/*.inc` (incluídos pelo
+    voice_groups.inc) com a macro `voice_group NOME[, deslocamento]`, e as divisões por
+    tecla são `keysplit NOME, início` seguidas de `split índice, fim`. Devolve o midi.cfg.
+    """
+    global ROOT, SOUND, VOICEGROUPS, SAMPLE_FILES, KEYSPLITS, PROG_WAVES
+    ROOT, SOUND = root, root / 'sound'
+    groups, state = {}, {'current': None}
+
+    def read(path: pathlib.Path) -> None:
+        for line in path.read_text().splitlines():
+            inc = re.match(r'^\s*\.include "([^"]+)"', line)
+            if inc:
+                read(root / inc.group(1))
+                continue
+            head = re.match(r'^\s*voice_group (\w+)(?:,\s*(\d+))?', line)
+            if head:
+                state['current'] = 'voicegroup_' + head.group(1)
+                # o deslocamento: o grupo começa nessa tecla (as baterias)
+                groups[state['current']] = [None] * int(head.group(2) or 0)
+                continue
+            voice = re.match(r'^\s+(voice_\w+)\s+(.*)$', line)
+            if voice and state['current']:
+                groups[state['current']].append((voice.group(1), [a.strip() for a in voice.group(2).split(',')]))
+
+    read(SOUND / 'voice_groups.inc')
+    tables, name, key = {}, None, 0
+    for line in (SOUND / 'keysplit_tables.inc').read_text().splitlines():
+        head = re.match(r'^keysplit (\w+), (\d+)', line)
+        if head:
+            name, key = 'keysplit_' + head.group(1), int(head.group(2))
+            tables[name] = {}
+            continue
+        split = re.match(r'^\s+split (\d+), (\d+)', line)
+        if split and name:
+            for k in range(key, int(split.group(2)) + 1):
+                tables[name][k] = int(split.group(1))
+            key = int(split.group(2)) + 1
+    VOICEGROUPS, KEYSPLITS = groups, tables
+    SAMPLE_FILES = parse_samples()
+    PROG_WAVES = parse_programmable_waves()
+    WAVE_CACHE.clear()
+    return parse_midi_cfg()
+
+
+def render_emerald(name: str, cfg: dict) -> tuple:
+    """Uma música do Emerald: o grupo vem pelo nome (`-G_underwater` é o voicegroup_underwater)."""
+    flags = dict(cfg[name])
+    group = 'voicegroup' + flags.pop('G')
+    VOICEGROUPS.setdefault('voicegroup000', [])
+    song = Song(SOUND / 'songs' / 'midi' / f'{name}.mid', {**flags, 'G': '0'})
+    song.group = group
+    return song.render_loop()
+
+
 def main() -> None:
     global OUT
     import argparse
@@ -950,6 +1013,8 @@ def main() -> None:
     parser.add_argument('only', nargs='?', default='', help='só as músicas que começam assim')
     parser.add_argument('--fonte', type=pathlib.Path, default=REPO.parent / 'Pokemon All',
                         help='pasta do Pokemon All (padrão: ao lado deste repositório)')
+    parser.add_argument('--emerald', type=pathlib.Path, default=REPO.parent / 'pokeemerald',
+                        help='o decomp do Emerald, com a pasta sound (padrão: ao lado deste repositório)')
     args = parser.parse_args()
     OUT = REPO / 'assets' / 'music'
     OUT.mkdir(parents=True, exist_ok=True)
@@ -982,16 +1047,29 @@ def main() -> None:
         write_ogg(OUT / f'{name}.ogg', audio)
         print(f'  music/{name}.ogg  {len(audio) / OUT_RATE:6.2f} s, vinheta')
 
+    # as do Emerald por último: o motor troca de instrumentos
+    wanted = [n for n in EMERALD_MUSIC if not args.only or n.startswith(args.only)]
+    for name in EMERALD_MUSIC:
+        if name not in wanted and name in previous:
+            rows[name] = (EMERALD_MUSIC[name], *previous[name])
+    if wanted:
+        em_cfg = use_emerald(args.emerald)
+        for name in wanted:
+            audio, loop_start, loop_end = render_emerald(name, em_cfg)
+            write_ogg(OUT / f'{name}.ogg', audio)
+            rows[name] = (EMERALD_MUSIC[name], loop_start / OUT_RATE, loop_end / OUT_RATE)
+            print(f'  music/{name}.ogg  {len(audio) / OUT_RATE:6.2f} s, loop de {loop_start / OUT_RATE:.3f} a {loop_end / OUT_RATE:.3f} s (Emerald)')
+
     lines = [
         '/**',
         ' * MÚSICAS — gerado por tools/assets/render_music.py. Não edite à mão.',
         ' *',
-        ' * As músicas do FireRed pelo motor de som dele: cada arquivo tem a introdução',
+        ' * As músicas do FireRed (e as do Emerald, 0.37.6) pelo motor de som deles: cada arquivo tem a introdução',
         ' * e uma volta do loop; o loop é o trecho de `loopStart` a `loopEnd`, em segundos.',
         ' */',
         'export const MUSIC_TRACKS = {',
     ]
-    for name in MUSIC:
+    for name in {**MUSIC, **EMERALD_MUSIC}:
         if name not in rows:
             continue
         where, start, end = rows[name]

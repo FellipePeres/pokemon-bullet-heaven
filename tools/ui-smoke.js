@@ -701,6 +701,7 @@ check('depois da escolha, o Continuar segue para a jornada (na vila); sem nome, 
   game.quitToMenu();
 }
 
+const HUB_RESCUE_SPOT_TEST = { map: 'centro', x: 4, y: 5, dir: 'up' };
 const DIVE_LAST = (await import('../src/data/dive.js')).DIVE.levels.length - 1;   // o último nível (0.37.3: o 5)
 // ---- a descida do Dive (0.36): a lagoa abre a descida; perder as bolhas leva à enfermeira; o fim volta à lagoa ----
 {
@@ -718,6 +719,8 @@ const DIVE_LAST = (await import('../src/data/dive.js')).DIVE.levels.length - 1; 
   check('o SIM abre a descida, no Nível 1', diveVisible() && game.diveOpen && !game.hubOpen && game.dive.mode === 'play' && game.dive.level === 0);
   game._frame(1000); game._frame(1016);
   check('a barra mostra o nível e a profundidade', registry.get('dive-depth').textContent === 'NÍVEL 1 · 10 m');
+  game._updateMusic();
+  check('a descida toca a música do mergulho do Emerald', game.music.wanted === 'mus_underwater');
   game.handleAction('pause');
   game._frame(1032);
   check('ESC pausa a descida', game.dive.paused && !registry.get('dive-pause').classes.has('hidden'));
@@ -729,6 +732,15 @@ const DIVE_LAST = (await import('../src/data/dive.js')).DIVE.levels.length - 1; 
         !game.diveOpen && hubVisible() && hub.mapId === 'centro' && hub.dialog?.name === 'Enfermeira' && dialogText().includes('pescador'),
         `${hub.mapId} ${hub.player.x},${hub.player.y}`);
   check('...em pé, num tile do Centro', hub.walkable(hub.player.x, hub.player.y));
+  game._updateMusic();
+  check('no Centro, a música do Centro', game.music.wanted === 'mus_poke_center');
+  game.openHub('home'); game._updateMusic();
+  check('na vila, a música calma (Pallet), não o tema do lobby', game.music.wanted === 'mus_pallet');
+  game.openCampaign(); game._updateMusic();
+  check('no mapa da jornada, a mesma música calma', game.music.wanted === 'mus_pallet');
+  game.menus.show('screen-title'); game._updateMusic();
+  check('o tema do lobby fica só no menu', game.music.wanted === 'lobby-theme');
+  game.openHub(HUB_RESCUE_SPOT_TEST);
   closeDialog();
   check('o resgate fica guardado na jornada', game.campaign.dive?.rescues === 1);
   hub.say('pescador');

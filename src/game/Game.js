@@ -56,6 +56,8 @@ import { maxHpFor } from '../systems/stats.js';
 const HUB_RESCUE_SPOT = { map: 'centro', x: 4, y: 5, dir: 'up' };
 /** A volta à superfície (o salão do Kyogre): na frente da lagoa da vila. */
 const LAKE_SPOT = SCENE_SPOTS.lagoa;
+/** A música calma da vila e do mapa da jornada (0.37.6): o tema de Pallet, do FireRed. */
+const VILLAGE_MUSIC = 'mus_pallet';
 const MAX_CATCH_UP = 60;
 
 export class Game {
@@ -234,15 +236,21 @@ export class Game {
   }
 
   /**
-   * A música que deveria tocar agora: o tema do lobby nos menus e na vila (ou a
-   * do lugar: o Centro Pokémon tem a dele), a da fase na partida, a do líder
+   * A música que deveria tocar agora: o tema do lobby só nos menus; o de Pallet na vila
+   * e no mapa da jornada (ou a do lugar: o Centro Pokémon tem a dele); a do mergulho na
+   * descida e a das cavernas no salão do Kyogre; a da fase na partida, a do líder
    * quando ele entra, a da vitória no resultado, a do Hall da Fama e a do Centro
    * Pokémon depois de uma derrota. A pausa só abaixa o volume.
    */
   _updateMusic() {
     const run = this.run;
-    let track = this.hubOpen ? (this.hub.place?.music ?? 'lobby-theme') : 'lobby-theme';
-    if (this.diveOpen && this.hall.active) track = 'mus_sevii_dungeon';   // o salão do Kyogre (0.37)
+    // 0.37.6 (o Fellipe): o tema do lobby só no menu; a vila e o mapa da jornada com uma
+    // música calma (Pallet); a descida com a do mergulho do Emerald
+    const screen = typeof document !== 'undefined' ? document.getElementById('app')?.dataset.screen : null;
+    let track = 'lobby-theme';
+    if (this.hubOpen) track = this.hub.place?.music ?? VILLAGE_MUSIC;
+    else if (screen === 'screen-campaign' || screen === 'screen-starter') track = VILLAGE_MUSIC;
+    if (this.diveOpen) track = this.hall.active ? 'mus_sevii_dungeon' : 'mus_underwater';   // o salão do Kyogre (0.37) e a descida
     if (this.hallOpen) track = 'mus_hall_of_fame';
     else if (this.centerOpen) track = 'mus_poke_center';
     else if (run?.state === 'victory') track = 'mus_victory_gym_leader';

@@ -1,7 +1,7 @@
 /**
  * MÚSICAS — gerado por tools/assets/render_music.py. Não edite à mão.
  *
- * As músicas do FireRed pelo motor de som dele: cada arquivo tem a introdução
+ * As músicas do FireRed (e as do Emerald, 0.37.6) pelo motor de som deles: cada arquivo tem a introdução
  * e uma volta do loop; o loop é o trecho de `loopStart` a `loopEnd`, em segundos.
  */
 export const MUSIC_TRACKS = {
@@ -42,5 +42,9 @@ export const MUSIC_TRACKS = {
   /** O Centro Pokémon, depois de uma derrota. */
   mus_poke_center: { loopStart: 0.016735, loopEnd: 33.267710 },
   /** A luta contra o Kyogre, no salão da Caverna Marinha (0.37). */
-  mus_vs_legend: { loopStart: 13.260181, loopEnd: 45.054558 }
+  mus_vs_legend: { loopStart: 13.260181, loopEnd: 45.054558 },
+  /** A vila e o mapa da jornada (0.37.6): o tema de Pallet, calmo. */
+  mus_pallet: { loopStart: 0.016735, loopEnd: 43.849161 },
+  /** A descida do Dive (0.37.6): a música do mergulho do Emerald. */
+  mus_underwater: { loopStart: 25.231247, loopEnd: 86.911338 }
 };
