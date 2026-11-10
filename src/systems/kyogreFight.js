@@ -422,7 +422,8 @@ export class KyogreFight {
     this.state = 'gone';
     this.run.state = 'running';
     this.rings = []; this.hazards = []; this.tsunami = null;
-    this.run.pendingGift = { choices: ['kyogre'], title: 'Gotcha! O Kyogre foi capturado!', mandatory: true };
+    // toPC (0.37.9): ele vai sempre para o PC, e o card da captura avisa
+    this.run.pendingGift = { choices: ['kyogre'], title: 'Gotcha! O Kyogre foi capturado!', mandatory: true, toPC: true };
     this.final = { t: this.cfg.finalTide, spawn: 0 };
     this.run.objective = 'SOBREVIVA À MARÉ FINAL!';
     bus.emit(EVENTS.TOAST, { text: 'A água está subindo! Sobreviva à maré final!', icon: 'boss' });

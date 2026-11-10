@@ -53,6 +53,7 @@ export class Hub {
     this._place(spot.x, spot.y, spot.dir);
     this.dialog = null;
     this.fade = null;
+    this.scene = null;   // uma cena do Maxie pela metade (um save carregado no meio dela) não fica presa (0.37.9)
     this.awaitStarter = false;
   }
 

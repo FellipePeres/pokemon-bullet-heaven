@@ -73,8 +73,13 @@ class StubElement {
 function stubCtx() {
   const noop = () => {};
   const gradient = { addColorStop: noop };
+  // como o canvas de verdade: raio negativo lança erro (0.37.9, o Origin Pulse do
+  // Kyogre do Theo travava o jogo assim, e este stub engolia o erro)
+  const radius = (r, what) => { if (r < 0) throw new RangeError(`${what}: raio negativo (${r})`); };
   return new Proxy({
     canvas: { width: 1280, height: 720 },
+    arc: (x, y, r) => radius(r, 'arc'),
+    ellipse: (x, y, rx, ry) => { radius(rx, 'ellipse'); radius(ry, 'ellipse'); },
     createPattern: () => ({}),
     createRadialGradient: () => gradient,
     createLinearGradient: () => gradient,
@@ -839,10 +844,12 @@ const DIVE_LAST = (await import('../src/data/dive.js')).DIVE.levels.length - 1; 
   run.update(1 / 60, { x: 0, y: 0 });
   game._handleRunState();
   check('capturou: a tela de captura do Kyogre, sem Ignorar', game.captureOpen && registry.get('capture-skip').classes.has('hidden'));
+  check('...e o card avisa que ele vai para o PC', registry.get('capture-note').innerHTML.includes('vai direto para o PC'));
+  const spare = !game.run.team.isFull;
   game.pickCapture('kyogre');
-  const where = game.run.team.has('kyogre') || game.run.pc.some((m) => m.pokemonId === 'kyogre');
-  check('...o Kyogre entra (na equipe ou no PC), revela o "???" e fica fora das 151',
-        where && game.profile.pokedex.secret.includes('kyogre') && !game.profile.pokedex.caught.includes(382) && game.campaign.dive.captured);
+  check('o Kyogre vai sempre para o PC, mesmo com espaço na equipe (0.37.9), revela o "???" e fica fora das 151',
+        spare && !game.run.team.has('kyogre') && game.run.pc.some((m) => m.pokemonId === 'kyogre')
+        && game.profile.pokedex.secret.includes('kyogre') && !game.profile.pokedex.caught.includes(382) && game.campaign.dive.captured);
   check('a maré final: a vitória espera os 30 s', run.fight.final && run.fight.holding && run.state === 'running');
   run.fight.final.t = 0.01;
   for (let i = 0; i < 10; i++) run.update(1 / 60, { x: 0, y: 0 });
@@ -850,10 +857,21 @@ const DIVE_LAST = (await import('../src/data/dive.js')).DIVE.levels.length - 1; 
   check('a maré baixou: a vitória, sem o Modo Livre', run.state === 'victory' && registry.get('btn-result-endless').classes.has('hidden'));
   check('...e com Jogar de novo', !registry.get('btn-result-retry').classes.has('hidden'));
   game.quitToMenu();
-  check('a volta é pela lagoa, e a cena do Maxie começa', hubVisible() && hub.mapId === 'vila' && hub.player.x === 30 && !!hub.scene
-        && game.campaign.dive.sceneSeen);
+  check('a volta é pela lagoa, e a cena do Maxie começa (só conta como vista no fim)', hubVisible() && hub.mapId === 'vila' && hub.player.x === 30 && !!hub.scene
+        && !game.campaign.dive.sceneSeen);
+  check('...e o Kyogre está no PC da jornada', game.campaign.journey.pc.some((m) => m.pokemonId === 'kyogre')
+        && !game.campaign.journey.team.members.some((m) => m.pokemonId === 'kyogre'));
+  // o jogo fechou (ou travou) no meio da cena: continuar volta à lagoa, e a cena recomeça (0.37.9)
+  for (let i = 0; i < 60 * 3; i++) { if (hub.dialog) { hub.dialog.shown = 999; hub.confirm(); } hub.update(1 / 60); }
+  game.continueGame();
+  check('fechou no meio da cena: continuar volta à lagoa e a cena recomeça do início', hubVisible() && hub.mapId === 'vila'
+        && hub.player.x === 30 && hub.player.y === 11 && hub.scene?.step === 0 && !game.campaign.dive.sceneSeen);
+  await game.loadFromFile({ text: async () => JSON.stringify(game.buildSaveData()) });
+  check('...e carregar o save também', hubVisible() && hub.mapId === 'vila' && hub.player.x === 30 && hub.scene?.step === 0);
   for (let i = 0; i < 60 * 60 && hub.scene; i++) { if (hub.dialog) { hub.dialog.shown = 999; hub.confirm(); } hub.update(1 / 60); }
-  check('a cena acaba e devolve o controle (uma vez por jornada)', !hub.scene && !hub.dialog);
+  check('a cena acaba, devolve o controle e conta como vista (uma vez por jornada)', !hub.scene && !hub.dialog && game.campaign.dive.sceneSeen);
+  game.continueGame();
+  check('vista a cena, continuar volta à frente de casa, sem cena', hubVisible() && !hub.scene && hub.mapId === 'vila' && hub.player.x !== 30);
   hub.say('pescador');
   check('o pescador depois da captura', dialogText().includes('minhoca'));
   closeDialog();
@@ -891,6 +909,31 @@ const DIVE_LAST = (await import('../src/data/dive.js')).DIVE.levels.length - 1; 
   check('Voltar para a vila: acorda no Centro, com a enfermeira', !game.run && hubVisible() && hub.mapId === 'centro' && hub.dialog?.name === 'Enfermeira');
   closeDialog();
   member.abilities = saved;
+}
+
+// ---- o Origin Pulse do Kyogre do jogador, desenhado do 1º quadro ao fim (0.37.9) ----
+// O anel nasce com raio ~8 e as marcas vermelhas eram traçadas com o raio - 10: o
+// canvas lançava erro e o jogo travava no 1º golpe (o bug do Kyogre do Theo).
+{
+  const { drawSignatures } = await import('../src/render/signature.js');
+  game.campaign.journey = { team: { members: [{ uid: 'kyo', pokemonId: 'kyogre', level: 90, xp: 0, hp: 0,
+    abilities: ['origin_pulse', 'water_spout'], upgrades: {} }], active: ['kyo'] }, pc: [] };
+  game.startStage('gym_1_pewter');
+  const run = game.run;
+  run.spawner.update = () => {};
+  run.damageCompanion = () => {};
+  run.progression.addXp = () => {};
+  const ctx = stubCtx();
+  let pulses = 0, error = null;
+  for (let i = 0; i < 60 * 8 && !error; i++) {
+    if (run.enemies.filter((e) => !e.dead).length < 4) run.spawner.spawnAt('rattata', run.player.x + 140, run.player.y + 20, 5);
+    run.update(1 / 60, { x: 0, y: 0 });
+    pulses += run.signatures.filter((s) => s.kind === 'origin_pulse' && s.age <= 1 / 60 + 1e-9).length;
+    try { drawSignatures(ctx, run); game.renderer.render(run); } catch (err) { error = err; }
+  }
+  check('o Origin Pulse do Kyogre em campo é desenhado do 1º quadro ao fim, sem erro', pulses >= 2 && !error,
+        error ? error.message : `${pulses} disparos`);
+  game.quitToMenu();
 }
 
 // ---- 0.25: a partida anda com toques espaçados (aba escondida), a luta começa sozinha e os Shards no canto ----

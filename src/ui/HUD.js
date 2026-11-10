@@ -395,7 +395,7 @@ export class HUD {
 
   /* ============================== CAPTURA ============================== */
 
-  showCapture(choices, onPick, subtitle = 'Escolha um Pokémon para a sua equipe', { teamSize = 0, maxSize = 6 } = {}) {
+  showCapture(choices, onPick, subtitle = 'Escolha um Pokémon para a sua equipe', { teamSize = 0, maxSize = 6, toPC = false } = {}) {
     const rerolls = this.game.profile?.bag?.reroll ?? 0;
     const reroll = el('capture-reroll');
     reroll.classList.toggle('hidden', !rerolls || !!this.game.run?.pendingGift);
@@ -408,7 +408,9 @@ export class HUD {
     el('capture-skip').classList.toggle('hidden', !!this.game.run?.pendingGift?.mandatory);
     // nada se perde: com a equipe cheia, o PC guarda (0.12, os testes mostraram
     // jogadores deixando de capturar por achar que alguém seria descartado)
-    this._captureNote(teamSize >= maxSize
+    // o Kyogre (0.37.9) vai sempre para o PC, mesmo com espaço na equipe
+    if (toPC) this._captureNote('<b>O Kyogre vai direto para o PC.</b> Ele descansa da luta e espera por você no PC do Centro Pokémon ou do mapa da jornada.', true);
+    else this._captureNote(teamSize >= maxSize
       ? '<b>Equipe cheia? Pode capturar!</b> Nenhum Pokémon se perde: o novo vai para o PC, ou entra na equipe e quem sair vai para o PC.'
       : `Entra direto na equipe (${teamSize + 1}/${maxSize}). Quando ela encher, o PC guarda os próximos.`,
       teamSize >= maxSize);

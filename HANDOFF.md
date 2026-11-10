@@ -5,7 +5,7 @@
 > decisão foi tomada e o que falta fazer. O `README.md` é o manual de uso;
 > este aqui é o contexto de desenvolvimento.
 
-**Versão atual:** `0.37.8` · **Última atualização:** 2026-11-09
+**Versão atual:** `0.37.9` · **Última atualização:** 2026-11-10
 **Stack:** HTML + CSS + JavaScript puro (ES Modules). Sem backend, sem build, sem dependências.
 **Repositório:** https://github.com/FellipePeres/pokemon-bullet-heaven (público)
 **Jogo no ar:** https://fellipeperes.github.io/pokemon-bullet-heaven/
@@ -636,8 +636,11 @@ Nunca voltar bônus globais para o pool de level up — foi pedido explícito.
   - 3 Dive Balls por luta. Sem bolas, ele pode ser derrotado.
 - **Capturou**:
   - a tela de captura de sempre, sem "Ignorar" (o presente `mandatory`);
-  - o Kyogre entra no nível da equipe, com o Origin Pulse exclusivo e o Water
-    Spout;
+  - o Kyogre vai **sempre para o PC**, mesmo com espaço na equipe (0.37.9, pedido do
+    Fellipe depois do bug do Theo; o presente `toPC`). O card avisa antes da escolha
+    e o toast diz onde buscá-lo (o PC do Centro ou do mapa da jornada). A maré final
+    é sem ele;
+  - ele chega no nível da equipe, com o Origin Pulse exclusivo e o Water Spout;
   - o "???" da Pokédex se revela (`registerCaught(382)` vai para o `secret`, fora
     das 151);
   - a maré final de 30 s, e só depois a vitória.
@@ -647,6 +650,12 @@ Nunca voltar bônus globais para o pool de level up — foi pedido explícito.
   por jornada, depois da captura, na frente da lagoa ou no Centro. O Maxie chega,
   o "!", a fala, o Crobat no corte de tela do Voar, "A caminho do vulcão!" e o
   pássaro do Voar (ou a porta, no Centro).
+  - Só conta como vista **quando chega ao fim** (0.37.9; até a 0.37.8 contava no
+    começo, e quem saía com o jogo travado perdia a cena para sempre).
+  - Com a cena pendente (capturou, e o jogo fechou ou travou antes do fim),
+    **Continuar** e **Carregar save** abrem a vila na frente da lagoa, e a cena
+    começa (`Game._enterVillage`). As folhas dela são pré-carregadas, porque esse
+    caminho não passa pela descida.
 - **O Endless aquático** (a fase `kyogre_endless`): com o Kyogre na jornada, o
   salão está vazio e o card é o da maré sem fim. Sem XP (`stage.noXp`); cada elite
   rende os Shards de sempre.
@@ -660,8 +669,9 @@ Nunca voltar bônus globais para o pool de level up — foi pedido explícito.
 
   A alavanca é a `difficulty` da fase (1). Com 0,8, a de 80 vencia todas.
 - **Os testes**: o `smoke-test` (a arena, a chuva, a chegada do Kyogre, o kit e a
-  Pokédex) e o `ui-smoke` (o fluxo inteiro, do Nível 6 à cena e ao Endless). O
-  roteiro de screenshots é `kyogre`.
+  Pokédex) e o `ui-smoke` (o fluxo inteiro, do Nível 6 à cena e ao Endless; o PC;
+  a cena pendente ao continuar e ao carregar; o Origin Pulse do Kyogre em campo
+  desenhado do 1º quadro ao fim). O roteiro de screenshots é `kyogre`.
 
 ### A descida do Dive — o modo aquático (0.36)
 - Pedido do Fellipe, desenhado e medido numa maquete jogável que ele aprovou
@@ -1123,6 +1133,7 @@ o Brock como está, todas as outras mais duras, menos níveis.
 | 63 | o tema do lobby só no menu; na vila e no mapa da jornada uma música calma; a descida com algo de submersão; o resto como está | 0.37.6: as candidatas numa página de audição (artifact "Músicas da Vila e da Descida"); como o Fellipe não escolheu, entraram as sugestões: **Pallet Town** (FireRed) na vila, no mapa da jornada e na escolha do inicial, e a **Underwater** do Emerald (a do Dive em Hoenn) na descida. O `render_music.py` agora toca músicas do Emerald (`EMERALD_MUSIC`, os instrumentos do decomp pret/pokeemerald, com o formato de `voice_group` e `keysplit` dele). A cena do Maxie segue o lugar: Pallet na lagoa, a do Centro no Centro |
 | 64 | "Underwater para o nível 1 a 3 e o Abnormal para o 4 e 5; e para a vila, a das Ilhas 1, 2 e 3" | 0.37.7: a vila e o mapa da jornada com as Ilhas 1, 2 e 3 do FireRed (o Pallet saiu); na descida, a Underwater do Emerald nos Níveis 1 a 3 e a Abnormal Weather do Emerald depois do bolsão de ar (no 4 e no 5, e ao continuar do checkpoint) |
 | 65 | uma opção de repetir a fase do Kyogre: hoje é preciso sair e descer tudo de novo | 0.37.8: no fim da luta do Kyogre, a tela de resultado oferece Jogar de novo (na vitória) e Tentar de novo ou Voltar para a vila (na derrota); jogar de novo recomeça a luta com a equipe curada, sem a descida. Com o Kyogre já capturado, o salão é o do Endless aquático. Só voltar para a vila (ou sair pelo card) exige descer de novo |
+| 66 | um tester (o Theo) pegou o Kyogre, usou na mesma fase e o jogo travou; ao voltar, tinha perdido a cena do Maxie. O Kyogre vai sempre para o PC, com um aviso; corrigir o bug; o save dele com tudo, mas carregando como quem acabou de sair da caverna, com a cena | 0.37.9: a causa era o desenho do Origin Pulse do jogador (raio negativo no canvas no 1º quadro de todo disparo), que parava o laço do jogo; a pausa ainda funcionava, e sair por ela marcava a cena como vista sem rodá-la. Corrigidos o desenho, o laço (pede o próximo quadro antes) e a cena (só conta no fim; pendente, Continuar e Carregar save abrem na lagoa com a cena). O Kyogre vai sempre para o PC, com o aviso no card e no toast. O save do Theo voltou com `sceneSeen: false` e nada mais mudado (o Kyogre dele continua na equipe). Testes: o canvas falso do `ui-smoke` agora lança com raio negativo, como o de verdade |
 | Fase 8 (Giovanni) | 1 → 0,8 | 4,0 | 4,5 | 60 | 84 → 62 |
 | Lorelei | 1,05 → 0,8 | 3,5 | 3,1–4,7 | 64 | 92 → 66 |
 | Bruno | 1,12 → 0,97 | 3,7 | 3,5–6,3 ² | 66 | 99 → 68 |
@@ -1563,6 +1574,18 @@ Nenhum pedido do Fellipe em aberto. O que está planejado:
   `hub.update` com `hubOpen`. Nos testes, `hub.update` direto continua andando com
   a vila escondida; clicar numa saída já anda até lá e sai (não aperte a direção
   depois, senão o jogador anda na vila escondida).
+- **Raio negativo no canvas trava o jogo (0.37.9, o bug do Kyogre do Theo):**
+  `ctx.arc` e `ctx.ellipse` com raio negativo lançam `IndexSizeError`. O anel do
+  Origin Pulse do jogador nasce com raio ~8 e as marcas eram traçadas com o raio
+  − 10: **todo** Origin Pulse travava no 1º quadro. Os testes não pegavam porque
+  o Kyogre sempre caía na reserva e o canvas falso do `ui-smoke` engolia o erro;
+  agora ele lança como o de verdade. Desenho com raio calculado (`r - algo`,
+  `r * (1 - t)`) precisa de piso (`Math.max`) ou de um `continue` antes.
+  - Até a 0.37.8, o `Game.loop` pedia o próximo quadro **depois** do `_frame`: um
+    erro num quadro parava o laço de vez, mas os menus (HTML) continuavam
+    respondendo. Foi assim que o Theo saiu pela pausa, o `quitToMenu` marcou a cena
+    do Maxie como vista e ela nunca rodou. Agora o pedido vem antes, e a cena só
+    conta no fim.
 - **Desempenho:** gradiente criado por projétil a cada quadro era o desenho mais
   caro; agora é sprite. Efeitos, acertos e partículas têm teto (`CONFIG.fx`).
   Medido na `vitrine.html?estresse` (Chrome sem janela): 60 FPS e ~2 ms por

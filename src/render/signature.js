@@ -521,7 +521,10 @@ const DRAW = {
       const k = ring.radius / sig.maxRadius;
       ctx.globalAlpha = 1 - k * 0.6;
       outlinedRing(ctx, sig.x, sig.y, ring.radius, 9 * (1 - k * 0.5), 'rgba(10,30,90,.8)', '#3d8bff', '#d8f2ff');
-      // as marcas vermelhas do Kyogre na onda
+      // as marcas vermelhas do Kyogre na onda, por dentro da borda: só depois que o anel
+      // passa de 10 px (no 1º quadro o raio é ~8, e o arco com raio negativo lança
+      // erro no canvas e travava o jogo — o bug do Kyogre do Theo, 0.37.9)
+      if (ring.radius <= 10) continue;
       ctx.strokeStyle = 'rgba(255,90,80,.85)';
       ctx.lineWidth = 3;
       for (let i = 0; i < 6; i++) {

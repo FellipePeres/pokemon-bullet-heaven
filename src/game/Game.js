@@ -129,8 +129,11 @@ export class Game {
   /* ============================ loop principal ============================ */
 
   loop(ts) {
-    this._frame(ts);
+    // o próximo quadro é pedido antes: um erro num quadro (um desenho com um valor
+    // ruim) aparece no console, mas não para o jogo de vez. Até a 0.37.8 o pedido
+    // vinha depois, e o erro do Origin Pulse congelava a partida (o bug do Theo)
     requestAnimationFrame((next) => this.loop(next));
+    this._frame(ts);
   }
 
   /**
@@ -555,7 +558,7 @@ export class Game {
     // saves de antes da escolha de treinador perguntam uma vez
     if (!this.profile.trainer) { this.askTrainer(() => this.continueGame()); return; }
     this._foldPendingRun();
-    this.openHub('home');   // desde a 0.29, a jornada abre na vila, na frente de casa
+    this._enterVillage();   // desde a 0.29, a jornada abre na vila, na frente de casa (ou da lagoa, com a cena do Maxie pendente)
   }
 
   /**
@@ -900,12 +903,23 @@ export class Game {
       return;
     }
     this.hud.showCapture(choices, (pokemonId, shiny) => this.pickCapture(pokemonId, shiny), this.run.pendingGift?.title,
-      { teamSize: this.run.team.members.length, maxSize: CONFIG.team.maxSize });
+      { teamSize: this.run.team.members.length, maxSize: CONFIG.team.maxSize, toPC: !!this.run.pendingGift?.toPC });
   }
 
   pickCapture(pokemonId, shiny = false) {
     const run = this.run;
-    if (pokemonId === 'kyogre') this.diveRecord.captured = true;   // o Kyogre (0.37): a cena do Maxie vem depois
+    if (pokemonId === 'kyogre') {
+      // o Kyogre (0.37) vai sempre para o PC, mesmo com espaço na equipe (0.37.9, pedido
+      // do Fellipe depois do bug do Theo): a maré final é sem ele, e ele espera no PC.
+      // A cena do Maxie vem depois, na volta à vila
+      this.diveRecord.captured = true;
+      run.captureSystem.captureToPC(pokemonId, {
+        shiny, note: 'Ele descansa da luta: para levá-lo, use o PC do Centro Pokémon ou do mapa da jornada.'
+      });
+      this.tracker.registerCaught(getPokemon(pokemonId).dex);
+      this.resolveCapture();
+      return;
+    }
     if (run.team.isFull) {
       // equipe cheia: quem sai vai para o PC — ou o novo vai direto para lá
       this.hud.showReplace({ ...getPokemon(pokemonId), shiny }, run.team.members, (memberUid) => {
@@ -1141,7 +1155,7 @@ export class Game {
 
   /**
    * Caiu na luta do Kyogre e voltou para a vila: acorda no Centro, na frente da
-   * enfermeira. Se já tinha capturado, o Kyogre ficou na equipe, e a cena do Maxie
+   * enfermeira. Se já tinha capturado, o Kyogre ficou no PC, e a cena do Maxie
    * acontece ali.
    */
   _legendaryDefeat({ ended = false } = {}) {
@@ -1155,14 +1169,42 @@ export class Game {
     if (!this._maybeMaxieScene('centro')) this.hub.say('enfermeira_resgate');
   }
 
-  /** A cena do Maxie, uma vez por jornada, logo depois da captura. Devolve se começou. */
+  /**
+   * A cena do Maxie, uma vez por jornada, logo depois da captura. Devolve se começou.
+   * Ela só conta como vista quando chega ao fim (0.37.9): até a 0.37.8 contava no
+   * começo, e o Theo, que saiu com o jogo travado, perdeu a cena para sempre.
+   */
   _maybeMaxieScene(version) {
+    if (!this.maxieScenePending || this.hub.scene) return false;
     const record = this.diveRecord;
-    if (!record.captured || record.sceneSeen) return false;
-    record.sceneSeen = true;
-    this.autosave();
-    this.hub.scene = new MaxieScene(this.hub, version, { playerName: this.playerName });
+    // vindo direto de um save (sem a descida), as folhas da cena ainda não carregaram
+    preloadAssets(['dive/maxie', 'dive/exclam', 'dive/bird', 'dive/crobat', 'dive/band_out', 'dive/band_in']);
+    this.hub.scene = new MaxieScene(this.hub, version, {
+      playerName: this.playerName,
+      onEnd: () => { record.sceneSeen = true; this.autosave(); }
+    });
     return true;
+  }
+
+  /** Capturou o Kyogre e a cena do Maxie ainda não chegou ao fim. */
+  get maxieScenePending() {
+    const record = this.diveRecord;
+    return !!record.captured && !record.sceneSeen;
+  }
+
+  /**
+   * A volta à vila de quem continua a jornada ou carrega um save: na frente de casa —
+   * ou, com a cena do Maxie pendente (o jogo fechou ou travou entre a captura e o fim
+   * da cena), na frente da lagoa, como quem acabou de sair da Caverna Marinha, e a
+   * cena começa (0.37.9).
+   */
+  _enterVillage() {
+    if (this.campaign.starter && this.maxieScenePending) {
+      this.openHub(LAKE_SPOT);
+      this._maybeMaxieScene('lagoa');
+      return;
+    }
+    this.openHub('home');
   }
 
   /* ============================ Modo Livre (0.20) ============================ */
@@ -1453,7 +1495,7 @@ export class Game {
 
       toast(`Save carregado (${data.savedAt ? new Date(data.savedAt).toLocaleString('pt-BR') : 'sem data'}).`, '📂');
 
-      const resume = () => this.openHub('home');
+      const resume = () => this._enterVillage();
       // saves de antes da escolha de treinador perguntam uma vez
       if (this.profile.trainer) resume();
       else this.askTrainer(resume);
