@@ -1443,8 +1443,16 @@ desde a 0.7), a revanche dos líderes, as outras regiões e, na vila, o modo End
 
 ## 10. Próximos passos
 
-Nenhum pedido do Fellipe em aberto. O que está planejado:
+O que está planejado:
 
+- **A história e as quests** ([PLANEJAMENTO-HISTORIA.md](PLANEJAMENTO-HISTORIA.md),
+  pedido do Fellipe em 2026-11-10, à espera da aprovação dele): uma história
+  própria correndo junto da jornada, como no Pokémon Tower Defense. Os pássaros
+  lendários foram roubados, e é por isso que as hordas mudaram; o ladrão é o
+  Maxie, que só aparece na cena do Kyogre. Entram um sistema de quests (o
+  rastreador no canto superior, "Fale com a mãe 0/1"), as cenas em dados e uma
+  missão para cada lendário, e a Poké Ball deixa de oferecer lendários. O
+  Kyogre vira late game. As etapas vão de H-1 a H-12.
 - **A vila** ([PLANEJAMENTO-LOBBY.md](PLANEJAMENTO-LOBBY.md)): a L-7 (sons e
   capricho), o modo Endless pelo mato alto e o modo aquático pela lagoa (cada um
   com o seu plano, quando chegar a vez) e as decisões da seção 13 de lá (o nome
