@@ -284,7 +284,7 @@ export class Game {
       case 'defeat':
         // no Modo Livre, cair é só o fim dele: o que a equipe ganhou fica
         if (this.run.endless) this.leaveEndless();
-        else if (this.run.stage.returnTo === 'lake') this._legendaryDefeat();
+        else if (this.run.stage.returnTo === 'lake') this.endRun(false);   // com Tentar de novo (0.37.8)
         else this.endRun(false);
         break;
     }
@@ -1119,12 +1119,33 @@ export class Game {
   }
 
   /**
-   * Caiu na luta do Kyogre: acorda no Centro, na frente da enfermeira (a luta não
-   * recomeça: outra chance exige descer de novo). Se já tinha capturado, o Kyogre
-   * ficou na equipe, e a cena do Maxie acontece ali.
+   * Jogar de novo a luta do Kyogre (0.37.8, o Fellipe: "hoje tem que sair e fazer tudo de
+   * novo"): da tela de resultado, vencendo ou perdendo, a luta recomeça com a equipe curada,
+   * sem a descida. Com o Kyogre já capturado, o salão é o do Endless aquático.
    */
-  _legendaryDefeat() {
-    this.endRun(false);   // guarda a jornada (com o Kyogre, se ele já foi capturado) e as métricas
+  retryLegendary() {
+    const run = this.run;
+    if (!run || run.stage.returnTo !== 'lake') return;
+    const stageId = run.stage.id === 'kyogre' && this.diveRecord.captured ? 'kyogre_endless' : run.stage.id;
+    this.hud.hideAllOverlays();
+    this.run = null;
+    this.runEnded = false;
+    this.startStage(stageId);
+  }
+
+  /** Da derrota na luta do Kyogre: voltar para a vila (acorda no Centro, com a enfermeira). */
+  legendaryGiveUp() {
+    if (!this.run) return;
+    this._legendaryDefeat({ ended: true });
+  }
+
+  /**
+   * Caiu na luta do Kyogre e voltou para a vila: acorda no Centro, na frente da
+   * enfermeira. Se já tinha capturado, o Kyogre ficou na equipe, e a cena do Maxie
+   * acontece ali.
+   */
+  _legendaryDefeat({ ended = false } = {}) {
+    if (!ended) this.endRun(false);   // guarda a jornada (com o Kyogre, se ele já foi capturado) e as métricas
     this.hud.hideAllOverlays();
     this.run = null;
     this.runEnded = false;

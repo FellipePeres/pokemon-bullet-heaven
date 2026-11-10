@@ -419,6 +419,8 @@
         <div class="menu-column" id="result-victory">
           <button id="btn-result-save" class="menu-btn"><span class="btn-text">Salvar Jogo (.json)</span></button>
           <button id="btn-result-menu" class="menu-btn primary"><span class="btn-text">Continuar Jornada</span></button>
+          <!-- o salão do Kyogre (0.37.8): jogar de novo sem descer de novo -->
+          <button id="btn-result-retry" class="menu-btn hidden"><span class="btn-text">Jogar de novo<small class="btn-sub">Volta ao salão do Kyogre, sem descer de novo</small></span></button>
           <button id="btn-result-endless" class="menu-btn">
             <span class="btn-text">Modo Livre<small class="btn-sub">A fase sem fim: XP reduzido, inimigos cada vez mais fortes</small></span>
           </button>
@@ -429,6 +431,9 @@
           <button id="btn-result-center" class="menu-btn primary">
             <span class="btn-text">Centro Pokémon<small class="btn-sub">Cura a equipe e recomeça esta fase, com o que ela ganhou</small></span>
           </button>
+          <!-- a luta do Kyogre (0.37.8): tentar de novo direto, ou voltar para a vila (acorda no Centro) -->
+          <button id="btn-result-retry-defeat" class="menu-btn primary hidden"><span class="btn-text">Tentar de novo<small class="btn-sub">A equipe é curada e a luta recomeça, sem descer de novo</small></span></button>
+          <button id="btn-result-village" class="menu-btn hidden"><span class="btn-text">Voltar para a vila<small class="btn-sub">O pescador tira você da água; você acorda no Centro</small></span></button>
         </div>
       </div>
     </div>

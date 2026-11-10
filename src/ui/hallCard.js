@@ -92,7 +92,7 @@ export function showHallCard(game, stageId, { onPlay, onBack }) {
   back.innerHTML = '<span class="btn-text">Voltar para a Vila</span>';
   back.onclick = () => onBack();
   actions.appendChild(back);
-  if (!endless) actions.appendChild(create('p', 'hall-note', `Voltando agora, a próxima chance exige descer os ${DIVE.levels.length} níveis de novo.`));
+  if (!endless) actions.appendChild(create('p', 'hall-note', `Voltando agora, a próxima chance exige descer os ${DIVE.levels.length} níveis de novo. Depois da luta, dá para jogar de novo sem descer.`));
   panel.appendChild(actions);
   show(panel);
 }

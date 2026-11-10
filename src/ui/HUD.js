@@ -50,6 +50,10 @@ export class HUD {
     el('btn-result-menu').onclick = () => this.game.quitToMenu();
     // derrota: o Centro Pokémon, ou a jornada do zero (que pede confirmação)
     el('btn-result-center').onclick = () => this.game.pokemonCenter();
+    // a luta do Kyogre (0.37.8): jogar de novo sem a descida
+    el('btn-result-retry').onclick = () => this.game.retryLegendary();
+    el('btn-result-retry-defeat').onclick = () => this.game.retryLegendary();
+    el('btn-result-village').onclick = () => this.game.legendaryGiveUp();
     el('btn-center-go').onclick = () => this.game.leaveCenter();
     el('btn-center-map').onclick = () => this.game.quitToMenu();
     el('capture-skip').onclick = () => this.game.resolveCapture();
@@ -497,6 +501,13 @@ export class HUD {
 
     el('result-victory').classList.toggle('hidden', !victory);
     el('btn-result-endless')?.classList.toggle('hidden', !!run.stage.returnTo);
+    // a luta do Kyogre (0.37.8): jogar de novo ali mesmo; a derrota não leva ao Centro de sempre
+    const legendary = run.stage.returnTo === 'lake';
+    el('btn-result-retry').classList.toggle('hidden', !legendary);
+    el('btn-result-retry-defeat').classList.toggle('hidden', !legendary);
+    el('btn-result-village').classList.toggle('hidden', !legendary);
+    el('btn-result-center').classList.toggle('hidden', legendary);
+    if (legendary && !victory) el('result-subtitle').textContent = 'Todos os seus Pokémon desmaiaram, mas o que eles ganharam fica. Tente de novo, sem descer de novo.';
     el('result-defeat').classList.toggle('hidden', victory);
 
     clear(el('result-team')).append(...this._teamSummary(run.team.members));

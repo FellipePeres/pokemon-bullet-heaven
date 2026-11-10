@@ -848,6 +848,7 @@ const DIVE_LAST = (await import('../src/data/dive.js')).DIVE.levels.length - 1; 
   for (let i = 0; i < 10; i++) run.update(1 / 60, { x: 0, y: 0 });
   game._handleRunState();
   check('a maré baixou: a vitória, sem o Modo Livre', run.state === 'victory' && registry.get('btn-result-endless').classes.has('hidden'));
+  check('...e com Jogar de novo', !registry.get('btn-result-retry').classes.has('hidden'));
   game.quitToMenu();
   check('a volta é pela lagoa, e a cena do Maxie começa', hubVisible() && hub.mapId === 'vila' && hub.player.x === 30 && !!hub.scene
         && game.campaign.dive.sceneSeen);
@@ -877,7 +878,17 @@ const DIVE_LAST = (await import('../src/data/dive.js')).DIVE.levels.length - 1; 
   game.run.team.members.forEach((m) => { m.fainted = true; m.hp = 0; });
   game.run.update(1 / 60, { x: 0, y: 0 });
   game._handleRunState();
-  check('caiu na luta do Kyogre: acorda no Centro, com a enfermeira', !game.run && hubVisible() && hub.mapId === 'centro' && hub.dialog?.name === 'Enfermeira');
+  check('caiu na luta do Kyogre: a derrota oferece Tentar de novo e Voltar para a vila', game.run?.state === 'defeat'
+        && !registry.get('btn-result-retry-defeat').classes.has('hidden') && !registry.get('btn-result-village').classes.has('hidden')
+        && registry.get('btn-result-center').classes.has('hidden'));
+  registry.get('btn-result-retry-defeat').click();
+  check('Tentar de novo: a luta recomeça, sem a descida, com a equipe curada', game.run?.stage.id === 'kyogre' && game.run.state === 'running'
+        && game.run.team.members.every((m) => !m.fainted));
+  game.run.team.members.forEach((m) => { m.fainted = true; m.hp = 0; });
+  game.run.update(1 / 60, { x: 0, y: 0 });
+  game._handleRunState();
+  registry.get('btn-result-village').click();
+  check('Voltar para a vila: acorda no Centro, com a enfermeira', !game.run && hubVisible() && hub.mapId === 'centro' && hub.dialog?.name === 'Enfermeira');
   closeDialog();
   member.abilities = saved;
 }

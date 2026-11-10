@@ -1,6 +1,6 @@
 {
   "name": "pokemon-bullet-heaven",
-  "version": "0.37.7",
+  "version": "0.37.8",
   "description": "Bullet Heaven com jornada Pokemon - HTML/CSS/JS puro, sem backend.",
   "type": "module",
   "private": true,
