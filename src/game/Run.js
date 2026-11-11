@@ -38,7 +38,7 @@ export class Run {
 
     this.world = { ...this.stage.world };
     this.time = 0;
-    this.state = 'running';   // running | levelup | capture | paused | victory | defeat
+    this.state = 'running';   // running | levelup | capture | paused | victory | defeat | intro | story
     this.objective = 'SOBREVIVA';
 
     // ---- entidades ----
@@ -97,6 +97,11 @@ export class Run {
     this.pendingBall = false;
     this.pendingGift = null;     // presente da fase esperando a escolha (ver stage.gifts)
     this.pendingIntro = null;    // líder que acabou de chegar e se apresenta
+    // os eventos de história da fase (0.39, PLANEJAMENTO-HISTORIA.md seção 9.2): a partida
+    // pausa e a caixa de texto aparece com o retrato. Uma vez por jornada (`storySeen`).
+    const seen = new Set(options.storySeen ?? []);
+    this.storyQueue = (this.stage.story ?? []).filter((e) => !seen.has(e.id)).sort((a, b) => a.at - b.at);
+    this.pendingStory = null;
     this.levelUpMember = null;   // Pokémon que está com a tela de melhoria aberta
     this.unlockQueue = [];       // Golpes Despertos esperando o anúncio ({ member, moveId })
 
@@ -256,6 +261,7 @@ export class Run {
     if (this.state !== 'running') return;
 
     this.time += dt;
+    if (this.storyQueue.length && !this.endless && this.time >= this.storyQueue[0].at) this.pendingStory = this.storyQueue.shift();
     this.fxBudget = CONFIG.fx.impactsPerFrame;
     if (this.shakeTime > 0) this.shakeTime = Math.max(0, this.shakeTime - dt);
     this.grid.rebuild(this.enemies);
@@ -665,6 +671,7 @@ export class Run {
       return;
     }
     if (this.pendingIntro) { this.state = 'intro'; return; }
+    if (this.pendingStory) { this.state = 'story'; return; }
     if (this.evolutionQueue.length) { this.state = 'evolution'; return; }
     if (this.pendingBall || this.pendingGift) { this.state = 'capture'; return; }
 

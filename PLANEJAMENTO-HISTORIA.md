@@ -305,8 +305,8 @@ computador do laboratório já combinam com o prólogo.
 
 ### 9.1 O motor
 
-A cena do Maxie (`game/MaxieScene.js`) vira o molde. Um `game/Cutscene.js` lê
-roteiros de `data/cutscenes.js`:
+A cena do Maxie (até a 0.38, `game/MaxieScene.js`) virou o molde. Desde a 0.39,
+o `game/Cutscene.js` lê os roteiros de `data/cutscenes.js`:
 
 - **os passos que já existem:** `wait`, `say`, `show`, `walk`, `face`, `emote`,
   `throw`, `cutin`, `bird` e `end`;
@@ -315,21 +315,42 @@ roteiros de `data/cutscenes.js`:
 
 A regra do Maxie vale para todas: **a cena só conta como vista quando chega ao
 fim**. Se ficar pendente, ela volta ao continuar o jogo. A cena do Maxie passa
-para o formato novo sem mudar nada do que o jogador vê.
+para o formato novo sem mudar nada do que o jogador vê (conferido quadro a
+quadro na 0.39: a antiga e a nova dão o mesmo estado em todos os 553 quadros da
+lagoa e 447 do Centro).
+
+**O que entrou na 0.39 (H-2):**
+
+- **Os gatilhos**: entrar num lugar (`enter`), falar com alguém (`npc`) ou escolher
+  o inicial (`starter`), com as condições das falas (`when`).
+- **Os passos novos**: `fade`, `camera`, `show`/`hide` (também das pessoas do
+  lugar), `place`, `shake`, `give` (da mochila ou um item da história),
+  `quest`, `flag` e `talk` (uma fala de `data/dialogue.js`, que conta para as
+  quests). O `walk` anda por um `path` ou até o primeiro tile livre de `to`, pelo
+  caminho mais curto. Um passo pode mudar com a jornada (`pick` e `cases`).
+- **O registro**: `campaign.scenes = { id: 'started' | 'seen' }`. A cena se
+  registra ao começar (e o jogo salva) e só vira `seen` no fim. Uma `started`
+  volta do começo ao continuar, no `spot` dela.
+- **O check-data** confere cada roteiro: o lugar, os atores e as folhas, os
+  caminhos só no chão do mapa, as falas, os itens e as quests citados, e o `end`
+  no fim.
 
 ### 9.2 Na partida
 
-O **evento de história**, `stage.story: [{ at, name, portrait, lines }]`: a partida
-pausa e a caixa de texto aparece com o retrato, como na apresentação do líder, mas
-sem luta. O uso é pequeno, no máximo um por fase, para não quebrar o ritmo do
-Bullet Heaven.
+O **evento de história**, `stage.story: [{ id, at, name, portrait, lines }]`: a
+partida pausa e a caixa de texto aparece com o retrato, como na apresentação do
+líder, mas sem luta, uma página por vez. O uso é pequeno, no máximo um por fase
+(o check-data recusa mais), para não quebrar o ritmo do Bullet Heaven. Ele
+aparece uma vez por jornada (o `id` entra em `campaign.scenes`) e conta para o
+objetivo `scene` das quests. Está pronto desde a 0.39; o primeiro de verdade é o
+vulto de vermelho na Fase 5 (H-4).
 
 ### 9.3 As cenas de Kanto
 
 | # | Cena | Onde | Capítulo | Etapa |
 |---|---|---|---|---|
-| 1 | O discurso do Carvalho, encenado | laboratório | Prólogo | H-2 |
-| 2 | O rival pega o inicial dele (decisão 1) | laboratório | Prólogo | H-2 |
+| 1 | O discurso do Carvalho, encenado | laboratório | Prólogo | H-2 ✅ |
+| 2 | O rival pega o inicial dele (decisão 1) | laboratório | Prólogo | H-2 ✅ |
 | 3 | A lenda dos pássaros | casa do velho sábio | 1 | H-4 |
 | 4 | A vila culpa a Equipe Rocket | vila (moradores) | 2 | H-4 |
 | 5 | O vulto de vermelho na Rota 10 | evento na Fase 5 | 3 | H-4 |
@@ -346,8 +367,23 @@ Bullet Heaven.
 | 16 | O Kyogre e o Maxie | lagoa ou Centro (já existe) | 8 | H-11 |
 | 17 | O Pokémon rosa | vila | Epílogo | H-11 |
 
-Cada cena chega na etapa do capítulo dela. A H-2 traz o motor e as duas do
-prólogo, que servem de teste para ele; a do Maxie passa para o motor sem mudar.
+Cada cena chega na etapa do capítulo dela. A H-2 trouxe o motor e as duas do
+prólogo, que servem de teste para ele; a do Maxie passou para o motor sem mudar.
+
+**As duas do prólogo (0.39):**
+
+- **O discurso** (`prologo_carvalho`): começa ao entrar no laboratório pela
+  primeira vez (ou ao falar com o Carvalho), só numa jornada sem inicial e para
+  quem não é veterano. A câmera vai até ele e aparece o "!". O jogador anda até
+  ele, e o Carvalho se vira para o quadro no meio do discurso. No fim, vai para
+  trás da mesa das Poké Balls, e a escolha do inicial abre.
+- **O rival** (`prologo_rival`): logo depois da escolha. Ele entra atrasado ("Vô!
+  Cheguei!"), anda até a bola com vantagem sobre a sua (como no FireRed; é a
+  mesma do time dele no Campeão), "O rival pegou o Squirtle!", e acha bobagem se
+  preocupar com as hordas: "Eu quero é ser Campeão!". Ele sai, e o Carvalho
+  fecha com a fala de sempre (o Mapa da Jornada). **Padrão até o Fellipe
+  decidir:** o rival é o neto do Carvalho, como no FireRed, e se chama "Rival",
+  como no Campeão.
 
 ---
 
@@ -374,7 +410,7 @@ prólogo, que servem de teste para ele; a do Maxie passa para o motor sem mudar.
 | Etapa | O que entra |
 |---|---|
 | **H-1** ✅ 0.38 | O sistema de quests e o prólogo: `data/quests.js`, o `QuestSystem`, o rastreador, o save por jornada com a migração, as condições novas nas falas, a cadeia do prólogo e o discurso novo do Carvalho. Testes no `ui-smoke`. |
-| **H-2** | As cenas em dados (`Cutscene.js` a partir da cena do Maxie, que não muda), o evento de história na partida e as duas cenas do prólogo: o discurso do Carvalho encenado e o rival pegando o inicial dele (seção 9.3). |
+| **H-2** ✅ 0.39 | As cenas em dados (`Cutscene.js` a partir da cena do Maxie, que não muda), o evento de história na partida e as duas cenas do prólogo: o discurso do Carvalho encenado e o rival pegando o inicial dele (seção 9.3). |
 | **H-3** | A tela de missões. |
 | **H-4** | Os capítulos 1 a 3: as falas de depois da vitória dos líderes, o velho sábio, os moradores e as quests de cada capítulo. |
 | **H-5** | A captura sem lendários e o molde da missão de lendário, tirado do salão do Kyogre. |

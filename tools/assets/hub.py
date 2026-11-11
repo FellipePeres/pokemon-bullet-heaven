@@ -416,6 +416,8 @@ SPRITES = {
     'lass':        ('people/lass', 'npc_blue', 16, 32),
     'scientist':   ('people/scientist', 'npc_white', 16, 32),
     'worker_f':    ('people/worker_f', 'npc_green', 16, 32),
+    # o rival (0.39, PLANEJAMENTO-HISTORIA.md seção 9.3): o Blue do FireRed
+    'rival':       ('people/blue', 'npc_green', 16, 32),
     'meowth':      ('pokemon/meowth', 'npc_blue', 16, 16),
     'clefairy':    ('pokemon/clefairy', 'npc_pink', 16, 16),
     'pidgey':      ('pokemon/pidgey', 'npc_blue', 16, 16),

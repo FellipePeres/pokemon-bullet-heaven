@@ -155,11 +155,13 @@ export const HUB = {
         { cells: [[6, 1], [7, 1]], talk: 'lab_quadro' },
         { cells: [[8, 4], [9, 4], [10, 4]], talk: 'pokebolas' }
       ],
-      // as três Poké Balls do FireRed: Bulbasaur, Squirtle e Charmander, da esquerda para a direita
+      // as três Poké Balls do FireRed: Bulbasaur, Squirtle e Charmander, da esquerda para a direita.
+      // Some a do jogador e, depois que o rival pega a dele na cena (0.39), a com vantagem
+      // sobre a do jogador (data/stages.js, RIVAL_STARTER)
       decor: [
-        { sprite: 'item_ball', x: 8, y: 4, oy: -6, hideIf: { starterIs: 'bulbasaur' } },
-        { sprite: 'item_ball', x: 9, y: 4, oy: -6, hideIf: { starterIs: 'squirtle' } },
-        { sprite: 'item_ball', x: 10, y: 4, oy: -6, hideIf: { starterIs: 'charmander' } }
+        { sprite: 'item_ball', x: 8, y: 4, oy: -6, hideIf: [{ starterIs: 'bulbasaur' }, { starterIs: 'squirtle', flag: 'rival_inicial' }] },
+        { sprite: 'item_ball', x: 9, y: 4, oy: -6, hideIf: [{ starterIs: 'squirtle' }, { starterIs: 'charmander', flag: 'rival_inicial' }] },
+        { sprite: 'item_ball', x: 10, y: 4, oy: -6, hideIf: [{ starterIs: 'charmander' }, { starterIs: 'bulbasaur', flag: 'rival_inicial' }] }
       ]
     },
 

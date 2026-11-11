@@ -6,7 +6,7 @@
  * Uso:
  *   node tools/screenshot.mjs <roteiro> [--out pasta] [--size 1280x720]
  *
- * Roteiros: vitrine, treinador, vila, quests, jornada, opcoes, partida, golpes,
+ * Roteiros: vitrine, treinador, vila, quests, cenas, jornada, opcoes, partida, golpes,
  * estresse, chefe, cenario e outros (ver ROTEIROS abaixo).
  * Sem --out, as imagens vão para a pasta temporária do sistema (pbh-screens).
  * Para usar outro navegador: variável de ambiente CHROME_PATH.
@@ -62,11 +62,39 @@ const ROTEIROS = {
     { run: "game.hub.enter({ map: 'casa_1f', x: 7, y: 4, dir: 'right' }); game.hub.interact()" }, { wait: 300 },
     { run: 'for (let i = 0; i < 40 && game.hub.dialog; i++) game.hub.confirm()' }, { wait: 250 }, { shot: 'quests-02-mae-concluida' },
     { wait: 2000 }, { shot: 'quests-03-proxima' },
-    { run: "game.hub.enter({ map: 'lab', x: 6, y: 4, dir: 'up' }); game.hub.interact()" }, { wait: 2600 }, { shot: 'quests-04-discurso' },
-    { run: "game.hub.dialog = null; game.hub.awaitStarter = true; game.chooseStarter('charmander'); for (let i = 0; i < 40 && game.hub.dialog; i++) game.hub.confirm()" },
+    { run: "game.hub.enter({ map: 'lab', x: 6, y: 11, dir: 'up' })" }, { wait: 2600 }, { shot: 'quests-04-discurso' },
+    { run: "game.hub.scene = null; game.hub.dialog = null; game.campaign.scenes = { prologo_carvalho: 'seen', prologo_rival: 'seen' };" +
+           " game.hub.awaitStarter = true; game.chooseStarter('charmander'); for (let i = 0; i < 40 && game.hub.dialog; i++) game.hub.confirm()" },
     { wait: 2400 }, { shot: 'quests-05-mapa' },
     { run: 'game.openCampaign()' }, { wait: 2600 }, { shot: 'quests-06-jornada' },
     { run: "game.startStage('gym_1_pewter')" }, { wait: 1500 }, { shot: 'quests-07-partida' }
+  ],
+  // as cenas (0.39, data/cutscenes.js): o discurso do Carvalho encenado, o rival, o evento
+  // de história na fase e a cena do Maxie, que agora roda no motor novo (game/Cutscene.js)
+  cenas: [
+    { open: 'index.html' }, { wait: 500 },
+    { run: "window.skip = (n = 1) => { for (let i = 0; i < n; i++) { const h = game.hub; if (!h.dialog) return; h.dialog.shown = 999; h.confirm(); } };" +
+           " game.newGame(); game.chooseTrainer('leaf'); game.chooseName('Fellipe')" }, { wait: 1200 },
+    { run: "game.hub.enter({ map: 'casa_1f', x: 7, y: 4, dir: 'right' }); game.hub.interact(); skip(9)" }, { wait: 2400 },
+    { run: "game.hub.enter({ map: 'lab', x: 6, y: 11, dir: 'up' })" }, { wait: 1500 }, { shot: 'cenas-01-o-carvalho-chama' },
+    { wait: 1200 }, { run: 'skip()' }, { wait: 3200 }, { shot: 'cenas-02-o-sonho' },
+    { run: 'skip(2)' }, { wait: 1800 }, { shot: 'cenas-03-o-quadro' },
+    { run: 'skip(2)' }, { wait: 300 }, { run: 'skip(3)' }, { wait: 3000 }, { shot: 'cenas-04-a-mesa' },
+    { run: 'skip()' }, { wait: 1200 }, { shot: 'cenas-05-a-escolha' },
+    { run: "game.chooseStarter('charmander')" }, { wait: 1600 }, { shot: 'cenas-06-o-rival-chega' },
+    { run: 'skip()' }, { wait: 600 }, { run: 'skip()' }, { wait: 3200 }, { shot: 'cenas-07-o-rival-escolhe' },
+    { run: 'skip()' }, { wait: 900 }, { shot: 'cenas-08-pegou' },
+    { run: 'skip()' }, { wait: 500 }, { run: 'skip()' }, { wait: 500 }, { run: 'skip()' }, { wait: 1200 }, { shot: 'cenas-09-hordas' },
+    { run: 'skip(2)' }, { wait: 500 }, { run: 'skip()' }, { wait: 3500 }, { shot: 'cenas-10-o-neto' },
+    { run: 'skip()' }, { wait: 1200 }, { run: 'skip(2)' }, { wait: 1400 }, { shot: 'cenas-11-o-mapa' },
+    { run: 'skip(9)' }, { wait: 1200 }, { shot: 'cenas-12-depois' },
+    { run: "import('./src/data/stages.js').then(({ STAGES }) => { STAGES.gym_1_pewter.story = [{ id: 'exemplo', at: 1, name: 'BROCK', portrait: 'portrait/brock'," +
+           " lines: ['{player}... os Geodude desceram do Monte Lua. Eles nunca fizeram isso.'] }]; game.startStage('gym_1_pewter'); })" },
+    { wait: 3000 }, { shot: 'cenas-13-evento-na-fase' },
+    { run: "game.advanceStory(); game.quitToMenu(); game.hub.enter({ map: 'vila', x: 30, y: 11, dir: 'down' });" +
+           " game.diveRecord.captured = true; game.diveRecord.sceneSeen = false; game._maybeMaxieScene('lagoa')" },
+    { wait: 1000 }, { run: 'skip()' }, { wait: 3600 }, { shot: 'cenas-14-maxie' },
+    { run: 'skip(3)' }, { wait: 1900 }, { shot: 'cenas-15-maxie-crobat' }
   ],
   // a melhoria de UX da 0.31: o card de escolha (o inicial e a Poké Ball) e o painel da fase
   ux: [

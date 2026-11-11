@@ -5,7 +5,7 @@
 > decisão foi tomada e o que falta fazer. O `README.md` é o manual de uso;
 > este aqui é o contexto de desenvolvimento.
 
-**Versão atual:** `0.38.0` · **Última atualização:** 2026-11-10
+**Versão atual:** `0.39.0` · **Última atualização:** 2026-11-10
 **Stack:** HTML + CSS + JavaScript puro (ES Modules). Sem backend, sem build, sem dependências.
 **Repositório:** https://github.com/FellipePeres/pokemon-bullet-heaven (público)
 **Jogo no ar:** https://fellipeperes.github.io/pokemon-bullet-heaven/
@@ -154,6 +154,7 @@ src/
     sceneTiles.js     as tiras de metatiles de todos os cenários: as do FireRed e a do salão do Kyogre (0.37)
     dialogue.js       as falas da vila, com as condições (inicial, insígnias, Campeão, uma vez só, quests)
     quests.js         as quests da história (0.38): capítulos, objetivos, doneIf e a próxima de cada uma
+    cutscenes.js      as cenas (0.39): os roteiros (o Maxie, o discurso do Carvalho, o rival), os gatilhos e os passos
     decor.js          a loja de Pokédolls: os enfeites do quarto, o preço e o lugar de cada um
     types.js          tipos, cores, a tabela de efetividade completa e a defesa (0.32)
     kanto.js          nomes da Pokédex 1-151
@@ -178,12 +179,13 @@ src/
   game/
     Run.js            uma partida: estado, loop, colisões, dano recebido (com o tipo), condições de fim
     Hub.js            a vila (0.29): andar em grade, portas, saídas, conversas e o clique
+    Cutscene.js       o motor das cenas (0.39): toca um roteiro de data/cutscenes.js por cima da vila
     Game.js           orquestra tudo: perfil, jornadas, telas, loop principal, save
   render/
     Renderer.js       canvas: chão, atores, efeitos, barra do chefe, treinador
     assets.js         carrega as folhas do catálogo e desenha quadros em escala inteira
     trainer.js        qual quadro do treinador mostrar (passo pela distância andada)
-    HubRenderer.js    a vila: o chão, as pessoas, a camada de cima e o escurecer das portas
+    HubRenderer.js    a vila: o chão, as pessoas, a camada de cima, o escurecer das portas e as cenas (atores, câmera e efeitos)
     fx.js             desenha os sprites de golpe
     signature.js      desenha em código os golpes exclusivos dos lendários (0.16)
     scenery.js        pinta o chão da arena (o grid do terreno) num canvas por cenário
@@ -629,6 +631,56 @@ Nunca voltar bônus globais para o pool de level up — foi pedido explícito.
   partida, a vitória com comemoração) e a migração de jornadas antigas. O roteiro
   de screenshots é `quests`.
 
+### As cenas (0.39)
+- **O motor** (`game/Cutscene.js`): toca um roteiro de `data/cutscenes.js` por
+  cima da vila; enquanto ele dura, o jogador não anda e o mapa não abre. Nasceu
+  da cena do Maxie, que agora é um roteiro como os outros. **A troca foi
+  conferida quadro a quadro:** a antiga e a nova dão o mesmo estado (o Maxie, o
+  pássaro, a bola, o clarão, o corte de tela) em todos os quadros, nas duas
+  versões. Não mudar a ordem do `update` (quem anda, o tempo do pássaro, o passo,
+  o pássaro, um passo por quadro) sem conferir de novo.
+- **Os roteiros**: `map`, `spot`, `trigger` (`enter`, `npc` ou `starter`), `when`
+  (as condições das falas), `actors`, `band`, `preload` e `steps`. Os passos e o
+  que cada um faz estão no topo de `data/cutscenes.js`. O estado de cada passo
+  fica em `this.local`: **o roteiro nunca muda** (ele é compartilhado entre as
+  vezes que a cena toca).
+- **Os atores**: os da cena (`cast`), as pessoas do lugar (pelo id, andam e somem
+  como os da cena; `npcAt` ignora quem está escondido) e o jogador ('player',
+  que anda pelo `fx`/`fy` como na vila). O `walk` com `to` acha o caminho mais
+  curto até o primeiro tile livre da lista; sem caminho, o passo segue sem andar
+  (a cena nunca trava).
+- **O registro** (`campaign.scenes`): `started` ao começar (o jogo salva), `seen`
+  no fim. Uma `started` com `spot` volta do começo no **Continuar** e no
+  **Carregar save** (`Game.pendingScene`, `_enterVillage`). A do Maxie tem
+  `record: false` e usa o registro de sempre (`campaign.dive.sceneSeen`).
+- **O fim**: `onEnd` marca a cena, salva e emite `EVENTS.STORY` (`scene`), o
+  objetivo novo das quests. O `then` (o do `end` ou o de uma fala do passo
+  `talk`) roda pela vila depois que a cena sai, como a escolha do inicial.
+- **O prólogo**: o discurso do Carvalho (`prologo_carvalho`) começa ao entrar no
+  laboratório sem inicial (quem é veterano continua com a versão curta); a fala
+  dele de `starter: false` virou só "Pense com calma", para quem volta da escolha.
+  Depois da escolha, a cena do rival (`prologo_rival`): o inicial dele é o
+  `RIVAL_STARTER` de `data/stages.js` (o com vantagem, o mesmo do time dele no
+  Campeão), e a bola dele some da mesa pela flag `rival_inicial` (o `hideIf` dos
+  enfeites aceita uma lista). A folha do rival é o Blue do FireRed
+  (`npc/rival`, de `tools/assets/hub.py`).
+- **Os itens da história** (`KEY_ITEMS` em `data/items.js`, `campaign.keyItems`):
+  o passo `give` dá esses ou os da mochila do Poké Mart. Os dois que existem são
+  as pistas do Capítulo 3 (H-4).
+- **O evento de história na fase** (`stage.story: [{ id, at, name, portrait, lines }]`):
+  o `Run` pausa (`state = 'story'`) no segundo `at`, e o Game mostra o
+  `story-overlay` (o molde da apresentação do líder, sem luta), uma página por
+  vez (o botão, o A ou o Enter). Uma vez por jornada (`storySeen`), no máximo um
+  por fase. Nenhuma fase tem ainda; o primeiro é o da Fase 5 (H-4).
+- **As falas** ganharam as condições `scene` (vista até o fim) e `flag`, e o
+  `{rival}` (o inicial dele).
+- **O check-data** confere cada roteiro (o lugar, os atores, as folhas, os
+  caminhos só no chão do mapa e de tile em tile, as falas, os itens, as quests e o
+  `end` no fim) e os eventos das fases. **Os testes**: o `ui-smoke` toca as duas
+  cenas do prólogo inteiras (a câmera, o Carvalho virando, o rival na bola certa,
+  a bola sumindo, a cena pendente voltando ao continuar), uma cena de teste com
+  os passos novos e o evento na fase. O roteiro de screenshots é `cenas`.
+
 ### O lendário secreto da Pokédex (0.35)
 - Pedido do Fellipe: no fim da Pokédex, um Pokémon misterioso, "???", **sem
   silhueta e sem número**, que o jogador vê desde o começo sem saber quem é, e
@@ -689,7 +741,9 @@ Nunca voltar bônus globais para o pool de level up — foi pedido explícito.
   - a maré final de 30 s, e só depois a vitória.
 - **O fim**: a volta é sempre pela lagoa. Caiu na luta: acorda no Centro, com a
   enfermeira (a luta não recomeça). Primeira vitória: 500 Shards.
-- **A cena do Maxie** (`game/MaxieScene.js`, desenhada pelo `HubRenderer`): uma vez
+- **A cena do Maxie** (desde a 0.39, os roteiros `maxie_lagoa` e `maxie_centro`
+  de `data/cutscenes.js`, no motor `game/Cutscene.js`; até a 0.38,
+  `game/MaxieScene.js`), desenhada pelo `HubRenderer`: uma vez
   por jornada, depois da captura, na frente da lagoa ou no Centro. O Maxie chega,
   o "!", a fala, o Crobat no corte de tela do Voar, "A caminho do vulcão!" e o
   pássaro do Voar (ou a porta, no Centro).
@@ -1178,6 +1232,7 @@ o Brock como está, todas as outras mais duras, menos níveis.
 | 65 | uma opção de repetir a fase do Kyogre: hoje é preciso sair e descer tudo de novo | 0.37.8: no fim da luta do Kyogre, a tela de resultado oferece Jogar de novo (na vitória) e Tentar de novo ou Voltar para a vila (na derrota); jogar de novo recomeça a luta com a equipe curada, sem a descida. Com o Kyogre já capturado, o salão é o do Endless aquático. Só voltar para a vila (ou sair pelo card) exige descer de novo |
 | 66 | um tester (o Theo) pegou o Kyogre, usou na mesma fase e o jogo travou; ao voltar, tinha perdido a cena do Maxie. O Kyogre vai sempre para o PC, com um aviso; corrigir o bug; o save dele com tudo, mas carregando como quem acabou de sair da caverna, com a cena | 0.37.9: a causa era o desenho do Origin Pulse do jogador (raio negativo no canvas no 1º quadro de todo disparo), que parava o laço do jogo; a pausa ainda funcionava, e sair por ela marcava a cena como vista sem rodá-la. Corrigidos o desenho, o laço (pede o próximo quadro antes) e a cena (só conta no fim; pendente, Continuar e Carregar save abrem na lagoa com a cena). O Kyogre vai sempre para o PC, com o aviso no card e no toast. O save do Theo voltou com `sceneSeen: false` e nada mais mudado (o Kyogre dele continua na equipe). Testes: o canvas falso do `ui-smoke` agora lança com raio negativo, como o de verdade |
 | 67 | uma história própria, como no Pokémon Tower Defense: o Carvalho diz que as hordas mudaram, o sonho de ser Campeão continua, mas o ideal é devolver a paz às rotas; os pássaros lendários foram roubados pelo Maxie, que só aparece no Kyogre; um sistema de quests ("fale com a mãe 0/1" no canto de cima) com as recompensas no fim; muitas cutscenes; lendários só por missões, cada um com a sua fase; o Kyogre late game; uma vila por geração. Aprovou o plano inteiro e acrescentou: o lendário liberado volta à Poké Ball das fases seguintes, com a chance baixa de hoje | `PLANEJAMENTO-HISTORIA.md` (a premissa, os capítulos de Kanto, as missões dos lendários, as quests, as cenas e as etapas H-1 a H-12). 0.38: a H-1, com as quests (`data/quests.js`, `systems/QuestSystem.js`), o rastreador na vila, no mapa da jornada e na partida, o prólogo do quarto ao Brock, o discurso novo do Carvalho e a migração das jornadas que já existiam |
+| 68 | "pode partir para o próximo passo gerando um artifact"; antes: "essas mudanças não vão subir, só depois de tudo pronto no planejamento" e "sempre deve ter um artifact" | 0.39 (H-2 do PLANEJAMENTO-HISTORIA, só na branch): o motor das cenas (`game/Cutscene.js`, `data/cutscenes.js`), com a do Maxie convertida e conferida quadro a quadro; o discurso do Carvalho encenado e a cena do rival (o Blue do FireRed, o inicial com vantagem); o evento de história na fase (`stage.story`); `campaign.scenes` com a cena pendente voltando ao continuar; os itens da história; o check-data das cenas; o roteiro `cenas` e a página do planejamento num artifact |
 | Fase 8 (Giovanni) | 1 → 0,8 | 4,0 | 4,5 | 60 | 84 → 62 |
 | Lorelei | 1,05 → 0,8 | 3,5 | 3,1–4,7 | 64 | 92 → 66 |
 | Bruno | 1,12 → 0,97 | 3,7 | 3,5–6,3 ² | 66 | 99 → 68 |
@@ -1495,8 +1550,8 @@ O que está planejado:
   jornada, como no Pokémon Tower Defense. Os pássaros lendários foram roubados, e
   é por isso que as hordas mudaram; o ladrão é o Maxie, que só aparece na cena do
   Kyogre. **A H-1 está no jogo desde a 0.38** (as quests, o rastreador e o
-  prólogo; ver a seção 4). Falta, em ordem: a H-2 (as cenas em dados, a partir da
-  do Maxie, e o evento de história na partida), a H-3 (a tela de missões), a H-4
+  prólogo; ver a seção 4), e **a H-2 desde a 0.39** (o motor das cenas, as duas do
+  prólogo e o evento de história na fase). Falta, em ordem: a H-3 (a tela de missões), a H-4
   (os capítulos 1 a 3), a H-5 (a captura sem lendários e o molde da missão de
   lendário), uma missão para cada lendário (H-6 a H-11) e as recompensas (H-12).
   **Regra do Fellipe para a H-5:** um lendário liberado na missão dele (vencida,

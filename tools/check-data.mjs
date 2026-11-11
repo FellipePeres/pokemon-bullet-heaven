@@ -9,7 +9,7 @@ import { POKEMON } from '../src/data/pokemon.js';
 import { ABILITIES } from '../src/data/abilities.js';
 import { BONUS_MOVES } from '../src/data/bonusMoves.js';
 import { LEGENDARY_MOVES, LEGENDARY_KITS, LEGENDARY_ENCOUNTERS } from '../src/data/legendaries.js';
-import { MART_ITEMS, getMartItem, itemEvolutions } from '../src/data/items.js';
+import { MART_ITEMS, getMartItem, itemEvolutions, KEY_ITEMS } from '../src/data/items.js';
 import { UPGRADES } from '../src/data/upgrades.js';
 import { AWAKENING_KEYS, awakeningSuffixes } from '../src/data/awakening.js';
 import { ENEMIES } from '../src/data/enemies.js';
@@ -30,6 +30,7 @@ import { DIALOGUE } from '../src/data/dialogue.js';
 import { DECOR, decorMax } from '../src/data/decor.js';
 import { QUESTS, CHAPTERS, FIRST_QUEST, QUEST_EVENTS } from '../src/data/quests.js';
 import { DONE_IF_KEYS } from '../src/systems/QuestSystem.js';
+import { CUTSCENES, CUTSCENE_STEPS, CUTSCENE_TRIGGERS } from '../src/data/cutscenes.js';
 import { existsSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -253,16 +254,19 @@ badSegments.length ? fail(`trechos com cenário inexistente: ${badSegments.join(
     : ok(`${halls.length} salões com banner no painel da fase`);
 }
 
+// as condições e ações das falas da vila (game/Hub.js), que as cenas também usam
+const KNOWN_WHEN = new Set(['starter', 'starterIs', 'shiny', 'badges', 'champion', 'dex', 'veteran', 'dive', 'diveTm', 'diveRescued', 'kyogre', 'locked', 'once', 'quest', 'questDone', 'scene', 'flag']);
+const KNOWN_ACTIONS = new Set(['starter', 'pc', 'mart', 'save', 'campaign', 'pokedoll', 'badges', 'aquatic']);
+// o chão da vila: só onde o mapa do FireRed deixa pisar
+const floor = (mapId, x, y) => {
+  const map = HUB_MAPS[mapId];
+  return !!map && x >= 0 && y >= 0 && x < map.width && y < map.height && map.walk[y][x] === '.';
+};
+const inside = (mapId, x, y) => { const m = HUB_MAPS[mapId]; return !!m && x >= 0 && y >= 0 && x < m.width && y < m.height; };
+
 // a vila (0.29): mapas gerados, portas, saídas, pessoas, objetos e falas
 {
   const issues = [];
-  const KNOWN_WHEN = new Set(['starter', 'starterIs', 'shiny', 'badges', 'champion', 'dex', 'veteran', 'dive', 'diveTm', 'diveRescued', 'kyogre', 'locked', 'once', 'quest', 'questDone']);
-  const KNOWN_ACTIONS = new Set(['starter', 'pc', 'mart', 'save', 'campaign', 'pokedoll', 'badges', 'aquatic']);
-  const floor = (mapId, x, y) => {
-    const map = HUB_MAPS[mapId];
-    return !!map && x >= 0 && y >= 0 && x < map.width && y < map.height && map.walk[y][x] === '.';
-  };
-  const inside = (mapId, x, y) => { const m = HUB_MAPS[mapId]; return !!m && x >= 0 && y >= 0 && x < m.width && y < m.height; };
   const talkKeys = new Set();
 
   for (const [name, spot] of Object.entries(HUB.spawn)) {
@@ -399,6 +403,102 @@ badSegments.length ? fail(`trechos com cenário inexistente: ${badSegments.join(
   issues.length
     ? fail(`quests: ${issues.join(' · ')}`)
     : ok(`a história: ${Object.keys(QUESTS).length} quests em ${Object.keys(CHAPTERS).length} capítulos, todas encadeadas a partir de "${FIRST_QUEST}"`);
+}
+
+// as cenas (0.39, data/cutscenes.js): o lugar, os atores, os caminhos só no chão, e
+// as falas, os itens e as quests que elas citam; e os eventos de história das fases
+{
+  const issues = [];
+  const SHEETS = { ...ASSET_MANIFEST, ...HUB_SPRITES, ...DIVE_WORLD.sprites };
+  const DIRS = ['up', 'down', 'left', 'right'];
+  const NEEDS_WHO = new Set(['show', 'hide', 'place', 'walk', 'face', 'emote', 'throw', 'bird']);
+  let stepCount = 0;
+  for (const [id, def] of Object.entries(CUTSCENES)) {
+    const place = HUB.maps[def.map];
+    if (!place) { issues.push(`${id}: lugar que não existe (${def.map})`); continue; }
+    if (def.spot && !floor(def.map, def.spot.x, def.spot.y)) issues.push(`${id}: spot fora do chão`);
+    if (def.record !== false && !def.spot) issues.push(`${id}: sem spot (a cena pendente não teria onde voltar)`);
+    for (const t of def.trigger ?? []) {
+      if (!CUTSCENE_TRIGGERS.includes(t.on)) issues.push(`${id}: trigger desconhecido (${t.on})`);
+      if (t.on === 'enter' && t.target !== def.map) issues.push(`${id}: trigger de entrada em outro lugar (${t.target})`);
+      if (t.on === 'npc' && !(place.npcs ?? []).some((n) => n.id === t.target)) issues.push(`${id}: trigger de alguém que não está no lugar (${t.target})`);
+    }
+    for (const cond of Object.keys(def.when ?? {})) if (!KNOWN_WHEN.has(cond)) issues.push(`${id}: condição desconhecida (${cond})`);
+    const actors = new Set(['player', ...Object.keys(def.actors ?? {}), ...(place.npcs ?? []).map((n) => n.id)]);
+    for (const [aid, a] of Object.entries(def.actors ?? {})) {
+      if (!SHEETS[a.sprite]) issues.push(`${id}: ${aid} sem folha (${a.sprite})`);
+      if (!floor(def.map, a.x, a.y)) issues.push(`${id}: ${aid} começa fora do chão (${a.x},${a.y})`);
+    }
+    for (const key of [...(def.preload ?? []), ...(def.band ? [def.band] : [])]) if (!SHEETS[key]) issues.push(`${id}: folha que não existe (${key})`);
+    const steps = def.steps ?? [];
+    if (steps.at(-1)?.do !== 'end') issues.push(`${id}: o último passo não é o end (a cena nunca contaria como vista)`);
+    steps.forEach((raw, i) => {
+      if (raw.pick && !Object.keys(raw.cases ?? {}).length) issues.push(`${id} passo ${i + 1}: pick sem casos`);
+      const variants = raw.pick ? Object.values(raw.cases ?? {}).map((c) => ({ ...raw, ...c })) : [raw];
+      for (const step of variants) {
+        stepCount++;
+        const at = `${id} passo ${i + 1} (${step.do})`;
+        if (!CUTSCENE_STEPS.includes(step.do)) { issues.push(`${at}: passo desconhecido`); continue; }
+        if (NEEDS_WHO.has(step.do) && step.who == null) issues.push(`${at}: sem who`);
+        for (const who of [step.who, step.toward, step.npc]) if (who != null && !actors.has(who)) issues.push(`${at}: ator que não está na cena (${who})`);
+        if (step.do === 'face' && !step.toward && !DIRS.includes(step.dir)) issues.push(`${at}: direção desconhecida (${step.dir})`);
+        if (step.do === 'say' && !step.lines?.length) issues.push(`${at}: sem falas`);
+        if (step.do === 'talk' && !DIALOGUE[step.key]) issues.push(`${at}: fala que não existe (${step.key})`);
+        if (step.do === 'walk') {
+          const tiles = step.path ?? step.to ?? [];
+          if (!tiles.length) issues.push(`${at}: sem path nem to`);
+          for (const [x, y, dir] of tiles) {
+            if (!floor(def.map, x, y)) issues.push(`${at}: tile fora do chão (${x},${y})`);
+            if (dir && !DIRS.includes(dir)) issues.push(`${at}: direção desconhecida (${dir})`);
+          }
+          // o path anda de tile em tile, como na vila
+          for (let k = 1; k < (step.path ?? []).length; k++) {
+            const [ax, ay] = step.path[k - 1], [bx, by] = step.path[k];
+            if (Math.abs(ax - bx) + Math.abs(ay - by) !== 1) issues.push(`${at}: o path pula de ${ax},${ay} para ${bx},${by}`);
+          }
+        }
+        if (step.do === 'place' && !floor(def.map, step.x, step.y)) issues.push(`${at}: tile fora do chão (${step.x},${step.y})`);
+        if (step.do === 'camera' && step.to !== 'player' && !inside(def.map, step.x, step.y)) issues.push(`${at}: fora do mapa`);
+        if (step.do === 'cutin' && (!SHEETS[step.sprite] || !def.band)) issues.push(`${at}: sem a folha do Pokémon ou a faixa (band)`);
+        if (step.do === 'bird' && !['in', 'grab', 'away', 'gone'].includes(step.mode)) issues.push(`${at}: modo desconhecido (${step.mode})`);
+        if (step.do === 'give' && getMartItem(step.item)?.kind !== 'bag' && !KEY_ITEMS[step.item]) issues.push(`${at}: item que não existe (${step.item})`);
+        if (step.do === 'quest' && !QUESTS[step.id]) issues.push(`${at}: quest que não existe (${step.id})`);
+        if (step.do === 'flag' && !step.name) issues.push(`${at}: flag sem nome`);
+        if (step.do === 'end' && step.then && !KNOWN_ACTIONS.has(step.then)) issues.push(`${at}: ação desconhecida (${step.then})`);
+      }
+    });
+  }
+  // os eventos de história das fases (stage.story): no máximo um por fase, para não
+  // quebrar o ritmo do Bullet Heaven (seção 9.2 do planejamento)
+  const storyIds = new Set();
+  let storyCount = 0;
+  for (const [stageId, stage] of Object.entries(STAGES)) {
+    const events = stage.story ?? [];
+    if (events.length > 1) issues.push(`${stageId}: mais de um evento de história`);
+    for (const e of events) {
+      storyCount++;
+      if (!e.id) issues.push(`${stageId}: evento de história sem id`);
+      else if (CUTSCENES[e.id] || storyIds.has(e.id)) issues.push(`${stageId}: id de evento repetido (${e.id})`);
+      storyIds.add(e.id);
+      if (!(e.at >= 0 && e.at < stage.duration)) issues.push(`${stageId}: evento fora da fase (${e.at}s)`);
+      if (!e.lines?.length) issues.push(`${stageId}: evento sem falas`);
+      if (e.portrait && !ASSET_MANIFEST[e.portrait]) issues.push(`${stageId}: retrato que não existe (${e.portrait})`);
+    }
+  }
+  for (const [qid, quest] of Object.entries(QUESTS)) {
+    for (const o of quest.objectives ?? []) {
+      if (o.on === 'scene' && !CUTSCENES[o.target] && !storyIds.has(o.target)) issues.push(`${qid}: cena que não existe (${o.target})`);
+    }
+  }
+  for (const [key, entry] of Object.entries(DIALOGUE)) {
+    for (const line of entry.lines ?? []) {
+      const scene = line.when?.scene;
+      if (scene && !CUTSCENES[scene] && !storyIds.has(scene)) issues.push(`${key}: condição de uma cena que não existe (${scene})`);
+    }
+  }
+  issues.length
+    ? fail(`cenas: ${issues.join(' · ')}`)
+    : ok(`as cenas: ${Object.keys(CUTSCENES).length} roteiros com ${stepCount} passos, caminhos só no chão; ${storyCount} evento(s) de história nas fases`);
 }
 
 // pools de captura: mostra quanto de cada fase já está implementado

@@ -262,20 +262,44 @@ check('o mato alto a oeste também fica travado: o senhor avisa', hub.dialog?.na
 closeDialog();
 settle();
 
-// o laboratório: o Carvalho conta a mini-história e dá o inicial
+// o laboratório (0.39): entrar começa a cena do discurso do Carvalho (data/cutscenes.js)
+// toca a cena até o fim, passando as páginas; devolve o que apareceu na caixa de texto
+const runScene = (watch = null) => {
+  const seen = [];
+  let last = null;
+  for (let i = 0; i < 60 * 180 && hub.scene; i++) {
+    if (hub.dialog && hub.dialog !== last) { last = hub.dialog; seen.push({ name: hub.dialog.name, text: hub.dialog.pages.join(' ') }); watch?.(seen.at(-1)); }
+    if (hub.dialog) { hub.dialog.shown = 999; hub.confirm(); }
+    hub.update(1 / 60);
+  }
+  return seen;
+};
+const said = (seen, text) => seen.some((d) => d.text.includes(text));
 goTo(26, 7);
 press('up');
 check('a porta do laboratório leva para dentro', hub.mapId === 'lab' && hub.player.x === 6 && hub.player.y === 12);
 check('entrar no laboratório fecha a quest: agora é falar com o Prof. Carvalho',
       game.quests.isDone('p_lab') && game.quests.isActive('p_carvalho'));
 check('as três Poké Balls estão na mesa', hub.decor.filter((d) => d.sprite === 'item_ball').length === 3);
-hub.clickTile(6, 3);
-settle();
-check('o Carvalho conta a mini-história das hordas', hub.dialog?.name === 'Prof. Carvalho' && dialogText().includes('hordas'));
-check('...o discurso do prólogo: o sonho continua possível, mas o ideal é devolver a paz às rotas',
-      dialogText().includes('Fellipe') && dialogText().includes('esse sonho continua possível') && dialogText().includes('resolver o problema das hordas')
-      && dialogText().includes('um lugar de paz'));
-closeDialog();
+check('...e a cena do discurso do Carvalho começa sozinha (só conta como vista no fim)',
+      hub.scene?.id === 'prologo_carvalho' && game.sceneRecord.prologo_carvalho === 'started');
+{
+  hub.update(1 / 60, STEP.down);
+  check('durante a cena o jogador não anda', hub.player.x === 6 && hub.player.y === 12 && !hub.player.moving);
+  let camera = false, oakTurned = false;
+  const lab = runScene(() => {
+    camera ||= !!hub.scene?.fx.camera;
+    oakTurned ||= hub.npcs.find((n) => n.id === 'carvalho')?.dir === 'up';
+  });
+  check('o Carvalho conta a mini-história das hordas', lab.every((d) => d.name === 'Prof. Carvalho') && said(lab, 'hordas'));
+  check('...o discurso do prólogo: o sonho continua possível, mas o ideal é devolver a paz às rotas',
+        said(lab, 'Fellipe') && said(lab, 'esse sonho continua possível') && said(lab, 'resolver o problema das hordas') && said(lab, 'um lugar de paz'));
+  check('...encenado: a câmera vai até ele e, no meio, ele se vira para o quadro', camera && oakTurned);
+  const oak = hub.npcs.find((n) => n.id === 'carvalho');
+  check('...ele vai para trás da mesa e o jogador para na frente dela',
+        oak.x === 9 && oak.y === 3 && oak.dir === 'down' && hub.player.x === 8 && hub.player.y === 5 && hub.player.dir === 'up' && !hub.player.moving);
+  check('no fim, a cena conta como vista', !hub.scene && game.sceneRecord.prologo_carvalho === 'seen');
+}
 check('...e abre a escolha do inicial com 3 opções',
       !registry.get('screen-starter').classes.has('hidden') && registry.get('starter-choices').children.length === 3);
 {
@@ -292,17 +316,38 @@ check('...e abre a escolha do inicial com 3 opções',
 game.cancelStarter();
 check('o Voltar da escolha devolve ao laboratório, com o Carvalho esperando', hubVisible() && dialogText().includes('Pense com calma'));
 closeDialog();
-hub.clickTile(6, 3);
+hub.clickTile(9, 3);
 settle();
+check('vista a cena, falar com o Carvalho de novo é curto: escolha com calma', hub.dialog?.name === 'Prof. Carvalho' && dialogText().includes('esperando por você') && !hub.scene);
 closeDialog();
+check('...e a escolha abre de novo', !registry.get('screen-starter').classes.has('hidden'));
 game.chooseStarter('charmander');
-check('escolhido o inicial, o Carvalho entrega o Mapa da Jornada (0.30)',
-      hubVisible() && dialogText().includes('Charmander') && dialogText().includes('Fellipe recebeu o MAPA DA JORNADA'));
-check('...e pede para voltar com o que descobrir sobre as hordas', dialogText().includes('volte e me conte'));
+check('escolhido o inicial, o rival chega (a cena do rival, 0.39)', hubVisible() && hub.scene?.id === 'prologo_rival');
 check('com o inicial escolhido, a quest do Carvalho espera ele terminar de falar', game.quests.isActive('p_carvalho'));
-closeDialog();
+{
+  let rivalAt = null;
+  const rivalScene = runScene((d) => {
+    if (d.text.includes('O rival pegou')) { const r = hub.scene.actor('rival'); rivalAt = `${r.x},${r.y},${r.dir}`; }
+  });
+  check('o rival entra atrasado e pega o inicial com vantagem sobre o seu (Squirtle contra Charmander)',
+        said(rivalScene, 'Vô! Cheguei!') && said(rivalScene, 'O rival pegou o Squirtle!') && said(rivalScene, 'contra o seu Charmander'));
+  check('...andando até a bola dele, na frente da mesa', rivalAt === '9,5,up', rivalAt);
+  check('...e acha bobagem se preocupar com as hordas: quer ser Campeão', said(rivalScene, 'Hordas, hordas') && said(rivalScene, 'Liga'));
+  check('escolhido o inicial, o Carvalho entrega o Mapa da Jornada (0.30)',
+        said(rivalScene, 'Charmander! Ótima escolha') && said(rivalScene, 'Fellipe recebeu o MAPA DA JORNADA'));
+  check('...e pede para voltar com o que descobrir sobre as hordas', said(rivalScene, 'volte e me conte'));
+  check('o rival sai pela porta e a cena conta como vista', hub.scene === null && game.sceneRecord.prologo_rival === 'seen');
+}
 check('ele terminou: a próxima quest é abrir o Mapa da Jornada', game.quests.isDone('p_carvalho') && game.quests.isActive('p_mapa'));
-check('a bola do inicial escolhido some da mesa', hub.decor.filter((d) => d.sprite === 'item_ball').length === 2);
+check('a bola do inicial escolhido some da mesa, e a do rival também', hub.decor.filter((d) => d.sprite === 'item_ball').length === 1
+      && hub.decor.some((d) => d.sprite === 'item_ball' && d.x === 8));
+game.sceneRecord.prologo_rival = 'started';
+game.continueGame();
+check('uma cena que ficou no meio volta do começo ao continuar, no lugar dela',
+      hubVisible() && hub.mapId === 'lab' && hub.player.x === 8 && hub.player.y === 5 && hub.scene?.id === 'prologo_rival' && hub.scene.step === 0);
+check('...com a bola do rival de volta na mesa até ele pegar', (hub.update(1 / 60), hub.decor.filter((d) => d.sprite === 'item_ball').length === 2));
+runScene();
+check('...e no fim conta como vista de novo, sem repetir a quest', !hub.scene && game.sceneRecord.prologo_rival === 'seen' && game.quests.isActive('p_mapa'));
 check('Pokédex registra o inicial escolhido', game.profile.pokedex.caught.includes(4));
 game.hubHud.render();
 check('com o inicial, o Mapa da jornada destrava, com o aviso de novo',
@@ -746,6 +791,70 @@ check('depois da escolha, o Continuar segue para a jornada (na vila); sem nome, 
   check('o Novo Sorteio sorteia de novo e gasta da mochila', game.rerollCapture() && game.profile.bag.reroll === 0);
   game.resolveCapture();
   game.quitToMenu();
+}
+
+// ---- o motor das cenas (0.39): os passos novos numa cena de teste, e o evento de história na fase ----
+{
+  const { CUTSCENES } = await import('../src/data/cutscenes.js');
+  const { QUESTS } = await import('../src/data/quests.js');
+  const { STAGES } = await import('../src/data/stages.js');
+  game.openHub('home');
+  QUESTS.teste_cena = { kind: 'side', chapter: 'cap1', objectives: [{ text: 'Veja a cena de teste', on: 'scene', target: 'teste_cena' }], next: [], reward: null };
+  CUTSCENES.teste_cena = { map: 'vila', spot: { x: 6, y: 17, dir: 'down' }, steps: [
+    { do: 'fade', to: 1, t: 0.2 }, { do: 'fade', to: 0, t: 0.2 },
+    { do: 'shake', t: 0.3, power: 2 },
+    { do: 'hide', who: 'menina' },
+    { do: 'quest', id: 'teste_cena' },
+    { do: 'give', item: 'revive', count: 2 },
+    { do: 'give', item: 'pena_dourada' },
+    { do: 'flag', name: 'teste_flag' },
+    { do: 'place', who: 'player', x: 7, y: 17, dir: 'left' },
+    { do: 'end' }
+  ] };
+  const revives = game.profile.bag.revive ?? 0;
+  check('uma cena começa pelo código (game.playScene)', game.playScene('teste_cena') && hub.scene?.id === 'teste_cena');
+  let faded = 0, shook = false, opened = false;
+  const texts = [];
+  for (let i = 0; i < 60 * 20 && hub.scene; i++) {
+    faded = Math.max(faded, hub.scene.fx.fade);
+    shook ||= !!hub.scene.fx.shake;
+    opened ||= game.quests.isActive('teste_cena');
+    if (hub.dialog) { texts.push(hub.dialog.pages.join(' ')); hub.dialog.shown = 999; hub.confirm(); }
+    hub.update(1 / 60);
+  }
+  const girl = hub.npcs.find((n) => n.id === 'menina');
+  check('fade escurece e clareia, e shake treme a tela', faded === 1 && shook);
+  check('hide some com alguém do lugar, que deixa de bloquear o tile', girl.hidden && !hub.npcAt(girl.x, girl.y));
+  check('give dá um item da mochila e um da história, e avisa na caixa',
+        game.profile.bag.revive === revives + 2 && game.campaign.keyItems?.pena_dourada === 1
+        && texts.includes(`${game.playerName} recebeu 2 REVIVER!`) && texts.includes(`${game.playerName} recebeu PENA DOURADA!`));
+  check('quest abre uma quest, e o fim da cena conta para o objetivo `scene`', opened && game.quests.isDone('teste_cena'));
+  check('flag marca a flag da vila e place põe o jogador no tile',
+        game.campaign.hub.flags.teste_flag === true && hub.player.x === 7 && hub.player.y === 17 && hub.player.dir === 'left');
+  delete CUTSCENES.teste_cena; delete QUESTS.teste_cena; delete game.quests.state.done.teste_cena;
+  delete game.campaign.scenes.teste_cena; delete game.campaign.hub.flags.teste_flag; delete game.campaign.keyItems.pena_dourada;
+  game.profile.bag.revive = revives;
+
+  const stage = STAGES.gym_1_pewter;
+  stage.story = [{ id: 'teste_historia', at: 0.5, name: 'Brock', portrait: stage.leader.portrait, lines: ['O Brock olha para você, {player}.', 'E volta para a luta.'] }];
+  game.startStage('gym_1_pewter');
+  for (let i = 0; i < 120 && game.run.state === 'running'; i++) { game.run.update(1 / 60, { x: 0, y: 0 }); game._handleRunState(); }
+  check('o evento de história da fase pausa a partida e abre a caixa com o retrato',
+        game.run.state === 'story' && game.storyOpen && !registry.get('story-overlay').classes.has('hidden')
+        && registry.get('story-name').textContent === 'Brock' && registry.get('story-text').textContent === `O Brock olha para você, ${game.playerName}.`);
+  const paused = game.run.time;
+  game.run.update(1 / 60, { x: 0, y: 0 });
+  check('...com o relógio da fase parado', game.run.time === paused);
+  game.handleAction('confirm');
+  check('...uma página por vez (o A ou o Enter)', game.storyOpen && registry.get('story-text').textContent === 'E volta para a luta.');
+  game.handleAction('confirm');
+  check('...e depois da última a partida segue, com o evento contado como visto', !game.storyOpen && game.run.state === 'running'
+        && registry.get('story-overlay').classes.has('hidden') && game.sceneRecord.teste_historia === 'seen');
+  game.quitToMenu();
+  game.startStage('gym_1_pewter');
+  check('rejogando a fase, o evento já visto não volta', game.run.storyQueue.length === 0);
+  game.quitToMenu();
+  delete stage.story; delete game.campaign.scenes.teste_historia;
 }
 
 const HUB_RESCUE_SPOT_TEST = { map: 'centro', x: 4, y: 5, dir: 'up' };

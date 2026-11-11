@@ -26,6 +26,8 @@
  *                      ({badges} vira o número de insígnias: uma vez por insígnia)
  *            quest     a quest com este id está ativa (data/quests.js, 0.38)
  *            questDone a quest com este id já fechou
+ *            scene     a cena com este id já foi vista até o fim (data/cutscenes.js, 0.39)
+ *            flag      a flag da vila com este nome está marcada (as cenas marcam, passo `flag`)
  *
  * A conversa que chega ao fim conta para as quests ("Fale com a mãe"): o
  * objetivo `talk` olha a chave da fala (mae, carvalho_inicial...).
@@ -34,8 +36,12 @@
  *          (o Estojo de Insígnias), 'campaign' (o mapa)
  *   ask    uma pergunta de SIM/NÃO na última página: { yes: ação, no: [páginas] }
  *
- * No texto: {player} é o nome do treinador, {pokemon} o inicial, {leader} o
- * último líder vencido, {dex} quantos há na Pokédex e {item} o nome do enfeite.
+ * No texto: {player} é o nome do treinador, {pokemon} o inicial, {rival} o
+ * inicial do rival (0.39), {leader} o último líder vencido, {dex} quantos há na
+ * Pokédex e {item} o nome do enfeite.
+ *
+ * As cenas (data/cutscenes.js) também falam: falar com alguém pode começar uma
+ * cena no lugar da fala (o trigger 'npc'), como o discurso do Carvalho.
  */
 export const DIALOGUE = {
   /* ================================ a casa ================================ */
@@ -102,17 +108,10 @@ export const DIALOGUE = {
         'Ah, aí está você! Pronto para mais uma jornada, hein?',
         'As hordas continuam lá fora. Escolha o seu parceiro.'
       ], then: 'starter' },
-      // o discurso do prólogo (0.38, PLANEJAMENTO-HISTORIA.md seção 8): o sonho e a missão
+      // o discurso do prólogo (0.38) virou a cena `prologo_carvalho` (0.39, data/cutscenes.js),
+      // que começa ao entrar no laboratório; quem volta da escolha sem escolher ouve só isto
       { when: { starter: false }, say: [
-        'Ah, aí está você, {player}! Entre, entre. Antes de tudo, precisamos conversar.',
-        'Você quer ser o Campeão de Kanto, eu sei. E esse sonho continua possível.',
-        'Mas preciso ser honesto: as rotas não são mais como antes. As hordas mudaram.',
-        'Os Pokémon selvagens andam em bandos de dezenas e cercam qualquer treinador que passa.',
-        'Isso não é natural. Um Pokémon não abandona a própria casa sem motivo... Alguma coisa aconteceu.',
-        'Ser Campeão é um sonho bonito. Mas o ideal, de verdade, era resolver o problema das hordas.',
-        'Fazer as rotas voltarem a ser o que eram: um lugar de paz, de encontros, e não de caos.',
-        'Sozinho, eu não consigo. Mas um treinador que atravessa Kanto inteira... talvez consiga.',
-        'Ninguém atravessa Kanto sozinho. Por isso quero que você leve um destes três.'
+        'Pense com calma, {player}. Os três estão na mesa, esperando por você.'
       ], then: 'starter' },
       { when: { champion: true }, say: [
         'Você fez o que poucos fizeram. Mas as hordas não acabaram.',

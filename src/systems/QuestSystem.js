@@ -83,6 +83,18 @@ export class QuestSystem {
     return completed;
   }
 
+  /**
+   * Abre a quest `id` por fora da cadeia (o passo `quest` das cenas, 0.39). Se a
+   * jornada já cumpriu, ela fecha em silêncio. Devolve se ficou aberta.
+   */
+  start(id) {
+    const state = this.state;
+    if (!state || !QUESTS[id] || state.done[id] || state.active.includes(id)) return false;
+    state.active.push(id);
+    this._catchUp(state, [id]);
+    return state.active.includes(id);
+  }
+
   /** As quests do rastreador: a de história primeiro, no máximo TRACKED_MAX. */
   tracked() {
     const state = this.state;

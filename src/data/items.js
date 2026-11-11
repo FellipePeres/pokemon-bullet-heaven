@@ -24,6 +24,16 @@ import { POKEMON } from './pokemon.js';
  */
 export const STONES = ['fire_stone', 'water_stone', 'thunder_stone', 'leaf_stone', 'moon_stone'];
 
+/**
+ * OS ITENS DA HISTÓRIA (0.39, PLANEJAMENTO-HISTORIA.md): não se compram; as cenas
+ * dão (o passo `give` de data/cutscenes.js) e eles ficam na jornada
+ * (`campaign.keyItems`). Os dois primeiros são as pistas do Capítulo 3 (H-4).
+ */
+export const KEY_ITEMS = {
+  pena_dourada: { name: 'Pena Dourada', description: 'Uma pena que brilha como um raio. A Erika achou no jardim do ginásio.' },
+  emblema_vermelho: { name: 'Pedaço de Metal', description: 'Um pedaço de máquina com um emblema vermelho. Não é da Equipe Rocket.' }
+};
+
 export const MART_ITEMS = [
   { id: 'reroll', name: 'Novo Sorteio', icon: 'reroll', price: 300, kind: 'bag',
     description: 'Na tela da Poké Ball, sorteia de novo as 4 opções. Vai para a mochila.' },

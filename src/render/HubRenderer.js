@@ -6,6 +6,9 @@ import { getTrainerLook } from '../data/trainers.js';
 const T = 16;
 /** Quadro parado de cada direção nas folhas do FireRed (a direita é a esquerda espelhada). */
 const STAND = { down: 0, up: 1, left: 2, right: 2 };
+/** O primeiro quadro andando de cada direção (o segundo é o seguinte). */
+const WALK = { down: 3, up: 5, left: 7, right: 7 };
+const actorFrame = (a) => (a.moving && a.prog < 0.5 ? WALK[a.dir] + ((a.steps ?? 0) % 2) : STAND[a.dir]);
 const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 
 /**
@@ -58,15 +61,24 @@ export class HubRenderer {
     const mapW = hub.map.width * size;
     const mapH = hub.map.height * size;
     const p = hub.player;
+    const scene = hub.scene;
 
     // a câmera segue o jogador sem sair do mapa; mapa pequeno (um cômodo) fica no
-    // meio. Na vertical, conta só a área abaixo da barra do topo.
+    // meio. Na vertical, conta só a área abaixo da barra do topo. Numa cena, ela pode
+    // ir até outro tile (o passo `camera` de game/Cutscene.js) e tremer (`shake`).
     const top = this.insetTop;
     const areaH = H - top;
-    const ox = mapW <= W ? Math.round((W - mapW) / 2) : Math.round(clamp(W / 2 - (p.fx + 0.5) * size, W - mapW, 0));
-    const oy = mapH <= areaH
+    const view = scene?.fx.camera ?? { x: p.fx, y: p.fy };
+    let ox = mapW <= W ? Math.round((W - mapW) / 2) : Math.round(clamp(W / 2 - (view.x + 0.5) * size, W - mapW, 0));
+    let oy = mapH <= areaH
       ? Math.round(top + (areaH - mapH) / 2)
-      : Math.round(clamp(top + areaH / 2 - (p.fy + 0.5) * size, H - mapH, top));
+      : Math.round(clamp(top + areaH / 2 - (view.y + 0.5) * size, H - mapH, top));
+    const shake = scene?.fx.shake;
+    if (shake) {
+      const now = performance.now();
+      ox += Math.round(Math.sin(now / 23) * shake.power * S);
+      oy += Math.round(Math.cos(now / 31) * shake.power * S);
+    }
     this.offset = { x: ox, y: oy };
 
     ctx.imageSmoothingEnabled = false;
@@ -85,14 +97,15 @@ export class HubRenderer {
       actors.push({ y: item.y, order: 0, draw: () => this._sprite(`npc/${item.sprite}`, 0, false, item.x, item.y, item.oy ?? 0) });
     }
     for (const npc of hub.npcs) {
-      actors.push({ y: npc.y, order: 1, draw: () => this._sprite(`npc/${npc.sprite}`, STAND[npc.dir], npc.dir === 'right', npc.x, npc.y, 0) });
+      if (npc.hidden) continue;
+      // numa cena, as pessoas do lugar também andam (game/Cutscene.js)
+      actors.push({ y: npc.y, order: 1, draw: () => this._sprite(`npc/${npc.sprite}`, actorFrame(npc), npc.dir === 'right', npc.x, npc.y, 0) });
     }
     actors.push({ y: p.fy, order: 2, draw: () => this._player(hub) });
-    // a cena do Maxie (0.37): ele anda pela vila como as pessoas dela
-    const m = hub.scene?.maxie;
-    if (m && !m.hidden) {
-      const frame = m.moving && m.prog < 0.5 ? { down: 3, up: 5, left: 7, right: 7 }[m.dir] + (m.steps % 2) : STAND[m.dir];
-      actors.push({ y: m.y, order: 1, draw: () => this._sprite('dive/maxie', frame, m.dir === 'right', m.x, m.y, 0) });
+    // os atores da cena (o Maxie, o rival...) andam pela vila como as pessoas dela
+    for (const a of scene?.cast ?? []) {
+      if (a.hidden) continue;
+      actors.push({ y: a.y, order: 1, draw: () => this._sprite(a.sprite, actorFrame(a), a.dir === 'right', a.x, a.y, 0) });
     }
     actors.sort((a, b) => a.y - b.y || a.order - b.order);
     for (const actor of actors) actor.draw();
@@ -101,9 +114,9 @@ export class HubRenderer {
     if (cover) ctx.drawImage(cover.img, ox, oy, mapW, mapH);
     for (const item of decor) if (item.piece) this._piece(item, '-top');
 
-    if (hub.scene) this._scene(hub.scene);
+    if (scene) this._scene(scene);
 
-    const fade = hub.fadeAlpha;
+    const fade = Math.max(hub.fadeAlpha, scene?.fx.fade ?? 0);
     if (fade > 0) {
       ctx.fillStyle = `rgba(0, 0, 0, ${fade.toFixed(3)})`;
       ctx.fillRect(0, 0, W, H);
@@ -111,17 +124,18 @@ export class HubRenderer {
   }
 
   /**
-   * Os efeitos da cena do Maxie (game/MaxieScene.js), em tiles da vila: o "!", a
-   * Poké Ball, o clarão, o pássaro do Voar (levando o Maxie) e o corte de tela com
-   * as listras e o Crobat.
+   * Os efeitos das cenas (game/Cutscene.js), em tiles da vila: o "!", a Poké Ball,
+   * o clarão, o pássaro do Voar (levando alguém) e o corte de tela com as listras e
+   * o Pokémon passando.
    */
   _scene(scene) {
-    const ctx = this.ctx, S = this.scale, size = T * S, fx = scene.fx, m = scene.maxie;
+    const ctx = this.ctx, S = this.scale, size = T * S, fx = scene.fx;
     const at = (x, y) => ({ x: this.offset.x + x * size, y: this.offset.y + y * size });
-    if (fx.emote && !m.hidden) {
+    const who = fx.emote ? scene.where(fx.emote.who) : null;
+    if (who && !who.hidden) {
       const sheet = getSheet('dive/exclam');
       const k = Math.min(1, scene.t / 0.15);
-      const q = at(m.x, m.y - 1);
+      const q = at(who.x, who.y - 1);
       if (sheet) ctx.drawImage(sheet.img, q.x, q.y - (1 - k) * 6 * S, 16 * S, 16 * S);
     }
     if (fx.ball) {
@@ -140,19 +154,17 @@ export class HubRenderer {
       if (bird.flip) { ctx.translate(q.x + 32 * S, q.y + bob); ctx.scale(-1, 1); ctx.drawImage(birdSheet.img, 0, 0, 32 * S, 32 * S); }
       else ctx.drawImage(birdSheet.img, q.x, q.y + bob, 32 * S, 32 * S);
       ctx.restore();
-      // levando o Maxie pendurado
-      if (bird.carry) {
-        const mx = getSheet('dive/maxie');
-        if (mx) ctx.drawImage(mx.img, 0, 0, 16, 32, q.x + 8 * S, q.y + bob + 18 * S, 16 * S, 32 * S);
-      }
+      // levando alguém pendurado (o Maxie)
+      const carried = bird.carry ? getSheet(scene.actor(bird.who)?.sprite) : null;
+      if (carried) ctx.drawImage(carried.img, 0, 0, 16, 32, q.x + 8 * S, q.y + bob + 18 * S, 16 * S, 32 * S);
     }
-    if (fx.cutin != null) this._cutin(scene, fx.cutin);
+    if (fx.cutin) this._cutin(scene, fx.cutin.t, fx.cutin.sprite);
   }
 
-  /** O corte de tela do Voar: a faixa com as listras correndo e o Crobat passando. */
-  _cutin(scene, t) {
+  /** O corte de tela do Voar: a faixa com as listras correndo e o Pokémon (o Crobat) passando. */
+  _cutin(scene, t, sprite) {
     const ctx = this.ctx, S = this.scale, W = this.canvas.width, H = this.canvas.height;
-    const band = getSheet(scene.band), crobat = getSheet('dive/crobat');
+    const band = getSheet(scene.band), crobat = getSheet(sprite);
     if (!band) return;
     const open = Math.min(1, t / 0.2) * Math.min(1, Math.max(0, (2.1 - t) / 0.2));
     const h = 80 * S * open, y0 = H / 2 - h / 2;

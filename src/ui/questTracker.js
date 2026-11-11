@@ -62,6 +62,14 @@ export class QuestTracker {
     this.render();
   }
 
+  /** Uma quest abriu sem outra fechar (o passo `quest` das cenas, 0.39): ela entra deslizando. */
+  announce() {
+    if (this.flash) return;   // a comemoração em curso já mostra as novas quando acabar
+    const now = this.game.quests.tracked().map((q) => q.id);
+    this.fresh = new Set(now.filter((id) => !this.shownIds.includes(id)));
+    this.render();
+  }
+
   /** Redesenha o rastreador da vila e o do mapa da jornada. */
   render() {
     const list = this.flash ?? this.game.quests.tracked();

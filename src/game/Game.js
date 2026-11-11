@@ -19,7 +19,8 @@ import { DiveHUD } from '../ui/diveHud.js';
 import { DIVE } from '../data/dive.js';
 import { KyogreHall } from './KyogreHall.js';
 import { KyogreHallRenderer } from '../render/KyogreHallRenderer.js';
-import { MaxieScene, SCENE_SPOTS } from './MaxieScene.js';
+import { Cutscene } from './Cutscene.js';
+import { CUTSCENES } from '../data/cutscenes.js';
 import { showHallCard, hideHallCard } from '../ui/hallCard.js';
 import { HubRenderer } from '../render/HubRenderer.js';
 import { HubHUD } from '../ui/hubHud.js';
@@ -41,7 +42,7 @@ import { POKEMON, getPokemon } from '../data/pokemon.js';
 import { ENEMIES } from '../data/enemies.js';
 import { MusicPlayer } from '../audio/music.js';
 import { swapWithPC, moveMon, normalizePC, fixDuplicateUids } from '../systems/pc.js';
-import { getMartItem, itemEvolutions } from '../data/items.js';
+import { getMartItem, itemEvolutions, KEY_ITEMS } from '../data/items.js';
 import { getDecor, decorMax } from '../data/decor.js';
 import { evolveMember, learnNextMove } from '../systems/moves.js';
 import { nextMoveFor } from '../data/tms.js';
@@ -58,7 +59,7 @@ import { maxHpFor } from '../systems/stats.js';
 /** Onde o jogador acorda depois de perder as bolhas: na frente da enfermeira do Centro. */
 const HUB_RESCUE_SPOT = { map: 'centro', x: 4, y: 5, dir: 'up' };
 /** A volta à superfície (o salão do Kyogre): na frente da lagoa da vila. */
-const LAKE_SPOT = SCENE_SPOTS.lagoa;
+const LAKE_SPOT = { map: 'vila', ...CUTSCENES.maxie_lagoa.spot };
 /** A música calma da vila e do mapa da jornada (0.37.7, escolha do Fellipe): as Ilhas 1, 2 e 3, do FireRed. */
 const VILLAGE_MUSIC = 'mus_sevii_123';
 const MAX_CATCH_UP = 60;
@@ -118,6 +119,8 @@ export class Game {
     this.captureOpen = false;
     this.evolutionOpen = false;
     this.introOpen = false;
+    this.storyOpen = false;     // o evento de história na fase (0.39)
+    this.storyPage = 0;
     this.lastTime = 0;
     this.autosaveTimer = 0;
 
@@ -291,6 +294,9 @@ export class Game {
       case 'intro':
         if (!this.introOpen) this.openLeaderIntro();
         break;
+      case 'story':
+        if (!this.storyOpen) this.openStoryEvent();
+        break;
       case 'victory':
         this.endRun(true);
         break;
@@ -332,6 +338,8 @@ export class Game {
    * aparece, então a vitória avisa por um toast.
    */
   storyEvent(on, target = null) {
+    // entrar num lugar pode começar uma cena (o trigger 'enter', 0.39): o discurso do Carvalho
+    if (on === 'enter') this.sceneTrigger('enter', target);
     const completed = this.quests.notify(on, target);
     if (!completed.length) return;
     this.questTracker.celebrate(completed);
@@ -468,6 +476,7 @@ export class Game {
 
   /** O botão Mapa da jornada (e o Start do controle): só depois do inicial. */
   hubOpenMap() {
+    if (this.hub.scene) return;   // no meio de uma cena, o mapa espera ela acabar (0.39)
     if (!this.campaign.starter) {
       toast('Fale com o Prof. Carvalho primeiro: ele está no laboratório.', '🔒');
       return;
@@ -651,6 +660,8 @@ export class Game {
     options.ownedElsewhere = (journey?.pc ?? []).map((m) => m.pokemonId);   // lendário: um de cada
     options.trainer = this.profile.trainer;
     options.campaignStarter = this.campaign.starter;
+    // os eventos de história da fase (0.39) aparecem uma vez por jornada
+    options.storySeen = Object.keys(this.campaign.scenes ?? {}).filter((id) => this.campaign.scenes[id] === 'seen');
 
     this.run = new Run(stageId, options);
     // o Endless aquático (0.37): a fase já começa sem fim, sem líder
@@ -664,6 +675,7 @@ export class Game {
     this.unlockOpen = false;
     this.captureOpen = false;
     this.evolutionOpen = false;
+    this.storyOpen = false;
     this.autosaveTimer = 0;
 
     // registra na Pokédex quem entra em campo
@@ -738,6 +750,7 @@ export class Game {
     if (action.startsWith('pad:')) { this.handlePad(action.slice(4)); return; }
     // o A e o B da vila (Enter/Espaço/Z e X/Backspace)
     if (action === 'confirm' || action === 'cancel') {
+      if (this.storyOpen) { if (action === 'confirm') this.advanceStory(); return; }
       if (this.diveOpen) {
         if (this.diveHud.defeatOpen) { if (action === 'confirm') this.diveContinue(); else this.diveGiveUp(); return; }
         if (action === 'confirm') (this.hall.active ? this.hall : this.dive).confirm();
@@ -793,6 +806,7 @@ export class Game {
       return;
     }
     if (button === 'start' && this.run?.state === 'paused') { this.togglePause(); return; }
+    if (this.storyOpen && button === 'a') { this.advanceStory(); return; }
     // na vila: o A fala, o B cancela (segurado, corre), o Start abre o mapa; o direcional anda
     if (this.hubOpen && !this.menus.openModal) {
       if (button === 'a') this.hub.confirm();
@@ -918,6 +932,40 @@ export class Game {
     this.run.pendingIntro = null;
     if (this.run.state === 'intro') this.run.state = 'running';
     this.input.clear();
+  }
+
+  /**
+   * Um evento de história na fase (0.39, `stage.story`): a partida pausa e a caixa
+   * de texto aparece com o retrato, uma página por vez.
+   */
+  openStoryEvent() {
+    const event = this.run.pendingStory;
+    if (!event) { if (this.run.state === 'story') this.run.state = 'running'; return; }
+    this.storyOpen = true;
+    this.storyPage = 0;
+    this._showStoryPage(event);
+  }
+
+  _showStoryPage(event) {
+    const text = this.hub._fill(event.lines[this.storyPage], this.hub._context());
+    this.hud.showStory(event, text, { last: this.storyPage >= event.lines.length - 1, onNext: () => this.advanceStory() });
+  }
+
+  /** A próxima página; depois da última, a partida continua e o evento conta como visto. */
+  advanceStory() {
+    if (!this.storyOpen || !this.run) return;
+    const event = this.run.pendingStory;
+    this.storyPage++;
+    if (event && this.storyPage < event.lines.length) { this._showStoryPage(event); return; }
+    this.storyOpen = false;
+    this.hud.hideStory();
+    this.run.pendingStory = null;
+    if (this.run.state === 'story') this.run.state = 'running';
+    this.input.clear();
+    if (!event) return;
+    this.sceneRecord[event.id] = 'seen';
+    this.autosave();
+    bus.emit(EVENTS.STORY, { on: 'scene', target: event.id });
   }
 
   /** Mostra a evolução (a partida fica pausada até o jogador confirmar). */
@@ -1224,12 +1272,91 @@ export class Game {
   _maybeMaxieScene(version) {
     if (!this.maxieScenePending || this.hub.scene) return false;
     const record = this.diveRecord;
-    // vindo direto de um save (sem a descida), as folhas da cena ainda não carregaram
-    preloadAssets(['dive/maxie', 'dive/exclam', 'dive/bird', 'dive/crobat', 'dive/band_out', 'dive/band_in']);
-    this.hub.scene = new MaxieScene(this.hub, version, {
-      playerName: this.playerName,
-      onEnd: () => { record.sceneSeen = true; this.autosave(); }
+    // desde a 0.39 é um roteiro de data/cutscenes.js, com o registro de sempre (o do Kyogre)
+    return this.playScene(`maxie_${version}`, { onEnd: () => { record.sceneSeen = true; } });
+  }
+
+  /* ============================ as cenas (0.39) ============================ */
+
+  /** As cenas da jornada: { id: 'started' | 'seen' } (a do Maxie fica no registro do Kyogre). */
+  get sceneRecord() {
+    return (this.campaign.scenes ??= {});
+  }
+
+  /**
+   * Toca a cena `id` (data/cutscenes.js) por cima da vila. Ela se registra como
+   * começada (e o jogo salva: se fechar no meio, ela volta ao continuar) e só conta
+   * como vista no fim. Devolve se começou.
+   */
+  playScene(id, { onEnd = null } = {}) {
+    const def = CUTSCENES[id];
+    if (!def || this.hub.scene || (def.map && def.map !== this.hub.mapId)) return false;
+    // vindo direto de um save, as folhas da cena ainda não carregaram
+    preloadAssets([...(def.preload ?? []), ...Object.values(def.actors ?? {}).map((a) => a.sprite)]);
+    const record = def.record !== false;
+    if (record) { this.sceneRecord[id] = 'started'; this.autosave(); }
+    this.hub.scene = new Cutscene(this.hub, def, {
+      id,
+      fill: (text) => this.hub._fill(text, this.hub._context()),
+      value: (key) => this.hub._context()[key] ?? null,
+      give: (item, count) => this.giveItem(item, count),
+      quest: (questId) => this.openQuest(questId),
+      onEnd: () => {
+        if (record) this.sceneRecord[id] = 'seen';
+        onEnd?.();
+        this.autosave();
+        // a história: o objetivo `scene` das quests
+        bus.emit(EVENTS.STORY, { on: 'scene', target: id });
+      }
     });
+    return true;
+  }
+
+  /**
+   * Algo que pode começar uma cena aconteceu na vila: entrou num lugar ('enter'),
+   * falou com alguém ('npc') ou escolheu o inicial ('starter'). Toca a primeira
+   * cena daquele lugar com esse trigger, ainda não vista, cujas condições batem.
+   */
+  sceneTrigger(on, target = null) {
+    if (!this.profile.trainer || this.hub.scene || !this.hub.map) return false;
+    const ctx = this.hub._context();
+    for (const [id, def] of Object.entries(CUTSCENES)) {
+      if (!def.trigger?.some((t) => t.on === on && (t.target == null || t.target === target))) continue;
+      if (def.map && def.map !== this.hub.mapId) continue;
+      if (this.sceneRecord[id] === 'seen' || !this.hub._matches(def.when, ctx)) continue;
+      return this.playScene(id);
+    }
+    return false;
+  }
+
+  /** Uma cena que começou e não chegou ao fim (o jogo fechou no meio dela), ou null. */
+  get pendingScene() {
+    const entry = Object.entries(this.campaign.scenes ?? {}).find(([id, state]) => state === 'started' && CUTSCENES[id]?.spot);
+    return entry?.[0] ?? null;
+  }
+
+  /**
+   * Dá um item de uma cena (o passo `give`): os da mochila do Poké Mart vão para
+   * `profile.bag`; os da história (data/items.js, KEY_ITEMS), para a jornada.
+   * Devolve o nome para a caixa de texto, ou null se o item não existe.
+   */
+  giveItem(id, count = 1) {
+    const mart = getMartItem(id);
+    if (mart?.kind === 'bag') {
+      this.profile.bag[id] = (this.profile.bag[id] ?? 0) + count;
+      return mart.name;
+    }
+    const key = KEY_ITEMS[id];
+    if (!key) return null;
+    const items = (this.campaign.keyItems ??= {});
+    items[id] = (items[id] ?? 0) + count;
+    return key.name;
+  }
+
+  /** Abre uma quest (o passo `quest` das cenas): ela entra deslizando no rastreador. */
+  openQuest(id) {
+    if (!this.quests.start(id)) return false;
+    this.questTracker.announce();
     return true;
   }
 
@@ -1249,6 +1376,14 @@ export class Game {
     if (this.campaign.starter && this.maxieScenePending) {
       this.openHub(LAKE_SPOT);
       this._maybeMaxieScene('lagoa');
+      return;
+    }
+    // uma cena que ficou no meio (0.39) volta do começo, no lugar dela
+    const pending = this.pendingScene;
+    if (pending) {
+      const def = CUTSCENES[pending];
+      this.openHub({ map: def.map, ...def.spot });
+      this.playScene(pending);
       return;
     }
     this.openHub('home');

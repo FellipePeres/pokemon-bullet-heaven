@@ -109,7 +109,12 @@ export function createRegionProgress() {
     dive: null,
     // as quests da história (0.38, systems/QuestSystem.js): { active, progress, done }.
     // Nasce na primeira vez que a jornada abre; a de antes das quests é posta em dia pelo doneIf.
-    quests: null
+    quests: null,
+    // as cenas (0.39, data/cutscenes.js) e os eventos de história das fases: { id: 'started' | 'seen' }.
+    // Só 'seen' conta como vista; 'started' volta ao continuar (o jogo fechou no meio).
+    scenes: null,
+    // os itens da história que as cenas dão (data/items.js, KEY_ITEMS): { id: quantidade }
+    keyItems: null
   };
 }
 

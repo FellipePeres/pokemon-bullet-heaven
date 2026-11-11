@@ -4,7 +4,7 @@ import { HUB_MAPS, HUB_DECOR } from '../data/hubMaps.js';
 import { DECOR, decorMax } from '../data/decor.js';
 import { DIALOGUE } from '../data/dialogue.js';
 import { getPokemon } from '../data/pokemon.js';
-import { STAGES } from '../data/stages.js';
+import { STAGES, RIVAL_STARTER } from '../data/stages.js';
 import { bus, EVENTS } from '../core/events.js';
 
 const DIRS = { up: [0, -1], down: [0, 1], left: [-1, 0], right: [1, 0] };
@@ -42,7 +42,7 @@ export class Hub {
     this.path = null;       // os passos de um clique (andar até o tile)
     this.pending = null;    // o que fazer ao chegar (falar, entrar na porta, sair)
     this.awaitStarter = false;
-    this.scene = null;      // a cena do Maxie (0.37, game/MaxieScene.js): enquanto dura, o jogador não anda
+    this.scene = null;      // a cena tocando (0.39, game/Cutscene.js): enquanto dura, o jogador não anda
   }
 
   /* ============================== lugares ============================== */
@@ -50,11 +50,13 @@ export class Hub {
   /** Põe o jogador num lugar: 'bedroom', 'home' ou { map, x, y, dir }. */
   enter(target) {
     const spot = typeof target === 'string' ? HUB.spawn[target] : target;
+    // uma cena pela metade (um save carregado no meio dela) não fica presa (0.37.9); a
+    // que o lugar começa ao chegar (o trigger 'enter' das cenas, 0.39) fica
+    this.scene = null;
     this._load(spot.map);
     this._place(spot.x, spot.y, spot.dir);
     this.dialog = null;
     this.fade = null;
-    this.scene = null;   // uma cena do Maxie pela metade (um save carregado no meio dela) não fica presa (0.37.9)
     this.awaitStarter = false;
   }
 
@@ -84,7 +86,7 @@ export class Hub {
   /** O tile em si (sem contar quem está em cima). */
   floor(x, y) { return this.inside(x, y) && this.map.walk[y][x] === '.'; }
 
-  npcAt(x, y) { return this.npcs.find((npc) => npc.x === x && npc.y === y) ?? null; }
+  npcAt(x, y) { return this.npcs.find((npc) => !npc.hidden && npc.x === x && npc.y === y) ?? null; }
 
   /**
    * O que está enfeitando o lugar agora: as peças fixas (a bola do inicial
@@ -93,7 +95,10 @@ export class Hub {
    */
   get decor() {
     const ctx = { starterId: this.campaign.starter };
-    const fixed = (this.place.decor ?? []).filter((d) => !d.hideIf || !this._matches(d.hideIf, ctx));
+    // `hideIf` é uma condição ou uma lista delas (some se qualquer uma bater: a bola do
+    // inicial do jogador e, depois da cena do rival, a dele, 0.39)
+    const hidden = (cond) => (Array.isArray(cond) ? cond : [cond]).some((c) => this._matches(c, ctx));
+    const fixed = (this.place.decor ?? []).filter((d) => !d.hideIf || !hidden(d.hideIf));
     return this.mapId === HUB.room ? [...fixed, ...this._roomDecor()] : fixed;
   }
 
@@ -154,11 +159,16 @@ export class Hub {
     if (!this.map) return;
     if (this.banner && (this.banner.t -= dt) <= 0) this.banner = null;
     if (this.fade) { this._updateFade(dt); return; }
-    // a cena do Maxie (0.37): o roteiro anda, e a caixa de texto é a da vila
+    // uma cena (0.37 o Maxie; 0.39 o motor de game/Cutscene.js): o roteiro anda, e a
+    // caixa de texto é a da vila. No fim, a ação que ela deixou (abrir a escolha do inicial...)
     if (this.scene) {
       this.scene.update(dt);
       if (this.dialog) this._updateDialog(dt);
-      if (this.scene?.done) this.scene = null;
+      if (this.scene?.done) {
+        const then = this.scene.then;
+        this.scene = null;
+        if (then) this._act(then);
+      }
       return;
     }
     this._updateNpcs(dt);
@@ -367,6 +377,8 @@ export class Hub {
     if (npc) {
       if (!npc.counter) npc.dir = OPPOSITE[p.dir];
       npc.timer = between(...CONFIG.hub.lookEvery);
+      // falar com alguém pode começar uma cena (o trigger 'npc', 0.39) no lugar da fala
+      if (this.game.sceneTrigger?.('npc', npc.id)) return true;
       this.say(npc.talk, { npc });
       return true;
     }
@@ -457,6 +469,8 @@ export class Hub {
     this.awaitStarter = false;
     const oak = this.npcs.find((npc) => npc.id === 'carvalho');
     if (oak) this._faceToward(oak, this.player);
+    // a cena do rival (0.39), que termina com esta mesma fala do Carvalho
+    if (this.game.sceneTrigger?.('starter')) return;
     this.say('carvalho_inicial', { npc: oak });
   }
 
@@ -496,9 +510,13 @@ export class Hub {
       diveRescued: (campaign.dive?.rescues ?? 0) > 0,
       locked: !!extra.locked,
       quests: game.quests?.state ?? null,   // a história (0.38): as condições quest e questDone
+      scenes: campaign.scenes ?? {},        // as cenas vistas (0.39): a condição scene
       item: extra.item ?? '',
       player: game.playerName,
       pokemon: campaign.starter ? getPokemon(campaign.starter)?.name ?? '' : '',
+      // o inicial do rival: o que leva vantagem sobre o do jogador (data/stages.js)
+      rivalStarter: RIVAL_STARTER[campaign.starter] ?? null,
+      rival: RIVAL_STARTER[campaign.starter] ? getPokemon(RIVAL_STARTER[campaign.starter])?.name ?? '' : '',
       leader: leaderStage ? titleCase(leaderStage.leader.name) : ''
     };
   }
@@ -517,6 +535,9 @@ export class Hub {
         // a história (0.38): a quest `value` está ativa / já fechou
         case 'quest': if (!ctx.quests?.active.includes(value)) return false; break;
         case 'questDone': if (!ctx.quests?.done[value]) return false; break;
+        // as cenas (0.39): a cena `value` já foi vista; a flag `value` da vila está marcada
+        case 'scene': if (ctx.scenes?.[value] !== 'seen') return false; break;
+        case 'flag': if (!this._flags()[value]) return false; break;
         default: return false;   // condição desconhecida: a fala não vale (o check-data acusa)
       }
     }
@@ -527,6 +548,7 @@ export class Hub {
     return text
       .replaceAll('{player}', ctx.player)
       .replaceAll('{pokemon}', ctx.pokemon)
+      .replaceAll('{rival}', ctx.rival ?? '')
       .replaceAll('{leader}', ctx.leader)
       .replaceAll('{dex}', String(ctx.dex))
       .replaceAll('{badges}', String(ctx.badges))

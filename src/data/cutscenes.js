@@ -1,0 +1,212 @@
+/**
+ * AS CENAS (0.39, PLANEJAMENTO-HISTORIA.md seção 9) — os roteiros que o
+ * game/Cutscene.js toca por cima da vila. Enquanto uma cena dura, o jogador não
+ * anda; a caixa de texto é a da vila. A regra do Maxie vale para todas: **a cena
+ * só conta como vista quando chega ao fim**. Se o jogo fechar no meio, ela volta
+ * do começo ao continuar, com o jogador no `spot`.
+ *
+ * Cada cena:
+ *   map       o lugar da vila (data/hub.js) onde ela acontece
+ *   spot      onde o jogador fica quando ela volta pendente
+ *   trigger   o que começa a cena: { on: 'enter', target: lugar } (entrou no lugar),
+ *             { on: 'npc', target: id } (falou com alguém do lugar) ou { on: 'starter' }
+ *             (acabou de escolher o inicial). Sem trigger, só o código a começa (a do Maxie).
+ *   when      as condições das falas (data/dialogue.js) para o trigger valer
+ *   record    false: não se registra em `campaign.scenes` (a do Maxie usa o registro do Kyogre)
+ *   band      a faixa do corte de tela (passo `cutin`)
+ *   actors    quem entra só na cena: { id: { sprite, x, y, dir, hidden } }. As pessoas do
+ *             lugar (pelo id de data/hub.js) e o jogador ('player') também atuam.
+ *   preload   folhas para carregar antes (as dos atores entram sozinhas)
+ *   steps     os passos, um de cada vez:
+ *     wait   { t }                     espera t segundos
+ *     say    { name, lines }           a caixa de texto ({player}, {pokemon}, {rival}...)
+ *     talk   { key, npc }              uma fala de data/dialogue.js; conta para as quests,
+ *                                      e o `then` dela fica para o fim da cena
+ *     show / hide { who }              alguém aparece ou some
+ *     place  { who, x, y, dir }        põe alguém num tile, sem andar
+ *     walk   { who, path | to, speed, bird }
+ *                                      anda pelos tiles de `path`; ou, com `to` ([x, y, dir?]...),
+ *                                      até o primeiro desses tiles que estiver livre, pelo caminho
+ *                                      mais curto, e vira para `dir`. `speed`: segundos por tile.
+ *     face   { who, dir | toward }     vira para uma direção ou para alguém
+ *     emote  { who }                   o "!" em cima de alguém
+ *     throw  { who }                   solta uma Poké Ball, com o clarão
+ *     cutin  { sprite }                o corte de tela com as listras (`band`) e um Pokémon passando
+ *     bird   { who, mode }             o pássaro do Voar: 'in', 'grab', 'away' ou 'gone'
+ *     fade   { to, t }                 escurece (to: 1) ou clareia (to: 0) a tela
+ *     camera { x, y, t } / { to: 'player', t }
+ *                                      leva a câmera até um tile, e de volta ao jogador
+ *     shake  { t, power, wait }        treme a tela (wait: false segue sem esperar)
+ *     give   { item, count, silent }   dá um item (da mochila ou da história) e avisa na caixa
+ *     quest  { id }                    abre uma quest (data/quests.js)
+ *     flag   { name, value }           marca uma flag da vila (as falas `once`, os enfeites `hideIf`)
+ *     end    { then }                  o fim: só aqui a cena conta como vista; `then` é uma
+ *                                      ação das falas (data/dialogue.js), como 'starter'
+ *   Um passo pode mudar com a jornada: `pick: 'rivalStarter'` e `cases: { squirtle: {...} }`
+ *   juntam ao passo o caso daquele valor do contexto das falas.
+ */
+
+// a cena do Maxie (0.37, PLANEJAMENTO-DIVE.md seção 10), igual à de antes, agora em dados
+const MAXIE = [
+  'Não acredito que cheguei tarde!',
+  'Você capturou o lendário Kyogre!',
+  'Não posso deixar que isso aconteça com os próximos...'
+];
+const MAXIE_END = 'A caminho do vulcão! O próximo lendário será meu!';
+const MAXIE_SHEETS = ['dive/maxie', 'dive/exclam', 'dive/bird', 'dive/crobat', 'dive/band_out', 'dive/band_in'];
+
+const OAK = 'Prof. Carvalho';
+
+export const CUTSCENES = {
+  /* ============================ o Maxie (0.37) ============================ */
+
+  // na frente da lagoa: voltou à superfície com o Kyogre
+  maxie_lagoa: {
+    map: 'vila', spot: { x: 30, y: 11, dir: 'down' }, record: false,
+    band: 'dive/band_out',
+    actors: { maxie: { sprite: 'dive/maxie', x: 21, y: 12, dir: 'right', hidden: true } },
+    preload: MAXIE_SHEETS,
+    steps: [
+      { do: 'wait', t: 0.6 },
+      { do: 'say', lines: ['{player} voltou à superfície pela lagoa, com o Kyogre!'] },
+      { do: 'show', who: 'maxie' },
+      { do: 'walk', who: 'maxie', path: [[22, 12], [23, 12], [24, 12], [25, 12], [26, 12], [27, 12], [28, 12], [29, 12], [30, 12]], speed: 0.13 },
+      { do: 'face', who: 'maxie', dir: 'up' }, { do: 'face', who: 'player', dir: 'down' },
+      { do: 'emote', who: 'maxie' },
+      { do: 'say', name: 'Maxie', lines: MAXIE },
+      { do: 'throw', who: 'maxie' },
+      { do: 'cutin', sprite: 'dive/crobat' },
+      { do: 'bird', who: 'maxie', mode: 'in' },
+      { do: 'say', name: 'Maxie', lines: [MAXIE_END] },
+      { do: 'bird', who: 'maxie', mode: 'grab' },
+      { do: 'bird', who: 'maxie', mode: 'away' },
+      { do: 'wait', t: 0.6 },
+      { do: 'end' }
+    ]
+  },
+
+  // no Centro Pokémon: caiu na maré final e o pescador trouxe
+  maxie_centro: {
+    map: 'centro', spot: { x: 4, y: 5, dir: 'up' }, record: false,
+    band: 'dive/band_in',
+    actors: { maxie: { sprite: 'dive/maxie', x: 2, y: 9, dir: 'up', hidden: true } },
+    preload: MAXIE_SHEETS,
+    steps: [
+      { do: 'wait', t: 0.4 },
+      { do: 'say', name: 'Enfermeira', lines: [
+        'Ah, você acordou! O pescador da lagoa trouxe você até aqui.',
+        'Disse que fisgou você desmaiado lá no fundo... e que foi o maior peixe da vida dele.',
+        'E o Pokémon gigante que veio com você também está bem.'
+      ] },
+      { do: 'show', who: 'maxie' },
+      { do: 'walk', who: 'maxie', path: [[2, 8], [2, 7], [3, 7], [4, 7], [4, 6]], speed: 0.13 },
+      { do: 'face', who: 'maxie', dir: 'up' }, { do: 'face', who: 'player', dir: 'down' },
+      { do: 'emote', who: 'maxie' },
+      { do: 'say', name: 'Maxie', lines: MAXIE },
+      { do: 'throw', who: 'maxie' },
+      { do: 'cutin', sprite: 'dive/crobat' },
+      { do: 'bird', who: 'maxie', mode: 'in' },
+      { do: 'say', name: 'Maxie', lines: [MAXIE_END] },
+      // dentro de casa não dá para voar: ele sai correndo pela porta com o Crobat
+      { do: 'walk', who: 'maxie', path: [[4, 7], [3, 7], [2, 7], [2, 8], [2, 9]], speed: 0.13, bird: true },
+      { do: 'hide', who: 'maxie' }, { do: 'bird', who: 'maxie', mode: 'gone' },
+      { do: 'wait', t: 0.6 },
+      { do: 'end' }
+    ]
+  },
+
+  /* ============================ o prólogo (0.39) ============================ */
+
+  // 1. o discurso do Carvalho, encenado: ele chama o jogador, olha o quadro e vai até a mesa
+  prologo_carvalho: {
+    map: 'lab', spot: { x: 6, y: 11, dir: 'up' },
+    trigger: [{ on: 'enter', target: 'lab' }, { on: 'npc', target: 'carvalho' }],
+    when: { starter: false, veteran: false },
+    steps: [
+      { do: 'wait', t: 0.3 },
+      { do: 'camera', x: 6, y: 4, t: 0.6 },
+      { do: 'face', who: 'carvalho', dir: 'down' },
+      { do: 'emote', who: 'carvalho' },
+      { do: 'say', name: OAK, lines: ['Ah, aí está você, {player}! Entre, entre. Antes de tudo, precisamos conversar.'] },
+      { do: 'camera', to: 'player', t: 0.5 },
+      { do: 'walk', who: 'player', to: [[6, 4, 'up']] },
+      { do: 'face', who: 'carvalho', toward: 'player' },
+      { do: 'say', name: OAK, lines: [
+        'Você quer ser o Campeão de Kanto, eu sei. E esse sonho continua possível.',
+        'Mas preciso ser honesto: as rotas não são mais como antes. As hordas mudaram.'
+      ] },
+      // ele se vira para o quadro, como quem ainda procura a resposta
+      { do: 'face', who: 'carvalho', dir: 'up' },
+      { do: 'wait', t: 0.6 },
+      { do: 'say', name: OAK, lines: [
+        'Os Pokémon selvagens andam em bandos de dezenas e cercam qualquer treinador que passa.',
+        'Isso não é natural. Um Pokémon não abandona a própria casa sem motivo... Alguma coisa aconteceu.'
+      ] },
+      { do: 'face', who: 'carvalho', dir: 'down' },
+      { do: 'say', name: OAK, lines: [
+        'Ser Campeão é um sonho bonito. Mas o ideal, de verdade, era resolver o problema das hordas.',
+        'Fazer as rotas voltarem a ser o que eram: um lugar de paz, de encontros, e não de caos.',
+        'Sozinho, eu não consigo. Mas um treinador que atravessa Kanto inteira... talvez consiga.'
+      ] },
+      // e vai para trás da mesa das Poké Balls; o jogador para na frente dela
+      { do: 'walk', who: 'carvalho', path: [[7, 3], [8, 3], [9, 3]] },
+      { do: 'face', who: 'carvalho', dir: 'down' },
+      { do: 'walk', who: 'player', to: [[8, 5, 'up']] },
+      { do: 'say', name: OAK, lines: ['Ninguém atravessa Kanto sozinho. Por isso quero que você leve um destes três.'] },
+      { do: 'end', then: 'starter' }
+    ]
+  },
+
+  // 2. o rival chega atrasado, pega o inicial com vantagem sobre o seu e acha bobagem
+  // se preocupar com as hordas (decisão 1 do planejamento)
+  prologo_rival: {
+    map: 'lab', spot: { x: 8, y: 5, dir: 'up' },
+    trigger: [{ on: 'starter' }],
+    actors: { rival: { sprite: 'npc/rival', x: 6, y: 12, dir: 'up', hidden: true } },
+    steps: [
+      // voltando pendente, a bola dele ainda está na mesa
+      { do: 'flag', name: 'rival_inicial', value: false },
+      { do: 'wait', t: 0.5 },
+      { do: 'show', who: 'rival' },
+      { do: 'say', name: 'Rival', lines: ['Vô! Cheguei! Cadê o meu Pokémon?'] },
+      { do: 'face', who: 'player', toward: 'rival' },
+      { do: 'face', who: 'carvalho', toward: 'rival' },
+      { do: 'say', name: OAK, lines: ['Atrasado como sempre! {player} chegou primeiro e já escolheu.'] },
+      // até a bola com vantagem sobre o inicial do jogador (como no FireRed)
+      { do: 'walk', who: 'rival', speed: 0.16, pick: 'rivalStarter', cases: {
+        bulbasaur: { to: [[8, 5, 'up'], [8, 3, 'down']] },
+        squirtle: { to: [[9, 5, 'up'], [9, 3, 'down']] },
+        charmander: { to: [[10, 5, 'up'], [10, 3, 'down']] }
+      } },
+      { do: 'say', name: 'Rival', lines: ['Então eu fico com este!'] },
+      { do: 'flag', name: 'rival_inicial' },
+      { do: 'say', lines: ['O rival pegou o {rival}!'] },
+      { do: 'face', who: 'rival', toward: 'player' },
+      { do: 'face', who: 'player', toward: 'rival' },
+      { do: 'say', name: 'Rival', lines: ['O meu {rival} leva vantagem contra o seu {pokemon}. Já comecei na frente!'] },
+      { do: 'say', name: OAK, lines: ['Eu estava contando a {player} sobre as hordas. Você também devia ouvir.'] },
+      { do: 'face', who: 'rival', toward: 'carvalho' },
+      { do: 'say', name: 'Rival', lines: [
+        'Hordas, hordas... Vô, eu quero é ser Campeão!',
+        'Os Pokémon selvagens que se virem. Eu vou juntar as oito insígnias.'
+      ] },
+      { do: 'face', who: 'rival', toward: 'player' },
+      { do: 'say', name: 'Rival', lines: ['A gente se vê na Liga, {player}. Se você chegar lá!'] },
+      { do: 'walk', who: 'rival', to: [[6, 12]], speed: 0.13 },
+      { do: 'hide', who: 'rival' },
+      { do: 'face', who: 'carvalho', toward: 'player' },
+      { do: 'face', who: 'player', toward: 'carvalho' },
+      { do: 'say', name: OAK, lines: ['Esse meu neto... Sonha alto, mas ainda não entendeu o que está acontecendo lá fora.'] },
+      // o fim de antes: o Mapa da Jornada e o "volte e me conte" (fecha a quest do Carvalho)
+      { do: 'talk', key: 'carvalho_inicial', npc: 'carvalho' },
+      { do: 'end' }
+    ]
+  }
+};
+
+/** Os passos que o game/Cutscene.js conhece (o check-data confere). */
+export const CUTSCENE_STEPS = ['wait', 'say', 'talk', 'show', 'hide', 'place', 'walk', 'face', 'emote', 'throw', 'cutin',
+  'bird', 'fade', 'camera', 'shake', 'give', 'quest', 'flag', 'end'];
+
+/** O que pode começar uma cena. */
+export const CUTSCENE_TRIGGERS = ['enter', 'npc', 'starter'];

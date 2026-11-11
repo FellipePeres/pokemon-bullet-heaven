@@ -171,6 +171,7 @@ export const HUB_SPRITES = {
   'npc/pidgey': { src: 'assets/hub/npc/pidgey.png', frameWidth: 16, frameHeight: 16, frames: 3 },
   'npc/pikachu': { src: 'assets/hub/npc/pikachu.png', frameWidth: 16, frameHeight: 16, frames: 3 },
   'npc/prof_oak': { src: 'assets/hub/npc/prof_oak.png', frameWidth: 16, frameHeight: 32, frames: 9 },
+  'npc/rival': { src: 'assets/hub/npc/rival.png', frameWidth: 16, frameHeight: 32, frames: 9 },
   'npc/scientist': { src: 'assets/hub/npc/scientist.png', frameWidth: 16, frameHeight: 32, frames: 10 },
   'npc/woman_1': { src: 'assets/hub/npc/woman_1.png', frameWidth: 16, frameHeight: 32, frames: 10 },
   'npc/worker_f': { src: 'assets/hub/npc/worker_f.png', frameWidth: 16, frameHeight: 32, frames: 10 },

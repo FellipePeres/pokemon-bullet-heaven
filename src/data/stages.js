@@ -930,6 +930,13 @@ export const STAGES = {
 };
 
 /**
+ * O inicial do rival (0.39, a cena do laboratório em data/cutscenes.js): o que leva
+ * vantagem sobre o do jogador, como no FireRed. É o mesmo do time dele no Campeão
+ * (`bossTeamByStarter`: Blastoise, Charizard ou Venusaur).
+ */
+export const RIVAL_STARTER = { charmander: 'squirtle', bulbasaur: 'charmander', squirtle: 'bulbasaur' };
+
+/**
  * CAMPANHA — a jornada por Kanto, ginásio a ginásio, até o Campeão.
  * Uma entrada `{ comingSoon: true, name, icon, portrait, description }` aparece no
  * mapa como "em breve": é como uma região nova começa antes de ter as fases.
