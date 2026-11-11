@@ -149,7 +149,8 @@ não abre até você vencer.
   são roteiros em dados, com câmera, gente andando, itens e quests. A história
   acontece antes e depois das fases, nunca no meio delas, sempre em tela cheia: depois
   da Fase 1, no ginásio dele, o Brock pede a sua ajuda para entender o que está
-  acontecendo com os Pokémon.
+  acontecendo com os Pokémon, e de volta à vila o velho sábio conta que os
+  pássaros lendários sumiram dos céus.
 - **Os 151 Pokémon de Kanto jogáveis**, cada um com linha de 3 golpes e linha
   evolutiva. Alguns chegam como presente, como no FireRed (Farfetch'd, Lickitung e
   o prêmio do Dojo de Saffron: Hitmonlee ou Hitmonchan).

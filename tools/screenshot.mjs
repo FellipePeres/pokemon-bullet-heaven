@@ -69,8 +69,8 @@ const ROTEIROS = {
     { run: 'game.openCampaign()' }, { wait: 2600 }, { shot: 'quests-06-jornada' },
     { run: "game.startStage('gym_1_pewter')" }, { wait: 1500 }, { shot: 'quests-07-partida' }
   ],
-  // as cenas (0.39, data/cutscenes.js): o discurso do Carvalho encenado, o rival, a cena do Brock
-  // depois da Fase 1 (em tela cheia, nunca no meio da fase) e a do Maxie, no motor novo (game/Cutscene.js)
+  // as cenas (0.39, data/cutscenes.js): o discurso do Carvalho encenado, o rival, as cenas do Brock
+  // e do velho sábio depois da Fase 1 (em tela cheia, nunca no meio da fase) e a do Maxie, no motor novo (game/Cutscene.js)
   cenas: [
     { open: 'index.html' }, { wait: 500 },
     { run: "window.skip = (n = 1) => { for (let i = 0; i < n; i++) { const h = game.hub; if (!h.dialog) return; h.dialog.shown = 999; h.confirm(); } };" +
@@ -94,11 +94,16 @@ const ROTEIROS = {
     { run: 'skip(2)' }, { wait: 2400 }, { shot: 'cenas-14-brock-as-rotas' },
     { run: 'skip(2)' }, { wait: 2200 }, { shot: 'cenas-15-brock-pede-ajuda' },
     { run: 'skip(2)' }, { wait: 1500 }, { shot: 'cenas-16-a-quest-nova' },
-    { run: 'skip()' }, { wait: 2800 }, { shot: 'cenas-17-de-volta' },
+    // de volta à vila: o velho sábio sai de casa, vê o jogador e conta dos pássaros
+    { run: 'skip()' }, { wait: 2700 }, { shot: 'cenas-17-o-sabio-sai' },
+    { wait: 900 }, { run: 'skip()' }, { wait: 2600 }, { shot: 'cenas-18-o-sabio-chega' },
+    { run: 'skip(2)' }, { wait: 2400 }, { shot: 'cenas-19-os-passaros' },
+    { run: 'skip(2)' }, { wait: 2400 }, { shot: 'cenas-20-deve-ter-a-ver' },
+    { run: 'skip(2)' }, { wait: 3200 }, { shot: 'cenas-21-livre' },
     { run: "game.hub.scene = null; game.hub.enter({ map: 'vila', x: 30, y: 11, dir: 'down' });" +
            " game.diveRecord.captured = true; game.diveRecord.sceneSeen = false; game._maybeMaxieScene('lagoa')" },
-    { wait: 1000 }, { run: 'skip()' }, { wait: 3600 }, { shot: 'cenas-18-maxie' },
-    { run: 'skip(3)' }, { wait: 1900 }, { shot: 'cenas-19-maxie-crobat' }
+    { wait: 1000 }, { run: 'skip()' }, { wait: 3600 }, { shot: 'cenas-22-maxie' },
+    { run: 'skip(3)' }, { wait: 1900 }, { shot: 'cenas-23-maxie-crobat' }
   ],
   // a melhoria de UX da 0.31: o card de escolha (o inicial e a Poké Ball) e o painel da fase
   ux: [

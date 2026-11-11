@@ -443,12 +443,17 @@ export class Hub {
     if (d.then) this._act(d.then);
   }
 
-  /** De um palco de cena (0.39) para a vila, na frente de casa, escurecendo a tela. */
+  /**
+   * De um palco de cena (0.39) para a vila, escurecendo a tela: na frente de casa ou,
+   * se outra cena espera (a do velho sábio depois da do Brock), no lugar dela, e ela toca.
+   */
   _goHome() {
-    const spot = HUB.spawn.home;
+    const next = this.game.pendingSceneSpot ?? null;
+    const spot = next ?? HUB.spawn.home;
     this._fadeOut(() => {
       this._load(spot.map);
       this._place(spot.x, spot.y, spot.dir);
+      if (next) this.game.playScene(next.id);
       this.game.autosave?.();
     });
   }

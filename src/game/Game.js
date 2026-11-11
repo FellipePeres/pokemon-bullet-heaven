@@ -1313,6 +1313,12 @@ export class Game {
     return entry?.[0] ?? null;
   }
 
+  /** A cena que espera a vila, com o lugar dela ({ id, map, x, y, dir }), ou null. */
+  get pendingSceneSpot() {
+    const id = this.pendingScene;
+    return id ? { id, map: CUTSCENES[id].map, ...CUTSCENES[id].spot } : null;
+  }
+
   /**
    * Arma as cenas de um gatilho que não toca na hora (o 'win': venceu a fase e a cena
    * é na vila). Elas ficam devidas (`due`) e tocam quando o jogador chegar.

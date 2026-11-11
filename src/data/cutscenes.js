@@ -245,6 +245,53 @@ export const CUTSCENES = {
       { do: 'wait', t: 0.6 },
       { do: 'end', then: 'home' }
     ]
+  },
+
+  // logo depois, de volta à vila (pedido do Fellipe): o velho sábio sai de casa, vê o jogador,
+  // o "!", e conta o que reparou: os pássaros lendários sumiram dos céus, e foi aí que tudo
+  // começou. É tudo o que ele sabe; depois ele volta para casa e o jogador está livre.
+  // O jogador aparece na rua, embaixo da casa dele (a volta da Fase 1 chega no `spot`)
+  sabio_passaros: {
+    map: 'vila', spot: { x: 27, y: 21, dir: 'left' },
+    trigger: [{ on: 'win', target: 'gym_1_pewter' }],
+    actors: { sabio: { sprite: 'npc/old_man_1', x: 30, y: 18, dir: 'down', hidden: true } },
+    steps: [
+      { do: 'wait', t: 0.4 },
+      // a câmera sobe um pouco para mostrar a porta dele e o jogador juntos (o rastreador fica no canto de cima)
+      { do: 'camera', x: 28, y: 19, t: 0.6 },
+      // a porta abre: ele sai de casa
+      { do: 'show', who: 'sabio' },
+      { do: 'wait', t: 0.4 },
+      { do: 'face', who: 'sabio', toward: 'player' },
+      { do: 'emote', who: 'sabio' },
+      { do: 'face', who: 'player', toward: 'sabio' },
+      { do: 'say', name: 'Velho sábio', lines: ['{player}! Espere um pouco!'] },
+      { do: 'walk', who: 'sabio', to: [[28, 21, 'left'], [27, 20, 'down']], speed: 0.3 },
+      { do: 'face', who: 'player', toward: 'sabio' },
+      { do: 'say', name: 'Velho sábio', lines: [
+        'Soube que o Brock te pediu ajuda. As notícias correm rápido nesta vila.',
+        'Antes de você seguir para Cerulean, quero te contar uma coisa.'
+      ] },
+      // ele olha para o céu, como faz todas as manhãs
+      { do: 'face', who: 'sabio', dir: 'up' },
+      { do: 'wait', t: 0.8 },
+      { do: 'say', name: 'Velho sábio', lines: [
+        'Faz muitos anos que eu olho o céu todas as manhãs. E reparei numa coisa...',
+        'Os três pássaros lendários de Kanto sumiram dos céus. Faz tempo que ninguém vê nenhum deles.'
+      ] },
+      { do: 'face', who: 'sabio', toward: 'player' },
+      { do: 'say', name: 'Velho sábio', lines: [
+        'Foi depois disso que os Pokémon começaram a agir assim, e as hordas apareceram. Deve ter alguma coisa a ver.',
+        'Mas isso é tudo que eu posso te ajudar, por enquanto. Boa sorte, {player}.'
+      ] },
+      { do: 'wait', t: 0.3 },
+      // e volta para casa
+      { do: 'walk', who: 'sabio', to: [[30, 18, 'up']], speed: 0.3 },
+      { do: 'wait', t: 0.2 },
+      { do: 'hide', who: 'sabio' },
+      { do: 'camera', to: 'player', t: 0.5 },
+      { do: 'end' }
+    ]
   }
 };
 

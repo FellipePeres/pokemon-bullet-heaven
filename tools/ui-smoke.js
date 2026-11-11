@@ -646,9 +646,30 @@ check('...e a quest da Misty ainda não apareceu: quem pede é o Brock', game.qu
         && brockScene.every((d) => d.name === 'Brock'));
   check('a quest nova abre no meio da conversa, depois do pedido', askedFirst && game.quests.isActive('c2_misty'));
   settle();
-  check('no fim, a tela escurece e o jogador volta para a vila, na frente de casa (com a barra de volta)',
-        hub.mapId === 'vila' && hub.player.x === 6 && hub.player.y === 17 && !registry.get('screen-hub').classes.has('cinema')
+  check('no fim, a tela escurece e o jogador aparece na vila (com a barra de volta), na rua embaixo da casa do velho sábio',
+        hub.mapId === 'vila' && hub.player.x === 27 && hub.player.y === 21 && !registry.get('screen-hub').classes.has('cinema')
         && game.sceneRecord.depois_brock === 'seen');
+  // logo depois, a cena do velho sábio (pedido do Fellipe): ele sai de casa, vê o jogador e conta dos pássaros
+  check('...e a cena do velho sábio começa: ele sai de casa', hub.scene?.id === 'sabio_passaros' && game.sceneRecord.sabio_passaros === 'started');
+  let sawPlayer = false, cameOver = null;
+  const sage = runScene((d) => {
+    const s = hub.scene?.actor('sabio');
+    if (d.text.includes('Espere um pouco')) sawPlayer = !s.hidden && s.x === 30 && s.y === 18;
+    if (d.text.includes('Soube que o Brock')) cameOver = `${s.x},${s.y},${s.dir}`;
+  });
+  check('...vê o jogador da porta, com o "!", e chama', sawPlayer && sage[0]?.name === 'Velho sábio');
+  check('...vem até o lado do jogador para conversar', cameOver === '28,21,left', cameOver);
+  check('...sabe que o Brock pediu ajuda e conta que os pássaros lendários sumiram dos céus',
+        said(sage, 'Soube que o Brock te pediu ajuda') && said(sage, 'pássaros lendários de Kanto sumiram dos céus'));
+  check('...que foi depois disso que tudo começou, e que é tudo o que ele pode ajudar por enquanto',
+        said(sage, 'Deve ter alguma coisa a ver') && said(sage, 'isso é tudo que eu posso te ajudar'));
+  check('no fim ele volta para casa e o jogador está livre', !hub.scene && game.sceneRecord.sabio_passaros === 'seen'
+        && (press('left'), hub.player.x === 26 && hub.player.y === 21));
+  hub.enter({ map: 'casa_sabio', x: 3, y: 6, dir: 'up' });
+  hub.interact();
+  check('na casa dele, depois, o sábio lembra da conversa', hub.dialog?.name === 'Velho sábio' && dialogText().includes('Os pássaros lendários sumiram'));
+  closeDialog();
+  hub.enter('home');
   game.questTracker.render();
   check('o rastreador mostra: derrote a Misty e encontre pistas sobre o comportamento dos Pokémon',
         questBox().innerHTML.includes('Capítulo 2') && questBox().innerHTML.includes('Derrote a Misty e encontre pistas sobre o comportamento dos Pokémon'));

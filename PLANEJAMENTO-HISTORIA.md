@@ -98,7 +98,7 @@ quando o jogador volta, ou o lugar da fase antes dela.
 | Capítulo | Quando | O que o jogador descobre | Missão de lendário |
 |---|---|---|---|
 | **Prólogo — O sonho** | na vila, antes da Fase 1 | O Carvalho: as hordas mudaram, ninguém sabe por quê. O sonho de ser Campeão continua possível, mas o ideal é devolver a paz às rotas. | — |
-| **1 — As rotas tomadas** | Fase 1 (Brock) | **Feito na 0.39** (pedido do Fellipe). Depois da vitória, no ginásio de Pewter, em tela cheia: o Brock parabeniza o jogador por ter vencido, conta que os Pokémon estão agindo de um jeito que ninguém viu (os Geodude desceram do Monte Lua), diz que é muito sério e pede ajuda para entender o que está acontecendo. Manda investigar a cidade de Cerulean. É a apresentação do problema; o Maxie não aparece, e não há corte de tela. Abre a quest **"Derrote a Misty e encontre pistas sobre o comportamento dos Pokémon"** (o mapa segue para o ginásio dela). A lenda dos pássaros, do velho sábio, que ficava aqui, ganha o lugar dela na H-4. | — |
+| **1 — As rotas tomadas** | Fase 1 (Brock) | **Feito na 0.39** (pedido do Fellipe). Depois da vitória, no ginásio de Pewter, em tela cheia: o Brock parabeniza o jogador por ter vencido, conta que os Pokémon estão agindo de um jeito que ninguém viu (os Geodude desceram do Monte Lua), diz que é muito sério e pede ajuda para entender o que está acontecendo. Manda investigar a cidade de Cerulean. É a apresentação do problema; o Maxie não aparece, e não há corte de tela. Abre a quest **"Derrote a Misty e encontre pistas sobre o comportamento dos Pokémon"** (o mapa segue para o ginásio dela). Logo depois, de volta à vila: o **velho sábio** sai de casa, vê o jogador (o "!"), vem até ele e conta que soube do pedido do Brock, que os pássaros lendários sumiram dos céus e que foi depois disso que tudo começou ("deve ter alguma coisa a ver"), mas que é tudo o que ele pode ajudar por enquanto. Ele volta para casa, e o jogador fica livre. | — |
 | **2 — O céu vazio** | Fases 2 e 3 (Misty, Surge) | A Misty: o mar ficou bravo desde que o Articuno deixou de ser visto sobre as Ilhas Seafoam. O Surge: a Usina pifou, os Voltorb invadiram Vermilion e ninguém vê o Zapdos há meses. Na vila, os moradores culpam a Equipe Rocket. | — |
 | **3 — Os rastros** | Fases 4 e 5 (Erika, Koga) | A Erika acha, no jardim, uma pena dourada e um pedaço de metal com um emblema vermelho, e o jogador leva os dois ao Carvalho. O Koga viu um vulto de capuz vermelho carregando uma máquina pela Rota 10: "não era da Rocket, o uniforme era outro". | — |
 | **4 — O trovão preso** | Fase 6 (Sabrina) | Antes da Fase 6, perto da Usina, um estrondo vem lá de dentro (a cena de antes da fase). A Sabrina vê "três jaulas e um homem olhando para o mar". Abre a quest **"Investigue a Usina"**: o Zapdos está preso numa máquina com o emblema vermelho. Agora é certeza: **alguém roubou os pássaros**. | **Zapdos** |
@@ -379,7 +379,7 @@ para o objetivo `scene` das quests. O check-data recusa a caixa com retrato
 | 1 | O discurso do Carvalho, encenado | laboratório | Prólogo | H-2 ✅ |
 | 2 | O rival pega o inicial dele (decisão 1) | laboratório | Prólogo | H-2 ✅ |
 | 3 | O Brock pede ajuda | ginásio de Pewter, depois da Fase 1 | 1 | H-2 ✅ |
-| 4 | A lenda dos pássaros | casa do velho sábio | 1 ou 2 (a decidir) | H-4 |
+| 4 | O velho sábio e os pássaros | vila, na volta da Fase 1 | 1 | H-2 ✅ |
 | 5 | A vila culpa a Equipe Rocket | vila (moradores) | 2 | H-4 |
 | 6 | O vulto de vermelho na Rota 10 | antes da Fase 5 | 3 | H-4 |
 | 7 | O estrondo na Usina | antes da Fase 6 | 4 | H-6 |
@@ -396,8 +396,8 @@ para o objetivo `scene` das quests. O check-data recusa a caixa com retrato
 | 18 | O Pokémon rosa | vila | Epílogo | H-11 |
 
 Cada cena chega na etapa do capítulo dela. A H-2 trouxe o motor, as duas do
-prólogo e a do Brock (pedido do Fellipe); a do Maxie passou para o motor sem
-mudar.
+prólogo e as duas da volta da Fase 1, a do Brock e a do velho sábio (pedidos do
+Fellipe); a do Maxie passou para o motor sem mudar.
 
 **As duas do prólogo (0.39):**
 
@@ -419,7 +419,18 @@ primeiro palco), em tela cheia. O Brock (o sprite dele do FireRed, em pixel) est
 na frente do jogador: parabeniza, olha para o lado ao falar das rotas, volta e diz
 que é muito sério, pede ajuda e manda investigar Cerulean. A quest da Misty entra
 no rastreador no meio da conversa. No fim, a tela escurece e o jogador está na
-vila, na frente de casa.
+vila, já na cena seguinte.
+
+**A do velho sábio (0.39, `sabio_passaros`):** logo depois da do Brock (as duas
+ficam devidas na vitória, e a saída do palco leva ao lugar da próxima). O jogador
+aparece na rua, embaixo da casa do sábio; a câmera sobe um pouco para mostrar a
+porta, ele sai, vê o jogador (o "!") e chama: "Espere um pouco!". Vem até o lado
+dele e conta: "Soube que o Brock te pediu ajuda", olha para o céu ("faz muitos
+anos que eu olho o céu todas as manhãs"), os três pássaros lendários sumiram, e
+foi depois disso que os Pokémon começaram a agir assim: "deve ter alguma coisa a
+ver. Mas isso é tudo que eu posso te ajudar, por enquanto". Ele volta para casa,
+a câmera volta ao jogador e o jogo segue livre. Na casa dele, depois, ele lembra
+da conversa.
 
 ---
 
@@ -446,7 +457,7 @@ vila, na frente de casa.
 | Etapa | O que entra |
 |---|---|
 | **H-1** ✅ 0.38 | O sistema de quests e o prólogo: `data/quests.js`, o `QuestSystem`, o rastreador, o save por jornada com a migração, as condições novas nas falas, a cadeia do prólogo e o discurso novo do Carvalho. Testes no `ui-smoke`. |
-| **H-2** ✅ 0.39 | As cenas em dados (`Cutscene.js` a partir da cena do Maxie, que não muda), as cenas de antes e de depois das fases, em tela cheia nos palcos (o ginásio de Pewter), as duas cenas do prólogo e a do Brock, com a quest da Misty: o discurso do Carvalho encenado e o rival pegando o inicial dele (seção 9.3). |
+| **H-2** ✅ 0.39 | As cenas em dados (`Cutscene.js` a partir da cena do Maxie, que não muda), as cenas de antes e de depois das fases, em tela cheia nos palcos (o ginásio de Pewter), as duas cenas do prólogo e as duas da volta da Fase 1 (o Brock, com a quest da Misty, e o velho sábio): o discurso do Carvalho encenado e o rival pegando o inicial dele (seção 9.3). |
 | **H-3** | A tela de missões. |
 | **H-4** | Os capítulos 1 a 3: as falas de depois da vitória dos líderes, o velho sábio, os moradores e as quests de cada capítulo. |
 | **H-5** | A captura sem lendários e o molde da missão de lendário, tirado do salão do Kyogre. |

@@ -257,6 +257,11 @@ export const DIALOGUE = {
       { when: { badges: 6 }, say: ['Existe um Pokémon criado pelo homem, escondido numa caverna perto de Cerulean. Nem as hordas chegam perto dele.'] },
       { when: { badges: 4 }, say: ['Na Floresta de Viridian, as árvores escondem mais olhos do que folhas. Nunca pare de andar lá dentro.'] },
       { when: { badges: 2 }, say: ['Dizem que as hordas começaram depois que três pássaros lendários sumiram dos céus de Kanto.', 'Gelo, trovão e fogo... onde estarão?'] },
+      // depois da cena da volta da Fase 1 (0.39, data/cutscenes.js): ele já contou dos pássaros
+      { when: { scene: 'sabio_passaros' }, say: [
+        'Os pássaros lendários sumiram, e as hordas vieram logo depois. Isso eu não esqueço.',
+        'Se descobrir alguma coisa em Cerulean, volte aqui e me conte.'
+      ] },
       { say: ['Sente-se, jovem. Quando eu era criança, os Pokémon andavam sozinhos ou em pares.', 'Hoje andam em bandos de cem.'] }
     ]
   },
