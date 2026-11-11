@@ -326,25 +326,28 @@ Bullet Heaven.
 
 ### 9.3 As cenas de Kanto
 
-| # | Cena | Onde | Capítulo |
-|---|---|---|---|
-| 1 | O discurso do Carvalho | laboratório | Prólogo |
-| 2 | O rival pega o inicial dele (decisão 1) | laboratório | Prólogo |
-| 3 | A lenda dos pássaros | casa do velho sábio | 1 |
-| 4 | A vila culpa a Equipe Rocket | vila (moradores) | 2 |
-| 5 | O vulto de vermelho na Rota 10 | evento na Fase 5 | 3 |
-| 6 | O estrondo na Usina | evento na Fase 6 | 4 |
-| 7 | A jaula do Zapdos | Usina | 4 (missão) |
-| 8 | O Carvalho e o emblema | laboratório | 4 |
-| 9 | A jaula do Articuno | Ilhas Seafoam | 5 (missão) |
-| 10 | O Giovanni e o emblema | depois da Fase 8 | 6 |
-| 11 | A jaula do Moltres | Monte Brasa | 6 (missão) |
-| 12 | A Victory Road se abre | mapa da jornada | 7 |
-| 13 | O rival Campeão | sala do Campeão | 7 |
-| 14 | "Ainda falta alguma coisa" | laboratório | 7 |
-| 15 | O Mewtwo e a máquina quebrada | Caverna Desconhecida | 8 (missão) |
-| 16 | O Kyogre e o Maxie | lagoa ou Centro (já existe) | 8 |
-| 17 | O Pokémon rosa | vila | Epílogo |
+| # | Cena | Onde | Capítulo | Etapa |
+|---|---|---|---|---|
+| 1 | O discurso do Carvalho, encenado | laboratório | Prólogo | H-2 |
+| 2 | O rival pega o inicial dele (decisão 1) | laboratório | Prólogo | H-2 |
+| 3 | A lenda dos pássaros | casa do velho sábio | 1 | H-4 |
+| 4 | A vila culpa a Equipe Rocket | vila (moradores) | 2 | H-4 |
+| 5 | O vulto de vermelho na Rota 10 | evento na Fase 5 | 3 | H-4 |
+| 6 | O estrondo na Usina | evento na Fase 6 | 4 | H-6 |
+| 7 | A jaula do Zapdos | Usina | 4 (missão) | H-6 |
+| 8 | O Carvalho e o emblema | laboratório | 4 | H-6 |
+| 9 | A jaula do Articuno | Ilhas Seafoam | 5 (missão) | H-7 |
+| 10 | O Giovanni e o emblema | depois da Fase 8 | 6 | H-8 |
+| 11 | A jaula do Moltres | Monte Brasa | 6 (missão) | H-8 |
+| 12 | A Victory Road se abre | mapa da jornada | 7 | H-9 |
+| 13 | O rival Campeão | sala do Campeão | 7 | H-9 |
+| 14 | "Ainda falta alguma coisa" | laboratório | 7 | H-9 |
+| 15 | O Mewtwo e a máquina quebrada | Caverna Desconhecida | 8 (missão) | H-10 |
+| 16 | O Kyogre e o Maxie | lagoa ou Centro (já existe) | 8 | H-11 |
+| 17 | O Pokémon rosa | vila | Epílogo | H-11 |
+
+Cada cena chega na etapa do capítulo dela. A H-2 traz o motor e as duas do
+prólogo, que servem de teste para ele; a do Maxie passa para o motor sem mudar.
 
 ---
 
@@ -371,7 +374,7 @@ Bullet Heaven.
 | Etapa | O que entra |
 |---|---|
 | **H-1** ✅ 0.38 | O sistema de quests e o prólogo: `data/quests.js`, o `QuestSystem`, o rastreador, o save por jornada com a migração, as condições novas nas falas, a cadeia do prólogo e o discurso novo do Carvalho. Testes no `ui-smoke`. |
-| **H-2** | As cenas em dados (`Cutscene.js` a partir da cena do Maxie, que não muda) e o evento de história na partida. |
+| **H-2** | As cenas em dados (`Cutscene.js` a partir da cena do Maxie, que não muda), o evento de história na partida e as duas cenas do prólogo: o discurso do Carvalho encenado e o rival pegando o inicial dele (seção 9.3). |
 | **H-3** | A tela de missões. |
 | **H-4** | Os capítulos 1 a 3: as falas de depois da vitória dos líderes, o velho sábio, os moradores e as quests de cada capítulo. |
 | **H-5** | A captura sem lendários e o molde da missão de lendário, tirado do salão do Kyogre. |
