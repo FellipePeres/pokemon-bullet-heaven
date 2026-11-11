@@ -316,6 +316,19 @@ A barra ganha um ícone novo, **Missões**, ao lado das Conquistas. A tela mostr
 quests ativas com a descrição de cada uma e, embaixo, as concluídas, por capítulo.
 Funciona também como diário: dá para reler o que já aconteceu.
 
+**Feito na 0.39 (H-3)**, com os padrões:
+- **O botão**: o Diário (o item `journal`) nas duas barras, a da vila e a do mapa da
+  jornada. O pontinho vermelho acende quando abre uma quest que a tela ainda não
+  mostrou, e apaga quando ela abre (`seen` no estado das quests).
+- **Agora**: cada quest ativa num cartão com a faixa da cor do tipo (dourada para a
+  história, azul para lendário), o capítulo, a descrição e os objetivos com o placar.
+- **O que já aconteceu**: um grupo por capítulo, na ordem da história, que abre e
+  fecha; dentro, as quests na ordem em que fecharam, com o ✓, a data e o texto. Os
+  outros objetivos de uma quest aparecem embaixo, já feitos.
+- **Itens importantes**: os itens que a história deu (o Pedaço de Metal), com o
+  desenho e o texto.
+- **Sem spoiler**: só aparece o que já abriu. Nenhuma quest futura.
+
 ### 7.4 Os dados (`data/quests.js`)
 
 ```js
@@ -598,7 +611,7 @@ do Zapdos, o tipo, as fraquezas e o nível recomendado (36; sem captura, decisã
 |---|---|
 | **H-1** ✅ 0.38 | O sistema de quests e o prólogo: `data/quests.js`, o `QuestSystem`, o rastreador, o save por jornada com a migração, as condições novas nas falas, a cadeia do prólogo e o discurso novo do Carvalho. Testes no `ui-smoke`. |
 | **H-2** ✅ 0.39 | As cenas em dados (`Cutscene.js` a partir da cena do Maxie, que não muda), as cenas de antes e de depois das fases, em tela cheia nos palcos (o ginásio de Pewter), as duas cenas do prólogo e as duas da volta da Fase 1 (o Brock, com a quest da Misty, e o velho sábio): o discurso do Carvalho encenado e o rival pegando o inicial dele (seção 9.3). |
-| **H-3** | A tela de missões. |
+| **H-3** ✅ 0.39 | A tela de missões (seção 7.3): o botão Missões nas duas barras, ao lado das Conquistas, com o pontinho quando abre uma quest nova; em cima, o que fazer agora; embaixo, o diário por capítulo, com a data de cada quest; no fim, os itens importantes da história. |
 | **H-4** ✅ 0.39 | Os capítulos 1 a 3: as falas de depois da vitória dos líderes, o velho sábio, os moradores e as quests de cada capítulo. O Capítulo 1 (o Brock e o velho sábio), o Capítulo 2 (a Misty, a casa roubada, os moradores; o Surge, o marinheiro e a Usina andável, com a missão do Zapdos, H-5 e H-6) e o Capítulo 3 (decisão 18): a Fase 4 fechada até a Usina, a cena do emblema com a Erika, e o Koga e a Sabrina como ginásios comuns. |
 | **H-5** ✅ 0.39 | A captura sem lendários e o molde da missão de lendário, tirado do salão do Kyogre: `systems/legendaryFight.js` (a captura, os avisos, os anéis, a leva final), o Kyogre por cima dele sem mudar nada (o mesmo rastro, quadro a quadro), o registro das missões na jornada, a volta pela missão e a regra da Poké Ball para quem tem missão. |
 | **H-6** ✅ 0.39 | O Zapdos (seção 5.1): o Lutar com a transição, a luta no fundo da Usina com ele enfraquecido pela máquina, a tempestade, e a cena de depois, em que ele foge assustado (sem captura, decisão 16). |

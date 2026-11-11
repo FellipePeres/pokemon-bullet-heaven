@@ -2417,6 +2417,73 @@ button { font: inherit; color: inherit; }
 .quest-tracker.collapsed .quest-done-tag,
 .quest-tracker.collapsed .quest-item.more { display: none; }
 .quest-tracker.collapsed .quest-title::after { content: '+'; margin-left: auto; font-size: 16px; }
+/* ===================== A TELA DE MISSÕES (H-3) ===================== */
+/* o diário da jornada: o que fazer agora, o que já aconteceu e os itens da história */
+.quest-log { display: flex; flex-direction: column; gap: 16px; font-family: var(--font-pixel); color: var(--gba-ink); }
+.ql-section { display: flex; flex-direction: column; gap: 8px; }
+.ql-head {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--gba-frame);
+}
+.ql-empty { margin: 0; font-size: 17px; color: var(--gba-ink-soft); }
+/* a quest ativa: a faixa da cor do tipo na borda esquerda */
+.ql-card {
+  padding: 8px 12px 9px 14px;
+  background: var(--gba-button);
+  border: 2px solid var(--gba-shade);
+  border-left: 6px solid #d29b17;
+  border-radius: 4px;
+}
+.ql-card.ql-legendary { border-left-color: #3a7bd5; }
+.ql-card.ql-side { border-left-color: var(--gba-ink-soft); }
+.ql-card-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.ql-chapter { font-size: 13px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--gba-frame); }
+.ql-kind {
+  flex: none;
+  padding: 1px 7px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #fff;
+  background: #d29b17;
+  border-radius: 3px;
+}
+.ql-kind-legendary { background: #3a7bd5; }
+.ql-kind-side { background: var(--gba-ink-soft); }
+.ql-desc { margin: 4px 0 0; font-size: 16px; line-height: 1.35; color: var(--gba-ink); }
+.ql-objs { margin: 6px 0 0; padding: 0; list-style: none; }
+.ql-objs li { display: flex; justify-content: space-between; gap: 12px; font-size: 17px; font-weight: 600; line-height: 1.35; }
+.ql-objs li b { flex: none; color: var(--gba-ink-soft); }
+.ql-objs li.met, .ql-objs li.met b { color: #2f9e4f; }
+/* o que já aconteceu: um grupo por capítulo, que abre e fecha */
+.ql-group { border-top: 3px dotted var(--gba-shade); }
+.ql-group-title {
+  padding: 7px 2px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--gba-ink);
+  cursor: pointer;
+  list-style-position: inside;
+}
+.ql-entry { margin: 0 0 8px 6px; padding: 2px 0 2px 10px; border-left: 3px solid #d29b17; }
+.ql-entry.ql-legendary { border-left-color: #3a7bd5; }
+.ql-entry.ql-side { border-left-color: var(--gba-shade); }
+.ql-entry-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; font-size: 16px; }
+.ql-entry-head b::before { content: '✓ '; color: #2f9e4f; }
+.ql-date { flex: none; font-size: 13px; color: var(--gba-ink-soft); }
+.ql-entry .ql-desc { margin-top: 1px; font-size: 15px; color: var(--gba-ink-soft); }
+.ql-entry .ql-objs { margin-top: 3px; }
+.ql-entry .ql-objs li { font-size: 15px; }
+/* os itens importantes: o ícone e o texto */
+.ql-item { display: flex; align-items: center; gap: 12px; padding: 6px 4px; border-top: 3px dotted var(--gba-shade); }
+.ql-item-icon { width: 40px; height: 40px; flex: none; image-rendering: pixelated; object-fit: contain; }
+.ql-item-text { display: flex; flex-direction: column; gap: 1px; }
+.ql-item-text b { font-size: 16px; }
+.ql-item-text span { font-size: 15px; color: var(--gba-ink-soft); line-height: 1.3; }
+
 /* na partida: uma linha na plaquinha da fase, só se a quest for desta fase */
 .hud-quest { font-size: 12px; font-weight: 600; color: #ffe9a8; }
 

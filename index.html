@@ -174,6 +174,7 @@
       <nav class="lobby-actions">
         <button class="bar-btn" data-modal="modal-pokedex" title="Pokédex"><span class="bar-icon" data-icon="pokedex"></span><span class="bar-label">Pokédex</span></button>
         <button class="bar-btn" id="hub-achievements" data-modal="modal-achievements" title="Conquistas"><span class="bar-icon" data-icon="achievements"></span><span class="bar-label">Conquistas</span></button>
+        <button class="bar-btn" id="hub-quests" data-modal="modal-quests" title="Missões: o que fazer agora e o que já aconteceu"><span class="bar-icon" data-icon="quests"></span><span class="bar-label">Missões</span></button>
         <button class="bar-btn" data-modal="modal-team" title="Equipe"><span class="bar-icon" data-icon="team"></span><span class="bar-label">Equipe</span></button>
         <button class="bar-btn" data-modal="modal-options" title="Opções e volume"><span class="bar-icon" data-icon="options"></span><span class="bar-label">Opções</span></button>
         <button class="bar-btn" data-modal="modal-help" title="Como jogar"><span class="bar-icon" data-icon="help"></span><span class="bar-label">Ajuda</span></button>
@@ -272,6 +273,7 @@
       <nav class="lobby-actions">
         <button class="bar-btn" data-modal="modal-pokedex" title="Pokédex"><span class="bar-icon" data-icon="pokedex"></span><span class="bar-label">Pokédex</span></button>
         <button class="bar-btn" id="bar-achievements" data-modal="modal-achievements" title="Conquistas"><span class="bar-icon" data-icon="achievements"></span><span class="bar-label">Conquistas</span></button>
+        <button class="bar-btn" id="bar-quests" data-modal="modal-quests" title="Missões: o que fazer agora e o que já aconteceu"><span class="bar-icon" data-icon="quests"></span><span class="bar-label">Missões</span></button>
         <button class="bar-btn" data-modal="modal-team" title="Equipe"><span class="bar-icon" data-icon="team"></span><span class="bar-label">Equipe</span></button>
         <button class="bar-btn" data-modal="modal-options" title="Opções e volume"><span class="bar-icon" data-icon="options"></span><span class="bar-label">Opções</span></button>
         <button class="bar-btn" data-modal="modal-help" title="Como jogar"><span class="bar-icon" data-icon="help"></span><span class="bar-label">Ajuda</span></button>
@@ -488,6 +490,20 @@
       </header>
       <div class="modal-body">
         <div id="achievements-list" class="node-list"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- as missões da jornada (H-3): o que fazer agora e o diário do que já aconteceu -->
+  <div id="modal-quests" class="modal hidden">
+    <div class="modal-card">
+      <header class="modal-head">
+        <h3><span class="ui-icon"><img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/journal.png" alt="" /></span>Missões</h3>
+        <span class="modal-sub" id="quests-sub"></span>
+        <button class="icon-btn close" data-close>✕</button>
+      </header>
+      <div class="modal-body">
+        <div id="quests-log" class="quest-log"></div>
       </div>
     </div>
   </div>

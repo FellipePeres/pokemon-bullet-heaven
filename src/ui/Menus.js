@@ -18,6 +18,7 @@ import { isBonusMove, BONUS_MOVE_LABEL } from '../data/bonusMoves.js';
 import { awakeningKeyOf, awakeningPartName } from '../data/awakening.js';
 import { Lobby } from './lobby.js';
 import { BadgeCase } from './badgeCase.js';
+import { buildQuestLog } from './questLog.js';
 import { JourneyScreen } from './journeys.js';
 import { MART_ITEMS, evolvedBy } from '../data/items.js';
 import { DECOR, decorMax } from '../data/decor.js';
@@ -25,7 +26,7 @@ import { choiceCard } from './pokemonCard.js';
 import { HUB_SPRITES, HUB_DECOR } from '../data/hubMaps.js';
 
 const SCREENS = ['screen-title', 'screen-journeys', 'screen-trainer', 'screen-name', 'screen-starter', 'screen-campaign', 'screen-hub', 'screen-dive'];
-const MODALS = ['modal-pokedex', 'modal-achievements', 'modal-team', 'modal-mart', 'modal-decor', 'modal-options', 'modal-help', 'modal-pc', 'modal-badges'];
+const MODALS = ['modal-pokedex', 'modal-achievements', 'modal-quests', 'modal-team', 'modal-mart', 'modal-decor', 'modal-options', 'modal-help', 'modal-pc', 'modal-badges'];
 
 /**
  * Telas fora da partida.
@@ -134,6 +135,7 @@ export class Menus {
     const builders = {
       'modal-pokedex': () => this.buildPokedex(),
       'modal-achievements': () => this.buildAchievements(),
+      'modal-quests': () => buildQuestLog(this.game),
       'modal-team': () => this.buildTeamDetail(),
       'modal-mart': () => this.buildMart(),
       'modal-decor': () => this.buildDecor(),

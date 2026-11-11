@@ -141,7 +141,7 @@ check('jogo inicia no menu principal', !registry.get('screen-title').classes.has
 check('barra lateral visível no menu', !registry.get('side-rail').classes.has('hidden'));
 
 // ---- janelas da barra lateral ----
-for (const id of ['modal-pokedex', 'modal-achievements', 'modal-team', 'modal-options', 'modal-help']) {
+for (const id of ['modal-pokedex', 'modal-achievements', 'modal-quests', 'modal-team', 'modal-options', 'modal-help']) {
   game.menus.showModal(id);
   check(`janela ${id.replace('modal-', '')} abre`, !registry.get(id).classes.has('hidden'));
   game.menus.closeModal();
@@ -204,6 +204,25 @@ game.questTracker.toggle();
 check('um clique recolhe o rastreador, e outro abre', questBox().classes.has('collapsed'));
 game.questTracker.toggle();
 check('...aberto de novo', !questBox().classes.has('collapsed'));
+// a tela de Missões (H-3, PLANEJAMENTO-HISTORIA.md seção 7.3): o diário da jornada
+const nodesOf = (node, out = []) => { out.push(node); for (const c of node.children ?? []) nodesOf(c, out); return out; };
+const byClass = (node, cls) => nodesOf(node).filter((n) => n.classes?.has(cls));
+const textIn = (node) => nodesOf(node).map((n) => n._text).join(' | ');
+const questLog = () => registry.get('quests-log');
+const questsDot = () => registry.get('hub-quests').classes.has('alert');
+check('a quest nova acende o pontinho no botão Missões da barra da vila', questsDot());
+game.menus.showModal('modal-quests');
+check('a tela de Missões abre com a quest de agora: o capítulo, o tipo, a descrição e o objetivo',
+      !registry.get('modal-quests').classes.has('hidden') && byClass(questLog(), 'ql-card').length === 1
+      && byClass(questLog(), 'ql-story').length === 1
+      && ['Agora', 'Prólogo', 'História', 'A mãe está lá embaixo', 'Fale com a mãe', '0/1'].every((t) => textIn(questLog()).includes(t)),
+      textIn(questLog()));
+check('...com o resumo em cima', registry.get('quests-sub').textContent.startsWith('Uma missão em andamento'), registry.get('quests-sub').textContent);
+check('...e nada do que vem depois: nem o diário, nem os itens, nem a quest seguinte (sem spoiler)',
+      !textIn(questLog()).includes('O que já aconteceu') && !textIn(questLog()).includes('Itens importantes')
+      && !textIn(questLog()).includes('Prof. Carvalho passou cedinho') && !textIn(questLog()).includes('laboratório'));
+check('...e o pontinho apaga', !questsDot() && game.quests.state.seen.includes('p_mae'));
+game.menus.closeModal();
 game.hubRenderer.render(hub);
 game.hubHud.update(hub);
 check('a barra da vila mostra o nome do jogador e o Mapa da jornada travado',
@@ -244,6 +263,15 @@ check('a quest só fecha quando a conversa acaba', game.quests.isActive('p_mae')
         && questBox().innerHTML.includes('quest-item quest-story enter'));
   game.questTracker.render();
   check('...e o deslizar acontece uma vez só', !questBox().innerHTML.includes(' enter'));
+  check('a quest seguinte acende o pontinho das Missões de novo', questsDot());
+  game.menus.showModal('modal-quests');
+  check('...e a tela passa a ter o diário: a conversa com a mãe, já feita, embaixo do Prólogo',
+        byClass(questLog(), 'ql-card').length === 1 && textIn(questLog()).includes('Vá ao laboratório')
+        && byClass(questLog(), 'ql-group').length === 1 && byClass(questLog(), 'ql-group-title')[0]._text === 'Prólogo'
+        && byClass(questLog(), 'ql-entry').length === 1 && textIn(byClass(questLog(), 'ql-entry')[0]).includes('Fale com a mãe')
+        && byClass(questLog(), 'ql-date').length === 1);
+  game.menus.closeModal();
+  check('...e o pontinho apaga de novo', !questsDot());
 }
 check('o tapete da saída leva para a vila, na frente de casa',
       goTo(4, 8) && (press('down'), hub.mapId === 'vila' && hub.player.x === 6 && hub.player.y === 17));
@@ -1057,6 +1085,36 @@ game.menus.closeModal();
   settle();
   check('...e a volta é direto para a vila', hub.mapId === 'casa_2f' || hub.mapId === 'vila');
   game.openCampaign();
+}
+
+// ---- a tela de Missões depois do Capítulo 3 (H-3): o diário inteiro e os itens da história ----
+{
+  const { QUESTS, CHAPTERS } = await import('../src/data/quests.js');
+  const state = game.quests.state;
+  check('a quest nova (a da Sabrina) acende o pontinho no botão Missões do mapa da jornada',
+        registry.get('bar-quests').classes.has('alert'));
+  game.menus.showModal('modal-quests');
+  const log = questLog();
+  const all = textIn(log);
+  check('agora: a quest da Sabrina, dourada, com o objetivo', byClass(log, 'ql-card').length === state.active.length
+        && byClass(log, 'ql-card')[0].classes.has('ql-story') && all.includes('Vença a Sabrina'), all);
+  const titles = byClass(log, 'ql-group-title').map((n) => n._text);
+  const order = Object.values(CHAPTERS);
+  check('o diário: um grupo por capítulo, na ordem da história, do Prólogo ao Capítulo 3',
+        titles[0] === 'Prólogo' && titles.includes('Capítulo 3 — Os rastros')
+        && titles.every((t, i) => !i || order.indexOf(titles[i - 1]) < order.indexOf(t)), titles.join(', '));
+  check('...com cada quest concluída, uma vez',
+        byClass(log, 'ql-entry').length === Object.keys(state.done).filter((id) => QUESTS[id]).length);
+  check('...e dá para reler: a Usina, a Erika e o Koga estão lá, com o texto de cada uma',
+        ['Vença o Koga', QUESTS.z_usina.desc, QUESTS.c3_erika.desc].every((t) => all.includes(t)));
+  const items = byClass(log, 'ql-item');
+  check('os itens importantes: o Pedaço de Metal, com o desenho e o texto do emblema',
+        items.length >= 1 && textIn(items[0]).includes('Pedaço de Metal') && textIn(items[0]).includes('emblema vermelho')
+        && byClass(items[0], 'ql-item-icon')[0]?.src === 'assets/hub/npc/pedaco_metal.png');
+  check('o resumo em cima conta as concluídas', registry.get('quests-sub').textContent.includes('concluídas'), registry.get('quests-sub').textContent);
+  game.menus.closeModal();
+  check('...e o pontinho apaga nas duas barras',
+        !registry.get('bar-quests').classes.has('alert') && !registry.get('hub-quests').classes.has('alert'));
 }
 
 // ---- Campeão e Hall da Fama ----

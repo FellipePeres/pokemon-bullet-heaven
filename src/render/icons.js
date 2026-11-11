@@ -15,6 +15,7 @@ const ITEM = {
   /* navegação */
   pokedex:      { item: 'town-map',     emoji: '📕' },
   achievements: { item: 'star-piece',   emoji: '🏆' },
+  quests:       { item: 'journal',      emoji: '📖' },
   team:         { item: 'poke-ball',    emoji: '🎒' },
   pc:           { item: 'pokemon-box-link', emoji: '🖥️' },
   save:         { item: 'vs-recorder',  emoji: '💾' },

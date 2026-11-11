@@ -168,6 +168,10 @@ não abre até você vencer.
   tempestade daquela noite (a lembrança: uma sombra de asas cruzando o céu) e mostra o
   pedaço de metal que achou no jardim, com o mesmo emblema da máquina da Usina. Depois,
   a jornada segue pelo Koga e pela Sabrina.
+- **A tela de Missões**: o Diário na barra, ao lado das Conquistas. Em cima, o que
+  fazer agora; embaixo, o que já aconteceu, capítulo por capítulo, com a data de cada
+  missão, para reler a história; no fim, os itens importantes que ela deu. Um
+  pontinho avisa quando abre uma missão nova.
 - **Os 151 Pokémon de Kanto jogáveis**, cada um com linha de 3 golpes e linha
   evolutiva. Alguns chegam como presente, como no FireRed (Farfetch'd, Lickitung e
   o prêmio do Dojo de Saffron: Hitmonlee ou Hitmonchan).

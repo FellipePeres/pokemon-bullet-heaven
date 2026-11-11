@@ -1,4 +1,5 @@
 import { el } from './dom.js';
+import { questDot } from './questLog.js';
 
 /** Onde o rastreador completo aparece: a vila e o mapa da jornada. */
 const SPOTS = ['hub-quest', 'lobby-quest'];
@@ -72,6 +73,7 @@ export class QuestTracker {
 
   /** Redesenha o rastreador da vila e o do mapa da jornada. */
   render() {
+    questDot(this.game);
     const list = this.flash ?? this.game.quests.tracked();
     if (!this.flash) this.shownIds = list.map((q) => q.id);
     const html = list.map((quest, i) => this._item(quest, i)).join('');

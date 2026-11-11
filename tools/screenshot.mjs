@@ -219,6 +219,28 @@ const ROTEIROS = {
     { run: 'skip()' }, { wait: 2600 }, { shot: 'cel-15-o-koga' },
     { run: 'skip()' }, { wait: 2600 }, { shot: 'cel-16-a-vila' }
   ],
+  // a tela de Missões (H-3): o pontinho na barra, o começo da jornada e o diário depois do
+  // Capítulo 3 (as quests concluídas por capítulo, com as datas, e o Pedaço de Metal)
+  missoes: [
+    { open: 'index.html' }, { wait: 500 },
+    { run: "game.newGame(); game.chooseTrainer('leaf'); game.chooseName('Fellipe')" },
+    { wait: 1800 }, { shot: 'mis-01-o-pontinho' },
+    { run: "game.menus.showModal('modal-quests')" }, { wait: 900 }, { shot: 'mis-02-o-comeco' },
+    { run: "game.menus.closeModal(); game.chooseStarter('charmander');" +
+           "game.campaign.clearedStages.push('gym_1_pewter', 'gym_2_cerulean', 'gym_3_vermilion', 'zapdos', 'gym_4_celadon', 'gym_5_fuchsia');" +
+           "game.campaign.badges.push('boulder', 'cascade', 'thunder', 'rainbow', 'soul');" +
+           "const done = ['p_mae', 'p_lab', 'p_carvalho', 'p_mapa', 'c1_brock', 'c2_misty', 'c2_surge', 'z_usina', 'z_zapdos', 'c3_erika', 'c3_koga'];" +
+           "const st = game.quests.state; st.done = {}; st.progress = {};" +
+           "done.forEach((id, i) => { st.done[id] = { at: new Date(2026, 10, 1 + Math.floor(i * 0.95), 20, i).toISOString() }; });" +
+           "st.active = ['c3_sabrina']; st.seen = done.slice(); game.campaign.keyItems = { emblema_vermelho: 1 };" +
+           "document.getElementById('toast-container').style.display = 'none'; game.openCampaign()" },
+    { wait: 1600 }, { shot: 'mis-03-o-mapa' },
+    { run: "game.menus.showModal('modal-quests')" }, { wait: 1000 }, { shot: 'mis-04-o-diario' },
+    { run: "document.querySelector('#modal-quests .modal-body').scrollTop = 440" }, { wait: 500 }, { shot: 'mis-05-os-capitulos' },
+    { run: "document.querySelector('#modal-quests .modal-body').scrollTop = 99999" }, { wait: 500 }, { shot: 'mis-06-os-itens' },
+    { run: "document.querySelectorAll('#modal-quests .ql-group').forEach((g, i) => { g.open = i === 3; }); document.querySelector('#modal-quests .modal-body').scrollTop = 0" },
+    { wait: 500 }, { shot: 'mis-07-recolhidos' }
+  ],
   // a melhoria de UX da 0.31: o card de escolha (o inicial e a Poké Ball) e o painel da fase
   ux: [
     { open: 'index.html' }, { wait: 500 },

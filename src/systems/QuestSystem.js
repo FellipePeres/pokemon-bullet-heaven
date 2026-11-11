@@ -6,7 +6,8 @@ export const TRACKED_MAX = 3;
 
 /** O estado das quests de uma jornada nova: só a primeira, ativa. */
 export function createQuestState() {
-  return { active: [FIRST_QUEST], progress: {}, done: {} };
+  // `seen`: as quests que o jogador já viu na tela de missões (H-3)
+  return { active: [FIRST_QUEST], progress: {}, done: {}, seen: [] };
 }
 
 /**
@@ -104,6 +105,31 @@ export class QuestSystem {
       .sort((a, b) => (KIND_ORDER[QUESTS[a].kind] ?? 9) - (KIND_ORDER[QUESTS[b].kind] ?? 9))
       .slice(0, TRACKED_MAX)
       .map((id) => this.view(id));
+  }
+
+  /** Todas as quests ativas, a de história primeiro (a tela de missões, H-3). */
+  activeViews() {
+    const state = this.state;
+    if (!state) return [];
+    return state.active
+      .filter((id) => QUESTS[id])
+      .sort((a, b) => (KIND_ORDER[QUESTS[a].kind] ?? 9) - (KIND_ORDER[QUESTS[b].kind] ?? 9))
+      .map((id) => this.view(id));
+  }
+
+  /** Alguma quest ativa que o jogador ainda não viu na tela de missões (o pontinho do botão)? */
+  hasUnseen() {
+    const state = this.state;
+    if (!state) return false;
+    const seen = state.seen ?? [];
+    return state.active.some((id) => QUESTS[id] && !seen.includes(id));
+  }
+
+  /** A tela de missões abriu: as ativas de agora deixam de ser novidade. */
+  markSeen() {
+    const state = this.state;
+    if (!state) return;
+    state.seen = [...new Set([...(state.seen ?? []), ...state.active])];
   }
 
   /** Uma quest pronta para mostrar: o título do capítulo e cada objetivo com o placar. */

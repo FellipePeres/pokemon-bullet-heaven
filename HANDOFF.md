@@ -861,6 +861,25 @@ Nunca voltar bônus globais para o pool de level up — foi pedido explícito.
   a cena pendente ao continuar e ao carregar; o Origin Pulse do Kyogre em campo
   desenhado do 1º quadro ao fim). O roteiro de screenshots é `kyogre`.
 
+### A tela de Missões (H-3, 0.39 na branch)
+- PLANEJAMENTO-HISTORIA.md, seção 7.3 ("vamos para o H-3"; os detalhes no padrão).
+- **O botão** `#hub-quests` (a barra da vila) e `#bar-quests` (a do mapa da jornada),
+  logo depois das Conquistas, com o ícone `quests` (o item `journal` da PokeAPI). Abre
+  `#modal-quests`, montada por `ui/questLog.js` (`buildQuestLog`).
+- **O pontinho**: `questDot(game)` (em `ui/questLog.js`) acende o `.alert` dos dois
+  botões quando há quest ativa fora de `state.seen` (`QuestSystem.hasUnseen`). Quem
+  chama é o `QuestTracker.render`, que já roda a cada quest que abre ou fecha; abrir a
+  tela chama `QuestSystem.markSeen` e apaga.
+- **A tela**: "Agora" (`QuestSystem.activeViews`, todas as ativas, a de história
+  primeiro, sem o limite de 3 do rastreador), "O que já aconteceu" (`state.done`, um
+  `<details>` por capítulo na ordem de `CHAPTERS`, as quests na ordem do `at`, com a
+  data dd/mm) e "Itens importantes" (`campaign.keyItems`, com o `icon` do
+  `KEY_ITEMS`). Os textos entram como texto puro, nunca como HTML.
+- **Sem spoiler**: a tela só lê as ativas e as feitas; quest futura nunca aparece.
+- **Os testes**: o `ui-smoke` (o pontinho acende e apaga, o começo do prólogo sem a
+  quest seguinte, o diário depois da mãe, o diário inteiro depois do Koga, com os
+  capítulos na ordem e o Pedaço de Metal) e o roteiro de screenshots `missoes`.
+
 ### O Capítulo 3: a trava da Fase 4 e a cena do emblema (H-4, 0.39 na branch)
 - Pedido do Fellipe (decisão 18 do PLANEJAMENTO-HISTORIA, a proposta "Celadon: o
   emblema", aprovada com a cena montada como maquete). **Regra dele: nada de spoiler em
@@ -1444,6 +1463,7 @@ o Brock como está, todas as outras mais duras, menos níveis.
 | 75 | "pode construir isso" (a luta do Zapdos, para o Lutar do card funcionar: o molde das missões, tirado do salão do Kyogre, e a tempestade) | 0.39 (na branch): o molde `systems/legendaryFight.js` (o Kyogre por cima dele, idêntico quadro a quadro), a luta do Zapdos (preso na máquina do emblema vermelho, as correntes arrebentando, a tempestade marcada, o Zap Cannon, a Investida, o Discharge, o tabuleiro de raios, 3 Ultra Balls, a fuga sem captura), a arena da Power Plant, a transição de batalha do FireRed, a volta pela missão, a cena `zapdos_livre` com a luz de volta e o emblema, a regra da Poké Ball para quem tem missão; medido: no nível 58 vence 11 de 12 |
 | 76 | o refino da história: "essas maquinas que prendem os lendários sugam a energia deles" e mandam em ondas para um lugar misterioso, onde uma máquina central numa base do Maxie desorienta os Pokémon (ideia de End Game); o Zapdos enfraquecido explica a vitória de um jogador de nível baixo; "ao derrotar o Zapdos, rola uma cutscene do Zapdos voando e fugindo, assustado", sem captura por enquanto | 0.39 (na branch): a luta sem captura e de nível 36 (medida: 11 de 12 no 36), a energia escorrendo pelas correntes, a cena com o Zapdos do FireRed caído que foge pelo alto (os passos `cry`, `tremble` e `fly`) e a pista da energia mandada para longe; o card "Sem captura nesta luta" |
 | 77 | "A fase da Erika é barrada, o jogador precisa passar do Zapdos para liberar a Erika, o emblema pode ser visto outra vez e o jogador faz ligação que era o mesmo da máquina"; "não pode ter spoilers no título das fases ou quests"; a cena do emblema "montada já no artifact" e "um bate papo simples dando indícios da continuação"; "ficou excelente" | 0.39 (na branch): a trava da Fase 4 (`lock`, o Túnel de Pedra no escuro, sem o nome do Zapdos), as quests douradas da Usina, a do Koga e a da Sabrina, o palco do ginásio de Celadon com a Erika, a cena `depois_erika` (a lembrança com a sombra de asas, o pedaço de metal, o emblema reconhecido, as pistas: a Rocket no Cassino, a sombra para o sul) e os passos `toast`, `storm` e `item` |
+| 78 | "vamos para o H-3" | 0.39 (na branch): a tela de Missões (seção 7.3 do PLANEJAMENTO-HISTORIA): o Diário nas duas barras com o pontinho de quest nova, o que fazer agora, o diário por capítulo com as datas e os itens importantes; nenhuma quest futura aparece |
 | Fase 8 (Giovanni) | 1 → 0,8 | 4,0 | 4,5 | 60 | 84 → 62 |
 | Lorelei | 1,05 → 0,8 | 3,5 | 3,1–4,7 | 64 | 92 → 66 |
 | Bruno | 1,12 → 0,97 | 3,7 | 3,5–6,3 ² | 66 | 99 → 68 |
@@ -1763,10 +1783,10 @@ O que está planejado:
   Kyogre. **A H-1 está no jogo desde a 0.38** (as quests, o rastreador e o
   prólogo; ver a seção 4), e **a H-2 desde a 0.39** (o motor das cenas, as duas do
   prólogo, a do Brock e as cenas de antes e de depois das fases, em tela cheia nos
-  palcos; **nunca no meio de uma fase**, regra do Fellipe). **A H-5 e a H-6 também, na
-  branch** (o molde das missões e a missão do Zapdos). Falta, em ordem: a H-3 (a tela
-  de missões), o resto da H-4 (o Capítulo 3), as outras missões de lendário (H-7 a
-  H-11) e as recompensas (H-12).
+  palcos; **nunca no meio de uma fase**, regra do Fellipe). **A H-3, a H-4, a H-5 e a
+  H-6 também, na branch** (a tela de Missões, os Capítulos 1 a 3, o molde das missões
+  e a missão do Zapdos). Falta, em ordem: as outras missões de lendário (H-7 a H-11) e
+  as recompensas (H-12).
   **Regra do Fellipe para a H-5:** um lendário liberado na missão dele (vencida,
   capturado ou não) volta a aparecer na Poké Ball das fases seguintes, com a
   chance baixa de hoje; continua valendo um de cada por jornada. **Não tirar o
