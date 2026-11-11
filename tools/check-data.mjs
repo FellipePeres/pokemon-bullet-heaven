@@ -601,6 +601,17 @@ const inside = (mapId, x, y) => { const m = HUB_MAPS[mapId]; return !!m && x >= 
       }
     }
   }
+  // a trava da história (H-4, `lock` na fase): a fase que destrava existe, e o texto não cita
+  // o lendário dela (sem spoiler em título, regra do Fellipe)
+  for (const [id, stage] of Object.entries(STAGES)) {
+    if (!stage.lock) continue;
+    const by = STAGES[stage.lock.stage];
+    if (!by) { issues.push(`${id}: a trava espera uma fase que não existe (${stage.lock.stage})`); continue; }
+    if (!stage.lock.text || !stage.lock.go) issues.push(`${id}: a trava sem o texto ou sem o "para onde ir"`);
+    const secret = by.legendaryFight?.name;
+    if (secret && [stage.lock.text, stage.lock.go].some((t) => t?.includes(secret))) issues.push(`${id}: a trava cita o ${secret} (spoiler)`);
+    if (stage.lock.place && !STORY_PLACES[stage.lock.place]) issues.push(`${id}: a trava aponta um lugar que não existe (${stage.lock.place})`);
+  }
   // as passagens com `when` (a escotilha da Usina, H-6): cada condição é conhecida
   for (const [mapId, place] of Object.entries(HUB.maps)) {
     for (const w of place.warps ?? []) {

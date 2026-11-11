@@ -1306,6 +1306,7 @@ export class Game {
       emit: (on, target) => bus.emit(EVENTS.STORY, { on, target }),
       card: (missionId, answer) => this.showMission(missionId, answer),
       cry: (dex) => playCry(dex),
+      toast: (text, icon) => toast(text, icon),
       onEnd: () => {
         if (record) this.sceneRecord[id] = 'seen';
         onEnd?.();

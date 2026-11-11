@@ -395,6 +395,14 @@ def build_usina_fundo(s):
     s.block(0, 10, 15, 1)
 
 
+GYM4 = 'CeladonCity_Gym'
+
+
+def build_ginasio_celadon(s):
+    """O ginásio da Erika, inteiro: o palco da cena do emblema, depois da Fase 4 (H-4)."""
+    s.stamp(0, 0, GYM4, 0, 0, 13, 20)
+
+
 def build_cerulean(s):
     """
     Um recorte de Cerulean (0.39): a casa assaltada do FireRed (a porta da frente em
@@ -418,13 +426,14 @@ MAPS = {
     'ginasio_cerulean': (17, 20, build_ginasio_cerulean),
     'cerulean': (22, 15, build_cerulean),
     'ginasio_vermilion': (11, 21, build_ginasio_vermilion),
+    'ginasio_celadon': (13, 20, build_ginasio_celadon),
     'vermilion': (26, 18, build_vermilion),
     'usina': (49, 40, build_usina),
     'usina_fundo': (15, 11, build_usina_fundo),
     # a mesma sala com a luz de volta, depois da missão do Zapdos (H-6)
     'usina_luz': (15, 11, build_usina_fundo),
 }
-SOURCES = [P, V, R, F, CE, FU, IP, DS4, DS1, PH1, PH2, LAB, HOUSE1, WARDEN, COPYCAT, GYM1, GYM2, GYM3, VE, PP]
+SOURCES = [P, V, R, F, CE, FU, IP, DS4, DS1, PH1, PH2, LAB, HOUSE1, WARDEN, COPYCAT, GYM1, GYM2, GYM3, VE, PP, GYM4]
 
 
 # ============================ os móveis do quarto ============================
@@ -482,6 +491,7 @@ SPRITES = {
     # os líderes, para as cenas de depois das fases (0.39)
     'brock':       ('people/brock', 'npc_green', 16, 32),
     'misty':       ('people/misty', 'npc_blue', 16, 32),
+    'erika':       ('people/erika', 'npc_blue', 16, 32),
     # a casa assaltada de Cerulean (0.39)
     'policeman':   ('people/policeman', 'npc_blue', 16, 32),
     'old_man_2':   ('people/old_man_2', 'npc_white', 16, 32),
@@ -536,6 +546,11 @@ DRAWN = {
         'W': (226, 230, 240, 255), 'R': (206, 34, 34, 255), 'D': (112, 10, 14, 255), 'Y': (232, 192, 64, 255),
         'B': (16, 16, 22, 255), 'E': (255, 232, 96, 255), 'O': (255, 132, 40, 255),
     }, lambda: _machine_rows(False)),
+    # o pedaço de metal com o emblema que a Erika achou no jardim (H-4): uma placa retorcida
+    'pedaco_metal': (24, 20, {
+        'K': (34, 34, 46, 255), 'G': (70, 72, 88, 255), 'M': (112, 116, 136, 255), 'L': (168, 174, 192, 255),
+        'R': (206, 34, 34, 255), 'D': (112, 10, 14, 255), 'B': (16, 16, 22, 255),
+    }, lambda: _metal_rows()),
     'maquina_zapdos_quebrada': (64, 48, {
         'K': (34, 34, 46, 255), 'G': (70, 72, 88, 255), 'M': (112, 116, 136, 255), 'L': (168, 174, 192, 255),
         'W': (226, 230, 240, 255), 'R': (206, 34, 34, 255), 'D': (112, 10, 14, 255), 'Y': (232, 192, 64, 255),
@@ -556,6 +571,33 @@ EMBLEM = [
     '..RRRRRRR..',
     '....RRR....',
 ]
+
+
+def _metal_rows():
+    """O pedaço de metal de 24x20: a placa retorcida (o contorno escuro, o brilho, os amassados) e o emblema."""
+    from PIL import ImageDraw
+    mask = Image.new('L', (24, 20))
+    ImageDraw.Draw(mask).polygon([(3, 2), (20, 1), (22, 6), (21, 17), (12, 18), (2, 16), (1, 8)], fill=255)
+    g = [['M' if mask.getpixel((x, y)) else '.' for x in range(24)] for y in range(20)]
+    for y in range(20):
+        for x in range(24):
+            if g[y][x] == 'M' and any(not (0 <= x + dx < 24 and 0 <= y + dy < 20) or g[y + dy][x + dx] == '.'
+                                      for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1))):
+                g[y][x] = 'K'
+    for x in range(5, 19):
+        if g[3][x] == 'M':
+            g[3][x] = 'L'
+    for x, y in ((4, 6), (5, 6), (19, 13), (18, 14), (7, 15)):
+        if g[y][x] == 'M':
+            g[y][x] = 'G'
+    for x, y in ((3, 4), (20, 9), (16, 16)):
+        if g[y][x] == 'M':
+            g[y][x] = 'B'
+    for j, line in enumerate(EMBLEM):
+        for i, ch in enumerate(line):
+            if ch != '.':
+                g[5 + j][6 + i] = ch
+    return [''.join(r) for r in g]
 
 
 def _machine_rows(broken):

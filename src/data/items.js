@@ -30,8 +30,8 @@ export const STONES = ['fire_stone', 'water_stone', 'thunder_stone', 'leaf_stone
  * (`campaign.keyItems`). Os dois primeiros são as pistas do Capítulo 3 (H-4).
  */
 export const KEY_ITEMS = {
-  pena_dourada: { name: 'Pena Dourada', description: 'Uma pena que brilha como um raio. A Erika achou no jardim do ginásio.' },
-  emblema_vermelho: { name: 'Pedaço de Metal', description: 'Um pedaço de máquina com um emblema vermelho. Não é da Equipe Rocket.' }
+  // a Erika achou no jardim, depois da tempestade da noite do apagão (H-4, a cena do emblema)
+  emblema_vermelho: { name: 'Pedaço de Metal', description: 'Um pedaço de máquina com um emblema vermelho. É o mesmo da máquina da Usina.' }
 };
 
 export const MART_ITEMS = [

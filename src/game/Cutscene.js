@@ -32,9 +32,10 @@ export class Cutscene {
    * @param options id; fill(text) troca {player} e companhia; value(key) lê o contexto
    *                das falas (o `pick` dos passos); give(item, count) dá um item e devolve o
    *                nome; quest(id) abre uma quest; emit(on, target) conta um acontecimento da
-   *                história (a pista); cry(dex) toca o grito de um Pokémon; onEnd() no fim
+   *                história (a pista); cry(dex) toca o grito de um Pokémon; toast(text, icon) põe
+   *                um aviso no canto; onEnd() no fim
    */
-  constructor(hub, def, { id = null, fill = (text) => text, value = () => null, give = null, quest = null, emit = null, card = null, cry = null, onEnd = null } = {}) {
+  constructor(hub, def, { id = null, fill = (text) => text, value = () => null, give = null, quest = null, emit = null, card = null, cry = null, toast = null, onEnd = null } = {}) {
     this.hub = hub;
     this.id = id;
     this.band = def.band ?? null;
@@ -46,7 +47,7 @@ export class Cutscene {
       id: actorId, sprite: a.sprite, x: a.x, y: a.y, dir: a.dir ?? 'down', hidden: !!a.hidden, glow: !!a.glow,
       moving: false, steps: 0, prog: 0, walkPath: null, from: null, speed: CONFIG.hub.walkTime
     }));
-    this.fx = { emote: null, ball: null, flash: 0, bird: null, cutin: null, fade: 0, camera: null, shake: null };
+    this.fx = { emote: null, ball: null, flash: 0, bird: null, cutin: null, fade: 0, camera: null, shake: null, storm: null, item: null };
     this.then = null;
     this.done = false;
     this._fill = fill;
@@ -56,6 +57,7 @@ export class Cutscene {
     this._emit = emit;
     this._card = card;
     this._cry = cry;
+    this._toast = toast;
     this._onEnd = onEnd;
   }
 
@@ -78,6 +80,7 @@ export class Cutscene {
     const hub = this.hub;
     for (const a of this._walkers()) this._walk(a, dt);
     if (this.fx.bird) this.fx.bird.t += dt;
+    if (this.fx.storm) this.fx.storm.t += dt;
     if (this.fx.shake) { this.fx.shake.left -= dt; if (this.fx.shake.left <= 0) this.fx.shake = null; }
     const a = this._current();
     if (!a) return;
@@ -196,6 +199,12 @@ export class Cutscene {
         break;
       case 'quest': this._quest?.(a.id); done = true; break;
       case 'cry': this._cry?.(a.dex); done = true; break;
+      case 'toast': this._toast?.(this._fill(a.text), a.icon ?? 'stages'); done = true; break;
+      // a lembrança da tempestade (a Erika, H-4): a tela azul-escura, os clarões e uma sombra de
+      // asas cruzando o alto; fica até o `storm` com `off`
+      case 'storm': this.fx.storm = a.off ? null : { t: 0, sprite: a.sprite ?? 'dive/crobat' }; done = true; break;
+      // um item no quadro, ao lado da conversa (o pedaço de metal); `off` tira
+      case 'item': this.fx.item = a.off ? null : { sprite: a.sprite, x: a.at?.[0] ?? 1.5, y: a.at?.[1] ?? 2 }; done = true; break;
       case 'tremble': {
         // tremendo no lugar (o Zapdos assustado, H-6): de um lado para o outro, em pixels do GBA
         const m = this.actor(a.who);

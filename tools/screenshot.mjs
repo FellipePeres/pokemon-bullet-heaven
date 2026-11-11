@@ -189,6 +189,36 @@ const ROTEIROS = {
     { run: "game.hub.enter({ map: 'casa_sabio', x: 3, y: 6, dir: 'up' }); game.hub.interact()" }, { wait: 3200 }, { shot: 'zap-29-o-sabio' },
     { run: "{ const d = game.hub.dialog; if (d) { d.shown = 999; game.hub.confirm(); } }" }, { wait: 1600 }, { shot: 'zap-30-o-sabio-2' }
   ],
+  // o Capítulo 3 (H-4, decisão 18): a trava da Fase 4 no mapa (o Túnel de Pedra no escuro, sem
+  // spoiler), a Fase 4 aberta depois da Usina, e a cena do emblema com a Erika, fala por fala
+  celadon: [
+    { open: 'index.html' }, { wait: 500 },
+    { run: "window.skip = (n = 1) => { for (let i = 0; i < n; i++) { const h = game.hub; if (!h.dialog) return; h.dialog.shown = 999; h.confirm(); } };" +
+           "game.newGame(); game.chooseTrainer('leaf'); game.chooseName('Fellipe'); game.chooseStarter('charmander');" +
+           "const mon = (uid, id, abilities) => ({ uid, pokemonId: id, level: 40, xp: 0, hp: 0, abilities, upgrades: {} });" +
+           "game.campaign.journey = { team: { members: [mon('a', 'charizard', ['flamethrower']), mon('b', 'gyarados', ['hydro_pump']), mon('c', 'arcanine', ['flamethrower'])], active: ['a', 'b', 'c'] }, pc: [] };" +
+           "game.campaign.clearedStages.push('gym_1_pewter', 'gym_2_cerulean', 'gym_3_vermilion'); game.campaign.badges.push('boulder', 'cascade', 'thunder');" +
+           "game.quests.start('z_usina'); document.getElementById('toast-container').style.display = 'none'; game.openCampaign()" },
+    { wait: 1600 }, { shot: 'cel-01-trava' },
+    { run: "game.campaign.clearedStages.push('zapdos'); game.campaign.missions = { zapdos: { won: true, captured: false } };" +
+           "game.storyEvent('clue', 'olhos'); game.storyEvent('win', 'zapdos'); game.openCampaign(); game.menus.lobby.selected = 'gym_4_celadon'; game.menus.lobby.render()" },
+    { wait: 1400 }, { shot: 'cel-02-aberta' },
+    { run: "game.startStage('gym_4_celadon'); game.run.state = 'victory'" }, { wait: 1500 },
+    { run: 'game.quitToMenu()' }, { wait: 2800 }, { shot: 'cel-03-erika' },
+    { run: 'skip()' }, { wait: 2400 }, { shot: 'cel-04-a-tempestade' },
+    { run: 'skip()' }, { wait: 1300 }, { shot: 'cel-05-a-sombra', raw: true },
+    { wait: 1600 }, { shot: 'cel-06-a-sombra-fala' },
+    { run: 'skip()' }, { wait: 2200 }, { shot: 'cel-07-pela-manha' },
+    { run: 'skip()' }, { wait: 1600 }, { shot: 'cel-08-o-metal' },
+    { run: 'skip()' }, { wait: 550 }, { shot: 'cel-09-o-susto', raw: true },
+    { wait: 2300 }, { shot: 'cel-10-o-emblema' },
+    { run: 'skip()' }, { wait: 2600 }, { shot: 'cel-11-o-cassino' },
+    { run: 'skip()' }, { wait: 2400 }, { shot: 'cel-12-o-sul' },
+    { run: 'skip()' }, { wait: 1900 }, { shot: 'cel-13-fique-com-ele' },
+    { run: 'skip()' }, { wait: 1400 }, { shot: 'cel-14-recebeu' },
+    { run: 'skip()' }, { wait: 2600 }, { shot: 'cel-15-o-koga' },
+    { run: 'skip()' }, { wait: 2600 }, { shot: 'cel-16-a-vila' }
+  ],
   // a melhoria de UX da 0.31: o card de escolha (o inicial e a Poké Ball) e o painel da fase
   ux: [
     { open: 'index.html' }, { wait: 500 },

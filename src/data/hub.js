@@ -205,6 +205,15 @@ export const HUB = {
       ],
       things: []
     },
+    // o ginásio da Erika, inteiro (H-4): o palco da cena do emblema, depois da Fase 4
+    ginasio_celadon: {
+      name: 'Ginásio de Celadon',
+      scene: true,
+      npcs: [
+        { id: 'erika', sprite: 'erika', x: 6, y: 4, dir: 'down', talk: 'erika' }
+      ],
+      things: []
+    },
     // um recorte de Vermilion: o cais de madeira, com os marinheiros parados em terra
     vermilion: {
       name: 'Porto de Vermilion',

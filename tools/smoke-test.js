@@ -1397,6 +1397,13 @@ console.log('\n[a missão do Zapdos — preso, a tempestade, os ataques, a captu
   check('derrotado, ele cai sem forças (a fuga é a cena de depois), sem captura, e a fase é vencida',
         f.downed && !f.captured && !f.ball && !fight.pendingGift && fight.state === 'victory');
 
+  // H-4 (decisão 18): a Fase 4 espera a missão do Zapdos (a trava da história)
+  const { isStageUnlocked, storyLocked } = await import('../src/data/stages.js');
+  check('a Fase 4 fica presa pela trava da história depois da Fase 3, e abre com a missão vencida',
+        !isStageUnlocked('gym_4_celadon', ['gym_3_vermilion']) && storyLocked('gym_4_celadon', ['gym_3_vermilion'])
+        && isStageUnlocked('gym_4_celadon', ['gym_3_vermilion', 'zapdos']) && !storyLocked('gym_4_celadon', ['gym_3_vermilion', 'zapdos'])
+        && !storyLocked('gym_4_celadon', ['gym_2_cerulean']));
+
   // H-5: a captura sem lendários: quem tem missão só cai na Poké Ball depois dela
   for (const enc of Object.values(LEGENDARY_ENCOUNTERS)) enc.chance = 1;
   const LEG = Object.keys(LEGENDARY_KITS);

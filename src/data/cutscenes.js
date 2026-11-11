@@ -55,6 +55,10 @@
  *     cry    { dex }                   o grito de um Pokémon (assets/sound/cries)
  *     tremble { who, t, power }        alguém treme no lugar (o Zapdos assustado)
  *     fly    { who, t, height }        alguém levanta voo e some pelo alto da tela
+ *     toast  { text, icon }            um aviso no canto da tela
+ *     storm  { sprite } / { off }      a lembrança de uma tempestade: a tela azul-escura, os
+ *                                      clarões e uma sombra de asas cruzando o alto
+ *     item   { sprite, at } / { off }  um item num quadro ao lado da conversa (`at`: o tile)
  *     flag   { name, value }           marca uma flag da vila (as falas `once`, os enfeites `hideIf`)
  *     end    { then }                  o fim: só aqui a cena conta como vista; `then` é uma
  *                                      ação das falas (data/dialogue.js), como 'starter', ou
@@ -400,7 +404,11 @@ export const CUTSCENES = {
       // a pista: fecha o "Descubra se o Zapdos também sumiu" (e o Capítulo 2) e abre a da Erika
       { do: 'emit', on: 'clue', target: 'zapdos' },
       { do: 'wait', t: 0.4 },
-      { do: 'say', name: 'Lt. Surge', lines: ['Se foi a Equipe Rocket, eles aprenderam truques novos. O seu próximo ginásio é o da Erika, em Celadon. Ela me disse que achou uma coisa estranha no jardim.'] },
+      // a Fase 4 está fechada (decisão 18): o Túnel de Pedra está no escuro desde o apagão
+      { do: 'say', name: 'Lt. Surge', lines: [
+        'Se foi a Equipe Rocket, eles aprenderam truques novos.',
+        'E tem mais: o caminho para Celadon passa pelo Túnel de Pedra, e desde o apagão ele está no escuro. Ninguém atravessa.'
+      ] },
       { do: 'wait', t: 0.6 },
       { do: 'end', then: 'home' }
     ]
@@ -518,7 +526,54 @@ export const CUTSCENES = {
         'Alguém prendeu o Zapdos aqui de propósito.'
       ] },
       { do: 'wait', t: 0.4 },
+      // a luz da Usina volta, e com ela o Túnel de Pedra: a Fase 4 abre (decisão 18)
+      { do: 'toast', text: 'A luz voltou: o Túnel de Pedra acendeu. O caminho para Celadon está aberto.', icon: 'stages' },
       { do: 'end', then: { go: { map: 'usina', x: 5, y: 12, dir: 'left' } } }
+    ]
+  },
+
+  /* ========================= Capítulo 3: os rastros ========================= */
+  // depois da Fase 4 (H-4, decisão 18, a proposta "Celadon: o emblema" aprovada pelo Fellipe):
+  // no ginásio de Celadon, a Erika conta da tempestade da noite do apagão (a lembrança: uma sombra
+  // de asas cruzando o céu, o Crobat do Maxie sem nome) e mostra o pedaço de metal do jardim. O
+  // jogador reconhece o emblema da máquina da Usina. A pista falsa da Rocket continua, mas a
+  // sombra seguiu para o sul, rumo ao mar. Depois, a história dos lendários descansa
+  depois_erika: {
+    map: 'ginasio_celadon', spot: { x: 7, y: 4, dir: 'left' },
+    trigger: [{ on: 'win', target: 'gym_4_celadon' }],
+    preload: ['dive/crobat', 'npc/pedaco_metal'],
+    steps: [
+      { do: 'face', who: 'erika', dir: 'right' },
+      { do: 'wait', t: 0.6 },
+      { do: 'say', name: 'Erika', lines: ['Que batalha bonita, {player}. Até as flores do ginásio se agitaram.'] },
+      { do: 'face', who: 'erika', dir: 'up' },
+      { do: 'wait', t: 0.5 },
+      { do: 'say', name: 'Erika', lines: ['Sabe... na noite em que a Usina apagou, caiu uma tempestade estranha sobre Celadon.'] },
+      // a lembrança: a tela escurece, os raios piscam e uma sombra de asas cruza o alto
+      { do: 'storm' },
+      { do: 'wait', t: 1.0 },
+      { do: 'say', name: 'Erika', lines: ['No meio dos raios, vi uma sombra enorme cruzando o céu. Um Pokémon de asas, carregando alguma coisa pesada.'] },
+      { do: 'storm', off: true },
+      { do: 'face', who: 'erika', dir: 'right' },
+      { do: 'wait', t: 0.3 },
+      { do: 'say', name: 'Erika', lines: ['Pela manhã, achei isto no jardim, entre as flores. Como se tivesse caído do céu.'] },
+      { do: 'item', sprite: 'npc/pedaco_metal', at: [1.4, 2.1] },
+      { do: 'say', lines: ['Um pedaço de metal retorcido, com um emblema vermelho.'] },
+      { do: 'emote', who: 'player' },
+      { do: 'say', lines: ['{player} reconhece o emblema: é o mesmo da máquina que prendia o Zapdos!'] },
+      // a pista: fecha "Descubra o que a Erika encontrou no jardim" e abre a do Koga
+      { do: 'emit', on: 'clue', target: 'emblema' },
+      { do: 'item', off: true },
+      { do: 'say', name: 'Erika', lines: ['Você já viu isso antes? A Equipe Rocket tem um esconderijo aqui em Celadon, embaixo do Cassino...'] },
+      { do: 'face', who: 'erika', dir: 'down' },
+      { do: 'wait', t: 0.3 },
+      { do: 'say', name: 'Erika', lines: ['Mas a sombra não foi para o Cassino. Seguiu para o sul, na direção do mar.'] },
+      { do: 'face', who: 'erika', dir: 'right' },
+      { do: 'say', name: 'Erika', lines: ['Fique com ele. Quem sabe um dia você descobre de onde veio.'] },
+      { do: 'give', item: 'emblema_vermelho' },
+      { do: 'say', name: 'Erika', lines: ['O seu próximo desafio é o Koga, em Fuchsia. Também fica ao sul. Fique de olhos abertos pelo caminho.'] },
+      { do: 'wait', t: 0.5 },
+      { do: 'end', then: 'home' }
     ]
   },
 
@@ -537,7 +592,7 @@ export const CUTSCENES = {
 
 /** Os passos que o game/Cutscene.js conhece (o check-data confere). */
 export const CUTSCENE_STEPS = ['wait', 'say', 'talk', 'show', 'hide', 'place', 'walk', 'face', 'emote', 'throw', 'cutin',
-  'bird', 'fade', 'camera', 'shake', 'give', 'quest', 'emit', 'card', 'flag', 'cry', 'tremble', 'fly', 'end'];
+  'bird', 'fade', 'camera', 'shake', 'give', 'quest', 'emit', 'card', 'flag', 'cry', 'tremble', 'fly', 'toast', 'storm', 'item', 'end'];
 
 /** O que pode começar uma cena. */
 export const CUTSCENE_TRIGGERS = ['enter', 'npc', 'starter', 'win', 'play'];

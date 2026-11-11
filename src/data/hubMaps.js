@@ -242,6 +242,31 @@ export const HUB_MAPS = {
       '###########'
     ]
   },
+  ginasio_celadon: {
+    src: 'assets/hub/ginasio_celadon.png', top: 'assets/hub/ginasio_celadon-top.png', width: 13, height: 20,
+    walk: [
+      '######.######',
+      '#############',
+      '#...........#',
+      '#..#######..#',
+      '##.##....#.##',
+      '#........#..#',
+      '#..#........#',
+      '#..#.....#..#',
+      '#..###.###..#',
+      '#..##...##..#',
+      '#..........##',
+      '##..........#',
+      '#...........#',
+      '#..##...##..#',
+      '#..##...##..#',
+      '#...........#',
+      '#...#...#...#',
+      '#...........#',
+      '#...........#',
+      '#############'
+    ]
+  },
   vermilion: {
     src: 'assets/hub/vermilion.png', top: 'assets/hub/vermilion-top.png', width: 26, height: 18,
     walk: [
@@ -351,6 +376,7 @@ export const HUB_SPRITES = {
   'npc/brock': { src: 'assets/hub/npc/brock.png', frameWidth: 16, frameHeight: 32, frames: 3 },
   'npc/clefairy': { src: 'assets/hub/npc/clefairy.png', frameWidth: 16, frameHeight: 16, frames: 3 },
   'npc/clerk': { src: 'assets/hub/npc/clerk.png', frameWidth: 16, frameHeight: 32, frames: 9 },
+  'npc/erika': { src: 'assets/hub/npc/erika.png', frameWidth: 16, frameHeight: 32, frames: 3 },
   'npc/escotilha': { src: 'assets/hub/npc/escotilha.png', frameWidth: 16, frameHeight: 16, frames: 1 },
   'npc/fisher': { src: 'assets/hub/npc/fisher.png', frameWidth: 16, frameHeight: 32, frames: 10 },
   'npc/gentleman': { src: 'assets/hub/npc/gentleman.png', frameWidth: 16, frameHeight: 32, frames: 10 },
@@ -369,6 +395,7 @@ export const HUB_SPRITES = {
   'npc/old_man_1': { src: 'assets/hub/npc/old_man_1.png', frameWidth: 16, frameHeight: 32, frames: 10 },
   'npc/old_man_2': { src: 'assets/hub/npc/old_man_2.png', frameWidth: 16, frameHeight: 32, frames: 9 },
   'npc/olhos_zapdos': { src: 'assets/hub/npc/olhos_zapdos.png', frameWidth: 40, frameHeight: 16, frames: 1 },
+  'npc/pedaco_metal': { src: 'assets/hub/npc/pedaco_metal.png', frameWidth: 24, frameHeight: 20, frames: 1 },
   'npc/pidgey': { src: 'assets/hub/npc/pidgey.png', frameWidth: 16, frameHeight: 16, frames: 3 },
   'npc/pikachu': { src: 'assets/hub/npc/pikachu.png', frameWidth: 16, frameHeight: 16, frames: 3 },
   'npc/policeman': { src: 'assets/hub/npc/policeman.png', frameWidth: 16, frameHeight: 32, frames: 9 },

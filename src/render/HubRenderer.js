@@ -203,6 +203,58 @@ export class HubRenderer {
       if (carried) ctx.drawImage(carried.img, 0, 0, 16, 32, q.x + 8 * S, q.y + bob + 18 * S, 16 * S, 32 * S);
     }
     if (fx.cutin) this._cutin(scene, fx.cutin.t, fx.cutin.sprite);
+    if (fx.storm) this._storm(fx.storm);
+    if (fx.item) {
+      // o item num quadro branco com a borda azul da caixa de texto, ao lado da conversa
+      const sheet = getSheet(fx.item.sprite);
+      const q = at(fx.item.x, fx.item.y);
+      const w = 56 * S, h = 48 * S;
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(q.x, q.y, w, h);
+      ctx.strokeStyle = '#4a6fa5';
+      ctx.lineWidth = 2 * S;
+      ctx.strokeRect(q.x + S, q.y + S, w - 2 * S, h - 2 * S);
+      if (sheet) ctx.drawImage(sheet.img, q.x + 4 * S, q.y + 4 * S, 48 * S, 40 * S);
+    }
+  }
+
+  /**
+   * A lembrança da tempestade (o passo `storm`): a tela azul-escura, três clarões e, nos primeiros
+   * 2,4 s, uma sombra enorme de asas cruzando o alto da tela, da direita para a esquerda.
+   */
+  _storm(storm) {
+    const ctx = this.ctx, S = this.scale, W = this.canvas.width, H = this.canvas.height;
+    ctx.fillStyle = 'rgba(6,10,40,.58)';
+    ctx.fillRect(0, 0, W, H);
+    const t = storm.t;
+    const sheet = getSheet(storm.sprite);
+    if (sheet && t < 2.4) {
+      const off = this._shadow ??= typeof document !== 'undefined' ? document.createElement('canvas') : null;
+      if (off) {
+        const fw = sheet.def.frameWidth, fh = sheet.def.frameHeight;
+        off.width = fw; off.height = fh;
+        const o = off.getContext('2d');
+        o.clearRect(0, 0, fw, fh);
+        o.drawImage(sheet.img, 0, 0, fw, fh, 0, 0, fw, fh);
+        o.globalCompositeOperation = 'source-in';
+        o.fillStyle = '#05060c';
+        o.fillRect(0, 0, fw, fh);
+        o.globalCompositeOperation = 'source-over';
+        const k = Math.min(1, t / 2.2);
+        const size = fw * S;
+        const x = W + 10 * S - k * (W + size + 20 * S);
+        const y = this.offset.y + (Math.sin(k * Math.PI) * 10 - 6) * S;
+        ctx.save();
+        ctx.globalAlpha = 0.9;
+        ctx.imageSmoothingEnabled = false;
+        ctx.translate(x + size, y);
+        ctx.scale(-1, 1);
+        ctx.drawImage(off, 0, 0, size, fh * S);
+        ctx.restore();
+      }
+    }
+    const flash = [0.25, 1.15, 2.0].reduce((a, at) => Math.max(a, 1 - Math.abs(t - at) / 0.12), 0);
+    if (flash > 0) { ctx.fillStyle = `rgba(255,255,235,${(0.75 * flash).toFixed(3)})`; ctx.fillRect(0, 0, W, H); }
   }
 
   /** O corte de tela do Voar: a faixa com as listras correndo e o Pokémon (o Crobat) passando. */

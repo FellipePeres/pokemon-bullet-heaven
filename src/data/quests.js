@@ -115,21 +115,36 @@ export const QUESTS = {
     ],
     doneIf: { cleared: 'gym_4_celadon' },
     // a da Erika segue a história; a da Usina, paralela, quem abre é o marinheiro
-    next: ['c3_erika', 'z_usina'],
+    // a Fase 4 está fechada (decisão 18): o caminho segue pela Usina, que o marinheiro abre
+    next: ['z_usina'],
     reward: null
   },
 
   /* ========================== Capítulo 3: os rastros ========================== */
-  // o Surge manda o jogador à Erika (data/cutscenes.js, depois_surge)
+  // a luz voltou à Usina e o Túnel de Pedra acendeu (data/cutscenes.js, zapdos_livre): a Fase 4 abre
   c3_erika: {
     kind: 'story', chapter: 'cap3',
-    desc: 'O Lt. Surge contou que, na noite em que a Usina apagou, pareceu haver um combate lá dentro, como se o Zapdos estivesse brigando. E a Erika, em Celadon, achou uma coisa estranha no jardim.',
+    desc: 'A luz voltou à Usina, e o Túnel de Pedra acendeu de novo. O caminho para Celadon está aberto, e a Erika espera no ginásio dela.',
     objectives: [
       { text: 'Vença a Erika, em Celadon', on: 'win', target: 'gym_4_celadon', doneIf: { cleared: 'gym_4_celadon' } },
-      // a pista chega com a cena de depois da Fase 4
-      { text: 'Descubra o que a Erika encontrou no jardim', on: 'clue', target: 'jardim' }
+      // a pista chega com a cena de depois da Fase 4 (depois_erika): o emblema de novo
+      { text: 'Descubra o que a Erika encontrou no jardim', on: 'clue', target: 'emblema' }
     ],
-    doneIf: { cleared: 'gym_5_fuchsia' },
+    next: ['c3_koga'],
+    reward: null
+  },
+  // depois da Erika, a história dos lendários descansa (decisão 18): os ginásios seguem
+  c3_koga: {
+    kind: 'story', chapter: 'cap3',
+    desc: 'A Erika achou no jardim um pedaço de metal com o mesmo emblema da máquina da Usina. Na noite do apagão, ela viu uma sombra de asas seguir para o sul. O próximo ginásio é o do Koga, em Fuchsia, também ao sul.',
+    objectives: [{ text: 'Vença o Koga, em Fuchsia', on: 'win', target: 'gym_5_fuchsia', doneIf: { cleared: 'gym_5_fuchsia' } }],
+    next: ['c3_sabrina'],
+    reward: null
+  },
+  c3_sabrina: {
+    kind: 'story', chapter: 'cap3',
+    desc: 'O Koga caiu. O próximo ginásio é o da Sabrina, em Saffron.',
+    objectives: [{ text: 'Vença a Sabrina, em Saffron', on: 'win', target: 'gym_6_saffron', doneIf: { cleared: 'gym_6_saffron' } }],
     next: [],
     reward: null
   },
@@ -137,8 +152,9 @@ export const QUESTS = {
   /* ========================== a Usina (a missão do Zapdos) ========================== */
   // o marinheiro de Vermilion escutou correntes (data/cutscenes.js, vermilion_correntes): a visita
   // é pela marca da Usina no mapa da jornada (data/regionMap.js, STORY_PLACES)
+  // a Usina é o caminho principal (decisão 18): as quests dela são douradas, no Capítulo 2
   z_usina: {
-    kind: 'legendary', chapter: 'usina',
+    kind: 'story', chapter: 'cap2',
     desc: 'Preso em terra pelo mar agitado, um marinheiro de Vermilion trabalhou pela Rota 10 e escutou correntes pesadas se arrastando dentro da Usina, fechada desde o apagão.',
     // fecha no fundo da Usina, quando os olhos aparecem no escuro (data/cutscenes.js, usina_fundo)
     objectives: [{ text: 'Investigue a Usina, na Rota 10', on: 'clue', target: 'olhos' }],
@@ -147,11 +163,11 @@ export const QUESTS = {
     reward: null
   },
   z_zapdos: {
-    kind: 'legendary', chapter: 'usina',
+    kind: 'story', chapter: 'cap2',
     desc: 'No fundo da Usina, no escuro, dois olhos vermelhos. O Zapdos está lá embaixo, preso por correntes e fora de si. A escotilha fica na sala do gerador.',
     // fecha com a luta vencida (a fase `zapdos`, H-6): derrotado, ele foge (sem captura)
     objectives: [{ text: 'Derrote e liberte o Zapdos', on: 'win', target: 'zapdos' }],
-    next: [],
+    next: ['c3_erika'],
     reward: null
   }
 };

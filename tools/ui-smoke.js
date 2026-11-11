@@ -812,14 +812,15 @@ game.menus.closeModal();
         && hub.npcs.some((n) => n.id === 'surge' && n.sprite === 'lt_surge'));
   let atErika = null;
   const surge = runScene((d) => {
-    if (d.text.includes('O seu próximo ginásio é o da Erika')) atErika = { done: game.quests.isDone('c2_surge'), erika: game.quests.isActive('c3_erika'), usina: game.quests.isActive('z_usina') };
+    if (d.text.includes('Túnel de Pedra')) atErika = { done: game.quests.isDone('c2_surge'), erika: game.quests.isActive('c3_erika'), usina: game.quests.isActive('z_usina') };
   });
   check('o Surge conta da Usina que apagou e do Zapdos sumido (com o Articuno, já são dois)',
         said(surge, 'a Usina, perto da Rota 10, apagou') && said(surge, 'Com o Articuno, já são dois'));
   check('...e do combate naquela noite, como se o Zapdos estivesse brigando (nada de barco nem de clarão)',
         said(surge, 'Parecia um combate') && said(surge, 'Como se o Zapdos estivesse brigando') && !said(surge, 'barco') && !said(surge, 'clarão'));
-  check('a pista do Zapdos fecha o Capítulo 2 e abre a da Erika; a da Usina espera o marinheiro',
-        atErika?.done && atErika.erika && !atErika.usina && !game.campaign.quests.done.c2_surge.skipped);
+  check('a pista do Zapdos fecha a quest do Surge; o caminho para Celadon está no escuro, e a da Usina espera o marinheiro',
+        atErika?.done && !atErika.erika && !atErika.usina && !game.campaign.quests.done.c2_surge.skipped
+        && said(surge, 'Túnel de Pedra') && said(surge, 'Ninguém atravessa'));
   settle();
   check('emendada, a cena do porto de Vermilion, em tela cheia',
         hub.mapId === 'vermilion' && hub.scene?.id === 'vermilion_correntes' && registry.get('screen-hub').classes.has('cinema'));
@@ -830,12 +831,21 @@ game.menus.closeModal();
   check('o marinheiro vê o jogador e vem até ele', sailorAt === '12,11,left', sailorAt);
   check('...preso em terra pelo mar agitado, escutou correntes na Usina fechada',
         said(porto, 'A maré está agitada demais') && said(porto, 'Escutei correntes') && said(porto, 'fechada desde o apagão'));
-  check('...e abre a quest paralela da Usina (azul, de lendário)', game.quests.isActive('z_usina') && game.quests.view('z_usina').kind === 'legendary');
+  check('...e abre a quest da Usina, agora o caminho principal (dourada)', game.quests.isActive('z_usina') && game.quests.view('z_usina').kind === 'story');
   settle();
   game.questTracker.render();
-  check('na vila, o rastreador mostra a da Erika (dourada) e a da Usina (azul)',
-        hub.mapId === 'vila' && !hub.scene && questBox().innerHTML.includes('Vença a Erika, em Celadon')
-        && questBox().innerHTML.includes('Investigue a Usina, na Rota 10') && questBox().innerHTML.includes('quest-legendary'));
+  check('na vila, o rastreador mostra a da Usina (dourada), e ainda nada da Erika',
+        hub.mapId === 'vila' && !hub.scene && !questBox().innerHTML.includes('Vença a Erika')
+        && questBox().innerHTML.includes('Investigue a Usina, na Rota 10') && !questBox().innerHTML.includes('quest-legendary'));
+  // a trava da Fase 4 (decisão 18): o túnel no escuro, sem o nome do Zapdos (sem spoiler)
+  check('a Fase 4 está fechada até a Usina: jogar não começa nada', (game.startStage('gym_4_celadon'), !game.run));
+  game.openCampaign();
+  check('o mapa mostra a Fase 4 como a próxima, com a trava: o Túnel de Pedra no escuro e "Investigue a Usina" (sem o Zapdos)',
+        game.menus.lobby.selected === 'gym_4_celadon'
+        && JSON.stringify(registry.get('lobby-panel').children.map((c) => [c.className, c.innerHTML, (c.children ?? []).map((k) => k.innerHTML)])).includes('O Túnel de Pedra está no escuro')
+        && !JSON.stringify(registry.get('lobby-panel').children.map((c) => [c.innerHTML, (c.children ?? []).map((k) => k.innerHTML)])).includes('Zapdos'));
+  hub.enter('home');
+  game.openHub('home');
   hub.enter({ map: 'casa_sabio', x: 3, y: 6, dir: 'up' });
   hub.interact();
   check('o velho sábio: o Zapdos brigando e as correntes não são coisa da natureza', dialogText().includes('Isso não é coisa da natureza'));
@@ -1005,6 +1015,50 @@ game.menus.closeModal();
   game.openCampaign();
 }
 
+// ---- o Capítulo 3 (H-4, decisão 18): a Fase 4 abre com a luz da Usina, e a cena do emblema ----
+{
+  const { isStageUnlocked } = await import('../src/data/stages.js');
+  game.openHub('home');
+  check('com a luz da Usina de volta, a Fase 4 abre, e a quest dourada é a da Erika',
+        isStageUnlocked('gym_4_celadon', game.campaign.clearedStages) && game.quests.isActive('c3_erika'));
+  game.startStage('gym_4_celadon');
+  check('a Fase 4 é a batalha da Erika de sempre', game.run?.stage.id === 'gym_4_celadon');
+  game.run.state = 'victory';
+  game._handleRunState();
+  check('vencer a Erika deixa a cena do emblema devida', game.sceneRecord.depois_erika === 'due');
+  registry.get('btn-result-menu').click();
+  check('Continuar Jornada: o ginásio de Celadon em tela cheia, com a Erika em pixel',
+        hub.mapId === 'ginasio_celadon' && hub.scene?.id === 'depois_erika' && registry.get('screen-hub').classes.has('cinema')
+        && hub.npcs.some((n) => n.id === 'erika' && n.sprite === 'erika'));
+  let storm = false, item = false, emote = false, shadowGone = false;
+  const cena = runScene((d) => {
+    const fx = hub.scene?.fx;
+    if (d.text.includes('sombra enorme')) storm = !!fx?.storm;
+    if (d.text.includes('reconhece o emblema')) { item = fx?.item?.sprite === 'npc/pedaco_metal'; emote = true; }
+    if (d.text.includes('Pela manhã')) shadowGone = !fx?.storm;
+  });
+  check('a lembrança: a tela escurece e a sombra de asas cruza o alto enquanto a Erika conta, e some depois',
+        storm && shadowGone && said(cena, 'tempestade estranha sobre Celadon'));
+  check('o pedaço de metal no quadro, e o jogador reconhece o emblema da máquina da Usina',
+        item && emote && said(cena, 'é o mesmo da máquina que prendia o Zapdos'));
+  check('a conversa deixa as pistas: a Rocket no Cassino, a sombra para o sul e o Koga, também ao sul',
+        said(cena, 'embaixo do Cassino') && said(cena, 'Seguiu para o sul, na direção do mar') && said(cena, 'Koga, em Fuchsia'));
+  check('o Pedaço de Metal vai para a mochila da jornada', game.campaign.keyItems?.emblema_vermelho >= 1 && said(cena, 'recebeu PEDAÇO DE METAL'));
+  check('a pista fecha a quest da Erika e abre a do Koga (a história dos lendários descansa)',
+        game.quests.isDone('c3_erika') && game.quests.isActive('c3_koga') && game.sceneRecord.depois_erika === 'seen');
+  settle();
+  check('...e a volta é para a vila', hub.mapId === 'vila' && !hub.scene);
+  game.startStage('gym_5_fuchsia');
+  game.run.state = 'victory';
+  game._handleRunState();
+  check('vencer o Koga abre a da Sabrina, sem cena nenhuma',
+        game.quests.isDone('c3_koga') && game.quests.isActive('c3_sabrina') && !Object.values(game.sceneRecord).includes('due'));
+  registry.get('btn-result-menu').click();
+  settle();
+  check('...e a volta é direto para a vila', hub.mapId === 'casa_2f' || hub.mapId === 'vila');
+  game.openCampaign();
+}
+
 // ---- Campeão e Hall da Fama ----
 game.region.campaign.slice(0, -1).forEach((e) => {
   if (!game.campaign.clearedStages.includes(e.stage)) game.campaign.clearedStages.push(e.stage);
@@ -1104,12 +1158,13 @@ check('depois da escolha, o Continuar segue para a jornada (na vila); sem nome, 
     { do: 'hide', who: 'menina' },
     { do: 'quest', id: 'teste_cena' },
     { do: 'give', item: 'revive', count: 2 },
-    { do: 'give', item: 'pena_dourada' },
+    { do: 'give', item: 'emblema_vermelho' },
     { do: 'flag', name: 'teste_flag' },
     { do: 'place', who: 'player', x: 7, y: 17, dir: 'left' },
     { do: 'end' }
   ] };
   const revives = game.profile.bag.revive ?? 0;
+  const keyBefore = game.campaign.keyItems?.emblema_vermelho ?? 0;
   check('uma cena começa pelo código (game.playScene)', game.playScene('teste_cena') && hub.scene?.id === 'teste_cena');
   let faded = 0, shook = false, opened = false;
   const texts = [];
@@ -1124,13 +1179,13 @@ check('depois da escolha, o Continuar segue para a jornada (na vila); sem nome, 
   check('fade escurece e clareia, e shake treme a tela', faded === 1 && shook);
   check('hide some com alguém do lugar, que deixa de bloquear o tile', girl.hidden && !hub.npcAt(girl.x, girl.y));
   check('give dá um item da mochila e um da história, e avisa na caixa',
-        game.profile.bag.revive === revives + 2 && game.campaign.keyItems?.pena_dourada === 1
-        && texts.includes(`${game.playerName} recebeu 2 REVIVER!`) && texts.includes(`${game.playerName} recebeu PENA DOURADA!`));
+        game.profile.bag.revive === revives + 2 && game.campaign.keyItems?.emblema_vermelho === keyBefore + 1
+        && texts.includes(`${game.playerName} recebeu 2 REVIVER!`) && texts.includes(`${game.playerName} recebeu PEDAÇO DE METAL!`));
   check('quest abre uma quest, e o fim da cena conta para o objetivo `scene`', opened && game.quests.isDone('teste_cena'));
   check('flag marca a flag da vila e place põe o jogador no tile',
         game.campaign.hub.flags.teste_flag === true && hub.player.x === 7 && hub.player.y === 17 && hub.player.dir === 'left');
   delete CUTSCENES.teste_cena; delete QUESTS.teste_cena; delete game.quests.state.done.teste_cena;
-  delete game.campaign.scenes.teste_cena; delete game.campaign.hub.flags.teste_flag; delete game.campaign.keyItems.pena_dourada;
+  delete game.campaign.scenes.teste_cena; delete game.campaign.hub.flags.teste_flag; if (keyBefore) game.campaign.keyItems.emblema_vermelho = keyBefore; else delete game.campaign.keyItems.emblema_vermelho;
   game.profile.bag.revive = revives;
 
   // antes da fase (o gatilho 'play'): a cena toca em tela cheia, num palco, e a fase começa no fim.

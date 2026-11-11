@@ -861,6 +861,33 @@ Nunca voltar bônus globais para o pool de level up — foi pedido explícito.
   a cena pendente ao continuar e ao carregar; o Origin Pulse do Kyogre em campo
   desenhado do 1º quadro ao fim). O roteiro de screenshots é `kyogre`.
 
+### O Capítulo 3: a trava da Fase 4 e a cena do emblema (H-4, 0.39 na branch)
+- Pedido do Fellipe (decisão 18 do PLANEJAMENTO-HISTORIA, a proposta "Celadon: o
+  emblema", aprovada com a cena montada como maquete). **Regra dele: nada de spoiler em
+  título** (fase, quest, trava, card, aviso): a descoberta do Zapdos é na Usina.
+- **A trava da história** (`lock` na fase, `data/stages.js`): a Fase 4 tem
+  `lock: { stage: 'zapdos', text, go, place }`. `isStageUnlocked` olha o `unlockedBy` e a
+  trava (a fase `zapdos` entra nas `clearedStages` ao ser vencida, como qualquer fase);
+  `storyLocked` diz se a fase só espera a trava. No mapa da jornada, a fase presa pela
+  trava é a próxima (`Lobby.nextStage`), e o painel mostra o texto ("O Túnel de Pedra
+  está no escuro desde que a Usina apagou. Ninguém passa.") e o botão para o lugar da
+  história (`#panel-lock-go`, "Investigue a Usina, na Rota 10"). O check-data recusa a
+  trava que cita o lendário da fase que destrava.
+- **As quests**: depois do Surge, só a da Usina (`z_usina`, agora dourada, no Capítulo
+  2, aberta pelo marinheiro); a do Zapdos abre a da Erika (`c3_erika`, com a pista
+  `emblema`), que abre a do Koga (`c3_koga`) e a da Sabrina (`c3_sabrina`), só de vencer
+  os ginásios. As falas da vila que esperavam a quest da Erika passaram para a da Usina.
+- **O palco** `ginasio_celadon` (o mapa do FireRed inteiro, `tools/assets/hub.py`) com a
+  Erika (`npc/erika`) e a cena `depois_erika` (gatilho `win` da Fase 4).
+- **Os passos novos das cenas**: `toast` (um aviso; a volta da Usina avisa que o Túnel de
+  Pedra acendeu), `storm` (a lembrança: a tela azul-escura, os clarões e a sombra de asas
+  cruzando o alto, `HubRenderer._storm`, com a silhueta do `dive/crobat`; fica até
+  `storm { off }`) e `item` (um item num quadro ao lado da conversa: o pedaço de metal,
+  `npc/pedaco_metal`, desenhado com o emblema da máquina). A pena dourada saiu dos itens.
+- **Os testes**: o `smoke-test` (a trava), o `ui-smoke` (a trava sem spoiler no mapa, a
+  Fase 4 abrindo com a luz da Usina, a cena inteira, o item, a quest do Koga e a da
+  Sabrina) e o roteiro de screenshots `celadon`.
+
 ### O molde das missões e a luta do Zapdos (H-5 e H-6, 0.39 na branch)
 - Pedido do Fellipe ("pode construir isso": a luta do Zapdos, para o Lutar do card
   funcionar). Os detalhes que ele não decidiu ficaram no padrão
@@ -1416,6 +1443,7 @@ o Brock como está, todas as outras mais duras, menos níveis.
 | 74 | a Usina andável: "ao clicar no investigar no card da usina, a gente vai ter tiles jogáveis", uma escada para o fundo, a tela preta com um círculo de brilho fraco, os olhos vermelhos e o card "derrote e liberte Zapdos"; depois: os olhos em pixel e 2D, num tile; 13 Poké Balls (2 no caminho, 11 nas salas sem saída) com Reviver e Novo Sorteio; o card só depois dos olhos (2 s e 2 s), no padrão dos cards de fase, com a foto do Zapdos | 0.39 (na branch): a Usina inteira do FireRed como lugar para explorar (`explore`), as Poké Balls do chão (`loot`), a escotilha e os olhos desenhados em pixel, o escuro em degraus (`dark`), o card de missão (`data/missions.js`), as quests `z_usina` e `z_zapdos`; o card do Kyogre corrigido (o banner sumia) |
 | 75 | "pode construir isso" (a luta do Zapdos, para o Lutar do card funcionar: o molde das missões, tirado do salão do Kyogre, e a tempestade) | 0.39 (na branch): o molde `systems/legendaryFight.js` (o Kyogre por cima dele, idêntico quadro a quadro), a luta do Zapdos (preso na máquina do emblema vermelho, as correntes arrebentando, a tempestade marcada, o Zap Cannon, a Investida, o Discharge, o tabuleiro de raios, 3 Ultra Balls, a fuga sem captura), a arena da Power Plant, a transição de batalha do FireRed, a volta pela missão, a cena `zapdos_livre` com a luz de volta e o emblema, a regra da Poké Ball para quem tem missão; medido: no nível 58 vence 11 de 12 |
 | 76 | o refino da história: "essas maquinas que prendem os lendários sugam a energia deles" e mandam em ondas para um lugar misterioso, onde uma máquina central numa base do Maxie desorienta os Pokémon (ideia de End Game); o Zapdos enfraquecido explica a vitória de um jogador de nível baixo; "ao derrotar o Zapdos, rola uma cutscene do Zapdos voando e fugindo, assustado", sem captura por enquanto | 0.39 (na branch): a luta sem captura e de nível 36 (medida: 11 de 12 no 36), a energia escorrendo pelas correntes, a cena com o Zapdos do FireRed caído que foge pelo alto (os passos `cry`, `tremble` e `fly`) e a pista da energia mandada para longe; o card "Sem captura nesta luta" |
+| 77 | "A fase da Erika é barrada, o jogador precisa passar do Zapdos para liberar a Erika, o emblema pode ser visto outra vez e o jogador faz ligação que era o mesmo da máquina"; "não pode ter spoilers no título das fases ou quests"; a cena do emblema "montada já no artifact" e "um bate papo simples dando indícios da continuação"; "ficou excelente" | 0.39 (na branch): a trava da Fase 4 (`lock`, o Túnel de Pedra no escuro, sem o nome do Zapdos), as quests douradas da Usina, a do Koga e a da Sabrina, o palco do ginásio de Celadon com a Erika, a cena `depois_erika` (a lembrança com a sombra de asas, o pedaço de metal, o emblema reconhecido, as pistas: a Rocket no Cassino, a sombra para o sul) e os passos `toast`, `storm` e `item` |
 | Fase 8 (Giovanni) | 1 → 0,8 | 4,0 | 4,5 | 60 | 84 → 62 |
 | Lorelei | 1,05 → 0,8 | 3,5 | 3,1–4,7 | 64 | 92 → 66 |
 | Bruno | 1,12 → 0,97 | 3,7 | 3,5–6,3 ² | 66 | 99 → 68 |

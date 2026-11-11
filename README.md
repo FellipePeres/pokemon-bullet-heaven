@@ -163,6 +163,11 @@ não abre até você vencer.
   investidas e um tabuleiro de raios em que só fica a salvo quem pisa onde o raio acabou
   de cair. Derrotado, ele foge, assustado: a captura fica para outro momento (só depois
   de liberado ele aparece nas Poké Balls das fases).
+- **O emblema de novo**: o caminho para Celadon passa pelo Túnel de Pedra, no escuro
+  desde o apagão; ele só acende quando a luz volta à Usina. Depois da Erika, ela conta da
+  tempestade daquela noite (a lembrança: uma sombra de asas cruzando o céu) e mostra o
+  pedaço de metal que achou no jardim, com o mesmo emblema da máquina da Usina. Depois,
+  a jornada segue pelo Koga e pela Sabrina.
 - **Os 151 Pokémon de Kanto jogáveis**, cada um com linha de 3 golpes e linha
   evolutiva. Alguns chegam como presente, como no FireRed (Farfetch'd, Lickitung e
   o prêmio do Dojo de Saffron: Hitmonlee ou Hitmonchan).

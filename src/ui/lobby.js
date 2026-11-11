@@ -1,6 +1,6 @@
 import { el, create, clear, show, hide } from './dom.js';
 import { getPokemon } from '../data/pokemon.js';
-import { STAGES, isStageUnlocked } from '../data/stages.js';
+import { STAGES, isStageUnlocked, storyLocked } from '../data/stages.js';
 import { getTrainerLook } from '../data/trainers.js';
 import { REGION_MAP, STAGE_CITY, HOME_CITY, STORY_PLACES, cityName, cityPoint, placePoint } from '../data/regionMap.js';
 import { emptyStageStats } from '../systems/stageStats.js';
@@ -51,7 +51,9 @@ export class Lobby {
   /** A próxima fase da jornada (ou a última, se tudo já foi vencido). */
   get nextStage() {
     const cleared = this.campaign.clearedStages;
-    return this.stages.find((s) => !cleared.includes(s.id) && isStageUnlocked(s.id, cleared)) ?? this.stages.at(-1);
+    // a fase presa pela trava da história (H-4) também é a próxima: o painel diz o que falta
+    return this.stages.find((s) => !cleared.includes(s.id) && (isStageUnlocked(s.id, cleared) || storyLocked(s.id, cleared)))
+      ?? this.stages.at(-1);
   }
 
   /** Os lugares da história que estão no mapa agora (0.39): os de uma quest ativa. */
@@ -306,6 +308,20 @@ export class Lobby {
     // o caminho e a duração, numa linha só
     const trail = (stage.segments ?? []).map((seg) => seg.name).join(' → ');
     panel.appendChild(create('p', 'panel-trail', `${trail} · ${formatTime(stage.duration)}`));
+
+    // a trava da história (H-4): o que fecha o caminho e para onde ir (sem spoiler: a Usina)
+    if (storyLocked(stage.id, cleared)) {
+      const lock = create('div', 'panel-lock');
+      lock.appendChild(create('p', '', stage.lock.text));
+      const place = stage.lock.place && this.places.some(([id]) => id === stage.lock.place);
+      const go = create('button', 'panel-lock-go', stage.lock.go);
+      go.type = 'button';
+      go.id = 'panel-lock-go';
+      go.disabled = !place;
+      go.onclick = () => { this.selected = `place:${stage.lock.place}`; this.render(); };
+      lock.appendChild(go);
+      panel.appendChild(lock);
+    }
 
     // o nível recomendado (0.17): a derrota guarda o progresso e a próxima fase só
     // abre vencendo; aqui o jogador vê se é hora de fortalecer a equipe antes

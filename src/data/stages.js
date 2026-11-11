@@ -233,6 +233,14 @@ export const STAGES = {
     type: 'gym',
     icon: 'tm-grass',
     description: 'Rota 9, o Túnel de Pedra e a Rota 8 — até o Ginásio da Erika.',
+    // a trava da história (H-4, decisão 18 do PLANEJAMENTO-HISTORIA): o Túnel de Pedra está no
+    // escuro desde o apagão e só acende com a luz da Usina de volta (a missão do Zapdos, a fase
+    // `zapdos`). O texto não cita o Zapdos: a descoberta dele é na Usina (sem spoiler em título)
+    lock: {
+      stage: 'zapdos',
+      text: 'O Túnel de Pedra está no escuro desde que a Usina apagou. Ninguém passa.',
+      go: 'Investigue a Usina, na Rota 10', place: 'usina'
+    },
     music: 'mus_celadon', leaderMusic: 'mus_vs_gym_leader',
     duration: 165,
     xpScale: 1.48,   // 2:45 até o líder (0.15; era 3:30, e antes da 0.11, mais): cada inimigo vale mais XP
@@ -1038,6 +1046,15 @@ export const getStage = (id) => STAGES[id];
 export function isStageUnlocked(stageId, clearedStages = []) {
   const stage = STAGES[stageId];
   if (!stage) return false;
+  if (stage.unlockedBy && !clearedStages.includes(stage.unlockedBy)) return false;
+  // a trava da história (`lock`, H-4): a fase espera outra (a missão do Zapdos)
+  return !stage.lock || clearedStages.includes(stage.lock.stage);
+}
+
+/** A fase já estaria aberta pela anterior, mas espera a trava da história (`lock`)? */
+export function storyLocked(stageId, clearedStages = []) {
+  const stage = STAGES[stageId];
+  if (!stage?.lock || clearedStages.includes(stage.lock.stage)) return false;
   return !stage.unlockedBy || clearedStages.includes(stage.unlockedBy);
 }
 

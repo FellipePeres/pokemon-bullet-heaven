@@ -2035,6 +2035,11 @@ button { font: inherit; color: inherit; }
 .panel-badge { width: 32px; height: 32px; image-rendering: pixelated; }
 .panel-badge.missing { filter: grayscale(1) brightness(.5); opacity: .5; }
 .panel-trail { margin: 0; font-size: 15px; line-height: 1.35; }
+/* a trava da história no painel da fase (H-4): o que fecha o caminho e o botão para o lugar */
+.panel-lock { display: flex; flex-direction: column; gap: 6px; padding: 8px 10px; border: 2px dashed #8a2016; background: #fbe3e1; border-radius: 3px; }
+.panel-lock p { margin: 0; font-size: 14px; line-height: 1.35; color: #5a1a12; }
+.panel-lock-go { align-self: flex-start; font-family: var(--font-pixel, inherit); font-size: 13px; padding: 4px 10px; border: 0; border-radius: 3px; background: #4a6fa5; color: #fff; cursor: pointer; }
+.panel-lock-go:disabled { opacity: .5; cursor: default; }
 .panel-time { margin: 0; font-size: 14px; color: var(--gba-ink-soft); }
 /* o nível recomendado (0.17): verde quando a equipe está pronta, laranja perto, vermelho longe */
 .panel-level { margin: 0; padding: 4px 8px; font-size: 14px; border-radius: 3px; border: 2px solid currentColor; }
