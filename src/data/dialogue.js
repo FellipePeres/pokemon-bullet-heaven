@@ -179,6 +179,20 @@ export const DIALOGUE = {
     name: 'Dono da casa',
     lines: [{ say: ['Peças de máquina... Para que alguém ia querer isso?'] }]
   },
+  // os palcos da volta da Fase 3 (0.39, data/cutscenes.js)
+  surge: {
+    name: 'Lt. Surge',
+    lines: [{ say: ['O seu próximo ginásio é o da Erika, em Celadon. Mexa-se, recruta!'] }]
+  },
+  marinheiro: {
+    name: 'Marinheiro',
+    lines: [{ say: ['Correntes, na Usina fechada... Até hoje eu me arrepio.'] }]
+  },
+  marinheiro2: {
+    name: 'Marinheiro',
+    lines: [{ say: ['Com o mar desse jeito, o navio não sai do porto.'] }]
+  },
+  voltorb_usina: { lines: [{ say: ['O Voltorb faísca. É melhor não chegar perto.'] }] },
   // quem desiste da escolha (o Voltar da tela de iniciais)
   carvalho_espera: {
     name: 'Prof. Carvalho',
@@ -268,6 +282,9 @@ export const DIALOGUE = {
     lines: [
       { when: { champion: true }, say: ['Você venceu a Liga. Mas me diga: já foi até o fim do mato a oeste? Ninguém nunca foi.'] },
       // a história (0.39): o que ele diz depois de cada cena, enquanto a quest daquele momento está ativa
+      { when: { scene: 'vermilion_correntes', quest: 'c3_erika' }, say: [
+        'O Zapdos brigando, e depois correntes na Usina... Isso não é coisa da natureza, {player}.'
+      ] },
       { when: { scene: 'cerulean_roubo', quest: 'c2_surge' }, say: [
         'Levaram peças de máquina e deixaram o dinheiro? Que ladrão faz isso?',
         'Tem alguma coisa errada nessa história, {player}.'
@@ -289,6 +306,7 @@ export const DIALOGUE = {
     name: 'Pescador',
     lines: [
       { when: { kyogre: true }, say: ['Então era ISSO que vivia lá embaixo?! E eu jogando minhoca...'] },
+      { when: { scene: 'vermilion_correntes', quest: 'c3_erika' }, say: ['O mar de Vermilion também está bravo, é? Pois é, nem os barcos saem mais.'] },
       { when: { diveRescued: true, once: 'pescador_resgate' }, say: ['Ô, peixão! Quase arrebentou a minha linha. Da próxima vez, avisa antes de afundar!'] },
       { when: { dive: true }, say: ['Esse seu Pokémon... ele sabe mergulhar, não sabe? Vai lá e me conta o que tem no fundo!'] },
       { say: ['Às vezes fico imaginando o que tem lá embaixo... Se eu soubesse mergulhar, descobriria.'] }
@@ -306,6 +324,7 @@ export const DIALOGUE = {
     lines: [
       { when: { locked: true }, say: ['Ei! Vai sair sem Pokémon? As hordas te pegam na primeira curva.', 'Passa no laboratório do Prof. Carvalho antes!'] },
       // depois da casa roubada de Cerulean (0.39): a vila culpa a Equipe Rocket
+      { when: { scene: 'vermilion_correntes', quest: 'c3_erika' }, say: ['Dizem que Vermilion ficou dias sem luz! E a Equipe Rocket levando a culpa de novo.'] },
       { when: { scene: 'cerulean_roubo', quest: 'c2_surge' }, say: ['Viu o jornal? A Equipe Rocket assaltou uma casa em Cerulean!'] },
       { say: ['Daqui para o sul, é Kanto inteira. Boa sorte!'] }
     ]

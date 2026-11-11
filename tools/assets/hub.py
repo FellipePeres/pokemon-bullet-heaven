@@ -233,6 +233,7 @@ LAB, HOUSE1, WARDEN = 'PalletTown_ProfessorOaksLab', 'House1', 'FuchsiaCity_Ward
 COPYCAT = 'SaffronCity_CopycatsHouse_2F'
 GYM1 = 'PewterCity_Gym'
 GYM2 = 'CeruleanCity_Gym'
+GYM3, VE, PP = 'VermilionCity_Gym', 'VermilionCity', 'PowerPlant'
 
 
 def build_vila(s):
@@ -364,6 +365,24 @@ def build_ginasio_cerulean(s):
     s.stamp(0, 0, GYM2, 0, 0, 17, 20)
 
 
+def build_ginasio_vermilion(s):
+    """O ginásio do Lt. Surge, inteiro: o palco da cena de depois da Fase 3 (0.39)."""
+    s.stamp(0, 0, GYM3, 0, 0, 11, 21)
+
+
+def build_vermilion(s):
+    """Um recorte de Vermilion (0.39): o ginásio, o cais de madeira e o caminho até o navio."""
+    s.stamp(0, 0, VE, 14, 18, 26, 18)
+
+
+def build_usina(s):
+    """
+    A entrada da Usina (0.39): o canto de baixo, à esquerda, com o tapete da porta e o
+    corredor estreito para o norte (onde os Voltorb fecham a passagem na visita).
+    """
+    s.stamp(0, 0, PP, 0, 20, 26, 20)
+
+
 def build_cerulean(s):
     """
     Um recorte de Cerulean (0.39): a casa assaltada do FireRed (a porta da frente em
@@ -386,8 +405,11 @@ MAPS = {
     'ginasio_pewter': (13, 16, build_ginasio_pewter),
     'ginasio_cerulean': (17, 20, build_ginasio_cerulean),
     'cerulean': (22, 15, build_cerulean),
+    'ginasio_vermilion': (11, 21, build_ginasio_vermilion),
+    'vermilion': (26, 18, build_vermilion),
+    'usina': (26, 20, build_usina),
 }
-SOURCES = [P, V, R, F, CE, FU, IP, DS4, DS1, PH1, PH2, LAB, HOUSE1, WARDEN, COPYCAT, GYM1, GYM2]
+SOURCES = [P, V, R, F, CE, FU, IP, DS4, DS1, PH1, PH2, LAB, HOUSE1, WARDEN, COPYCAT, GYM1, GYM2, GYM3, VE, PP]
 
 
 # ============================ os móveis do quarto ============================
@@ -448,6 +470,10 @@ SPRITES = {
     # a casa assaltada de Cerulean (0.39)
     'policeman':   ('people/policeman', 'npc_blue', 16, 32),
     'old_man_2':   ('people/old_man_2', 'npc_white', 16, 32),
+    # Vermilion e a Usina (0.39)
+    'lt_surge':    ('people/lt_surge', 'npc_green', 16, 32),
+    'sailor':      ('people/sailor', 'npc_pink', 16, 32),
+    'voltorb':     ('pokemon/voltorb', 'npc_white', 16, 16),
     'meowth':      ('pokemon/meowth', 'npc_blue', 16, 16),
     'clefairy':    ('pokemon/clefairy', 'npc_pink', 16, 16),
     'pidgey':      ('pokemon/pidgey', 'npc_blue', 16, 16),

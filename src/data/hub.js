@@ -197,6 +197,34 @@ export const HUB = {
       ],
       things: []
     },
+    ginasio_vermilion: {
+      name: 'Ginásio de Vermilion',
+      scene: true,
+      npcs: [
+        { id: 'surge', sprite: 'lt_surge', x: 5, y: 2, dir: 'down', talk: 'surge' }
+      ],
+      things: []
+    },
+    // um recorte de Vermilion: o cais de madeira, com os marinheiros parados em terra
+    vermilion: {
+      name: 'Porto de Vermilion',
+      scene: true,
+      npcs: [
+        { id: 'marinheiro', sprite: 'sailor', x: 18, y: 11, dir: 'left', talk: 'marinheiro' },
+        { id: 'marinheiro2', sprite: 'sailor', x: 10, y: 15, dir: 'up', talk: 'marinheiro2' }
+      ],
+      things: []
+    },
+    // a entrada da Usina: os Voltorb fecham o corredor para o norte
+    usina: {
+      name: 'Usina',
+      scene: true,
+      npcs: [
+        { id: 'voltorb1', sprite: 'voltorb', x: 6, y: 9, dir: 'down', talk: 'voltorb_usina' },
+        { id: 'voltorb2', sprite: 'voltorb', x: 7, y: 9, dir: 'down', talk: 'voltorb_usina' }
+      ],
+      things: []
+    },
     // um recorte de Cerulean: a casa assaltada do FireRed, com o policial na porta
     cerulean: {
       name: 'Cidade de Cerulean',

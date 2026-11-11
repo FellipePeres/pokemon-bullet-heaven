@@ -152,7 +152,9 @@ não abre até você vencer.
   acontecendo com os Pokémon, e de volta à vila o velho sábio conta que os
   pássaros lendários sumiram dos céus. Em Cerulean, a Misty conta que o mar ficou
   bravo desde que o Articuno sumiu, e uma casa assaltada põe a culpa na Equipe
-  Rocket.
+  Rocket. Em Vermilion, o Lt. Surge conta que o Zapdos também sumiu, na noite em que
+  a Usina apagou, e um marinheiro escutou correntes lá dentro: a Usina aparece no
+  mapa da jornada, para o jogador ir investigar.
 - **Os 151 Pokémon de Kanto jogáveis**, cada um com linha de 3 golpes e linha
   evolutiva. Alguns chegam como presente, como no FireRed (Farfetch'd, Lickitung e
   o prêmio do Dojo de Saffron: Hitmonlee ou Hitmonchan).

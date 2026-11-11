@@ -215,6 +215,80 @@ export const HUB_MAPS = {
       '#####.........#......#',
       '###############.......'
     ]
+  },
+  ginasio_vermilion: {
+    src: 'assets/hub/ginasio_vermilion.png', top: 'assets/hub/ginasio_vermilion-top.png', width: 11, height: 21,
+    walk: [
+      '###########',
+      '###########',
+      '#..#...#..#',
+      '#.........#',
+      '#.........#',
+      '#.........#',
+      '###########',
+      '###########',
+      '...........',
+      '...........',
+      '.#.#.#.#.#.',
+      '...........',
+      '.#.#.#.#.#.',
+      '...........',
+      '.#.#.#.#.#.',
+      '...........',
+      '...........',
+      '...#...#...',
+      '...........',
+      '...........',
+      '###########'
+    ]
+  },
+  vermilion: {
+    src: 'assets/hub/vermilion.png', top: 'assets/hub/vermilion-top.png', width: 26, height: 18,
+    walk: [
+      '....................#.....',
+      '..........................',
+      '..........................',
+      '.................###.....#',
+      '####.........#######.....#',
+      '####..####...#######.....#',
+      '#####.####...#######.....#',
+      '##....####.......####...##',
+      '......###############...##',
+      '......###############...##',
+      '......##................##',
+      '########................##',
+      '########................##',
+      '########...###############',
+      '########...###############',
+      '########...###############',
+      '########...###############',
+      '######..###..#############'
+    ]
+  },
+  usina: {
+    src: 'assets/hub/usina.png', top: 'assets/hub/usina-top.png', width: 26, height: 20,
+    walk: [
+      '#####.....####......######',
+      '#####.....####......####..',
+      '#.........##...........###',
+      '#.........#............###',
+      '#...#######...#######.....',
+      '#...#######...#######....#',
+      '#......####.........#.....',
+      '#.......###.........#.....',
+      '#.......###.........######',
+      '######..#########...######',
+      '######..#########...#.....',
+      '#.........###...........##',
+      '#.........#.............##',
+      '##......###.............##',
+      '###.....######..##########',
+      '###.....######..##########',
+      '##.......####......####...',
+      '#.........##......####....',
+      '#.........#...............',
+      '##########################'
+    ]
   }
 };
 
@@ -231,6 +305,7 @@ export const HUB_SPRITES = {
   'npc/lapras_doll': { src: 'assets/hub/npc/lapras_doll.png', frameWidth: 32, frameHeight: 32, frames: 1 },
   'npc/lass': { src: 'assets/hub/npc/lass.png', frameWidth: 16, frameHeight: 32, frames: 10 },
   'npc/little_girl': { src: 'assets/hub/npc/little_girl.png', frameWidth: 16, frameHeight: 16, frames: 10 },
+  'npc/lt_surge': { src: 'assets/hub/npc/lt_surge.png', frameWidth: 16, frameHeight: 32, frames: 3 },
   'npc/meowth': { src: 'assets/hub/npc/meowth.png', frameWidth: 16, frameHeight: 16, frames: 3 },
   'npc/misty': { src: 'assets/hub/npc/misty.png', frameWidth: 16, frameHeight: 32, frames: 3 },
   'npc/mom': { src: 'assets/hub/npc/mom.png', frameWidth: 16, frameHeight: 32, frames: 3 },
@@ -242,7 +317,9 @@ export const HUB_SPRITES = {
   'npc/policeman': { src: 'assets/hub/npc/policeman.png', frameWidth: 16, frameHeight: 32, frames: 9 },
   'npc/prof_oak': { src: 'assets/hub/npc/prof_oak.png', frameWidth: 16, frameHeight: 32, frames: 9 },
   'npc/rival': { src: 'assets/hub/npc/rival.png', frameWidth: 16, frameHeight: 32, frames: 9 },
+  'npc/sailor': { src: 'assets/hub/npc/sailor.png', frameWidth: 16, frameHeight: 32, frames: 10 },
   'npc/scientist': { src: 'assets/hub/npc/scientist.png', frameWidth: 16, frameHeight: 32, frames: 10 },
+  'npc/voltorb': { src: 'assets/hub/npc/voltorb.png', frameWidth: 16, frameHeight: 16, frames: 3 },
   'npc/woman_1': { src: 'assets/hub/npc/woman_1.png', frameWidth: 16, frameHeight: 32, frames: 10 },
   'npc/worker_f': { src: 'assets/hub/npc/worker_f.png', frameWidth: 16, frameHeight: 32, frames: 10 },
   'npc/youngster': { src: 'assets/hub/npc/youngster.png', frameWidth: 16, frameHeight: 32, frames: 10 }

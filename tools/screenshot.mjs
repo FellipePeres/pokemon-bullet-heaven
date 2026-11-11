@@ -70,7 +70,8 @@ const ROTEIROS = {
     { run: "game.startStage('gym_1_pewter')" }, { wait: 1500 }, { shot: 'quests-07-partida' }
   ],
   // as cenas (0.39, data/cutscenes.js): o discurso do Carvalho encenado, o rival, as cenas do Brock
-  // e do velho sábio depois da Fase 1, as da Misty e da casa roubada depois da Fase 2 (em tela cheia, nunca no meio da fase) e a do Maxie, no motor novo (game/Cutscene.js)
+  // e do velho sábio depois da Fase 1, as da Misty e da casa roubada depois da Fase 2,
+  // as do Surge e do porto depois da Fase 3, a visita à Usina (em tela cheia, nunca no meio da fase) e a do Maxie, no motor novo (game/Cutscene.js)
   cenas: [
     { open: 'index.html' }, { wait: 500 },
     { run: "window.skip = (n = 1) => { for (let i = 0; i < n; i++) { const h = game.hub; if (!h.dialog) return; h.dialog.shown = 999; h.confirm(); } };" +
@@ -111,10 +112,27 @@ const ROTEIROS = {
     { run: 'skip()' }, { wait: 2000 }, { run: 'skip()' }, { wait: 2000 }, { shot: 'cenas-28-as-pecas' },
     { run: 'skip()' }, { wait: 2600 }, { shot: 'cenas-29-o-rival' },
     { run: 'skip()' }, { wait: 3200 }, { shot: 'cenas-30-o-surge-no-rastreador' },
+    // depois da Fase 3: o Surge e o combate na Usina, o marinheiro e as correntes, e a visita à Usina pelo mapa
+    { run: "game.openCampaign(); game.startStage('gym_3_vermilion'); game.run.state = 'victory'" }, { wait: 1500 },
+    { run: 'game.quitToMenu()' }, { wait: 2600 }, { shot: 'cenas-31-surge' },
+    { run: 'skip(2)' }, { wait: 2600 }, { shot: 'cenas-32-a-usina-apagou' },
+    { run: 'skip(3)' }, { wait: 2400 }, { run: 'skip()' }, { wait: 2200 }, { shot: 'cenas-33-o-combate' },
+    { run: 'skip()' }, { wait: 1200 }, { shot: 'cenas-34-a-pista-do-zapdos' },
+    { run: 'skip()' }, { wait: 2500 }, { shot: 'cenas-35-o-marinheiro' },
+    { wait: 900 }, { run: 'skip()' }, { wait: 2600 }, { run: 'skip()' }, { wait: 1800 }, { shot: 'cenas-36-a-mare' },
+    { run: 'skip()' }, { wait: 2200 }, { run: 'skip()' }, { wait: 2200 }, { shot: 'cenas-37-as-correntes' },
+    { run: 'skip()' }, { wait: 1500 }, { run: 'skip()' }, { wait: 1200 }, { shot: 'cenas-38-a-quest-da-usina' },
+    { wait: 3000 }, { shot: 'cenas-39-vila-com-a-usina' },
+    { run: "game.openCampaign(); game.menus.lobby.selected = 'place:usina'; game.menus.lobby.render()" }, { wait: 1500 }, { shot: 'cenas-40-mapa-usina' },
+    { run: "game.visitPlace('usina')" }, { wait: 2600 }, { shot: 'cenas-41-a-usina' },
+    { run: 'skip(2)' }, { wait: 2600 }, { shot: 'cenas-42-correntes-na-usina' },
+    { run: 'skip()' }, { wait: 1200 }, { shot: 'cenas-43-o-grito' },
+    { run: 'skip()' }, { wait: 2200 }, { run: 'skip()' }, { wait: 1500 }, { shot: 'cenas-44-perigoso' },
+    { run: 'skip()' }, { wait: 2000 },
     { run: "game.hub.scene = null; game.hub.enter({ map: 'vila', x: 30, y: 11, dir: 'down' });" +
            " game.diveRecord.captured = true; game.diveRecord.sceneSeen = false; game._maybeMaxieScene('lagoa')" },
-    { wait: 1000 }, { run: 'skip()' }, { wait: 3600 }, { shot: 'cenas-31-maxie' },
-    { run: 'skip(3)' }, { wait: 1900 }, { shot: 'cenas-32-maxie-crobat' }
+    { wait: 1000 }, { run: 'skip()' }, { wait: 3600 }, { shot: 'cenas-45-maxie' },
+    { run: 'skip(3)' }, { wait: 1900 }, { shot: 'cenas-46-maxie-crobat' }
   ],
   // a melhoria de UX da 0.31: o card de escolha (o inicial e a Poké Ball) e o painel da fase
   ux: [

@@ -1959,6 +1959,25 @@ button { font: inherit; color: inherit; }
   box-shadow: 0 0 0 calc(var(--mpx) * .5) var(--gba-ink);
 }
 .map-node.done .map-number { background: #2f9a45; }
+/* os lugares da história no mapa (0.39): a marca azul das missões de lendário, com o "!" */
+.map-place-mark {
+  position: absolute;
+  inset: calc(var(--mpx) * 3);
+  display: grid;
+  place-items: center;
+  font-family: var(--font-arcade);
+  font-size: 8px;
+  line-height: 1;
+  color: #fff;
+  background: #3a7bd5;
+  border-radius: calc(var(--mpx) * 2);
+  box-shadow: 0 0 0 calc(var(--mpx) * .5) var(--gba-ink);
+  animation: map-place 1s steps(1) infinite;
+}
+@keyframes map-place { 50% { transform: translateY(calc(var(--mpx) * -1)); } }
+@media (prefers-reduced-motion: reduce) { .map-place-mark { animation: none; } }
+.map-node.place .map-number { background: #3a7bd5; }
+.panel-place-text { margin: 0; font-size: 15px; line-height: 1.45; color: var(--gba-ink); }
 .map-node.locked .map-number { background: #6b7384; }
 .map-node:hover .map-number, .map-node:focus-visible .map-number { background: var(--poke-red); }
 /* o treinador: a cabeça do Red/Leaf sobre a cidade, como no jogo */

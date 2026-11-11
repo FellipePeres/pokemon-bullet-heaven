@@ -800,6 +800,82 @@ game.menus.closeModal();
   game.openCampaign();
 }
 
+// ---- a volta da Fase 3 (0.39): o Surge e o Zapdos, as correntes no porto e a visita à Usina ----
+{
+  game.startStage('gym_3_vermilion');
+  check('na partida, a plaquinha mostra a linha do Surge', registry.get('hud-quest').textContent.includes('Vença o Lt. Surge, em Vermilion 0/1'));
+  game.run.state = 'victory';
+  game._handleRunState();
+  game.quitToMenu();
+  check('vencido o Surge, a volta passa pelo ginásio dele, em tela cheia, com o Lt. Surge em pixel',
+        hub.mapId === 'ginasio_vermilion' && hub.scene?.id === 'depois_surge' && registry.get('screen-hub').classes.has('cinema')
+        && hub.npcs.some((n) => n.id === 'surge' && n.sprite === 'lt_surge'));
+  let atErika = null;
+  const surge = runScene((d) => {
+    if (d.text.includes('O seu próximo ginásio é o da Erika')) atErika = { done: game.quests.isDone('c2_surge'), erika: game.quests.isActive('c3_erika'), usina: game.quests.isActive('z_usina') };
+  });
+  check('o Surge conta da Usina que apagou e do Zapdos sumido (com o Articuno, já são dois)',
+        said(surge, 'a Usina, perto da Rota 10, apagou') && said(surge, 'Com o Articuno, já são dois'));
+  check('...e do combate naquela noite, como se o Zapdos estivesse brigando (nada de barco nem de clarão)',
+        said(surge, 'Parecia um combate') && said(surge, 'Como se o Zapdos estivesse brigando') && !said(surge, 'barco') && !said(surge, 'clarão'));
+  check('a pista do Zapdos fecha o Capítulo 2 e abre a da Erika; a da Usina espera o marinheiro',
+        atErika?.done && atErika.erika && !atErika.usina && !game.campaign.quests.done.c2_surge.skipped);
+  settle();
+  check('emendada, a cena do porto de Vermilion, em tela cheia',
+        hub.mapId === 'vermilion' && hub.scene?.id === 'vermilion_correntes' && registry.get('screen-hub').classes.has('cinema'));
+  let sailorAt = null;
+  const porto = runScene((d) => {
+    if (d.text.includes('Você é o que anda investigando')) { const sailor = hub.npcs.find((n) => n.id === 'marinheiro'); sailorAt = `${sailor.x},${sailor.y},${sailor.dir}`; }
+  });
+  check('o marinheiro vê o jogador e vem até ele', sailorAt === '12,11,left', sailorAt);
+  check('...preso em terra pelo mar agitado, escutou correntes na Usina fechada',
+        said(porto, 'A maré está agitada demais') && said(porto, 'Escutei correntes') && said(porto, 'fechada desde o apagão'));
+  check('...e abre a quest paralela da Usina (azul, de lendário)', game.quests.isActive('z_usina') && game.quests.view('z_usina').kind === 'legendary');
+  settle();
+  game.questTracker.render();
+  check('na vila, o rastreador mostra a da Erika (dourada) e a da Usina (azul)',
+        hub.mapId === 'vila' && !hub.scene && questBox().innerHTML.includes('Vença a Erika, em Celadon')
+        && questBox().innerHTML.includes('Investigue a Usina, na Rota 10') && questBox().innerHTML.includes('quest-legendary'));
+  hub.enter({ map: 'casa_sabio', x: 3, y: 6, dir: 'up' });
+  hub.interact();
+  check('o velho sábio: o Zapdos brigando e as correntes não são coisa da natureza', dialogText().includes('Isso não é coisa da natureza'));
+  closeDialog();
+  hub.enter('home');
+
+  game.openCampaign();
+  const placeNode = () => mapNodes().find((c) => c.classes.has('place'));
+  check('no mapa da jornada aparece a marca da Usina', !!placeNode() && String(placeNode().title).includes('Rota 10'));
+  game.menus.lobby.selected = 'place:usina';
+  game.menus.lobby.render();
+  const placePanel = () => registry.get('lobby-panel').children;
+  const goButton = () => placePanel().find((c) => c.classes.has('panel-actions'))?.children[0];
+  check('...e o painel dela conta do marinheiro, com o Investigar',
+        placePanel().some((c) => c.classes.has('panel-place-text') && c.innerHTML.includes('correntes')) && goButton()?.innerHTML.includes('Investigar') && !goButton().disabled);
+  check('a visita abre a Usina em tela cheia, com os Voltorb fechando o corredor',
+        game.visitPlace('usina') && hub.mapId === 'usina' && hub.scene?.id === 'usina_porta' && registry.get('screen-hub').classes.has('cinema')
+        && hub.npcs.filter((n) => n.sprite === 'voltorb').length === 2);
+  let shook = false;
+  const usina = [];
+  for (let i = 0; i < 60 * 60 && hub.scene; i++) {
+    shook ||= !!hub.scene.fx.shake;
+    if (hub.dialog) { usina.push(hub.dialog.pages.join(' ')); hub.dialog.shown = 999; hub.confirm(); }
+    hub.update(1 / 60);
+  }
+  check('lá dentro: as marcas de raio, as correntes, o grito elétrico (com tremor)',
+        usina.some((t) => t.includes('marcadas por raios')) && usina.some((t) => t.includes('Correntes')) && usina.some((t) => t.includes('grito elétrico')) && shook);
+  check('...e é perigoso demais seguir: a quest passa para "Chegue ao fundo da Usina"',
+        usina.some((t) => t.includes('perigoso demais seguir')) && game.quests.isDone('z_usina') && game.quests.isActive('z_usina_fundo'));
+  settle();
+  check('no fim, a volta para a vila', hub.mapId === 'vila' && !registry.get('screen-hub').classes.has('cinema'));
+  game.openCampaign();
+  game.menus.lobby.selected = 'place:usina';
+  game.menus.lobby.render();
+  check('depois, a marca continua (a missão vem depois), e o painel avisa que é perigoso demais',
+        !!placeNode() && goButton()?.disabled && goButton().innerHTML.includes('Perigoso demais') && !game.visitPlace('usina'));
+  hub.enter('home');
+  game.openCampaign();
+}
+
 // ---- Campeão e Hall da Fama ----
 game.region.campaign.slice(0, -1).forEach((e) => {
   if (!game.campaign.clearedStages.includes(e.stage)) game.campaign.clearedStages.push(e.stage);

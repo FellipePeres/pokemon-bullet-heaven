@@ -2,7 +2,7 @@ import { el, create, clear, show, hide } from './dom.js';
 import { getPokemon } from '../data/pokemon.js';
 import { STAGES, isStageUnlocked } from '../data/stages.js';
 import { getTrainerLook } from '../data/trainers.js';
-import { REGION_MAP, STAGE_CITY, HOME_CITY, cityName, cityPoint } from '../data/regionMap.js';
+import { REGION_MAP, STAGE_CITY, HOME_CITY, STORY_PLACES, cityName, cityPoint, placePoint } from '../data/regionMap.js';
 import { emptyStageStats } from '../systems/stageStats.js';
 import { badgeUrl, spriteUrl } from '../render/sprites.js';
 import { typeColor, typeName } from '../data/types.js';
@@ -54,8 +54,14 @@ export class Lobby {
     return this.stages.find((s) => !cleared.includes(s.id) && isStageUnlocked(s.id, cleared)) ?? this.stages.at(-1);
   }
 
+  /** Os lugares da história que estão no mapa agora (0.39): os de uma quest ativa. */
+  get places() {
+    return Object.entries(STORY_PLACES).filter(([, place]) => place.quests.some((id) => this.game.quests.isActive(id)));
+  }
+
   render() {
-    if (!this.selected || !STAGES[this.selected]) this.selected = this.nextStage.id;
+    const place = this.selected?.startsWith('place:') && this.places.some(([id]) => `place:${id}` === this.selected);
+    if (!place && (!this.selected || !STAGES[this.selected])) this.selected = this.nextStage.id;
     this._bar();
     this._map();
     this._panel();
@@ -144,9 +150,26 @@ export class Lobby {
       map.appendChild(node);
     }
 
+    // os lugares da história (0.39): a marca azul, com o "!", enquanto a quest dele está ativa
+    for (const [id, place] of this.places) {
+      const point = placePoint(id);
+      const key = `place:${id}`;
+      const node = create('button', `map-node place${this.selected === key ? ' selected' : ''}`);
+      node.type = 'button';
+      node.style.setProperty('--x', point.x);
+      node.style.setProperty('--y', point.y);
+      node.title = `${place.name} (${place.area})`;
+      node.appendChild(create('span', 'map-place-mark', '!'));
+      node.appendChild(create('span', 'map-number', place.name.replace(/^A /, '')));
+      node.onclick = () => { this.selected = key; this.render(); };
+      node.ondblclick = () => this.game.visitPlace(id);
+      map.appendChild(node);
+    }
+
     // o rosto do treinador acompanha a fase atual do mapa (0.30, pedido do Fellipe):
     // ao entrar é a próxima da jornada; escolher outra no mapa faz ele andar até lá
-    const city = STAGE_CITY[this.selected] ?? HOME_CITY;
+    // (num lugar da história, ele fica onde estava)
+    const city = STAGE_CITY[this.selected] ?? (this.selected?.startsWith('place:') ? this.playerCity : null) ?? HOME_CITY;
     const icon = create('span', 'map-player');
     icon.style.backgroundImage = `url(assets/ui/region-map/player-${this.game.profile.trainer === 'leaf' ? 'leaf' : 'red'}.png)`;
     const from = cityPoint(this.playerCity ?? city);
@@ -183,6 +206,7 @@ export class Lobby {
   /* ============================== o painel ============================== */
 
   _panel() {
+    if (this.selected?.startsWith('place:')) { this._placePanel(this.selected.slice(6)); return; }
     const panel = clear(el('lobby-panel'));
     const stage = STAGES[this.selected];
     const cleared = this.campaign.clearedStages;
@@ -323,6 +347,26 @@ export class Lobby {
     caseBtn.textContent = 'Ver no estojo';
     caseBtn.onclick = () => this.game.menus.showModal('modal-badges', { stageId: stage.id });
     actions.appendChild(caseBtn);
+    panel.appendChild(actions);
+  }
+
+  /** O painel de um lugar da história (0.39): o que se sabe dele e o botão da visita. */
+  _placePanel(id) {
+    const panel = clear(el('lobby-panel'));
+    const place = STORY_PLACES[id];
+    const seen = this.campaign.scenes?.[place.scene] === 'seen';
+    const head = create('div', 'panel-head');
+    head.appendChild(create('span', 'panel-chapter', place.area));
+    head.appendChild(create('h3', '', place.name));
+    panel.appendChild(head);
+    panel.appendChild(create('p', 'panel-place-text', seen ? place.seenText : place.text));
+    const actions = create('div', 'panel-actions');
+    const go = create('button', 'panel-play');
+    go.type = 'button';
+    go.innerHTML = `<span>${seen ? 'Perigoso demais por enquanto' : 'Investigar'}</span>`;
+    go.disabled = seen;
+    go.onclick = () => this.game.visitPlace(id);
+    actions.appendChild(go);
     panel.appendChild(actions);
   }
 

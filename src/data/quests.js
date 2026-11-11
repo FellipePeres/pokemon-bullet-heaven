@@ -33,7 +33,10 @@
 export const CHAPTERS = {
   prologo: 'Prólogo',
   cap1: 'Capítulo 1 — As rotas tomadas',
-  cap2: 'Capítulo 2 — O céu vazio'
+  cap2: 'Capítulo 2 — O céu vazio',
+  cap3: 'Capítulo 3 — Os rastros',
+  // as missões dos lendários (azuis) levam o nome do lugar
+  usina: 'A Usina'
 };
 
 export const QUESTS = {
@@ -111,6 +114,42 @@ export const QUESTS = {
       { text: 'Descubra se o Zapdos também sumiu', on: 'clue', target: 'zapdos' }
     ],
     doneIf: { cleared: 'gym_4_celadon' },
+    // a da Erika segue a história; a da Usina, paralela, quem abre é o marinheiro
+    next: ['c3_erika', 'z_usina'],
+    reward: null
+  },
+
+  /* ========================== Capítulo 3: os rastros ========================== */
+  // o Surge manda o jogador à Erika (data/cutscenes.js, depois_surge)
+  c3_erika: {
+    kind: 'story', chapter: 'cap3',
+    desc: 'O Lt. Surge contou que, na noite em que a Usina apagou, pareceu haver um combate lá dentro, como se o Zapdos estivesse brigando. E a Erika, em Celadon, achou uma coisa estranha no jardim.',
+    objectives: [
+      { text: 'Vença a Erika, em Celadon', on: 'win', target: 'gym_4_celadon', doneIf: { cleared: 'gym_4_celadon' } },
+      // a pista chega com a cena de depois da Fase 4
+      { text: 'Descubra o que a Erika encontrou no jardim', on: 'clue', target: 'jardim' }
+    ],
+    doneIf: { cleared: 'gym_5_fuchsia' },
+    next: [],
+    reward: null
+  },
+
+  /* ========================== a Usina (a missão do Zapdos) ========================== */
+  // o marinheiro de Vermilion escutou correntes (data/cutscenes.js, vermilion_correntes): a visita
+  // é pela marca da Usina no mapa da jornada (data/regionMap.js, STORY_PLACES)
+  z_usina: {
+    kind: 'legendary', chapter: 'usina',
+    desc: 'Preso em terra pelo mar agitado, um marinheiro de Vermilion trabalhou pela Rota 10 e escutou correntes pesadas se arrastando dentro da Usina, fechada desde o apagão.',
+    objectives: [{ text: 'Investigue a Usina, na Rota 10', on: 'scene', target: 'usina_porta' }],
+    openedBy: 'vermilion_correntes',
+    next: ['z_usina_fundo'],
+    reward: null
+  },
+  z_usina_fundo: {
+    kind: 'legendary', chapter: 'usina',
+    desc: 'As paredes da Usina estão marcadas por raios, e alguma coisa grita lá no fundo, presa por correntes. Os Voltorb fecham o corredor: por enquanto, é perigoso demais seguir.',
+    // a pista chega com a missão do Zapdos (Capítulo 4)
+    objectives: [{ text: 'Chegue ao fundo da Usina', on: 'clue', target: 'zapdos_preso' }],
     next: [],
     reward: null
   }

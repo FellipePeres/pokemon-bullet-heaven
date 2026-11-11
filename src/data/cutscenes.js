@@ -12,7 +12,9 @@
  *             { on: 'npc', target: id } (falou com alguém do lugar), { on: 'starter' }
  *             (acabou de escolher o inicial), { on: 'win', target: fase } (venceu a fase:
  *             a cena fica devida e toca na volta, no `spot`) ou { on: 'play', target: fase }
- *             (apertou Jogar: a cena toca antes, e a fase começa no fim, com `then: 'stage'`).
+ *             (apertou Jogar: a cena toca antes, e a fase começa no fim, com `then: 'stage'`)
+ *             ou { on: 'visit', target: lugar } (a visita a um lugar da história, pela marca dele
+ *             no mapa da jornada: STORY_PLACES em data/regionMap.js).
  *             Sem trigger, só o código a começa (a do Maxie).
  *
  * As cenas são ANTES e DEPOIS das fases, nunca no meio, e sempre em tela cheia, num
@@ -363,6 +365,100 @@ export const CUTSCENES = {
       { do: 'wait', t: 0.6 },
       { do: 'end', then: 'home' }
     ]
+  },
+
+  // depois da Fase 3, no ginásio dele: a Usina apagou, o Zapdos sumiu (já são dois), e naquela
+  // noite pareceu haver um combate lá dentro, como se o Zapdos estivesse brigando (pedido do Fellipe)
+  depois_surge: {
+    map: 'ginasio_vermilion', spot: { x: 5, y: 3, dir: 'up' },
+    trigger: [{ on: 'win', target: 'gym_3_vermilion' }],
+    steps: [
+      { do: 'face', who: 'surge', dir: 'down' },
+      { do: 'wait', t: 0.8 },
+      { do: 'say', name: 'Lt. Surge', lines: [
+        'Hah! Você tem pulso firme, recruta! Fazia tempo que ninguém me dava um choque desses.',
+        'A Misty me ligou. Disse que você anda fazendo perguntas sobre os pássaros lendários.'
+      ] },
+      { do: 'face', who: 'surge', dir: 'left' },
+      { do: 'wait', t: 0.5 },
+      { do: 'say', name: 'Lt. Surge', lines: [
+        'Então escute. Há alguns meses, a Usina, perto da Rota 10, apagou de uma noite para a outra. Vermilion ficou dias no escuro.',
+        'Os Voltorb e os Magnemite que viviam lá vieram parar na cidade. Você enfrentou alguns no caminho até aqui.',
+        'E desde aquela noite, ninguém vê o Zapdos. Ele vivia na Usina. Com o Articuno, já são dois.'
+      ] },
+      { do: 'face', who: 'surge', dir: 'down' },
+      { do: 'wait', t: 0.4 },
+      { do: 'say', name: 'Lt. Surge', lines: [
+        'Mas tem uma coisa que não sai da minha cabeça. Quem estava perto da Usina naquela noite ouviu trovões lá dentro, um atrás do outro.',
+        'Parecia um combate. Como se o Zapdos estivesse brigando com alguma coisa. Depois, silêncio. E tudo apagou.'
+      ] },
+      // a pista: fecha o "Descubra se o Zapdos também sumiu" (e o Capítulo 2) e abre a da Erika
+      { do: 'emit', on: 'clue', target: 'zapdos' },
+      { do: 'wait', t: 0.4 },
+      { do: 'say', name: 'Lt. Surge', lines: ['Se foi a Equipe Rocket, eles aprenderam truques novos. O seu próximo ginásio é o da Erika, em Celadon. Ela me disse que achou uma coisa estranha no jardim.'] },
+      { do: 'wait', t: 0.6 },
+      { do: 'end', then: 'home' }
+    ]
+  },
+
+  // logo depois, no cais: o mar agitado (o mesmo da Misty) prendeu o marinheiro em terra, e
+  // trabalhando pela Rota 10 ele escutou correntes dentro da Usina fechada. Abre a quest dela
+  vermilion_correntes: {
+    map: 'vermilion', spot: { x: 11, y: 11, dir: 'right' },
+    trigger: [{ on: 'win', target: 'gym_3_vermilion' }],
+    steps: [
+      { do: 'wait', t: 0.8 },
+      { do: 'face', who: 'marinheiro', toward: 'player' },
+      { do: 'emote', who: 'marinheiro' },
+      { do: 'say', name: 'Marinheiro', lines: ['Ei, treinador!'] },
+      { do: 'walk', who: 'marinheiro', to: [[12, 11, 'left']] },
+      { do: 'say', name: 'Marinheiro', lines: [
+        'Você é o que anda investigando as hordas? O Lt. Surge falou de você.',
+        'Faz semanas que eu não saio para o mar. A maré está agitada demais, nenhum barco consegue deixar o porto.'
+      ] },
+      // ele olha para o norte, para o lado da Usina
+      { do: 'face', who: 'marinheiro', dir: 'up' },
+      { do: 'wait', t: 0.5 },
+      { do: 'say', name: 'Marinheiro', lines: [
+        'Parado em terra, arrumei serviço levando cargas pela Rota 10. E uns dias atrás, passando perto da Usina...',
+        'Escutei correntes. Correntes pesadas, se arrastando lá dentro. Mas a Usina está fechada desde o apagão!'
+      ] },
+      { do: 'face', who: 'marinheiro', toward: 'player' },
+      { do: 'say', name: 'Marinheiro', lines: ['Eu não tive coragem de chegar perto. Mas um treinador como você... talvez consiga ver o que é.'] },
+      { do: 'quest', id: 'z_usina' },
+      { do: 'wait', t: 1.6 },
+      { do: 'end', then: 'home' }
+    ]
+  },
+
+  // a visita à Usina (pela marca dela no mapa da jornada): as paredes marcadas por raios, as
+  // correntes, o grito elétrico e os Voltorb fechando o corredor. Ainda não dá para entrar
+  usina_porta: {
+    map: 'usina', spot: { x: 5, y: 16, dir: 'up' },
+    trigger: [{ on: 'visit', target: 'usina' }],
+    steps: [
+      { do: 'wait', t: 0.5 },
+      // as luzes piscam
+      { do: 'fade', to: 0.7, t: 0.08 }, { do: 'fade', to: 0, t: 0.1 },
+      { do: 'wait', t: 0.25 },
+      { do: 'fade', to: 0.7, t: 0.08 }, { do: 'fade', to: 0, t: 0.14 },
+      { do: 'wait', t: 0.4 },
+      { do: 'say', lines: ['As luzes piscam, e as paredes estão marcadas por raios.', 'Houve uma batalha aqui. Das grandes.'] },
+      { do: 'walk', who: 'player', to: [[6, 11, 'up']] },
+      { do: 'shake', t: 0.6, power: 1.5 },
+      { do: 'say', lines: ['Clanc... clanc... Correntes, se arrastando no escuro, lá no fundo.'] },
+      { do: 'shake', t: 0.9, power: 3, wait: false },
+      { do: 'emote', who: 'player' },
+      { do: 'say', lines: ['Um grito elétrico atravessa a Usina!'] },
+      // os Voltorb (que parecem Poké Balls) reagem: são Pokémon, e estão nervosos
+      { do: 'emote', who: 'voltorb1' },
+      { do: 'say', lines: [
+        'Os Voltorb fecham o corredor, e a energia que escapa lá de dentro arrepia o {pokemon}.',
+        'É perigoso demais seguir agora.'
+      ] },
+      { do: 'wait', t: 0.4 },
+      { do: 'end', then: 'home' }
+    ]
   }
 };
 
@@ -371,4 +467,4 @@ export const CUTSCENE_STEPS = ['wait', 'say', 'talk', 'show', 'hide', 'place', '
   'bird', 'fade', 'camera', 'shake', 'give', 'quest', 'emit', 'flag', 'end'];
 
 /** O que pode começar uma cena. */
-export const CUTSCENE_TRIGGERS = ['enter', 'npc', 'starter', 'win', 'play'];
+export const CUTSCENE_TRIGGERS = ['enter', 'npc', 'starter', 'win', 'play', 'visit'];

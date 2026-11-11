@@ -21,6 +21,7 @@ import { KyogreHall } from './KyogreHall.js';
 import { KyogreHallRenderer } from '../render/KyogreHallRenderer.js';
 import { Cutscene } from './Cutscene.js';
 import { CUTSCENES } from '../data/cutscenes.js';
+import { STORY_PLACES } from '../data/regionMap.js';
 import { showHallCard, hideHallCard } from '../ui/hallCard.js';
 import { HubRenderer } from '../render/HubRenderer.js';
 import { HubHUD } from '../ui/hubHud.js';
@@ -1294,7 +1295,7 @@ export class Game {
   sceneTrigger(on, target = null) {
     if (!this.profile.trainer || this.hub.scene || !this.hub.map) return false;
     const ctx = this.hub._context();
-    if (on === 'win' || on === 'play') return false;   // os de depois e de antes da fase têm caminho próprio
+    if (on === 'win' || on === 'play' || on === 'visit') return false;   // os de depois e de antes da fase e a visita têm caminho próprio
     for (const [id, def] of Object.entries(CUTSCENES)) {
       if (!def.trigger?.some((t) => t.on === on && (t.target == null || t.target === target))) continue;
       if (def.map && def.map !== this.hub.mapId) continue;
@@ -1396,6 +1397,18 @@ export class Game {
     this.run = null;
     this.openHub({ map: def.map, ...def.spot });
     return this.playScene(id);
+  }
+
+  /**
+   * A visita a um lugar da história (0.39, a marca dele no mapa da jornada): a cena dele
+   * no palco, em tela cheia, e a volta para a vila. Uma vez só: depois, o painel avisa.
+   */
+  visitPlace(id) {
+    const place = STORY_PLACES[id];
+    const def = place && CUTSCENES[place.scene];
+    if (!def || this.sceneRecord[place.scene] === 'seen' || !place.quests.some((q) => this.quests.isActive(q))) return false;
+    this.openHub({ map: def.map, ...def.spot });
+    return this.playScene(place.scene);
   }
 
   /** A ação 'stage' do fim de uma cena de antes da fase: a fase começa. */

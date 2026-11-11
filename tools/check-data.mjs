@@ -31,6 +31,7 @@ import { DECOR, decorMax } from '../src/data/decor.js';
 import { QUESTS, CHAPTERS, FIRST_QUEST, QUEST_EVENTS } from '../src/data/quests.js';
 import { DONE_IF_KEYS } from '../src/systems/QuestSystem.js';
 import { CUTSCENES, CUTSCENE_STEPS, CUTSCENE_TRIGGERS } from '../src/data/cutscenes.js';
+import { STORY_PLACES } from '../src/data/regionMap.js';
 import { existsSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -426,6 +427,7 @@ const inside = (mapId, x, y) => { const m = HUB_MAPS[mapId]; return !!m && x >= 
       if (t.on === 'enter' && t.target !== def.map) issues.push(`${id}: trigger de entrada em outro lugar (${t.target})`);
       if (t.on === 'npc' && !(place.npcs ?? []).some((n) => n.id === t.target)) issues.push(`${id}: trigger de alguém que não está no lugar (${t.target})`);
       if ((t.on === 'win' || t.on === 'play') && !STAGES[t.target]) issues.push(`${id}: trigger de uma fase que não existe (${t.target})`);
+      if (t.on === 'visit' && STORY_PLACES[t.target]?.scene !== id) issues.push(`${id}: visita a um lugar que não leva a esta cena (${t.target})`);
     }
     for (const cond of Object.keys(def.when ?? {})) if (!KNOWN_WHEN.has(cond)) issues.push(`${id}: condição desconhecida (${cond})`);
     const actors = new Set(['player', ...Object.keys(def.actors ?? {}), ...(place.npcs ?? []).map((n) => n.id)]);
@@ -503,10 +505,19 @@ const inside = (mapId, x, y) => { const m = HUB_MAPS[mapId]; return !!m && x >= 
       if (scene && !CUTSCENES[scene]) issues.push(`${key}: condição de uma cena que não existe (${scene})`);
     }
   }
+  // os lugares da história no mapa (data/regionMap.js): a cena da visita e as quests que os mostram
+  for (const [id, place] of Object.entries(STORY_PLACES)) {
+    if (!CUTSCENES[place.scene]?.trigger?.some((t) => t.on === 'visit' && t.target === id)) issues.push(`lugar ${id}: a cena da visita não existe ou não é dele (${place.scene})`);
+    for (const q of place.quests ?? []) if (!QUESTS[q]) issues.push(`lugar ${id}: quest que não existe (${q})`);
+    if (!place.quests?.length) issues.push(`lugar ${id}: sem quest (nunca apareceria no mapa)`);
+    const [cx, cy] = place.cell ?? [];
+    if (!(cx >= 0 && cx < 22 && cy >= 0 && cy < 15)) issues.push(`lugar ${id}: fora da grade do Town Map`);
+    if (!place.text || !place.seenText) issues.push(`lugar ${id}: sem o texto do painel`);
+  }
   const stages = Object.keys(HUB.maps).filter((id) => HUB.maps[id].scene);
   issues.length
     ? fail(`cenas: ${issues.join(' · ')}`)
-    : ok(`as cenas: ${Object.keys(CUTSCENES).length} roteiros com ${stepCount} passos, caminhos só no chão; ${stages.length} palco(s) em tela cheia (${stages.join(', ')}); nada no meio das fases`);
+    : ok(`as cenas: ${Object.keys(CUTSCENES).length} roteiros com ${stepCount} passos, caminhos só no chão; ${stages.length} palco(s) em tela cheia (${stages.join(', ')}); ${Object.keys(STORY_PLACES).length} lugar(es) da história no mapa; nada no meio das fases`);
   if (waiting.length) console.log(`  …    | pistas que as quests esperam e ainda não têm cena: ${waiting.join(', ')}`);
 }
 

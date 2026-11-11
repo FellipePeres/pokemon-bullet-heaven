@@ -714,6 +714,20 @@ Nunca voltar bônus globais para o pool de level up — foi pedido explícito.
   fase para ouvir a Misty); o `doneIf` da quest (passar do Surge) fecha tudo em
   silêncio. **Por que não `cleared` da própria fase:** o `sync()` da chegada ao
   palco fecharia a quest em silêncio antes da pista.
+- **As do Surge** (`depois_surge`, `vermilion_correntes`, gatilho `win` da Fase 3)
+  em dois palcos novos, `ginasio_vermilion` e `vermilion` (o cais), com as folhas
+  `npc/lt_surge` e `npc/sailor`. A pista `zapdos` fecha a quest do Surge e abre a
+  da Erika (`c3_erika`, Capítulo 3); a da Usina (`z_usina`, `kind: 'legendary'`,
+  azul) tem `openedBy` e quem abre é o marinheiro.
+- **Os lugares da história no mapa** (`STORY_PLACES` em `data/regionMap.js`): marcas
+  que não são fases. Cada uma aparece enquanto uma das quests dela está ativa
+  (`Lobby.places`), com o painel do lugar (`_placePanel`: o texto e o
+  "Investigar"; depois de visto, "Perigoso demais por enquanto"). O botão chama
+  `Game.visitPlace`, que abre o palco da cena (gatilho `visit`) e a toca; a cena
+  termina com `then: 'home'`. A primeira é a Usina (a célula 18,4 do Town Map), com
+  o palco `usina` (a entrada da Usina do FireRed) e dois Voltorb (`npc/voltorb`)
+  fechando o corredor. O check-data confere que a cena e as quests de cada lugar
+  existem. É a base das marcas das missões de lendário (H-5).
 - **As falas da história presas à quest**: as linhas dos moradores e do sábio de
   depois de uma cena usam `scene` e `quest` juntos (valem enquanto a quest daquele
   momento está ativa) e vêm antes das dicas por insígnia, que senão as
@@ -1285,6 +1299,7 @@ o Brock como está, todas as outras mais duras, menos níveis.
 | 70 | a fala do Brock numa caixa com o retrato não: "um full screen com um cenário e ele em formato de pixel personagem da vila"; ele parabeniza, pede ajuda para entender o que está acontecendo (muito sério), sem o Maxie e sem corte; manda investigar a cidade; a quest: "derrote a Misty e encontre pistas do comportamento dos Pokémon" | 0.39 (na branch): a caixa com retrato saiu; os palcos (`scene: true`, o ginásio de Pewter extraído do FireRed, o Brock em pixel), a tela cheia (`cinema`), os gatilhos `win` e `play` com `then: 'home'`/`'stage'`; a cena `depois_brock`; a quest `c2_misty` com `openedBy`; decisão 12 no planejamento |
 | 71 | depois da Fase 1, ao aparecer na vila: o velho sábio sai de casa, vê o jogador ("!"), "soube que o Brock te pediu ajuda", conta que depois que os pássaros lendários sumiram dos céus isso começou, "deve ter algo a ver, mas isso é tudo que posso ajudar"; depois o jogador volta a jogar livre | 0.39 (na branch): a cena `sabio_passaros` (gatilho `win` da Fase 1, depois da do Brock), a saída do palco levando à próxima cena devida, a câmera enquadrando a porta, a fala nova do sábio na casa dele |
 | 72 | a continuação da Fase 2: "perfeito essas cenas, pode seguir com tudo que sugeriu, aceito todas as recomendações" (a proposta "Cerulean: o mar bravo") | 0.39 (na branch): os palcos do ginásio de Cerulean e da casa assaltada, a Misty, o policial e o dono em pixel; as cenas `depois_misty` e `cerulean_roubo` (com o rival); o passo `emit` e as pistas (`clue`); a quest da Misty em duas linhas e a do Surge; o `doneIf` por objetivo; as falas da vila culpando a Rocket, presas à quest |
+| 73 | a Fase 3 na história, com as mudanças do Fellipe: nada chega de barco, o Surge não viu clarão; o Surge conta que pareceu haver um combate dentro da Usina, como se o Zapdos estivesse brigando; o marinheiro, preso no porto pela maré agitada, escutou correntes vindo da Usina, e o jogador pode ir verificar; "pode fazer seguindo o planejamento" | 0.39 (na branch): os palcos do ginásio de Vermilion, do cais e da entrada da Usina; as cenas `depois_surge`, `vermilion_correntes` e `usina_porta`; a quest da Erika (Capítulo 3) e as da Usina (azuis); os lugares da história no mapa da jornada (`STORY_PLACES`, `visitPlace`), com a Usina como o primeiro |
 | Fase 8 (Giovanni) | 1 → 0,8 | 4,0 | 4,5 | 60 | 84 → 62 |
 | Lorelei | 1,05 → 0,8 | 3,5 | 3,1–4,7 | 64 | 92 → 66 |
 | Bruno | 1,12 → 0,97 | 3,7 | 3,5–6,3 ² | 66 | 99 → 68 |

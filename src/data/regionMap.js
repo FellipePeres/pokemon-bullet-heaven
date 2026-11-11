@@ -41,6 +41,27 @@ export const STAGE_CITY = {
   champion: 'indigo'
 };
 
+/**
+ * Os lugares da história no mapa (0.39): marcas que não são fases. Cada uma aparece
+ * enquanto uma das quests de `quests` está ativa, e o painel dela tem o botão da visita,
+ * que toca a cena `scene` (data/cutscenes.js, gatilho 'visit') no palco dela.
+ */
+export const STORY_PLACES = {
+  usina: {
+    name: 'A Usina', area: 'Rota 10', cell: [18, 4],
+    quests: ['z_usina', 'z_usina_fundo'],
+    scene: 'usina_porta',
+    text: 'Um marinheiro de Vermilion escutou correntes pesadas se arrastando aqui dentro. A Usina está fechada desde o apagão.',
+    seenText: 'As paredes estão marcadas por raios, e alguma coisa grita lá no fundo, presa por correntes. Os Voltorb fecham o corredor: por enquanto, é perigoso demais seguir.'
+  }
+};
+
+/** O centro de um lugar da história no mapa recortado, em pixels de 1x. */
+export function placePoint(id) {
+  const [x, y] = STORY_PLACES[id].cell;
+  return { x: 8 * x + 12, y: 8 * y + 20 };
+}
+
 /** A cidade de onde a jornada parte. */
 export const HOME_CITY = 'pallet';
 

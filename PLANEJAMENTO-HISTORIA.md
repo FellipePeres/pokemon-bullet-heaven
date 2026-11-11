@@ -99,7 +99,7 @@ quando o jogador volta, ou o lugar da fase antes dela.
 |---|---|---|---|
 | **Prólogo — O sonho** | na vila, antes da Fase 1 | O Carvalho: as hordas mudaram, ninguém sabe por quê. O sonho de ser Campeão continua possível, mas o ideal é devolver a paz às rotas. | — |
 | **1 — As rotas tomadas** | Fase 1 (Brock) | **Feito na 0.39** (pedido do Fellipe). Depois da vitória, no ginásio de Pewter, em tela cheia: o Brock parabeniza o jogador por ter vencido, conta que os Pokémon estão agindo de um jeito que ninguém viu (os Geodude desceram do Monte Lua), diz que é muito sério e pede ajuda para entender o que está acontecendo. Manda investigar a cidade de Cerulean. É a apresentação do problema; o Maxie não aparece, e não há corte de tela. Abre a quest **"Derrote a Misty e encontre pistas sobre o comportamento dos Pokémon"** (o mapa segue para o ginásio dela). Logo depois, de volta à vila: o **velho sábio** sai de casa, vê o jogador (o "!"), vem até ele e conta que soube do pedido do Brock, que os pássaros lendários sumiram dos céus e que foi depois disso que tudo começou ("deve ter alguma coisa a ver"), mas que é tudo o que ele pode ajudar por enquanto. Ele volta para casa, e o jogador fica livre. | — |
-| **2 — O céu vazio** | Fases 2 e 3 (Misty, Surge) | **A parte da Misty está feita na 0.39** (proposta "Cerulean: o mar bravo", aprovada inteira pelo Fellipe). Depois da Fase 2, duas cenas: no ginásio, a Misty conta que o mar ficou bravo desde que o Articuno deixou de ser visto sobre as Ilhas Seafoam (a primeira prova de que o sábio tem razão) e aponta o Surge e a Usina, onde o Zapdos aparecia; na rua de Cerulean, a casa assaltada do FireRed: o policial culpa a Equipe Rocket (a pista falsa) e o dono estranha que só levaram peças de máquina (as máquinas dos pássaros, no Capítulo 4); o rival passa correndo, a caminho de Vermilion. Na vila, os moradores culpam a Rocket, e só o velho sábio estranha o ladrão. **Falta (H-4):** o Surge, com a Usina que pifou, os Voltorb em Vermilion e o Zapdos que ninguém vê há meses (a pista `zapdos` da quest do Surge). | — |
+| **2 — O céu vazio** | Fases 2 e 3 (Misty, Surge) | **A parte da Misty está feita na 0.39** (proposta "Cerulean: o mar bravo", aprovada inteira pelo Fellipe). Depois da Fase 2, duas cenas: no ginásio, a Misty conta que o mar ficou bravo desde que o Articuno deixou de ser visto sobre as Ilhas Seafoam (a primeira prova de que o sábio tem razão) e aponta o Surge e a Usina, onde o Zapdos aparecia; na rua de Cerulean, a casa assaltada do FireRed: o policial culpa a Equipe Rocket (a pista falsa) e o dono estranha que só levaram peças de máquina (as máquinas dos pássaros, no Capítulo 4); o rival passa correndo, a caminho de Vermilion. Na vila, os moradores culpam a Rocket, e só o velho sábio estranha o ladrão. **A parte do Surge também, na 0.39** (proposta "Vermilion: a Usina apagou", versão 2, com as mudanças do Fellipe: nada chega de barco, ninguém viu clarão). No ginásio, o Surge conta que a Usina apagou, que os Voltorb e os Magnemite invadiram Vermilion e que ninguém vê o Zapdos ("com o Articuno, já são dois"); naquela noite, pareceu haver um combate dentro da Usina, como se o Zapdos estivesse brigando. No cais, um marinheiro, preso em terra pelo mar agitado (o mesmo da Misty), conta que trabalhando pela Rota 10 escutou correntes dentro da Usina fechada: abre a quest paralela **"Investigue a Usina"**, e a visita (pela marca da Usina no mapa) mostra as paredes marcadas por raios, as correntes, um grito elétrico e os Voltorb fechando o corredor. Fica a quest "Chegue ao fundo da Usina", esperando a missão do Zapdos. | — |
 | **3 — Os rastros** | Fases 4 e 5 (Erika, Koga) | A Erika acha, no jardim, uma pena dourada e um pedaço de metal com um emblema vermelho, e o jogador leva os dois ao Carvalho. O Koga viu um vulto de capuz vermelho carregando uma máquina pela Rota 10: "não era da Rocket, o uniforme era outro". | — |
 | **4 — O trovão preso** | Fase 6 (Sabrina) | Antes da Fase 6, perto da Usina, um estrondo vem lá de dentro (a cena de antes da fase). A Sabrina vê "três jaulas e um homem olhando para o mar". Abre a quest **"Investigue a Usina"**: o Zapdos está preso numa máquina com o emblema vermelho. Agora é certeza: **alguém roubou os pássaros**. | **Zapdos** |
 | **5 — O gelo** | Fase 7 (Blaine) | A Fase 7 passa pelas Ilhas Seafoam. Depois do Blaine, o Carvalho cruza as anotações e aponta o fundo das ilhas. | **Articuno** |
@@ -383,20 +383,22 @@ para o objetivo `scene` das quests. O check-data recusa a caixa com retrato
 | 5 | O mar bravo: a Misty e o Articuno | ginásio de Cerulean, depois da Fase 2 | 2 | H-4 ✅ |
 | 6 | A casa roubada (e o rival passa) | cidade de Cerulean, depois da Fase 2 | 2 | H-4 ✅ |
 | 7 | A vila culpa a Equipe Rocket | vila (falas dos moradores, sem cena) | 2 | H-4 ✅ |
-| 8 | O Surge, a Usina e o Zapdos | ginásio de Vermilion, depois da Fase 3 | 2 | H-4 |
-| 9 | O vulto de vermelho na Rota 10 | antes da Fase 5 | 3 | H-4 |
-| 10 | O estrondo na Usina | antes da Fase 6 | 4 | H-6 |
-| 11 | A jaula do Zapdos | Usina | 4 (missão) | H-6 |
-| 12 | O Carvalho e o emblema | laboratório | 4 | H-6 |
-| 13 | A jaula do Articuno | Ilhas Seafoam | 5 (missão) | H-7 |
-| 14 | O Giovanni e o emblema | ginásio de Viridian, depois da Fase 8 | 6 | H-8 |
-| 15 | A jaula do Moltres | Monte Brasa | 6 (missão) | H-8 |
-| 16 | A Victory Road se abre | mapa da jornada | 7 | H-9 |
-| 17 | O rival Campeão | sala do Campeão | 7 | H-9 |
-| 18 | "Ainda falta alguma coisa" | laboratório | 7 | H-9 |
-| 19 | O Mewtwo e a máquina quebrada | Caverna Desconhecida | 8 (missão) | H-10 |
-| 20 | O Kyogre e o Maxie | lagoa ou Centro (já existe) | 8 | H-11 |
-| 21 | O Pokémon rosa | vila | Epílogo | H-11 |
+| 8 | A Usina apagou: o Surge e o combate | ginásio de Vermilion, depois da Fase 3 | 2 | H-4 ✅ |
+| 9 | As correntes: o marinheiro | porto de Vermilion, depois da Fase 3 | 2 | H-4 ✅ |
+| 10 | A porta da Usina (a visita) | Usina, pela marca no mapa da jornada | 2 | H-4 ✅ |
+| 11 | O vulto de vermelho na Rota 10 | antes da Fase 5 | 3 | H-4 |
+| 12 | O estrondo na Usina | antes da Fase 6 | 4 | H-6 |
+| 13 | A jaula do Zapdos | Usina | 4 (missão) | H-6 |
+| 14 | O Carvalho e o emblema | laboratório | 4 | H-6 |
+| 15 | A jaula do Articuno | Ilhas Seafoam | 5 (missão) | H-7 |
+| 16 | O Giovanni e o emblema | ginásio de Viridian, depois da Fase 8 | 6 | H-8 |
+| 17 | A jaula do Moltres | Monte Brasa | 6 (missão) | H-8 |
+| 18 | A Victory Road se abre | mapa da jornada | 7 | H-9 |
+| 19 | O rival Campeão | sala do Campeão | 7 | H-9 |
+| 20 | "Ainda falta alguma coisa" | laboratório | 7 | H-9 |
+| 21 | O Mewtwo e a máquina quebrada | Caverna Desconhecida | 8 (missão) | H-10 |
+| 22 | O Kyogre e o Maxie | lagoa ou Centro (já existe) | 8 | H-11 |
+| 23 | O Pokémon rosa | vila | Epílogo | H-11 |
 
 Cada cena chega na etapa do capítulo dela. A H-2 trouxe o motor, as duas do
 prólogo e as duas da volta da Fase 1, a do Brock e a do velho sábio (pedidos do
@@ -445,6 +447,21 @@ casa estranha as peças de máquina, e o rival passa correndo ("Brincando de
 detetive?"). Depois, na vila, os moradores comentam o assalto, e só o sábio
 estranha; essas falas valem enquanto a quest do Surge está ativa.
 
+**As do Surge (0.39, `depois_surge`, `vermilion_correntes` e `usina_porta`):**
+depois da Fase 3, duas cenas emendadas em dois palcos novos (o ginásio de
+Vermilion inteiro e o cais da cidade). O Surge conta a Usina apagada, os Voltorb
+na cidade e o Zapdos sumido; quando ele fala do combate dentro da Usina, a pista
+`zapdos` fecha a quest dele (e o Capítulo 2) e abre a da Erika. No cais, o
+marinheiro vê o jogador (o "!"), vem até ele e conta das correntes; ele abre a
+quest paralela da Usina (azul). **A visita à Usina** é a primeira marca de lugar
+da história no mapa da jornada (`STORY_PLACES` em `data/regionMap.js`): aparece
+enquanto a quest da Usina está ativa, e o painel tem o "Investigar". Lá dentro
+(um terceiro palco, a entrada da Usina do FireRed), as luzes piscam, as paredes
+têm marcas de raio, as correntes se arrastam, um grito elétrico faz tudo tremer, e
+dois Voltorb fecham o corredor estreito para o norte. A quest passa para "Chegue
+ao fundo da Usina", que fecha com a missão do Zapdos (H-6). Na vila, o sábio diz
+que aquilo não é coisa da natureza.
+
 ---
 
 ## 10. Depois de Kanto: as vilas das outras gerações
@@ -472,7 +489,7 @@ estranha; essas falas valem enquanto a quest do Surge está ativa.
 | **H-1** ✅ 0.38 | O sistema de quests e o prólogo: `data/quests.js`, o `QuestSystem`, o rastreador, o save por jornada com a migração, as condições novas nas falas, a cadeia do prólogo e o discurso novo do Carvalho. Testes no `ui-smoke`. |
 | **H-2** ✅ 0.39 | As cenas em dados (`Cutscene.js` a partir da cena do Maxie, que não muda), as cenas de antes e de depois das fases, em tela cheia nos palcos (o ginásio de Pewter), as duas cenas do prólogo e as duas da volta da Fase 1 (o Brock, com a quest da Misty, e o velho sábio): o discurso do Carvalho encenado e o rival pegando o inicial dele (seção 9.3). |
 | **H-3** | A tela de missões. |
-| **H-4** (em andamento) | Os capítulos 1 a 3: as falas de depois da vitória dos líderes, o velho sábio, os moradores e as quests de cada capítulo. **Feito na 0.39:** o Capítulo 1 inteiro (o Brock e o velho sábio) e a parte da Misty do Capítulo 2 (a Misty, a casa roubada, os moradores). Falta o Surge e o Capítulo 3. |
+| **H-4** (em andamento) | Os capítulos 1 a 3: as falas de depois da vitória dos líderes, o velho sábio, os moradores e as quests de cada capítulo. **Feito na 0.39:** o Capítulo 1 inteiro (o Brock e o velho sábio) e o Capítulo 2 inteiro (a Misty, a casa roubada, os moradores; o Surge, o marinheiro e a visita à Usina). Falta o Capítulo 3 (Erika e Koga). |
 | **H-5** | A captura sem lendários e o molde da missão de lendário, tirado do salão do Kyogre. |
 | **H-6 a H-8** | O Zapdos, o Articuno e o Moltres, cada um com o seu plano e a sua maquete. |
 | **H-9** | A Liga com os pássaros e o fim do Capítulo 7 (o rival e o "ainda falta alguma coisa"). |
@@ -510,3 +527,9 @@ estranha; essas falas valem enquanto a quest do Surge está ativa.
     vila são palcos montados dos mapas do FireRed. A conversa com o Brock é a
     apresentação do problema, sem o Maxie e sem corte de tela, e abre a quest da
     Misty com as pistas em Cerulean (seção 4).
+13. **Em Vermilion, nada chega de barco e ninguém vê clarão** (pedido do Fellipe:
+    "ninguém vai buscar sentido entre o barco e que é uma equipe que vem de fora").
+    As pistas do Surge e do marinheiro são o combate dentro da Usina e as correntes
+    lá dentro, e o jogador pode ir verificar: a Usina vira uma marca no mapa da
+    jornada, com uma visita que mostra os sinais mas não deixa passar. O resgate do
+    Zapdos continua no Capítulo 4.
