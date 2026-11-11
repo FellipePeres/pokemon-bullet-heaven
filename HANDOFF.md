@@ -1734,13 +1734,18 @@ O que está planejado:
   Kyogre. **A H-1 está no jogo desde a 0.38** (as quests, o rastreador e o
   prólogo; ver a seção 4), e **a H-2 desde a 0.39** (o motor das cenas, as duas do
   prólogo, a do Brock e as cenas de antes e de depois das fases, em tela cheia nos
-  palcos; **nunca no meio de uma fase**, regra do Fellipe). Falta, em ordem: a H-3 (a tela de missões), a H-4
-  (os capítulos 1 a 3), a H-5 (a captura sem lendários e o molde da missão de
-  lendário), uma missão para cada lendário (H-6 a H-11) e as recompensas (H-12).
+  palcos; **nunca no meio de uma fase**, regra do Fellipe). **A H-5 e a H-6 também, na
+  branch** (o molde das missões e a missão do Zapdos). Falta, em ordem: a H-3 (a tela
+  de missões), o resto da H-4 (o Capítulo 3), as outras missões de lendário (H-7 a
+  H-11) e as recompensas (H-12).
   **Regra do Fellipe para a H-5:** um lendário liberado na missão dele (vencida,
   capturado ou não) volta a aparecer na Poké Ball das fases seguintes, com a
   chance baixa de hoje; continua valendo um de cada por jornada. **Não tirar o
   sorteio de hoje antes das missões existirem**, senão as aves somem do jogo.
+- **O Level Cap** (pedido do Fellipe em 2026-11-11, só no planejamento por enquanto:
+  PLANEJAMENTO-HISTORIA.md, seção 13.1): cada fase tem um teto de nível, e o próximo
+  só abre quando a fase é vencida. Para equilibrar. Ganha plano e maquete próprios, e o
+  `balance.mjs` mede a campanha de novo com ele.
 - **A vila** ([PLANEJAMENTO-LOBBY.md](PLANEJAMENTO-LOBBY.md)): a L-7 (sons e
   capricho), o modo Endless pelo mato alto e o modo aquático pela lagoa (cada um
   com o seu plano, quando chegar a vez) e as decisões da seção 13 de lá (o nome

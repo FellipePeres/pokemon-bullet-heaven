@@ -665,3 +665,42 @@ do Zapdos, o tipo, as fraquezas e o nível recomendado (36; sem captura, decisã
     momento" da captura, por enquanto, é a Poké Ball das fases seguintes (padrão, como
     na decisão 3). A mesma lógica deve valer para as outras máquinas (o Articuno e o
     Moltres), a confirmar quando chegar a vez de cada um.
+
+---
+
+## 13. Para depois (ideias registradas, sem construir)
+
+### 13.1 O Level Cap
+
+Pedido do Fellipe (2026-11-11, depois da missão do Zapdos): "vai existir Level Cap,
+cada fase os pokémons podem evoluir até um limite, liberando o próximo limite somente
+quando passarem da fase, uma tentativa de equilibrar, mas deixa isso no planejamento".
+
+- **A regra**: cada fase tem um teto de nível. Os Pokémon da equipe sobem até ele, e o
+  próximo teto só abre quando a fase é vencida.
+- **Por que**: equilibrar. Hoje dá para ficar muito acima de uma fase (repetindo a
+  anterior, no Modo Livre, no Endless), e a luta perde a graça; com o teto, cada fase
+  e cada missão são jogadas perto do nível em que foram medidas.
+- **O que decidir quando chegar a vez** (nada disso está decidido):
+  - o valor de cada teto (um ponto de partida: o nível recomendado da fase seguinte,
+    de `data/stages.js`; a Fase 1 pede 25, a 3 pede 33, a 4 pede 40, a 8 pede 60);
+  - o que acontece com a experiência acima do teto (some, fica guardada para quando o
+    teto subir, ou vira outra coisa, como Shards);
+  - a evolução: se o teto também segura a evolução por nível, ou só o nível;
+  - quem entra na equipe (a captura, os presentes, os lendários, que chegam no nível
+    da equipe) e o PC;
+  - o Modo Livre, o Endless e as missões dos lendários: a do Zapdos (nível 36) abre
+    depois da Fase 3, então o teto depois da Fase 3 precisa deixar a equipe chegar
+    perto de 36;
+  - as jornadas que já passaram do teto (nada se tira do jogador: elas ficam como
+    estão, e o teto só segura dali para frente);
+  - como o jogo mostra o teto (na barra de XP, no card da fase, no mapa da jornada).
+- **Antes de construir**: ganha um plano e uma maquete próprios, e o `balance.mjs` mede a
+  campanha de novo com o teto.
+
+### 13.2 A máquina central do Maxie
+
+A ideia de End Game da decisão 16 (seção 2): a energia sugada dos lendários alimenta uma
+máquina central numa base do Maxie, e é ela que desorienta os Pokémon. Ganha o seu
+plano quando chegar a vez (depois de Kanto, seção 10).
+
