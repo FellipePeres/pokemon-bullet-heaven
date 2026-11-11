@@ -99,9 +99,9 @@ quando o jogador volta, ou o lugar da fase antes dela.
 |---|---|---|---|
 | **Prólogo — O sonho** | na vila, antes da Fase 1 | O Carvalho: as hordas mudaram, ninguém sabe por quê. O sonho de ser Campeão continua possível, mas o ideal é devolver a paz às rotas. | — |
 | **1 — As rotas tomadas** | Fase 1 (Brock) | **Feito na 0.39** (pedido do Fellipe). Depois da vitória, no ginásio de Pewter, em tela cheia: o Brock parabeniza o jogador por ter vencido, conta que os Pokémon estão agindo de um jeito que ninguém viu (os Geodude desceram do Monte Lua), diz que é muito sério e pede ajuda para entender o que está acontecendo. Manda investigar a cidade de Cerulean. É a apresentação do problema; o Maxie não aparece, e não há corte de tela. Abre a quest **"Derrote a Misty e encontre pistas sobre o comportamento dos Pokémon"** (o mapa segue para o ginásio dela). Logo depois, de volta à vila: o **velho sábio** sai de casa, vê o jogador (o "!"), vem até ele e conta que soube do pedido do Brock, que os pássaros lendários sumiram dos céus e que foi depois disso que tudo começou ("deve ter alguma coisa a ver"), mas que é tudo o que ele pode ajudar por enquanto. Ele volta para casa, e o jogador fica livre. | — |
-| **2 — O céu vazio** | Fases 2 e 3 (Misty, Surge) | **A parte da Misty está feita na 0.39** (proposta "Cerulean: o mar bravo", aprovada inteira pelo Fellipe). Depois da Fase 2, duas cenas: no ginásio, a Misty conta que o mar ficou bravo desde que o Articuno deixou de ser visto sobre as Ilhas Seafoam (a primeira prova de que o sábio tem razão) e aponta o Surge e a Usina, onde o Zapdos aparecia; na rua de Cerulean, a casa assaltada do FireRed: o policial culpa a Equipe Rocket (a pista falsa) e o dono estranha que só levaram peças de máquina (as máquinas dos pássaros, no Capítulo 4); o rival passa correndo, a caminho de Vermilion. Na vila, os moradores culpam a Rocket, e só o velho sábio estranha o ladrão. **A parte do Surge também, na 0.39** (proposta "Vermilion: a Usina apagou", versão 2, com as mudanças do Fellipe: nada chega de barco, ninguém viu clarão). No ginásio, o Surge conta que a Usina apagou, que os Voltorb e os Magnemite invadiram Vermilion e que ninguém vê o Zapdos ("com o Articuno, já são dois"); naquela noite, pareceu haver um combate dentro da Usina, como se o Zapdos estivesse brigando. No cais, um marinheiro, preso em terra pelo mar agitado (o mesmo da Misty), conta que trabalhando pela Rota 10 escutou correntes dentro da Usina fechada: abre a quest paralela **"Investigue a Usina"**, e o "Investigar" (pela marca da Usina no mapa) leva o jogador para dentro da **Usina andável**: ele explora o labirinto do FireRed, pega Poké Balls com Reviver e Novo Sorteio e acha a escotilha da sala do gerador; lá embaixo, no escuro, dois olhos vermelhos e o card **"Derrote e liberte o Zapdos"** (seção 5). | — |
+| **2 — O céu vazio** | Fases 2 e 3 (Misty, Surge) | **A parte da Misty está feita na 0.39** (proposta "Cerulean: o mar bravo", aprovada inteira pelo Fellipe). Depois da Fase 2, duas cenas: no ginásio, a Misty conta que o mar ficou bravo desde que o Articuno deixou de ser visto sobre as Ilhas Seafoam (a primeira prova de que o sábio tem razão) e aponta o Surge e a Usina, onde o Zapdos aparecia; na rua de Cerulean, a casa assaltada do FireRed: o policial culpa a Equipe Rocket (a pista falsa) e o dono estranha que só levaram peças de máquina (as máquinas dos pássaros, no Capítulo 4); o rival passa correndo, a caminho de Vermilion. Na vila, os moradores culpam a Rocket, e só o velho sábio estranha o ladrão. **A parte do Surge também, na 0.39** (proposta "Vermilion: a Usina apagou", versão 2, com as mudanças do Fellipe: nada chega de barco, ninguém viu clarão). No ginásio, o Surge conta que a Usina apagou, que os Voltorb e os Magnemite invadiram Vermilion e que ninguém vê o Zapdos ("com o Articuno, já são dois"); naquela noite, pareceu haver um combate dentro da Usina, como se o Zapdos estivesse brigando. No cais, um marinheiro, preso em terra pelo mar agitado (o mesmo da Misty), conta que trabalhando pela Rota 10 escutou correntes dentro da Usina fechada: abre a quest paralela **"Investigue a Usina"**, e o "Investigar" (pela marca da Usina no mapa) leva o jogador para dentro da **Usina andável**: ele explora o labirinto do FireRed, pega Poké Balls com Reviver e Novo Sorteio e acha a escotilha da sala do gerador; lá embaixo, no escuro, dois olhos vermelhos e o card **"Derrote e liberte o Zapdos"** (seção 5). | **Zapdos** (a missão na Usina, seção 5.1) |
 | **3 — Os rastros** | Fases 4 e 5 (Erika, Koga) | A Erika acha, no jardim, uma pena dourada e um pedaço de metal com um emblema vermelho, e o jogador leva os dois ao Carvalho. O Koga viu um vulto de capuz vermelho carregando uma máquina pela Rota 10: "não era da Rocket, o uniforme era outro". | — |
-| **4 — O trovão preso** | Fase 6 (Sabrina) | Antes da Fase 6, perto da Usina, um estrondo vem lá de dentro (a cena de antes da fase). A Sabrina vê "três jaulas e um homem olhando para o mar". Abre a quest **"Investigue a Usina"**: o Zapdos está preso numa máquina com o emblema vermelho. Agora é certeza: **alguém roubou os pássaros**. | **Zapdos** |
+| **4 — O trovão preso** | Fase 6 (Sabrina) | **A rever quando chegar a vez** (decisões 14 e 15: a Usina e a missão do Zapdos vieram para depois da Fase 3, e o jogador pode chegar à Sabrina com o Zapdos preso ou livre). A ideia de antes: a Sabrina vê "três jaulas e um homem olhando para o mar"; agora a visão aponta para os outros dois pássaros. | — |
 | **5 — O gelo** | Fase 7 (Blaine) | A Fase 7 passa pelas Ilhas Seafoam. Depois do Blaine, o Carvalho cruza as anotações e aponta o fundo das ilhas. | **Articuno** |
 | **6 — O fogo e a suspeita** | Fase 8 (Giovanni) | O jogador chega achando que é a Rocket. O Giovanni olha o emblema e ri: não é da Rocket. A pista leva ao Monte Brasa, na Ilha 1. | **Moltres** |
 | **7 — O sonho** | Liga e Campeão | A Victory Road só abre com os três pássaros de volta (padrão; decisão 2). O rival no fim, e o Hall da Fama. Depois, o Carvalho: as rotas estão mais calmas, mas não como antes: "ainda falta alguma coisa". | — |
@@ -152,6 +152,75 @@ passos:
 - Cada lendário ganha **a sua seção ou maquete** quando chegar a vez, como foi com
   o Dive. Esta tabela é o ponto de partida.
 
+### 5.1 A missão do Zapdos (H-5 e H-6, feita na 0.39)
+
+Pedido do Fellipe: "pode construir isso" (a luta do Zapdos, para o "Lutar" do card
+funcionar: o molde das missões, tirado do salão do Kyogre, e a tempestade). As
+decisões abertas ficaram no padrão, para o Fellipe mudar o que quiser.
+
+- **O Lutar**: o grito do Zapdos e a transição de batalha do FireRed para os
+  lendários (`B_TRANSITION_BLUR`: duas piscadas para o cinza e o borrão em blocos que
+  escurece), por cima do escuro do fundo da Usina. A cena acaba ali, e a luta começa.
+- **A arena**: o fundo da Usina, montado com as peças da Power Plant do FireRed (o
+  piso, a parede de canos, os transformadores, o entulho e os geradores), um pouco
+  escurecido. No meio, logo acima de onde o jogador chega, **a máquina do emblema
+  vermelho** (desenhada em pixel: duas bobinas, o console com o emblema e a base com a
+  faixa de aviso), e a base dela bloqueia o caminho. A música é a da Usina no FireRed
+  (`mus_poke_mansion`), e a do lendário quando ele se solta.
+- **Preso (0:00 a 0:45)**: o Zapdos acorrentado à máquina (quatro correntes, das
+  bobinas e do console), se debatendo e soltando faíscas, enquanto a horda elétrica da
+  Usina vem (Voltorb, Magnemite, Pikachu, Electrode, Magneton, Electabuzz e Raichu,
+  níveis 54 a 58, com dois Electrode e um Electabuzz mais fortes). A tempestade já cai.
+  Nos últimos segundos, a máquina sobrecarrega (o emblema acende, um arco entre as
+  bobinas, "A máquina está sobrecarregando!").
+- **As correntes arrebentam**: ele entra em campo ainda preso (a apresentação do
+  lendário vem por cima), e logo depois o clarão, o grito, os elos voando, a máquina
+  quebra, e ele sobe furioso: "As correntes arrebentaram! O Zapdos está livre, e
+  furioso!".
+- **A tempestade (o desafio dele)**: os raios caem o tempo todo, sempre num lugar
+  marcado no chão antes (1,25 s de aviso). Um a cada 3,2 s com ele preso; 1 ou 2 a cada
+  2,4 s solto; 2 a cada 1,8 s abaixo de 50%; 3 a cada 1,3 s na fúria.
+- **Os ataques**, cada um com aviso:
+  - **Zap Cannon** (o golpe exclusivo dele): ele para e carrega (a mira tracejada até o
+    treinador), solta a esfera de trovão, que atravessa a arena devagar dando choques em
+    quem passa perto, e explode no lugar marcado;
+  - **Investida** (Drill Peck): a faixa acende no chão do Zapdos até depois do
+    treinador, com as setas correndo, e ele cruza a arena por ela (duas seguidas na fúria);
+  - **Discharge**: dois anéis elétricos saem dele;
+  - a horda chamada, como os líderes.
+- **A tempestade total** (aos 66% e aos 33%, e a cada 24 s na fúria): ele sobe para as
+  nuvens e some, intocável, e o chão vira um tabuleiro de casas de 200 px em volta do
+  treinador. As casas de uma cor caem primeiro (a dele inclusive), depois as da outra,
+  depois as da primeira de novo, com 1 s entre as levas. Só a próxima leva acende
+  forte, e a casa queimada fica escura: **fica a salvo quem pisa onde o raio acabou de
+  cair**. No fim, ele mergulha de volta num lugar marcado, com um Discharge.
+- **A captura** é a do molde: 3 Ultra Balls de 10%, o piso de 15% enquanto houver bola,
+  a volta a 25%, 8 s exausto com a bola caindo num feixe de luz. Capturado, ele vai
+  **sempre para o PC** (o card avisa), e a máquina entra em sobrecarga: 25 s de leva
+  final. **Sem bolas, derrotado, ele se solta e voa livre** ("O Zapdos se soltou e voou
+  para longe, livre!"): a missão vence do mesmo jeito.
+- **A força**: o nível recomendado do card (58) é o da luta. Medida com o jogador
+  automático e uma equipe comum de meio de jornada (`node tools/kyogre.mjs 58 12
+  zapdos`): no nível 50 vence 2 de 12; no 54, 8 de 12; **no 58, 11 de 12, com 3 a 4
+  desmaios**; no 62, 11 de 12. Primeira vitória: 300 Shards.
+- **Perdeu**: a tela de resultado oferece "Tentar de novo" (a equipe curada, sem
+  atravessar a Usina) e "Voltar para a vila" (acorda no Centro: um marinheiro de
+  Vermilion achou o jogador desmaiado perto da escotilha). Saiu no meio: volta para
+  cima, ao lado da escotilha.
+- **Venceu** (capturando ou não): a missão fica registrada na jornada, a quest
+  "Derrote e liberte o Zapdos" fecha, e o "Continuar Jornada" leva à **cena de depois**
+  (`zapdos_livre`), na sala do fundo **com a luz de volta**: as lâmpadas piscam e
+  acendem, "o Zapdos descansa na Ultra Ball" (ou "voou, livre"), o jogador vai até a
+  máquina destruída e vê, no meio dela, **um emblema vermelho que nunca viu**: "Alguém
+  prendeu o Zapdos aqui de propósito." O jogador fica em cima, ao lado da escotilha,
+  e a escotilha passa a levar à sala iluminada, só com os pedaços da máquina. Na vila,
+  o rapaz conta que a Usina voltou a funcionar, e o velho sábio, uma vez: "Alguém está
+  caçando os pássaros lendários. E o Articuno ainda não voltou."
+- **A jornada que já tinha o Zapdos** (da Poké Ball das fases, antes das missões): a
+  missão aparece concluída (as duas quests da Usina fecham sozinhas e a marca sai do
+  mapa), e o Carvalho comenta uma vez: "O Zapdos está com você? Então foi você quem o
+  encontrou primeiro!". Nada se tira do jogador.
+
 ---
 
 ## 6. A captura muda: o lendário só depois da missão dele
@@ -170,7 +239,10 @@ passos:
 - **Antes da liberação, nenhum lendário aparece na Poké Ball.** O sorteio
   (`CaptureSystem.rollLegendary`) passa a olhar a lista dos liberados da jornada.
 - **Ordem de construção:** o sorteio de hoje só muda quando as missões
-  existirem (H-5 em diante). Sem isso, as aves sumiriam do jogo.
+  existirem (H-5 em diante). Sem isso, as aves sumiriam do jogo. **Feito na 0.39,
+  lendário por lendário**: quem já tem missão (o Zapdos) só cai na Poké Ball depois de
+  liberado; os outros (Articuno, Moltres, Mewtwo, Mew) continuam como antes até a
+  missão deles existir (`MISSION_SPECIES` em `data/missions.js`).
 - **O kit continua**: o golpe exclusivo, as melhorias e o Golpe Desperto chegam
   com o lendário quando ele é recuperado.
 - **Jornadas que já têm um lendário continuam com ele**, porque nada se tira do
@@ -387,9 +459,9 @@ para o objetivo `scene` das quests. O check-data recusa a caixa com retrato
 | 9 | As correntes: o marinheiro | porto de Vermilion, depois da Fase 3 | 2 | H-4 ✅ |
 | 10 | A Usina andável e o fundo: os olhos e o card do Zapdos | Usina, pela marca no mapa da jornada | 2 | H-4 ✅ |
 | 11 | O vulto de vermelho na Rota 10 | antes da Fase 5 | 3 | H-4 |
-| 12 | O estrondo na Usina | antes da Fase 6 | 4 | H-6 |
-| 13 | A jaula do Zapdos | Usina | 4 (missão) | H-6 |
-| 14 | O Carvalho e o emblema | laboratório | 4 | H-6 |
+| 12 | ~~O estrondo na Usina~~ (saiu: a Usina andável e a missão vieram para depois da Fase 3, decisão 14) | — | — | — |
+| 13 | A jaula do Zapdos: a luta e, depois, a sala com a luz de volta e o emblema vermelho na máquina destruída (`zapdos_livre`) | o fundo da Usina | 2 (missão) | H-6 ✅ |
+| 14 | O Carvalho e o emblema | laboratório | 3 ou 4 | depois |
 | 15 | A jaula do Articuno | Ilhas Seafoam | 5 (missão) | H-7 |
 | 16 | O Giovanni e o emblema | ginásio de Viridian, depois da Fase 8 | 6 | H-8 |
 | 17 | A jaula do Moltres | Monte Brasa | 6 (missão) | H-8 |
@@ -508,9 +580,10 @@ do Zapdos, o tipo, as fraquezas, as 3 Ultra Balls e o nível recomendado (58).
 | **H-1** ✅ 0.38 | O sistema de quests e o prólogo: `data/quests.js`, o `QuestSystem`, o rastreador, o save por jornada com a migração, as condições novas nas falas, a cadeia do prólogo e o discurso novo do Carvalho. Testes no `ui-smoke`. |
 | **H-2** ✅ 0.39 | As cenas em dados (`Cutscene.js` a partir da cena do Maxie, que não muda), as cenas de antes e de depois das fases, em tela cheia nos palcos (o ginásio de Pewter), as duas cenas do prólogo e as duas da volta da Fase 1 (o Brock, com a quest da Misty, e o velho sábio): o discurso do Carvalho encenado e o rival pegando o inicial dele (seção 9.3). |
 | **H-3** | A tela de missões. |
-| **H-4** (em andamento) | Os capítulos 1 a 3: as falas de depois da vitória dos líderes, o velho sábio, os moradores e as quests de cada capítulo. **Feito na 0.39:** o Capítulo 1 inteiro (o Brock e o velho sábio) e o Capítulo 2 inteiro (a Misty, a casa roubada, os moradores; o Surge, o marinheiro e a visita à Usina). Falta o Capítulo 3 (Erika e Koga). |
-| **H-5** | A captura sem lendários e o molde da missão de lendário, tirado do salão do Kyogre. |
-| **H-6 a H-8** | O Zapdos, o Articuno e o Moltres, cada um com o seu plano e a sua maquete. |
+| **H-4** (em andamento) | Os capítulos 1 a 3: as falas de depois da vitória dos líderes, o velho sábio, os moradores e as quests de cada capítulo. **Feito na 0.39:** o Capítulo 1 inteiro (o Brock e o velho sábio) e o Capítulo 2 inteiro (a Misty, a casa roubada, os moradores; o Surge, o marinheiro e a Usina andável, com a missão do Zapdos, H-5 e H-6). Falta o Capítulo 3 (Erika e Koga). |
+| **H-5** ✅ 0.39 | A captura sem lendários e o molde da missão de lendário, tirado do salão do Kyogre: `systems/legendaryFight.js` (a captura, os avisos, os anéis, a leva final), o Kyogre por cima dele sem mudar nada (o mesmo rastro, quadro a quadro), o registro das missões na jornada, a volta pela missão e a regra da Poké Ball para quem tem missão. |
+| **H-6** ✅ 0.39 | O Zapdos (seção 5.1): o Lutar com a transição, a luta no fundo da Usina, a tempestade, a captura com Ultra Ball e a cena de depois. |
+| **H-7 e H-8** | O Articuno e o Moltres, cada um com o seu plano e a sua maquete. |
 | **H-9** | A Liga com os pássaros e o fim do Capítulo 7 (o rival e o "ainda falta alguma coisa"). |
 | **H-10** | O Mewtwo. |
 | **H-11** | O Kyogre como fecho de Kanto (as quests em volta da cena que já existe, a lagoa depois do Campeão) e o Mew. |
@@ -557,3 +630,8 @@ do Zapdos, o tipo, as fraquezas, as 3 Ultra Balls e o nível recomendado (58).
     fase "Derrote e liberte o Zapdos", com a foto dele. O card aparece depois da
     Fase 3, e a luta pede o nível dela (~58, padrão). A visão da Sabrina no
     Capítulo 4 passa a apontar para os outros dois pássaros.
+15. **A luta do Zapdos** (pedido do Fellipe: "pode construir isso"; os detalhes no
+    padrão, seção 5.1): preso na máquina nos primeiros 45 s, as correntes arrebentando,
+    a tempestade marcada no chão o tempo todo, o Zap Cannon, a Investida, o Discharge e
+    a tempestade total em tabuleiro; 3 Ultra Balls; derrotado sem captura, ele voa livre.
+    Depois, a sala com a luz de volta e o emblema vermelho na máquina destruída.

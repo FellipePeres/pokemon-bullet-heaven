@@ -747,7 +747,8 @@ Nunca voltar bônus globais para o pool de level up — foi pedido explícito.
   lugar (`assets/ui/gym-banners/usina.png`, do `gym_banners.py`), a foto do
   lendário, o tipo, as fraquezas, as bolas (a Ultra Ball veio do Pokemon All) e o
   nível. O passo `card` das cenas o abre e espera a escolha; o A/Enter luta, o
-  B/ESC volta. `Game.startMission` ainda só avisa (a luta é a H-5 e a H-6). A cena
+  B/ESC volta. No Lutar, a cena acaba ali (sem o `then`) e `Game.startMission` começa
+  a luta (a seção "O molde das missões e a luta do Zapdos"). No Voltar, a cena
   `usina_fundo` (`record: false`, toca a cada descida) termina com `then: { go }`,
   a ação nova que leva a outro lugar escurecendo.
 - **O `.hall-card` do Hall da Fama** passou a ser `.overlay-card.hall-card`: a
@@ -799,7 +800,8 @@ Nunca voltar bônus globais para o pool de level up — foi pedido explícito.
   Voltar para a Vila. Voltar sai pela lagoa, e outra chance exige descer de novo.
 - **A luta**:
   - A fase `kyogre` (secreta, fora da campanha) e `systems/kyogreFight.js` por cima
-    dela, com o desenho em `render/kyogreFight.js`.
+    dela (desde a H-5, no molde `systems/legendaryFight.js`), com o desenho em
+    `render/legendaryFight.js`.
   - A arena é o salão aprovado: o cenário `fixed` `kyogre_hall`, o tileset cave do
     Emerald.
   - A chuva o tempo todo (Drizzle: golpes de Água ×1,5 e de Fogo ×0,5, para todos;
@@ -857,6 +859,77 @@ Nunca voltar bônus globais para o pool de level up — foi pedido explícito.
   Pokédex) e o `ui-smoke` (o fluxo inteiro, do Nível 6 à cena e ao Endless; o PC;
   a cena pendente ao continuar e ao carregar; o Origin Pulse do Kyogre em campo
   desenhado do 1º quadro ao fim). O roteiro de screenshots é `kyogre`.
+
+### O molde das missões e a luta do Zapdos (H-5 e H-6, 0.39 na branch)
+- Pedido do Fellipe ("pode construir isso": a luta do Zapdos, para o Lutar do card
+  funcionar). Os detalhes que ele não decidiu ficaram no padrão
+  (PLANEJAMENTO-HISTORIA.md, seção 5.1, e a decisão 15).
+- **O molde** (`systems/legendaryFight.js`, a classe `LegendaryFight`): o que toda luta
+  de lendário tem, tirado da do Kyogre: os avisos no chão (círculos, ou as casas
+  quadradas, `shape: 'square'`), os anéis (`ring.type` diz o tipo do dano), a captura
+  inteira (o piso, a exaustão, a bola caindo, o arremesso, a faixa, a volta, o presente
+  `toPC`) e a leva final. Cada lendário estende a classe e preenche os ganchos
+  (`_before`, `_updateSpecial`, `_rise`, `_state`, `_calm`, `_comeBack`,
+  `_impactOther`, `onBossDown`). Os nomes, a bola e os textos ficam no
+  `legendaryFight` da fase (`kind`, `species`, `name`, `dex`, `ballName`, `ballSheet`,
+  `lostBall`, `finalObjective`, `finalToast`, `finalEnd`, `finalBanner`).
+  `systems/fights.js` escolhe a classe pelo `kind` (o `Run` chama `createFight`).
+- **O Kyogre passou para o molde sem mudar nada**: o mesmo rastro, quadro a quadro, com
+  o `Math.random` semeado (a luta inteira em dois níveis, e de novo com a captura
+  certa), antes e depois da troca. `render/kyogreFight.js` virou
+  `render/legendaryFight.js` (o desenho comum: os avisos, os raios, a bola, a faixa,
+  os letreiros e a barra do chefe, com as cores da bola em `fight.glow`), e o do
+  Zapdos está em `render/zapdosFight.js` (a máquina e as correntes embaixo de todos,
+  `drawFightGround`; a esfera, a faixa da Investida, as explosões e os elos por cima).
+- **A luta do Zapdos** (`systems/zapdosFight.js`, a fase secreta `zapdos`, o chefe
+  `zapdos_boss`, o cenário `usina_arena`): preso na máquina (`machine` na fase, em px do
+  mundo, logo acima de onde o treinador chega; a base bloqueia o caminho) nos 45 s da
+  horda; entra preso (`break`) e as correntes arrebentam 0,25 s depois da
+  apresentação; a tempestade (`_storm`, os raios marcados o tempo todo, `stormEvery`);
+  os ataques (`cannon`, `peck`, `discharge`), a tempestade total (`sky`, o tabuleiro de
+  `_grid` em três levas; o desenho acende só a próxima) e o mergulho de volta; a fúria
+  abaixo de 20%. Derrotado sem a captura (`onBossDown`, chamado pelo
+  `combat.killEnemy`), ele voa livre. Os danos ficam em `legendaryFight.damage`.
+- **A arena** é um salão `room` montado com a tira `scene/power_plant` (o `extract.py`
+  ganhou a Power Plant) e um campo novo nas receitas: `clear`, os retângulos (em casas
+  da arena) onde os enfeites não caem (o lugar da máquina). A máquina, a máquina
+  destruída, a Ultra Ball (`item/ultra-ball`) e o grito do Zapdos (`cries/145.ogg`)
+  saem do `tools/assets/hub.py`; a música, do `render_music.py` (`mus_poke_mansion`).
+- **O Lutar** (`Game.startMission`): o grito e a transição de batalha
+  (`hub.battle`, `BATTLE_INTRO` em `game/Hub.js`, desenhada pelo
+  `HubRenderer._battleIntro`: as duas piscadas para o cinza e o mosaico que escurece,
+  como o `B_TRANSITION_BLUR` do FireRed); a vila para enquanto ela dura; no fim, a fase.
+- **A volta** (`returnTo: 'mission'`): venceu, o `endRun` grava
+  `campaign.missions[id] = { won, captured, date }`, a quest fecha (o objetivo é o `win`
+  da fase), e o "Continuar Jornada" toca a cena devida `zapdos_livre` no palco
+  `usina_luz` (a sala do fundo com a luz, a mesma do `usina_fundo`); saiu no meio, volta
+  para cima, ao lado da escotilha; perdeu, "Tentar de novo" (`retryLegendary`) ou o
+  Centro com a `enfermeira_usina` (sem contar como resgate do Dive). A vitória não
+  oferece jogar de novo.
+- **O estado de cada missão** (`Game.missionState`): 'preso', 'capturado', 'livre' ou
+  'antes' (a jornada já tinha o lendário, da Poké Ball). `liberatedSpecies()` vai para
+  o `doneIf` das quests (`freed`), para as falas e cenas (`freed`, `caged`, `mission`,
+  e o `missao_<id>` do `pick`) e para a partida (`options.liberated`).
+- **A captura sem lendários** (H-5): `CaptureSystem.rollLegendary` tira do sorteio
+  quem tem missão (`MISSION_SPECIES`) e ainda não foi liberado. Os outros continuam
+  como antes até a missão deles existir.
+- **A escotilha muda**: duas passagens no mesmo tile com `when` (`Hub._warp` escolhe):
+  com o Zapdos preso, o fundo escuro; livre, a sala iluminada (`usina_luz_volta`, só os
+  pedaços da máquina).
+- **O presente `toPC`** vale para qualquer lendário (`Game.pickCapture` e o aviso da
+  tela de captura com o nome dele).
+- **A medição**: `node tools/kyogre.mjs 58 12 zapdos` (a equipe comum de meio de
+  jornada, no nível pedido, com as melhorias de quem subiu até ali). Nível 50 vence 2 de
+  12; 54, 8 de 12; 58, 11 de 12 (3 a 4 desmaios); 62, 11 de 12. As alavancas: a vida do
+  `zapdos_boss` (160.000), a `difficulty` da fase (1,18) e os danos do `legendaryFight`.
+  O bot lê o tabuleiro (vai para a casa que cai mais tarde) e sai de lado da Investida.
+- **Os testes**: o `smoke-test` (a arena e a máquina, preso, as correntes, cada ataque,
+  o tabuleiro e as levas, a captura com a Ultra Ball, a fuga, a regra da Poké Ball), o
+  `ui-smoke` (o Lutar com a transição, sair no meio, a derrota com as duas saídas, a
+  vitória com a captura no PC, a cena de depois, a escotilha nova, o sábio, a jornada
+  "antes" e o Carvalho) e o `check-data` (a missão aponta para uma fase com a luta, as
+  bolas e o nível do card batem com os da fase, as passagens com `when`). O roteiro de
+  screenshots é `zapdos`.
 
 ### A descida do Dive — o modo aquático (0.36)
 - Pedido do Fellipe, desenhado e medido numa maquete jogável que ele aprovou
@@ -1327,6 +1400,7 @@ o Brock como está, todas as outras mais duras, menos níveis.
 | 72 | a continuação da Fase 2: "perfeito essas cenas, pode seguir com tudo que sugeriu, aceito todas as recomendações" (a proposta "Cerulean: o mar bravo") | 0.39 (na branch): os palcos do ginásio de Cerulean e da casa assaltada, a Misty, o policial e o dono em pixel; as cenas `depois_misty` e `cerulean_roubo` (com o rival); o passo `emit` e as pistas (`clue`); a quest da Misty em duas linhas e a do Surge; o `doneIf` por objetivo; as falas da vila culpando a Rocket, presas à quest |
 | 73 | a Fase 3 na história, com as mudanças do Fellipe: nada chega de barco, o Surge não viu clarão; o Surge conta que pareceu haver um combate dentro da Usina, como se o Zapdos estivesse brigando; o marinheiro, preso no porto pela maré agitada, escutou correntes vindo da Usina, e o jogador pode ir verificar; "pode fazer seguindo o planejamento" | 0.39 (na branch): os palcos do ginásio de Vermilion, do cais e da entrada da Usina; as cenas `depois_surge`, `vermilion_correntes` e `usina_porta`; a quest da Erika (Capítulo 3) e as da Usina (azuis); os lugares da história no mapa da jornada (`STORY_PLACES`, `visitPlace`), com a Usina como o primeiro |
 | 74 | a Usina andável: "ao clicar no investigar no card da usina, a gente vai ter tiles jogáveis", uma escada para o fundo, a tela preta com um círculo de brilho fraco, os olhos vermelhos e o card "derrote e liberte Zapdos"; depois: os olhos em pixel e 2D, num tile; 13 Poké Balls (2 no caminho, 11 nas salas sem saída) com Reviver e Novo Sorteio; o card só depois dos olhos (2 s e 2 s), no padrão dos cards de fase, com a foto do Zapdos | 0.39 (na branch): a Usina inteira do FireRed como lugar para explorar (`explore`), as Poké Balls do chão (`loot`), a escotilha e os olhos desenhados em pixel, o escuro em degraus (`dark`), o card de missão (`data/missions.js`), as quests `z_usina` e `z_zapdos`; o card do Kyogre corrigido (o banner sumia) |
+| 75 | "pode construir isso" (a luta do Zapdos, para o Lutar do card funcionar: o molde das missões, tirado do salão do Kyogre, e a tempestade) | 0.39 (na branch): o molde `systems/legendaryFight.js` (o Kyogre por cima dele, idêntico quadro a quadro), a luta do Zapdos (preso na máquina do emblema vermelho, as correntes arrebentando, a tempestade marcada, o Zap Cannon, a Investida, o Discharge, o tabuleiro de raios, 3 Ultra Balls, a fuga sem captura), a arena da Power Plant, a transição de batalha do FireRed, a volta pela missão, a cena `zapdos_livre` com a luz de volta e o emblema, a regra da Poké Ball para quem tem missão; medido: no nível 58 vence 11 de 12 |
 | Fase 8 (Giovanni) | 1 → 0,8 | 4,0 | 4,5 | 60 | 84 → 62 |
 | Lorelei | 1,05 → 0,8 | 3,5 | 3,1–4,7 | 64 | 92 → 66 |
 | Bruno | 1,12 → 0,97 | 3,7 | 3,5–6,3 ² | 66 | 99 → 68 |

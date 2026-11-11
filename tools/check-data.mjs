@@ -33,6 +33,8 @@ import { DONE_IF_KEYS } from '../src/systems/QuestSystem.js';
 import { CUTSCENES, CUTSCENE_STEPS, CUTSCENE_TRIGGERS } from '../src/data/cutscenes.js';
 import { STORY_PLACES } from '../src/data/regionMap.js';
 import { MISSIONS } from '../src/data/missions.js';
+import { FIGHT_KINDS } from '../src/systems/fights.js';
+const MANIFEST_FOR = Object.fromEntries(Object.entries({ ...ASSET_MANIFEST, ...HUB_SPRITES, ...DIVE_WORLD.sprites }).map(([k, v]) => [k, v.src]));
 import { existsSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -257,7 +259,8 @@ badSegments.length ? fail(`trechos com cenário inexistente: ${badSegments.join(
 }
 
 // as condições e ações das falas da vila (game/Hub.js), que as cenas também usam
-const KNOWN_WHEN = new Set(['starter', 'starterIs', 'shiny', 'badges', 'champion', 'dex', 'veteran', 'dive', 'diveTm', 'diveRescued', 'kyogre', 'locked', 'once', 'quest', 'questDone', 'scene', 'flag']);
+const KNOWN_WHEN = new Set(['starter', 'starterIs', 'shiny', 'badges', 'champion', 'dex', 'veteran', 'dive', 'diveTm', 'diveRescued', 'kyogre', 'locked', 'once', 'quest', 'questDone', 'scene', 'flag',
+  'freed', 'caged', 'mission']);
 const KNOWN_ACTIONS = new Set(['starter', 'pc', 'mart', 'save', 'campaign', 'pokedoll', 'badges', 'aquatic', 'home', 'stage']);
 // o chão da vila: só onde o mapa do FireRed deixa pisar
 const floor = (mapId, x, y) => {
@@ -577,6 +580,27 @@ const inside = (mapId, x, y) => { const m = HUB_MAPS[mapId]; return !!m && x >= 
       if (!file || !existsSync(join(root, file))) issues.push(`missão ${id}: falta ${file}`);
     }
     if (!(mission.recommendedLevel > 0) || !mission.title || !mission.weak?.length) issues.push(`missão ${id}: card incompleto`);
+    // o molde das missões (H-5): a fase da luta, com o `legendaryFight` de uma luta que existe
+    const stage = STAGES[mission.stage];
+    const cfg = stage?.legendaryFight;
+    if (!stage) issues.push(`missão ${id}: fase que não existe (${mission.stage})`);
+    else if (!cfg || !FIGHT_KINDS.includes(cfg.kind)) issues.push(`missão ${id}: a fase ${mission.stage} não tem uma luta de lendário conhecida`);
+    else {
+      if (stage.mission !== id || stage.returnTo !== 'mission' || !stage.secret) issues.push(`missão ${id}: a fase ${mission.stage} precisa de mission, returnTo 'mission' e secret`);
+      if (cfg.species !== mission.species || !LEGENDARY_KITS[mission.species]) issues.push(`missão ${id}: o lendário da luta (${cfg.species}) não é o da missão (${mission.species})`);
+      if (cfg.balls !== mission.balls.count || cfg.chance !== mission.balls.chance) issues.push(`missão ${id}: o card mostra bolas diferentes das da luta`);
+      if (stage.recommendedLevel !== mission.recommendedLevel) issues.push(`missão ${id}: o nível do card não é o da fase`);
+      if (!cfg.ballSheet || !existsSync(join(root, ...(MANIFEST_FOR[cfg.ballSheet] ?? 'x').split('/')))) issues.push(`missão ${id}: a bola da luta (${cfg.ballSheet}) não tem folha`);
+      for (const key of ['name', 'dex', 'ballName', 'lostBall', 'finalObjective', 'finalToast', 'finalEnd', 'finalBanner']) {
+        if (cfg[key] == null) issues.push(`missão ${id}: o legendaryFight da fase não tem ${key}`);
+      }
+    }
+  }
+  // as passagens com `when` (a escotilha da Usina, H-6): cada condição é conhecida
+  for (const [mapId, place] of Object.entries(HUB.maps)) {
+    for (const w of place.warps ?? []) {
+      for (const cond of Object.keys(w.when ?? {})) if (!KNOWN_WHEN.has(cond)) issues.push(`${mapId}: passagem com condição desconhecida (${cond})`);
+    }
   }
   const stages = Object.keys(HUB.maps).filter((id) => HUB.maps[id].scene);
   issues.length

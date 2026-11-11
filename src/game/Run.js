@@ -19,7 +19,7 @@ import { bus, EVENTS } from '../core/events.js';
 import { typeColor, defenseMultiplier } from '../data/types.js';
 import { getPokemon } from '../data/pokemon.js';
 import { maxHpFor } from '../systems/stats.js';
-import { KyogreFight } from '../systems/kyogreFight.js';
+import { createFight } from '../systems/fights.js';
 import { weatherMultiplier } from '../systems/combat.js';
 
 /**
@@ -73,6 +73,8 @@ export class Run {
     // que está lá não volta na Poké Ball (0.18, um de cada)
     this.ownedElsewhere = new Set(options.ownedElsewhere ?? []);
     this.legendariesOffered = new Set();   // os que já apareceram nesta tentativa
+    // os lendários liberados nesta jornada (H-5): quem tem missão só cai na Poké Ball depois dela
+    this.liberated = new Set(options.liberated ?? []);
     // buffs dos 2º golpes na equipe: Tailwind (treinador mais rápido) e Reflect (menos dano)
     this.buffs = { tailwind: 0, reflect: 0 };
 
@@ -91,8 +93,8 @@ export class Run {
 
     this.spawner = new SpawnSystem(this);
     this.refreshStats();
-    // a luta do Kyogre (0.37): o que só ela tem, por cima da fase de sempre
-    this.fight = this.stage.legendaryFight ? new KyogreFight(this) : null;
+    // a luta de um lendário (o Kyogre, 0.37; o molde das missões, H-5): o que só ela tem, por cima da fase de sempre
+    this.fight = createFight(this);
 
     this.pendingBall = false;
     this.pendingGift = null;     // presente da fase esperando a escolha (ver stage.gifts)

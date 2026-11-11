@@ -898,8 +898,6 @@ game.menus.closeModal();
   check('mais 2 segundos e o card sobe, no padrão do card de fase, com a foto do Zapdos',
         game.missionCard?.id === 'zapdos' && !card.classes.has('hidden') && cardHtml().includes('Derrote e liberte o Zapdos') && cardHtml().includes('145.png')
         && cardHtml().includes('ultra-ball.png') && cardHtml().includes('Nível recomendado'));
-  game.handleAction('confirm');
-  check('o Lutar ainda avisa que a luta chega na próxima etapa (o card fica)', !!game.missionCard && !!hub.scene);
   game.handleAction('cancel');
   for (let i = 0; i < 4; i++) hub.update(1 / 60);
   settle();
@@ -907,15 +905,117 @@ game.menus.closeModal();
         !game.missionCard && card.classes.has('hidden') && !hub.scene && hub.mapId === 'usina' && hub.player.x === 5 && hub.player.y === 12);
   game.questTracker.render();
   check('no rastreador: "Derrote e liberte o Zapdos" (azul)', questBox().innerHTML.includes('Derrote e liberte o Zapdos'));
+
+  // ---- a missão do Zapdos (H-5 e H-6): o Lutar, a luta, a derrota, a vitória e a cena ----
+  const { BATTLE_INTRO } = await import('../src/game/Hub.js');
+  const toTheCard = () => {
+    hub.enter({ map: 'usina', x: 4, y: 13, dir: 'up' });
+    press('up');
+    for (let i = 0; i < 60 * 4.5 && !game.missionCard; i++) hub.update(1 / 60);
+    return !!game.missionCard;
+  };
+  const savedJourney = JSON.stringify(game.campaign.journey);
+  check('o Zapdos ainda está preso: nada dele na Poké Ball das fases', game.missionState('zapdos') === 'preso' && !game.liberatedSpecies().includes('zapdos'));
+  check('descer de novo: o escuro, os olhos e o card outra vez', toTheCard());
+  game.handleAction('confirm');
+  check('o Lutar fecha o card e começa a transição de batalha (a cena acaba ali)', !game.missionCard && !!hub.battle && !game.run);
+  const where = `${hub.mapId}:${hub.player.x},${hub.player.y}`;
+  for (let i = 0; i < 20; i++) hub.update(1 / 60, STEP.down);
+  check('...durante a transição, nada anda', `${hub.mapId}:${hub.player.x},${hub.player.y}` === where && !hub.player.moving && !!hub.battle);
+  for (let i = 0; i < 60 * BATTLE_INTRO + 2; i++) hub.update(1 / 60);
+  check('no fim dela, a luta do Zapdos: o fundo da Usina, o Zapdos preso na máquina e 3 Ultra Balls',
+        game.run?.stage.id === 'zapdos' && game.run.fight?.kind === 'zapdos' && game.run.fight.balls === 3 && !game.run.fight.snapped
+        && game.run.world.scene === 'usina_arena' && !hub.battle && !hub.scene);
+  // sair no meio: de volta para cima, ao lado da escotilha
+  game.quitToMenu();
+  check('sair no meio da luta volta para a Usina, ao lado da escotilha', !game.run && hubVisible() && hub.mapId === 'usina' && hub.player.x === 5 && hub.player.y === 12);
+  // a derrota: Tentar de novo ou o Centro, com a enfermeira da Usina
+  toTheCard();
+  game.handleAction('confirm');
+  for (let i = 0; i < 60 * BATTLE_INTRO + 2; i++) hub.update(1 / 60);
+  game.run.team.members.forEach((m) => { m.fainted = true; m.hp = 0; });
+  game.run.update(1 / 60, { x: 0, y: 0 });
+  game._handleRunState();
+  const sub = (id) => registry.get(id).children?.[0]?.children?.find?.((c) => c.className === 'btn-sub')?.textContent ?? '';
+  check('caiu na luta do Zapdos: a derrota oferece Tentar de novo e Voltar para a vila', game.run?.state === 'defeat'
+        && !registry.get('btn-result-retry-defeat').classes.has('hidden') && !registry.get('btn-result-village').classes.has('hidden')
+        && registry.get('btn-result-center').classes.has('hidden'));
+  registry.get('btn-result-retry-defeat').click();
+  check('Tentar de novo: a luta recomeça, sem atravessar a Usina, com a equipe curada', game.run?.stage.id === 'zapdos' && game.run.state === 'running'
+        && game.run.team.members.every((m) => !m.fainted));
+  game.run.team.members.forEach((m) => { m.fainted = true; m.hp = 0; });
+  game.run.update(1 / 60, { x: 0, y: 0 });
+  game._handleRunState();
+  const rescues = game.campaign.dive?.rescues ?? 0;
+  registry.get('btn-result-village').click();
+  check('Voltar para a vila: acorda no Centro, e a enfermeira conta do marinheiro de Vermilion',
+        !game.run && hubVisible() && hub.mapId === 'centro' && hub.dialog?.name === 'Enfermeira' && dialogText().includes('Usina')
+        && (game.campaign.dive?.rescues ?? 0) === rescues);
+  closeDialog();
+  check('perder não libera o Zapdos', game.missionState('zapdos') === 'preso' && game.quests.isActive('z_zapdos'));
+  // a vitória com a captura
+  toTheCard();
+  game.handleAction('confirm');
+  for (let i = 0; i < 60 * BATTLE_INTRO + 2; i++) hub.update(1 / 60);
+  // a captura: o presente da luta (toPC) abre a tela de sempre, e ele vai para o PC mesmo com espaço
+  const teamSize = game.run.team.members.length;
+  game.run.pendingGift = { choices: ['zapdos'], title: 'Gotcha! O Zapdos foi capturado!', mandatory: true, toPC: true };
+  game.run.state = 'capture';
+  game._handleRunState();
+  check('capturou: a tela da captura avisa que ele vai para o PC', game.captureOpen && game.run.pendingGift?.toPC);
+  game.pickCapture('zapdos');
+  check('...e ele vai para o PC, mesmo com espaço na equipe', game.run.pc.some((m) => m.pokemonId === 'zapdos')
+        && game.run.team.members.length === teamSize && !game.run.team.has('zapdos'));
+  game.run.fight.captured = true;
+  game.run.state = 'victory';
+  game._handleRunState();
+  check('venceu e capturou: a missão fica registrada, o Zapdos vai para o PC e a quest fecha',
+        game.missionState('zapdos') === 'capturado' && game.campaign.journey.pc.some((m) => m.pokemonId === 'zapdos')
+        && game.quests.isDone('z_zapdos') && game.sceneRecord.zapdos_livre === 'due');
+  check('a vitória não oferece jogar de novo (o Zapdos está livre)', registry.get('btn-result-retry').classes.has('hidden'));
+  check('depois da missão, o Zapdos pode cair na Poké Ball das fases seguintes', game.liberatedSpecies().includes('zapdos'));
+  registry.get('btn-result-menu').click();
+  check('Continuar Jornada: a sala do fundo com a luz de volta e a máquina destruída (a cena de depois)',
+        hubVisible() && hub.mapId === 'usina_luz' && hub.scene?.id === 'zapdos_livre' && !hub.place.dark
+        && hub.decor.some((d) => d.sprite === 'maquina_zapdos_quebrada'));
+  const livre = runScene();
+  check('a cena: a luz volta, o Zapdos descansa na Ultra Ball e o emblema vermelho na máquina',
+        said(livre, 'Ultra Ball') && said(livre, 'emblema vermelho') && said(livre, 'de propósito') && game.sceneRecord.zapdos_livre === 'seen');
+  settle();
+  check('...e o jogador fica em cima, ao lado da escotilha', hub.mapId === 'usina' && hub.player.x === 5 && hub.player.y === 12);
+  hub.enter({ map: 'usina', x: 4, y: 13, dir: 'up' });
+  press('up');
+  check('agora a escotilha leva à sala iluminada, só com os pedaços da máquina', hub.mapId === 'usina_luz' && hub.scene?.id === 'usina_luz_volta');
+  runScene();
+  settle();
+  check('...e volta para cima', hub.mapId === 'usina' && !hub.scene);
+  check('o Lutar de uma missão vencida não começa nada', !game.startMission('zapdos') && !hub.battle);
+  // o sábio comenta uma vez
+  hub.enter({ map: 'vila', x: 27, y: 22, dir: 'up' });
+  hub.say('sabio');
+  check('o velho sábio, uma vez: o emblema vermelho e alguém caçando os pássaros', dialogText().includes('caçando os pássaros'));
+  closeDialog();
+  hub.say('sabio');
+  check('...só uma vez', !dialogText().includes('caçando os pássaros'));
+  closeDialog();
+  // a mesma jornada, sem a missão: quem já tinha o Zapdos não perde nada
+  const missions = game.campaign.missions;
+  game.campaign.missions = {};
+  check('a jornada que já tinha o Zapdos (sem a missão) aparece como liberada ("antes")', game.missionState('zapdos') === 'antes'
+        && game.liberatedSpecies().includes('zapdos'));
+  hub.say('carvalho');
+  check('...e o Carvalho comenta uma vez: "foi você quem o encontrou primeiro"', dialogText().includes('encontrou primeiro'));
+  closeDialog();
+  game.campaign.missions = missions;
+  game.campaign.journey = JSON.parse(savedJourney);
+  game.campaign.journey.pc = [...(game.campaign.journey.pc ?? []), { uid: 'zap', pokemonId: 'zapdos', level: 58, xp: 0, hp: 0, abilities: ['zap_cannon', 'bolt_strike'], upgrades: {} }];
   hub.enter({ map: 'usina', x: 5, y: 38, dir: 'down' });
   press('down');
   check('o tapete da entrada leva de volta para a vila, sem a tela cheia', hub.mapId === 'vila' && !registry.get('screen-hub').classes.has('cinema'));
   game.openCampaign();
   game.menus.lobby.selected = 'place:usina';
   game.menus.lobby.render();
-  check('depois, a marca da Usina continua no mapa, com o "Entrar na Usina"',
-        !!placeNode() && goButton()?.innerHTML.includes('Entrar na Usina') && !goButton().disabled);
-  check('...e voltar lá não repete a chegada', game.visitPlace('usina') && !hub.scene && hub.mapId === 'usina');
+  check('depois da missão, a marca da Usina sai do mapa (as quests dela fecharam)', !placeNode());
   hub.enter('home');
   game.openCampaign();
 }

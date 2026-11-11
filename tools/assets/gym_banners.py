@@ -44,6 +44,8 @@ HALLS = {
     'champion_room': ('PokemonLeague_ChampionsRoom', 'BLUE', 0, 0),
     # o card da missão do Zapdos (0.39): a sala do gerador da Usina, onde ele fica no FireRed
     'usina': ('PowerPlant', 'ZAPDOS', 0, 0),
+    # a arena da luta do Zapdos (H-6), o fundo da Usina: o mesmo recorte
+    'usina_arena': ('PowerPlant', 'ZAPDOS', 0, 0),
 }
 
 

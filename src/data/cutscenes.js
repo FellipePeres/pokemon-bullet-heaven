@@ -458,6 +458,8 @@ export const CUTSCENES = {
   usina_fundo: {
     map: 'usina_fundo', spot: { x: 7, y: 9, dir: 'up' }, record: false,
     trigger: [{ on: 'enter', target: 'usina_fundo' }],
+    // só enquanto o Zapdos está preso (depois da missão, a escotilha leva à sala iluminada)
+    when: { caged: 'zapdos' },
     actors: { olhos: { sprite: 'npc/olhos_zapdos', x: 7, y: 4, dir: 'down', hidden: true, glow: true } },
     steps: [
       { do: 'wait', t: 2 },
@@ -467,7 +469,51 @@ export const CUTSCENES = {
       { do: 'emit', on: 'clue', target: 'olhos' },
       { do: 'wait', t: 2 },
       { do: 'card', mission: 'zapdos' },
-      // Voltar: de volta para cima, ao lado da escotilha
+      // Voltar: de volta para cima, ao lado da escotilha (o Lutar acaba a cena ali e começa a luta)
+      { do: 'end', then: { go: { map: 'usina', x: 5, y: 12, dir: 'left' } } }
+    ]
+  },
+
+  // depois da missão do Zapdos (H-6, o gatilho 'win' da fase `zapdos`): a sala do fundo com a
+  // luz de volta e a máquina do emblema vermelho destruída no meio dela. Toca na volta da luta
+  // (o "Continuar Jornada" da vitória) e deixa o jogador em cima, ao lado da escotilha
+  zapdos_livre: {
+    map: 'usina_luz', spot: { x: 7, y: 9, dir: 'up' },
+    trigger: [{ on: 'win', target: 'zapdos' }],
+    steps: [
+      { do: 'fade', to: 1, t: 0 },
+      { do: 'wait', t: 0.5 },
+      // a luz volta: as lâmpadas piscam e acendem
+      { do: 'fade', to: 0.3, t: 0.08 }, { do: 'fade', to: 1, t: 0.1 }, { do: 'wait', t: 0.25 },
+      { do: 'fade', to: 0.2, t: 0.08 }, { do: 'fade', to: 0.8, t: 0.12 }, { do: 'wait', t: 0.15 },
+      { do: 'fade', to: 0, t: 0.6 },
+      { do: 'wait', t: 0.4 },
+      { do: 'say', pick: 'missao_zapdos', lines: ['A luz voltou à Usina. O Zapdos descansa na Ultra Ball: ele vai esperar no PC.'], cases: {
+        livre: { lines: [
+          'A luz voltou à Usina. Lá em cima, um trovão bem longe: o Zapdos voou, livre.',
+          'Quem sabe ele não cruza o seu caminho de novo, numa Poké Ball pelas rotas.'
+        ] }
+      } },
+      { do: 'walk', who: 'player', to: [[7, 6, 'up']] },
+      { do: 'emote', who: 'player' },
+      { do: 'say', lines: [
+        'A máquina que prendia o Zapdos está destruída. As correntes saíam dela.',
+        'No meio, um emblema vermelho que {player} nunca viu.',
+        'Alguém prendeu o Zapdos aqui de propósito.'
+      ] },
+      { do: 'wait', t: 0.4 },
+      { do: 'end', then: { go: { map: 'usina', x: 5, y: 12, dir: 'left' } } }
+    ]
+  },
+
+  // de volta à sala do fundo depois da missão: só os pedaços da máquina
+  usina_luz_volta: {
+    map: 'usina_luz', spot: { x: 7, y: 9, dir: 'up' }, record: false,
+    trigger: [{ on: 'enter', target: 'usina_luz' }],
+    when: { scene: 'zapdos_livre' },
+    steps: [
+      { do: 'wait', t: 0.6 },
+      { do: 'say', lines: ['A sala do fundo está quieta. Só sobraram os pedaços da máquina do emblema vermelho.'] },
       { do: 'end', then: { go: { map: 'usina', x: 5, y: 12, dir: 'left' } } }
     ]
   }

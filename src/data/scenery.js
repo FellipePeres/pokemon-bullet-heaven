@@ -138,7 +138,18 @@ export const SCENES = {
     spacing: 10
   },
   // o salão do Kyogre (0.37): a arena aprovada na maquete, com o tileset cave do Emerald
-  kyogre_hall: { sheet: 'marine_cave', kind: 'fixed' }
+  kyogre_hall: { sheet: 'marine_cave', kind: 'fixed' },
+  // o fundo da Usina (H-6, a missão do Zapdos): o piso, a parede de canos, os transformadores,
+  // o entulho e os geradores da Power Plant do FireRed. `clear` (em casas da arena) deixa
+  // livre o lugar da máquina do emblema vermelho, desenhada por cima (render/zapdosFight.js)
+  usina_arena: {
+    sheet: 'power_plant', kind: 'room',
+    floor: [5, 5, 1, 1],
+    top: { rows: [19, 21], repeat: [24, 30], left: [21, 24], right: [41, 44] },
+    props: [[27, 22, 4, 2], [27, 25, 4, 1], [3, 3, 3, 1], [7, 4, 2, 1], [7, 10, 3, 3], [36, 25, 5, 1]],
+    clear: [[30, 14, 16, 11]],
+    spacing: 10
+  }
 };
 
 function leagueRoom(sheet) {

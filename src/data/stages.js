@@ -874,6 +874,12 @@ export const STAGES = {
     recommendedLevel: 90,
     bossTeam: ['kyogre_boss'],
     legendaryFight: {
+      // o molde das missões (H-5, systems/legendaryFight.js): quem é, a bola e os textos
+      kind: 'kyogre', species: 'kyogre', name: 'Kyogre', dex: 382,
+      ballName: 'Dive Ball', ballSheet: 'item/dive-ball',
+      lostBall: 'O Kyogre se recuperou um pouco! A Dive Ball afundou e volta na próxima vez.',
+      finalObjective: 'SOBREVIVA À MARÉ FINAL!', finalToast: 'A água está subindo! Sobreviva à maré final!',
+      finalEnd: 'A maré baixou.', finalBanner: 'MARÉ FINAL',
       balls: 3,           // 3 Dive Balls por luta (decisão do Fellipe; eram 2)
       chance: 0.1,        // 10% em cada uma: ~27% numa luta
       floor: 0.15,        // enquanto houver Dive Ball, a vida não passa daqui
@@ -926,6 +932,81 @@ export const STAGES = {
     ballChance: 0,
     maxBalls: 0,
     reward: { shards: 0 }
+  },
+
+  /* A MISSÃO DO ZAPDOS (H-6, "Derrote e liberte o Zapdos", PLANEJAMENTO-HISTORIA.md seção 5):
+     o fundo da Usina, pelo card que sobe no escuro (data/missions.js). O Zapdos acorrentado
+     à máquina do emblema vermelho, a horda elétrica, a tempestade marcada no chão e a
+     captura com 3 Ultra Balls (systems/zapdosFight.js, no molde das missões). Fora da
+     campanha: vencer não abre fase, abre a história (a cena `zapdos_livre`). */
+  zapdos: {
+    id: 'zapdos',
+    name: 'Missão — O fundo da Usina',
+    region: 'Kanto',
+    type: 'legendary',
+    icon: 'boss',
+    secret: true,
+    mission: 'zapdos',
+    description: 'O Zapdos, preso por correntes numa máquina no fundo da Usina.',
+    music: 'mus_poke_mansion', leaderMusic: 'mus_vs_legend',
+    duration: 45,
+    xpScale: 1.1,
+    world: { width: 2400, height: 1600, theme: 'gym' },
+    scaling: { hp: 0.6, speed: 0.25, damage: 0.3 },
+    difficulty: 1.18,
+    segments: [{ from: 0, name: 'O fundo da Usina', theme: 'gym', scene: 'usina_arena' }],
+    waves: [
+      // os 45 s com ele preso: a horda elétrica da Usina
+      { from: 0, to: 44, interval: 0.7, batch: 5, maxAlive: 140, level: [54, 58], enemies: [{ id: 'voltorb', weight: 3 }, { id: 'magnemite', weight: 3 }, { id: 'pikachu', weight: 2 }, { id: 'electrode', weight: 2 }, { id: 'magneton', weight: 2 }, { id: 'electabuzz', weight: 1 }, { id: 'raichu', weight: 1 }] },
+      // com o Zapdos solto, a horda continua, mais leve
+      { from: 45, to: 9999, interval: 2, batch: 3, maxAlive: 30, level: [54, 58], enemies: [{ id: 'voltorb', weight: 3 }, { id: 'magnemite', weight: 3 }, { id: 'electrode', weight: 2 }, { id: 'magneton', weight: 2 }] }
+    ],
+    elites: [
+      { at: 14, id: 'electrode_elite', count: 2, level: 58 },
+      { at: 30, id: 'electabuzz_elite', count: 1, level: 58 }
+    ],
+    leader: {
+      name: 'ZAPDOS',
+      title: 'Pokémon lendário',
+      type: 'electric',
+      dex: 145,
+      portrait: null,
+      quote: 'A máquina estala e as correntes rangem. O Zapdos está fora de si!'
+    },
+    recommendedLevel: 58,
+    bossTeam: ['zapdos_boss'],
+    legendaryFight: {
+      kind: 'zapdos', species: 'zapdos', name: 'Zapdos', dex: 145,
+      ballName: 'Ultra Ball', ballSheet: 'item/ultra-ball',
+      lostBall: 'O Zapdos se recuperou um pouco! A Ultra Ball rolou para longe e volta na próxima vez.',
+      finalObjective: 'SOBREVIVA À SOBRECARGA!', finalToast: 'A máquina vai explodir! Aguente a sobrecarga!',
+      finalEnd: 'A máquina apagou de vez.', finalBanner: 'SOBRECARGA',
+      balls: 3,           // 3 Ultra Balls por luta (o molde: a Dive Ball é do Kyogre)
+      chance: 0.1,        // 10% em cada uma
+      floor: 0.15,        // enquanto houver Ultra Ball, a vida não passa daqui
+      recover: 0.25,      // escapou (ou a bola não foi pega): volta a 25%
+      exhaust: 8,         // segundos exausto, com a bola no campo
+      finalTide: 25,      // a sobrecarga da máquina depois da captura
+      finalLevel: 58,
+      machine: [1200, 660],     // a máquina do emblema vermelho, logo acima de onde o treinador chega (px do mundo)
+      dim: 0.3,                 // o fundo da Usina é escuro
+      cannonCharge: 0.9,        // o Zap Cannon: segundos parado, carregando
+      peckWarn: 0.85,           // a Investida: a faixa acesa antes dele cruzar
+      stormEvery: [3.2, 2.4, 1.8, 1.3],   // a tempestade: um raio a cada (preso, solto, abaixo de 50%, fúria)
+      stormAt: [0.66, 0.33],    // a tempestade total: aos 66% e aos 33% (e de tempos em tempos na fúria)
+      stormCell: 200,           // a casa do tabuleiro de raios
+      stormWarn: 1.5,           // a primeira leva cai depois disso; as outras, `stormGap` depois
+      stormGap: 1.0,
+      // o dano de cada golpe (na escala dos golpes dos líderes)
+      damage: { storm: 9, cannon: 16, zap: 3, peck: 13, discharge: 8, cell: 14, dive: 10 },
+      summons: [{ id: 'voltorb', weight: 3 }, { id: 'electrode', weight: 2 }, { id: 'magneton', weight: 2 }, { id: 'electabuzz', weight: 1 }]
+    },
+    // a volta é pela Usina (Game.js): vencer leva à cena `zapdos_livre`; cair, ao Centro
+    returnTo: 'mission',
+    capturePool: 'phase6',
+    ballChance: 0,
+    maxBalls: 0,
+    reward: { shards: 300 }
   }
 };
 

@@ -6,6 +6,7 @@ import { DIALOGUE } from '../data/dialogue.js';
 import { getPokemon } from '../data/pokemon.js';
 import { STAGES, RIVAL_STARTER } from '../data/stages.js';
 import { bus, EVENTS } from '../core/events.js';
+import { MISSIONS } from '../data/missions.js';
 
 const DIRS = { up: [0, -1], down: [0, 1], left: [-1, 0], right: [1, 0] };
 const OPPOSITE = { up: 'down', down: 'up', left: 'right', right: 'left' };
@@ -14,6 +15,11 @@ const LOOK_DIRS = ['down', 'left', 'right', 'down', 'up'];
 /** "LT. SURGE" -> "Lt. Surge": os nomes dos líderes vêm em maiúsculas nos dados. */
 const titleCase = (text) => text.toLowerCase().replace(/(^|[\s.])\p{L}/gu, (c) => c.toUpperCase());
 const between = (min, max) => min + Math.random() * (max - min);
+/**
+ * A transição de batalha dos lendários do FireRed (B_TRANSITION_BLUR, H-6): duas piscadas para o
+ * cinza (16 quadros cada) e o borrão em blocos crescendo, que escurece no meio. Em segundos.
+ */
+export const BATTLE_INTRO = 1.45;
 
 /**
  * A VILA — o lobby jogável (PLANEJAMENTO-LOBBY.md): o jogador anda em grade,
@@ -43,6 +49,7 @@ export class Hub {
     this.pending = null;    // o que fazer ao chegar (falar, entrar na porta, sair)
     this.awaitStarter = false;
     this.scene = null;      // a cena tocando (0.39, game/Cutscene.js): enquanto dura, o jogador não anda
+    this.battle = null;     // a transição de batalha de uma missão (H-6): { t, then }; tudo para enquanto dura
   }
 
   /* ============================== lugares ============================== */
@@ -53,6 +60,7 @@ export class Hub {
     // uma cena pela metade (um save carregado no meio dela) não fica presa (0.37.9); a
     // que o lugar começa ao chegar (o trigger 'enter' das cenas, 0.39) fica
     this.scene = null;
+    this.battle = null;
     this._load(spot.map);
     this._place(spot.x, spot.y, spot.dir);
     this.dialog = null;
@@ -145,7 +153,13 @@ export class Hub {
     return !this.decor.some((d) => this._solidCells(d).some(([cx, cy]) => cx === x && cy === y));
   }
 
-  _warp(x, y) { return (this.place.warps ?? []).find((w) => w.x === x && w.y === y) ?? null; }
+  /** A passagem do tile (x, y); `when` escolhe entre duas no mesmo tile (a escotilha da Usina, H-6). */
+  _warp(x, y) {
+    const here = (this.place.warps ?? []).filter((w) => w.x === x && w.y === y);
+    if (here.length < 2) return here[0] ?? null;
+    const ctx = this._context();
+    return here.find((w) => this._matches(w.when, ctx)) ?? null;
+  }
 
   _thing(x, y) {
     const fixed = (this.place.things ?? []).find((t) => t.cells.some(([cx, cy]) => cx === x && cy === y));
@@ -176,6 +190,12 @@ export class Hub {
    */
   update(dt, move = { x: 0, y: 0 }, running = false) {
     if (!this.map) return;
+    // a transição de batalha (H-6, o Lutar do card de uma missão): no fim, a luta
+    if (this.battle) {
+      this.battle.t += dt;
+      if (this.battle.t >= BATTLE_INTRO) this.battle.then();
+      return;
+    }
     if (this.banner && (this.banner.t -= dt) <= 0) this.banner = null;
     if (this.fade) { this._updateFade(dt); return; }
     // uma cena (0.37 o Maxie; 0.39 o motor de game/Cutscene.js): o roteiro anda, e a
@@ -359,7 +379,7 @@ export class Hub {
 
   /** A: avança a conversa ou fala com quem está na frente. */
   confirm() {
-    if (this.fade || !this.map) return;
+    if (this.fade || this.battle || !this.map) return;
     if (this.dialog) { this._advance(); return; }
     if (this.player.moving || this.scene) return;
     this.interact();
@@ -368,7 +388,7 @@ export class Hub {
   /** B: na pergunta, é o NÃO; na conversa, avança como o A. */
   cancel() {
     const d = this.dialog;
-    if (!d || !this.map) return;
+    if (!d || this.battle || !this.map) return;
     if (this._onAsk()) { d.ask.choice = 1; this._advance(); return; }
     this._advance();
   }
@@ -558,6 +578,10 @@ export class Hub {
       diveRescued: (campaign.dive?.rescues ?? 0) > 0,
       locked: !!extra.locked,
       quests: game.quests?.state ?? null,   // a história (0.38): as condições quest e questDone
+      // as missões dos lendários (H-5): 'preso', 'capturado', 'livre' ou 'antes' (Game.missionState);
+      // `missao_<id>` é o que o `pick` das cenas lê
+      missions: Object.fromEntries(Object.keys(MISSIONS).map((id) => [id, game.missionState?.(id) ?? 'preso'])),
+      ...Object.fromEntries(Object.keys(MISSIONS).map((id) => [`missao_${id}`, game.missionState?.(id) ?? 'preso'])),
       scenes: campaign.scenes ?? {},        // as cenas vistas (0.39): a condição scene
       item: extra.item ?? '',
       player: game.playerName,
@@ -586,6 +610,10 @@ export class Hub {
         // as cenas (0.39): a cena `value` já foi vista; a flag `value` da vila está marcada
         case 'scene': if (ctx.scenes?.[value] !== 'seen') return false; break;
         case 'flag': if (!this._flags()[value]) return false; break;
+        // as missões (H-5): o lendário `value` já foi liberado / ainda está preso
+        case 'freed': if ((ctx.missions?.[value] ?? 'preso') === 'preso') return false; break;
+        case 'mission': if (Object.entries(value).some(([id, state]) => (ctx.missions?.[id] ?? 'preso') !== state)) return false; break;
+        case 'caged': if ((ctx.missions?.[value] ?? 'preso') !== 'preso') return false; break;
         default: return false;   // condição desconhecida: a fala não vale (o check-data acusa)
       }
     }
@@ -610,6 +638,7 @@ export class Hub {
    * alguém, numa placa ou numa porta: anda até o lado, vira e fala (ou entra).
    */
   clickTile(tx, ty) {
+    if (this.battle) return;
     if (this.scene) { if (this.dialog) this.confirm(); return; }
     if (this.fade || !this.map) return;
     if (this.dialog) { this.confirm(); return; }

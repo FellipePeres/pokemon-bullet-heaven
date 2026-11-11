@@ -325,11 +325,28 @@ export const HUB_MAPS = {
       '#.............#',
       '###############'
     ]
+  },
+  usina_luz: {
+    src: 'assets/hub/usina_luz.png', top: 'assets/hub/usina_luz-top.png', width: 15, height: 11,
+    walk: [
+      '###############',
+      '###############',
+      '#.............#',
+      '#.............#',
+      '#.............#',
+      '#.............#',
+      '#.............#',
+      '#.............#',
+      '#.............#',
+      '#.............#',
+      '###############'
+    ]
   }
 };
 
 /** As folhas dos personagens e objetos da vila (tiras de quadros, em 1x). */
 export const HUB_SPRITES = {
+  'item/ultra-ball': { src: 'assets/items/ultra-ball.png', frameWidth: 30, frameHeight: 30, frames: 1 },
   'npc/beauty': { src: 'assets/hub/npc/beauty.png', frameWidth: 16, frameHeight: 32, frames: 10 },
   'npc/brock': { src: 'assets/hub/npc/brock.png', frameWidth: 16, frameHeight: 32, frames: 3 },
   'npc/clefairy': { src: 'assets/hub/npc/clefairy.png', frameWidth: 16, frameHeight: 16, frames: 3 },
@@ -343,6 +360,8 @@ export const HUB_SPRITES = {
   'npc/lass': { src: 'assets/hub/npc/lass.png', frameWidth: 16, frameHeight: 32, frames: 10 },
   'npc/little_girl': { src: 'assets/hub/npc/little_girl.png', frameWidth: 16, frameHeight: 16, frames: 10 },
   'npc/lt_surge': { src: 'assets/hub/npc/lt_surge.png', frameWidth: 16, frameHeight: 32, frames: 3 },
+  'npc/maquina_zapdos': { src: 'assets/hub/npc/maquina_zapdos.png', frameWidth: 64, frameHeight: 48, frames: 1 },
+  'npc/maquina_zapdos_quebrada': { src: 'assets/hub/npc/maquina_zapdos_quebrada.png', frameWidth: 64, frameHeight: 48, frames: 1 },
   'npc/meowth': { src: 'assets/hub/npc/meowth.png', frameWidth: 16, frameHeight: 16, frames: 3 },
   'npc/misty': { src: 'assets/hub/npc/misty.png', frameWidth: 16, frameHeight: 32, frames: 3 },
   'npc/mom': { src: 'assets/hub/npc/mom.png', frameWidth: 16, frameHeight: 32, frames: 3 },

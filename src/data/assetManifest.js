@@ -384,6 +384,7 @@ export const ASSET_MANIFEST = {
   'scene/lorelei_room': { src: 'assets/scenes/lorelei_room.png', frameWidth: 16, frameHeight: 16, frames: 57 },
   'scene/mt_moon': { src: 'assets/scenes/mt_moon.png', frameWidth: 16, frameHeight: 16, frames: 61 },
   'scene/pewter_gym': { src: 'assets/scenes/pewter_gym.png', frameWidth: 16, frameHeight: 16, frames: 61 },
+  'scene/power_plant': { src: 'assets/scenes/power_plant.png', frameWidth: 16, frameHeight: 16, frames: 129 },
   'scene/route1': { src: 'assets/scenes/route1.png', frameWidth: 16, frameHeight: 16, frames: 50 },
   'scene/saffron_gym': { src: 'assets/scenes/saffron_gym.png', frameWidth: 16, frameHeight: 16, frames: 41 },
   'scene/vermilion_gym': { src: 'assets/scenes/vermilion_gym.png', frameWidth: 16, frameHeight: 16, frames: 57 },

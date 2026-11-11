@@ -22,8 +22,9 @@ import { KyogreHallRenderer } from '../render/KyogreHallRenderer.js';
 import { Cutscene } from './Cutscene.js';
 import { CUTSCENES } from '../data/cutscenes.js';
 import { STORY_PLACES } from '../data/regionMap.js';
-import { getMission } from '../data/missions.js';
+import { getMission, MISSIONS } from '../data/missions.js';
 import { showMissionCard, hideMissionCard } from '../ui/missionCard.js';
+import { playCry } from '../audio/cry.js';
 import { showHallCard, hideHallCard } from '../ui/hallCard.js';
 import { HubRenderer } from '../render/HubRenderer.js';
 import { HubHUD } from '../ui/hubHud.js';
@@ -63,6 +64,8 @@ import { maxHpFor } from '../systems/stats.js';
 const HUB_RESCUE_SPOT = { map: 'centro', x: 4, y: 5, dir: 'up' };
 /** A volta à superfície (o salão do Kyogre): na frente da lagoa da vila. */
 const LAKE_SPOT = { map: 'vila', ...CUTSCENES.maxie_lagoa.spot };
+/** A volta de uma missão sem vitória (H-6, saiu no meio): em cima, ao lado da escotilha da Usina. */
+const HATCH_SPOT = { map: 'usina', x: 5, y: 12, dir: 'left' };
 /** A música calma da vila e do mapa da jornada (0.37.7, escolha do Fellipe): as Ilhas 1, 2 e 3, do FireRed. */
 const VILLAGE_MUSIC = 'mus_sevii_123';
 const MAX_CATCH_UP = 60;
@@ -326,7 +329,8 @@ export class Game {
     return {
       starter: !!campaign.starter,
       mapSeen: !!campaign.hub?.flags?.mapa_visto,
-      cleared: campaign.clearedStages
+      cleared: campaign.clearedStages,
+      freed: this.liberatedSpecies()
     };
   }
 
@@ -669,6 +673,7 @@ export class Game {
       options = { starter: this.campaign.starter, starterShiny: this.campaign.starterShiny };
     }
     options.ownedElsewhere = (journey?.pc ?? []).map((m) => m.pokemonId);   // lendário: um de cada
+    options.liberated = this.liberatedSpecies();   // H-5: quem tem missão só cai na Poké Ball depois dela
     options.trainer = this.profile.trainer;
     options.campaignStarter = this.campaign.starter;
 
@@ -745,6 +750,13 @@ export class Game {
     if (run?.stage.returnTo === 'lake') {
       this.openHub(LAKE_SPOT);
       this._maybeMaxieScene('lagoa');
+      return;
+    }
+    // de uma missão (H-6): vencida, a cena de depois (no palco dela); senão, de volta à Usina
+    if (run?.stage.returnTo === 'mission') {
+      if (this._playPendingScene()) return;
+      this.openHub(HATCH_SPOT);
+      toast('Você recua pela escotilha.', '⚡');
       return;
     }
     if (!this.profile.trainer) { this.menus.show('screen-title'); return; }
@@ -978,11 +990,12 @@ export class Game {
 
   pickCapture(pokemonId, shiny = false) {
     const run = this.run;
-    if (pokemonId === 'kyogre') {
+    if (run.pendingGift?.toPC || pokemonId === 'kyogre') {
       // o Kyogre (0.37) vai sempre para o PC, mesmo com espaço na equipe (0.37.9, pedido
       // do Fellipe depois do bug do Theo): a maré final é sem ele, e ele espera no PC.
-      // A cena do Maxie vem depois, na volta à vila
-      this.diveRecord.captured = true;
+      // A cena do Maxie vem depois, na volta à vila. O mesmo vale para o lendário de cada
+      // missão (H-5, o presente `toPC` da luta)
+      if (pokemonId === 'kyogre') this.diveRecord.captured = true;
       run.captureSystem.captureToPC(pokemonId, {
         shiny, note: 'Ele descansa da luta: para levá-lo, use o PC do Centro Pokémon ou do mapa da jornada.'
       });
@@ -1036,6 +1049,11 @@ export class Game {
       // vencendo ou não, a equipe, a build e o PC ficam (0.17)
       journey: this._journeyFrom(run)
     });
+    // a missão de um lendário (H-5): vencida, ele está liberado (capturado ou não)
+    if (victory && run.stage.mission) {
+      const missions = (this.campaign.missions ??= {});
+      missions[run.stage.mission] = { won: true, captured: !!run.fight?.captured, date: new Date().toISOString() };
+    }
     // a história (0.38): "Vença o Brock" fecha aqui
     if (victory) bus.emit(EVENTS.STORY, { on: 'win', target: run.stage.id });
     // e a cena da vila de depois desta fase (0.39) fica devida: toca quando o jogador chegar
@@ -1213,7 +1231,7 @@ export class Game {
    */
   retryLegendary() {
     const run = this.run;
-    if (!run || run.stage.returnTo !== 'lake') return;
+    if (!run || !run.stage.returnTo) return;   // o salão do Kyogre e as missões (H-5)
     const stageId = run.stage.id === 'kyogre' && this.diveRecord.captured ? 'kyogre_endless' : run.stage.id;
     this.hud.hideAllOverlays();
     this.run = null;
@@ -1234,13 +1252,16 @@ export class Game {
    */
   _legendaryDefeat({ ended = false } = {}) {
     if (!ended) this.endRun(false);   // guarda a jornada (com o Kyogre, se ele já foi capturado) e as métricas
+    const mission = this.run?.stage.mission ?? null;
     this.hud.hideAllOverlays();
     this.run = null;
     this.runEnded = false;
-    this.diveRecord.rescues = (this.diveRecord.rescues ?? 0) + 1;
+    if (!mission) this.diveRecord.rescues = (this.diveRecord.rescues ?? 0) + 1;
     this.autosave();
     this.openHub(HUB_RESCUE_SPOT);
-    if (!this._maybeMaxieScene('centro')) this.hub.say('enfermeira_resgate');
+    // da missão (H-6): um marinheiro de Vermilion achou o jogador desmaiado na Usina
+    if (mission) this.hub.say('enfermeira_usina');
+    else if (!this._maybeMaxieScene('centro')) this.hub.say('enfermeira_resgate');
   }
 
   /**
@@ -1446,12 +1467,44 @@ export class Game {
   }
 
   /**
-   * A luta de uma missão. Ela vem com o molde das missões (H-5, tirado do salão do Kyogre)
-   * e a do Zapdos (H-6): até lá, o card avisa e continua aberto.
+   * O Lutar do card de uma missão (H-5, o molde tirado do salão do Kyogre; a do Zapdos é a
+   * H-6): o grito, a transição de batalha do FireRed para os lendários (as duas piscadas
+   * cinza e o borrão) por cima da vila e, no fim dela, a fase da luta. Devolve se começou.
    */
   startMission(id) {
-    toast(`A luta do ${getMission(id).name.charAt(0)}${getMission(id).name.slice(1).toLowerCase()} chega na próxima etapa.`, '⚡');
-    return false;
+    const mission = getMission(id);
+    const stage = STAGES[mission?.stage];
+    if (!stage) return false;
+    if (this.missionState(id) !== 'preso') {
+      toast(`O ${getPokemon(mission.species)?.name ?? mission.name} já está livre.`, '⚡');
+      return false;
+    }
+    playCry(mission.dex);
+    this.hub.battle = { t: 0, then: () => {
+      this.hub.battle = null;
+      this.hub.scene = null;
+      this.startStage(stage.id, null, { story: false });
+    } };
+    return true;
+  }
+
+  /**
+   * Como está a missão de um lendário nesta jornada: 'preso' (ainda não), 'capturado'
+   * (vencida, e ele está no PC), 'livre' (vencida sem a captura: ele voou) ou 'antes'
+   * (a jornada já tinha o lendário antes da missão existir; nada se tira do jogador).
+   */
+  missionState(id) {
+    const done = this.campaign.missions?.[id];
+    if (done?.won) return done.captured ? 'capturado' : 'livre';
+    const species = getMission(id)?.species;
+    const journey = this.campaign.journey;
+    const owned = [...(journey?.team?.members ?? []), ...(journey?.pc ?? [])].some((m) => m.pokemonId === species);
+    return owned ? 'antes' : 'preso';
+  }
+
+  /** Os lendários liberados nesta jornada (a missão vencida, ou já estavam com ele). */
+  liberatedSpecies() {
+    return Object.keys(MISSIONS).filter((id) => this.missionState(id) !== 'preso').map((id) => MISSIONS[id].species);
   }
 
   /** A ação 'stage' do fim de uma cena de antes da fase: a fase começa. */

@@ -196,12 +196,14 @@ export class Cutscene {
       case 'quest': this._quest?.(a.id); done = true; break;
       case 'emit': this._emit?.(a.on, a.target ?? null); done = true; break;
       case 'card':
-        // o card de uma missão (data/missions.js): a cena espera o Lutar ou o Voltar
+        // o card de uma missão (data/missions.js): a cena espera o Lutar ou o Voltar. No
+        // Lutar, a cena acaba ali (sem o `then` do fim): a luta começa (Game.startMission)
         if (!local.open) {
           local.open = true;
           if (!this._card) { done = true; break; }
           this._card(a.mission, (choice) => { local.choice = choice; });
         }
+        if (local.choice === 'play') { this.done = true; this._onEnd?.(); }
         done = !!local.choice;
         break;
       case 'flag': hub._flags()[a.name] = a.value ?? true; done = true; break;

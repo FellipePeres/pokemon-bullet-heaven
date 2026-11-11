@@ -14,6 +14,9 @@
  *   trail       a linha de baixo do card
  *   recommendedLevel  o nível recomendado
  *   note        o aviso embaixo dos botões
+ *   stage       a fase da luta (data/stages.js, `legendaryFight`), no molde das missões (H-5)
+ *   species     quem é liberado: depois da missão vencida, ele entra no sorteio da Poké Ball
+ *               das fases seguintes (PLANEJAMENTO-HISTORIA.md seção 6)
  */
 export const MISSIONS = {
   zapdos: {
@@ -28,8 +31,16 @@ export const MISSIONS = {
     balls: { icon: 'assets/items/ultra-ball.png', name: 'Ultra Balls', count: 3, chance: 0.1 },
     trail: 'O fundo da Usina · no escuro · preso por correntes, fora de si',
     recommendedLevel: 58,
-    note: 'Volte quando estiver pronto: a escotilha continua no mesmo lugar.'
+    note: 'Volte quando estiver pronto: a escotilha continua no mesmo lugar.',
+    stage: 'zapdos',
+    species: 'zapdos'
   }
 };
 
 export const getMission = (id) => MISSIONS[id] ?? null;
+
+/** Os lendários que têm missão: antes dela vencida, nenhum deles aparece na Poké Ball (H-5). */
+export const MISSION_SPECIES = Object.values(MISSIONS).map((m) => m.species);
+
+/** A missão de um lendário (pela espécie), ou null. */
+export const missionOf = (species) => Object.keys(MISSIONS).find((id) => MISSIONS[id].species === species) ?? null;

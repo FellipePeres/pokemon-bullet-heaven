@@ -223,7 +223,10 @@ export const HUB = {
       explore: true,
       warps: [
         { x: 5, y: 38, on: 'mat', to: 'vila', tx: 6, ty: 17, dir: 'down' },
-        { x: 4, y: 12, on: 'step', to: 'usina_fundo', tx: 7, ty: 9, dir: 'up' }
+        // a escotilha: no escuro, enquanto o Zapdos está preso; depois da missão (H-6), a sala
+        // iluminada com a máquina destruída (`when`: Hub._warp escolhe entre as duas)
+        { x: 4, y: 12, on: 'step', to: 'usina_fundo', tx: 7, ty: 9, dir: 'up', when: { caged: 'zapdos' } },
+        { x: 4, y: 12, on: 'step', to: 'usina_luz', tx: 7, ty: 9, dir: 'up', when: { freed: 'zapdos' } }
       ],
       npcs: [
         { id: 'voltorb1', sprite: 'voltorb', x: 23, y: 14, dir: 'down', talk: 'voltorb_usina' },
@@ -264,6 +267,15 @@ export const HUB = {
       dark: true,
       npcs: [],
       things: []
+    },
+    // o fundo da Usina depois da missão do Zapdos (H-6): a luz voltou, e a máquina do emblema
+    // vermelho está destruída no meio da sala. Um palco: só as cenas (`zapdos_livre` e a volta)
+    usina_luz: {
+      name: 'O fundo da Usina',
+      scene: true,
+      npcs: [],
+      things: [],
+      decor: [{ sprite: 'maquina_zapdos_quebrada', x: 7, y: 4, solid: true }]
     },
     // um recorte de Cerulean: a casa assaltada do FireRed, com o policial na porta
     cerulean: {

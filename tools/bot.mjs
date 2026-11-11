@@ -63,6 +63,34 @@ export function steer(run) {
   for (const z of run.zones) if (z.hostile && !z.dead) flee(z.x, z.y, (z.maxRadius ?? 200) + 50, 3);
   for (const p of run.projectiles) if (p.hostile && !p.dead) flee(p.x, p.y, 90, 2.5);
 
+  // a tempestade total do Zapdos (H-6): o tabuleiro de raios. Quem joga lê o tabuleiro e vai
+  // para a casa por perto que cai mais tarde (ou que acabou de cair), em vez de fugir de tudo
+  const cells = (run.fight?.hazards ?? []).filter((h) => h.shape === 'square' && !h.fired);
+  if (cells.length) {
+    const soon = (x, y) => {
+      let s = Infinity;
+      for (const h of cells) if (Math.abs(x - h.x) < h.r && Math.abs(y - h.y) < h.r) s = Math.min(s, h.warn - h.t);
+      return s;
+    };
+    let best = { x: player.x, y: player.y, s: soon(player.x, player.y) };
+    for (const h of cells) {
+      const d = Math.hypot(h.x - player.x, h.y - player.y);
+      if (d > 320) continue;
+      const s = soon(h.x, h.y) - d / 300;
+      if (s > best.s) best = { x: h.x, y: h.y, s };
+    }
+    const dx = best.x - player.x, dy = best.y - player.y, d = Math.hypot(dx, dy);
+    if (d < 24) return { x: 0, y: 0 };
+    return { x: dx / d, y: dy / d };
+  }
+  // a Investida do Zapdos: sai de lado da faixa acesa
+  const pk = run.fight?.peck;
+  if (pk?.phase === 'aim') {
+    const lx = pk.x1 - pk.x0, ly = pk.y1 - pk.y0, len = Math.hypot(lx, ly) || 1;
+    const nx = -ly / len, ny = lx / len;
+    const side = (player.x - pk.x0) * nx + (player.y - pk.y0) * ny;
+    if (Math.abs(side) < pk.w / 2 + 60) { const s = side >= 0 ? 1 : -1; mx += nx * s * 4; my += ny * s * 4; }
+  }
   // a luta do Kyogre (0.37): foge dos avisos no chão e vai até a Dive Ball
   for (const h of run.fight?.hazards ?? []) if (!h.fired) flee(h.x, h.y, h.r + 60, 3);
   // o maremoto: corre para a bolha de ar e fica lá dentro

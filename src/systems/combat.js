@@ -150,6 +150,8 @@ export function killEnemy(run, enemy, opts = {}) {
   if (enemy.dead) return;
   enemy.dead = true;
   run.stats.kills++;
+  // a luta de um lendário (H-6): o Zapdos derrotado sem a captura se solta e voa livre
+  if (enemy.boss) run.fight?.onBossDown?.(enemy);
 
   // amaldiçoado pelo Hex: explode em fogo-fátuo nos vizinhos
   const curse = enemy.status?.curse;

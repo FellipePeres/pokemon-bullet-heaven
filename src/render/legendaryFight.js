@@ -1,4 +1,5 @@
 import { getSheet } from './assets.js';
+import { drawZapdosGround, drawZapdosWorld, drawZapdosScreen, dischargeRing, blastWarning } from './zapdosFight.js';
 
 const TAU = Math.PI * 2;
 const PIXEL = '"Pixelify Sans", sans-serif';
@@ -6,10 +7,14 @@ const clamp01 = (t) => Math.max(0, Math.min(1, t));
 const easeOut = (t) => 1 - Math.pow(1 - clamp01(t), 3);
 
 /** Um número "aleatório" fixo para (seed, i): o desenho não treme de um quadro para o outro. */
-const hash = (seed, i) => { const x = Math.sin(seed * 12.9898 + i * 78.233) * 43758.5453; return x - Math.floor(x); };
+export const hash = (seed, i) => { const x = Math.sin(seed * 12.9898 + i * 78.233) * 43758.5453; return x - Math.floor(x); };
 
 /**
- * O DESENHO DA LUTA DO KYOGRE (systems/kyogreFight.js). Na 0.37.5, os ataques
+ * O DESENHO DAS LUTAS DE LENDÁRIO (o molde das missões, H-5: systems/legendaryFight.js):
+ * os avisos no chão, os raios, a bola caindo, o arremesso e a faixa da captura, os
+ * letreiros. O que é só do Zapdos está em render/zapdosFight.js.
+ *
+ * A LUTA DO KYOGRE (systems/kyogreFight.js). Na 0.37.5, os ataques
  * ficaram cinematográficos (o Fellipe: "precisa ter impacto grande na animação"):
  * - a carga do Origin Pulse (as marcas vermelhas acendendo) e os anéis grossos;
  * - as colunas do Water Spout estourando do chão;
@@ -20,11 +25,18 @@ const hash = (seed, i) => { const x = Math.sin(seed * 12.9898 + i * 78.233) * 43
  * - a faixa da captura, como a do Voar, com a bola balançando.
  * Só lê o estado.
  */
-export function drawKyogreWorld(ctx, run) {
+/** Embaixo de todos (antes dos Pokémon): a máquina e as correntes do Zapdos. */
+export function drawFightGround(ctx, run) {
+  const fight = run.fight;
+  if (fight?.kind === 'zapdos') drawZapdosGround(ctx, run, fight);
+}
+
+export function drawFightWorld(ctx, run) {
   const fight = run.fight;
   if (!fight) return;
   const now = run.time;
   const boss = fight.boss;
+  const kyogre = fight.kind === 'kyogre';
 
   // o lago fervendo antes de ele sair
   if (fight.boiling > 0) bubbles(ctx, fight.lake.x, fight.lake.y, 150, 70, fight.boiling, now);
@@ -34,14 +46,18 @@ export function drawKyogreWorld(ctx, run) {
   // as marcas queimadas dos raios ficam no chão um tempo
   for (const f of fight.fx) if (f.kind === 'scorch') scorch(ctx, f);
 
-  // os avisos no chão
-  for (const h of fight.hazards) if (!h.fired) warning(ctx, h);
+  // os avisos no chão (no tabuleiro do Zapdos, só a próxima leva acende forte)
+  let soonest = Infinity;
+  for (const h of fight.hazards) if (h.shape === 'square' && !h.fired) soonest = Math.min(soonest, h.warn - h.t);
+  for (const h of fight.hazards) if (!h.fired) warning(ctx, h, h.shape === 'square' && h.warn - h.t <= soonest + 0.05);
 
   // a carga do Origin Pulse: as marcas vermelhas acendem e a água se junta nele
-  if (fight.state === 'charge' && boss) charge(ctx, boss, clamp01(fight.t / fight.cfg.pulseCharge), now);
+  if (kyogre && fight.state === 'charge' && boss) charge(ctx, boss, clamp01(fight.t / fight.cfg.pulseCharge), now);
+  // o Zapdos: a faixa da Investida, a carga e a esfera do Zap Cannon
+  if (fight.kind === 'zapdos') drawZapdosWorld(ctx, run, fight);
 
-  // os anéis de onda
-  for (const ring of fight.rings) if (ring.delay <= 0) waveRing(ctx, ring, now);
+  // os anéis de onda (no Zapdos, o Discharge)
+  for (const ring of fight.rings) if (ring.delay <= 0) (ring.kind === 'discharge' ? dischargeRing : waveRing)(ctx, ring, now);
 
   // os efeitos do impacto: colunas, raios, estouros
   for (const f of fight.fx) {
@@ -54,10 +70,10 @@ export function drawKyogreWorld(ctx, run) {
   // o maremoto
   if (fight.tsunami) tsunami(ctx, run, fight.tsunami, now);
 
-  // a Dive Ball no campo: cai do alto num feixe de luz e fica brilhando
-  const sheet = getSheet('item/dive-ball');
+  // a bola no campo (a Dive Ball, a Ultra Ball): cai do alto num feixe de luz e fica brilhando
+  const sheet = getSheet(fight.cfg.ballSheet);
   const ball = fight.ball;
-  if (ball) diveBall(ctx, ball, sheet, now);
+  if (ball) diveBall(ctx, ball, sheet, now, fight.glow);
 
   // o arremesso (a faixa da captura é desenhada por cima da tela)
   const th = fight.throwing;
@@ -75,13 +91,13 @@ export function drawKyogreWorld(ctx, run) {
     }
     ctx.save(); ctx.translate(x, y); ctx.rotate(rot); ctx.drawImage(sheet.img, -20, -20, 40, 40); ctx.restore();
   } else if (th && sheet) {
-    // a bola fica no chão, onde o Kyogre estava, enquanto a faixa mostra o balanço
+    // a bola fica no chão, onde ele estava, enquanto a faixa mostra o balanço
     ctx.drawImage(sheet.img, th.to.x - 16, th.to.y + 44, 32, 32);
   }
 }
 
-/** Por cima da tela: o céu escuro, o clarão, o maremoto, a seta da Dive Ball, a faixa da captura e a maré final. */
-export function drawKyogreScreen(ctx, run, renderer) {
+/** Por cima da tela: o céu escuro, o clarão, o maremoto, a seta da bola, a faixa da captura e a leva final. */
+export function drawFightScreen(ctx, run, renderer) {
   const W = renderer.width, H = renderer.height;
   const fight = run.fight;
   if (fight?.dim > 0.01) { ctx.fillStyle = `rgba(4,6,24,${fight.dim})`; ctx.fillRect(0, 0, W, H); }
@@ -89,6 +105,7 @@ export function drawKyogreScreen(ctx, run, renderer) {
   if (!fight) return;
   const ts = fight.tsunami;
   if (ts?.phase === 'sweep') { ctx.fillStyle = 'rgba(40,110,220,.16)'; ctx.fillRect(0, 0, W, H); }
+  if (fight.kind === 'zapdos') drawZapdosScreen(ctx, run, renderer, fight);
   if (fight.flash > 0) { ctx.fillStyle = `rgba(${fight.flashColor},${fight.flash})`; ctx.fillRect(0, 0, W, H); }
 
   // o aviso do maremoto: o letreiro e a seta até a bolha de ar
@@ -98,32 +115,32 @@ export function drawKyogreScreen(ctx, run, renderer) {
     edgeArrow(ctx, renderer, ts.safe.x, ts.safe.y, '#8fe3ff', run.time);
   }
 
-  // a Dive Ball: o letreiro e a seta na borda, se ela estiver fora da tela
+  // a bola: o letreiro e a seta na borda, se ela estiver fora da tela
   const ball = fight.ball;
   if (ball) {
-    edgeArrow(ctx, renderer, ball.x, ball.y, '#8fe3ff', run.time);
+    edgeArrow(ctx, renderer, ball.x, ball.y, fight.glow.spark, run.time);
     const left = Math.max(0, Math.ceil(fight.cfg.exhaust - fight.t));
-    banner(ctx, W / 2, 150, `O Kyogre está exausto! Pegue a Dive Ball (${left})`, '#8fe3ff', 24);
+    banner(ctx, W / 2, 150, `O ${fight.name} está exausto! Pegue a ${fight.cfg.ballName} (${left})`, fight.glow.spark, 24);
   }
 
   // a faixa da captura, como a do Voar
   const th = fight.throwing;
   // (o tempo da partida para enquanto a bola balança: a faixa corre no relógio de verdade)
-  if (th && th.band > 0) captureBand(ctx, W, H, th, (typeof performance !== 'undefined' ? performance.now() : 0) / 1000);
+  if (th && th.band > 0) captureBand(ctx, W, H, th, (typeof performance !== 'undefined' ? performance.now() : 0) / 1000, fight);
 
-  // a maré final: o relógio no topo
-  if (fight.final && !run.pendingGift) banner(ctx, W / 2, 112, `MARÉ FINAL  ${Math.ceil(fight.final.t)} s`, '#8fe3ff', 30);
+  // a leva final (a maré do Kyogre): o relógio no topo
+  if (fight.final && !run.pendingGift) banner(ctx, W / 2, 112, `${fight.cfg.finalBanner}  ${Math.ceil(fight.final.t)} s`, fight.glow.spark, 30);
 }
 
-/** Na barra do chefe: a marca dos 15% (enquanto houver bola) e as Dive Balls que restam. */
-export function drawKyogreBossBar(ctx, run, x, y, w) {
+/** Na barra do chefe: a marca dos 15% (enquanto houver bola) e as bolas que restam. */
+export function drawFightBossBar(ctx, run, x, y, w) {
   const fight = run.fight;
   if (!fight) return;
   if (fight.balls > 0) {
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(x + w * fight.cfg.floor - 1, y - 4, 3, 22);
   }
-  const sheet = getSheet('item/dive-ball');
+  const sheet = getSheet(fight.cfg.ballSheet);
   if (!sheet) return;
   for (let i = 0; i < fight.cfg.balls; i++) {
     ctx.globalAlpha = i < fight.balls ? 1 : 0.25;
@@ -134,10 +151,12 @@ export function drawKyogreBossBar(ctx, run, x, y, w) {
 
 /* ------------------------------------------------------------------ os golpes */
 
-function warning(ctx, h) {
+function warning(ctx, h, next = false) {
   const k = clamp01(h.t / h.warn);
   const thunder = h.kind === 'thunder';
   const pulse = 0.5 + 0.5 * Math.sin(h.t * 18);
+  if (h.shape === 'square') { stormCell(ctx, h, pulse, next); return; }
+  if (h.kind === 'blast') { blastWarning(ctx, h); return; }
   ctx.fillStyle = thunder ? `rgba(255,230,90,${0.12 + 0.22 * k})` : `rgba(90,170,255,${0.14 + 0.26 * k})`;
   ctx.strokeStyle = thunder ? `rgba(255,236,120,${0.6 + 0.4 * pulse})` : `rgba(180,225,255,${0.6 + 0.4 * pulse})`;
   ctx.lineWidth = 3;
@@ -235,7 +254,7 @@ function column(ctx, f) {
 }
 
 /** O raio: um tronco grosso que vem do céu, com galhos, e o brilho em volta. */
-function lightning(ctx, f) {
+export function lightning(ctx, f) {
   const a = 1 - f.t / f.life;
   const pts = [];
   let x = f.x, y = f.y - 620;
@@ -262,8 +281,48 @@ function lightning(ctx, f) {
   glowCircle(ctx, f.x, f.y, 110 * (0.6 + 0.4 * a), `rgba(255,250,200,${0.5 * a})`);
 }
 
+/**
+ * A casa da tempestade (o Zapdos): a da próxima leva acende forte, com a borda piscando e o
+ * quadrado de dentro crescendo até o raio; as das levas seguintes ficam só no contorno tracejado.
+ */
+function stormCell(ctx, h, pulse, next) {
+  const r = h.r - 4;
+  if (!next) {
+    ctx.save();
+    ctx.setLineDash([12, 10]);
+    ctx.strokeStyle = 'rgba(255,236,140,.28)';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(h.x - r, h.y - r, r * 2, r * 2);
+    ctx.restore();
+    return;
+  }
+  // o quanto falta para cair, contado desde a leva anterior (1 s antes do raio)
+  const k = clamp01(1 - (h.warn - h.t) / 1.0);
+  ctx.fillStyle = `rgba(255,${210 - 90 * k},60,${0.18 + 0.3 * k})`;
+  ctx.fillRect(h.x - r, h.y - r, r * 2, r * 2);
+  ctx.strokeStyle = `rgba(255,240,140,${0.6 + 0.4 * pulse})`;
+  ctx.lineWidth = 4;
+  ctx.strokeRect(h.x - r, h.y - r, r * 2, r * 2);
+  const q = r * k;
+  ctx.lineWidth = 2;
+  ctx.strokeStyle = 'rgba(255,255,230,.85)';
+  ctx.strokeRect(h.x - q, h.y - q, q * 2, q * 2);
+}
+
 function scorch(ctx, f) {
   const a = 1 - f.t / f.life;
+  if (f.shape === 'square') {
+    // a casa queimada: o lugar seguro da próxima leva
+    ctx.fillStyle = `rgba(20,14,10,${0.32 * a})`;
+    ctx.fillRect(f.x - f.r * 0.85, f.y - f.r * 0.85, f.r * 1.7, f.r * 1.7);
+    ctx.strokeStyle = `rgba(255,220,120,${0.35 * a})`;
+    ctx.lineWidth = 2;
+    for (let i = 0; i < 4; i++) {
+      const ang = (i / 4) * TAU + 0.6;
+      ctx.beginPath(); ctx.moveTo(f.x, f.y); ctx.lineTo(f.x + Math.cos(ang) * f.r * 0.7, f.y + Math.sin(ang) * f.r * 0.7); ctx.stroke();
+    }
+    return;
+  }
   ctx.fillStyle = `rgba(20,14,10,${0.45 * a})`;
   ctx.beginPath(); ctx.ellipse(f.x, f.y, f.r * 0.9, f.r * 0.45, 0, 0, TAU); ctx.fill();
   ctx.strokeStyle = `rgba(255,220,120,${0.4 * a})`;
@@ -361,14 +420,14 @@ function tsunami(ctx, run, ts, now) {
 
 /* ------------------------------------------------------------------ a Dive Ball */
 
-function diveBall(ctx, ball, sheet, now) {
+function diveBall(ctx, ball, sheet, now, glow) {
   const k = clamp01(ball.t / ball.fall);
   // o feixe de luz do alto: mais forte enquanto ela cai, e some devagar depois
   const beam = ball.landed ? Math.max(0, 1 - (ball.t - ball.fall) / 1.2) : 1;
   if (beam > 0) {
     const g = ctx.createLinearGradient(ball.x, ball.y - 900, ball.x, ball.y);
-    g.addColorStop(0, 'rgba(160,235,255,0)');
-    g.addColorStop(1, `rgba(200,245,255,${0.55 * beam})`);
+    g.addColorStop(0, `rgba(${glow.beamTop},0)`);
+    g.addColorStop(1, `rgba(${glow.beam},${0.55 * beam})`);
     ctx.fillStyle = g;
     ctx.fillRect(ball.x - 46, ball.y - 900, 92, 900);
     ctx.fillStyle = `rgba(255,255,255,${0.5 * beam})`;
@@ -376,9 +435,9 @@ function diveBall(ctx, ball, sheet, now) {
   }
   // o brilho no chão: anéis que se abrem e as faíscas girando
   const pulse = (now * 1.6) % 1;
-  glowCircle(ctx, ball.x, ball.y, 70, `rgba(143,227,255,${ball.landed ? 0.45 : 0.25 * k})`);
+  glowCircle(ctx, ball.x, ball.y, 70, `rgba(${glow.soft},${ball.landed ? 0.45 : 0.25 * k})`);
   if (ball.landed) {
-    ctx.strokeStyle = `rgba(190,245,255,${1 - pulse})`;
+    ctx.strokeStyle = `rgba(${glow.ring},${1 - pulse})`;
     ctx.lineWidth = 4;
     ctx.beginPath(); ctx.ellipse(ball.x, ball.y + 8, 30 + 70 * pulse, 14 + 32 * pulse, 0, 0, TAU); ctx.stroke();
     for (let i = 0; i < 6; i++) {
@@ -403,9 +462,9 @@ function ballLand(ctx, f) {
  * Dive Ball grande no meio, balançando. No fim, as estrelas do "Gotcha!" ou a bola se
  * abrindo num clarão.
  */
-function captureBand(ctx, W, H, th, now) {
+function captureBand(ctx, W, H, th, now, fight) {
   const band = getSheet('dive/band_out');
-  const sheet = getSheet('item/dive-ball');
+  const sheet = getSheet(fight.cfg.ballSheet);
   const full = Math.round(H * 0.34);
   const h = Math.round(full * easeOut(th.band));
   const y0 = Math.round(H / 2 - h / 2);
@@ -438,7 +497,7 @@ function captureBand(ctx, W, H, th, now) {
       ctx.restore();
     }
     show = false;
-    text(ctx, cx, cy + full * 0.36, 'Ah, não! O Kyogre escapou!', '#ffb4ad', Math.round(full * 0.13));
+    text(ctx, cx, cy + full * 0.36, `Ah, não! O ${fight.name} escapou!`, '#ffb4ad', Math.round(full * 0.13));
   }
   if (show && sheet) {
     ctx.save();
@@ -450,7 +509,7 @@ function captureBand(ctx, W, H, th, now) {
   if (th.stage === 'shake' || th.stage === 'open') {
     // os balanços já dados, como pontinhos embaixo
     for (let i = 0; i < 3; i++) {
-      ctx.fillStyle = i < th.shakes ? '#8fe3ff' : 'rgba(255,255,255,.25)';
+      ctx.fillStyle = i < th.shakes ? fight.glow.spark : 'rgba(255,255,255,.25)';
       ctx.beginPath(); ctx.arc(cx - 30 + i * 30, cy + size * 0.68, 7, 0, TAU); ctx.fill();
     }
   }
@@ -460,18 +519,18 @@ function captureBand(ctx, W, H, th, now) {
       const a = (i / 8) * TAU + th.t;
       star(ctx, cx + Math.cos(a) * size * (0.6 + 0.5 * k), cy + Math.sin(a) * size * (0.4 + 0.3 * k), size * 0.1, '#fff3a0');
     }
-    text(ctx, cx, cy + full * 0.36, 'Gotcha! O Kyogre foi capturado!', '#fff3a0', Math.round(full * 0.13));
+    text(ctx, cx, cy + full * 0.36, `Gotcha! O ${fight.name} foi capturado!`, '#fff3a0', Math.round(full * 0.13));
   }
   ctx.restore();
   // a borda da faixa
-  ctx.fillStyle = 'rgba(143,227,255,.8)';
+  ctx.fillStyle = `rgba(${fight.glow.soft},.8)`;
   ctx.fillRect(0, y0, W, 3);
   ctx.fillRect(0, y0 + h - 3, W, 3);
 }
 
 /* ------------------------------------------------------------------ apoio */
 
-function glowCircle(ctx, x, y, r, color) {
+export function glowCircle(ctx, x, y, r, color) {
   if (r <= 0) return;
   const g = ctx.createRadialGradient(x, y, 0, x, y, r);
   g.addColorStop(0, color);
@@ -480,7 +539,7 @@ function glowCircle(ctx, x, y, r, color) {
   ctx.beginPath(); ctx.arc(x, y, r, 0, TAU); ctx.fill();
 }
 
-function star(ctx, x, y, r, color) {
+export function star(ctx, x, y, r, color) {
   ctx.fillStyle = color;
   ctx.beginPath();
   for (let i = 0; i < 8; i++) {
@@ -500,10 +559,10 @@ function text(ctx, x, y, str, color, size) {
   ctx.fillText(str, x, y);
 }
 
-function banner(ctx, x, y, str, color, size) { text(ctx, x, y, str, color, size); }
+export function banner(ctx, x, y, str, color, size) { text(ctx, x, y, str, color, size); }
 
 /** A seta na borda da tela apontando para algo fora dela (a Dive Ball, a bolha de ar). */
-function edgeArrow(ctx, renderer, wx, wy, color, now) {
+export function edgeArrow(ctx, renderer, wx, wy, color, now) {
   const W = renderer.width, H = renderer.height;
   const sx = wx - renderer.camera.x, sy = wy - renderer.camera.y;
   if (sx >= 0 && sy >= 0 && sx <= W && sy <= H) return;

@@ -408,8 +408,8 @@ export class HUD {
     el('capture-skip').classList.toggle('hidden', !!this.game.run?.pendingGift?.mandatory);
     // nada se perde: com a equipe cheia, o PC guarda (0.12, os testes mostraram
     // jogadores deixando de capturar por achar que alguém seria descartado)
-    // o Kyogre (0.37.9) vai sempre para o PC, mesmo com espaço na equipe
-    if (toPC) this._captureNote('<b>O Kyogre vai direto para o PC.</b> Ele descansa da luta e espera por você no PC do Centro Pokémon ou do mapa da jornada.', true);
+    // o Kyogre (0.37.9) e o lendário de cada missão (H-5) vão sempre para o PC, mesmo com espaço na equipe
+    if (toPC) this._captureNote(`<b>O ${choices[0]?.name ?? 'lendário'} vai direto para o PC.</b> Ele descansa da luta e espera por você no PC do Centro Pokémon ou do mapa da jornada.`, true);
     else this._captureNote(teamSize >= maxSize
       ? '<b>Equipe cheia? Pode capturar!</b> Nenhum Pokémon se perde: o novo vai para o PC, ou entra na equipe e quem sair vai para o PC.'
       : `Entra direto na equipe (${teamSize + 1}/${maxSize}). Quando ela encher, o PC guarda os próximos.`,
@@ -503,13 +503,20 @@ export class HUD {
 
     el('result-victory').classList.toggle('hidden', !victory);
     el('btn-result-endless')?.classList.toggle('hidden', !!run.stage.returnTo);
-    // a luta do Kyogre (0.37.8): jogar de novo ali mesmo; a derrota não leva ao Centro de sempre
-    const legendary = run.stage.returnTo === 'lake';
-    el('btn-result-retry').classList.toggle('hidden', !legendary);
+    // a luta do Kyogre (0.37.8) e as missões (H-6): jogar de novo ali mesmo; a derrota não leva
+    // ao Centro de sempre. Vencida, a missão não se repete (o lendário está livre)
+    const legendary = !!run.stage.returnTo;
+    const mission = run.stage.returnTo === 'mission';
+    el('btn-result-retry').classList.toggle('hidden', !legendary || mission);
     el('btn-result-retry-defeat').classList.toggle('hidden', !legendary);
     el('btn-result-village').classList.toggle('hidden', !legendary);
     el('btn-result-center').classList.toggle('hidden', legendary);
-    if (legendary && !victory) el('result-subtitle').textContent = 'Todos os seus Pokémon desmaiaram, mas o que eles ganharam fica. Tente de novo, sem descer de novo.';
+    const sub = (id, text) => { const small = el(id)?.querySelector('.btn-sub'); if (small) small.textContent = text; };
+    sub('btn-result-retry-defeat', mission ? 'A equipe é curada e a luta recomeça, sem atravessar a Usina' : 'A equipe é curada e a luta recomeça, sem descer de novo');
+    sub('btn-result-village', mission ? 'Um marinheiro tira você da Usina; você acorda no Centro' : 'O pescador tira você da água; você acorda no Centro');
+    if (legendary && !victory) {
+      el('result-subtitle').textContent = `Todos os seus Pokémon desmaiaram, mas o que eles ganharam fica. Tente de novo, ${mission ? 'sem atravessar a Usina de novo' : 'sem descer de novo'}.`;
+    }
     el('result-defeat').classList.toggle('hidden', victory);
 
     clear(el('result-team')).append(...this._teamSummary(run.team.members));

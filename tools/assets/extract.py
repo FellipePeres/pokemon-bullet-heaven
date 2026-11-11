@@ -295,6 +295,8 @@ SCENES = {
     'agatha_room':     ('PokemonLeague_AgathasRoom', True),
     'lance_room':      ('PokemonLeague_LancesRoom', True),
     'champion_room':   ('PokemonLeague_ChampionsRoom', True),
+    # a arena da missão do Zapdos (H-6): o fundo da Usina, com as peças da Power Plant
+    'power_plant':     ('PowerPlant', True),
 }
 PRIMARY_TILES = 640       # tiles do tileset primário; os do secundário vêm depois
 PRIMARY_METATILES = 640   # idem para as metatiles

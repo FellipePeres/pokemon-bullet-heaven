@@ -117,6 +117,11 @@ export const DIALOGUE = {
         'Você fez o que poucos fizeram. Mas as hordas não acabaram.',
         'Ouvi falar de um mato sem fim, a oeste daqui...'
       ] },
+      // H-5: a jornada que já tinha o Zapdos antes da missão existir (nada se tira do jogador)
+      { when: { mission: { zapdos: 'antes' }, once: 'carvalho_zapdos_antes' }, say: [
+        'O Zapdos está com você? Então foi você quem o encontrou primeiro!',
+        'Dizem que ele sumiu da Usina numa noite de trovões. Que bom que está em boas mãos.'
+      ] },
       // depois do inicial: uma dica por insígnia (uma vez cada) e a avaliação da Pokédex
       { when: { badges: 8, once: 'carvalho_dica_8' }, say: ['Oito insígnias! A Liga Pokémon espera você. Leve uma equipe de tipos variados.'] },
       { when: { badges: 7, once: 'carvalho_dica_7' }, say: ['Falta só uma insígnia. Giovanni não perdoa erro: confira os tipos da sua equipe.'] },
@@ -288,6 +293,11 @@ export const DIALOGUE = {
     name: 'Velho sábio',
     lines: [
       { when: { champion: true }, say: ['Você venceu a Liga. Mas me diga: já foi até o fim do mato a oeste? Ninguém nunca foi.'] },
+      // a missão do Zapdos (H-6): uma vez, depois da cena da máquina destruída
+      { when: { scene: 'zapdos_livre', once: 'sabio_zapdos' }, say: [
+        'O Zapdos preso numa máquina, com um emblema vermelho? Então eu tinha razão, {player}.',
+        'Alguém está caçando os pássaros lendários. E o Articuno ainda não voltou para Seafoam.'
+      ] },
       // a história (0.39): o que ele diz depois de cada cena, enquanto a quest daquele momento está ativa
       { when: { scene: 'vermilion_correntes', quest: 'c3_erika' }, say: [
         'O Zapdos brigando, e depois correntes na Usina... Isso não é coisa da natureza, {player}.'
@@ -331,6 +341,7 @@ export const DIALOGUE = {
     lines: [
       { when: { locked: true }, say: ['Ei! Vai sair sem Pokémon? As hordas te pegam na primeira curva.', 'Passa no laboratório do Prof. Carvalho antes!'] },
       // depois da casa roubada de Cerulean (0.39): a vila culpa a Equipe Rocket
+      { when: { scene: 'zapdos_livre', once: 'rapaz_usina' }, say: ['Ouviu? A Usina voltou a funcionar! Vermilion acendeu inteira ontem à noite.'] },
       { when: { scene: 'vermilion_correntes', quest: 'c3_erika' }, say: ['Dizem que Vermilion ficou dias sem luz! E a Equipe Rocket levando a culpa de novo.'] },
       { when: { scene: 'cerulean_roubo', quest: 'c2_surge' }, say: ['Viu o jornal? A Equipe Rocket assaltou uma casa em Cerulean!'] },
       { say: ['Daqui para o sul, é Kanto inteira. Boa sorte!'] }
@@ -370,6 +381,14 @@ export const DIALOGUE = {
 
   /* ============================ a descida do Dive ============================ */
   // depois de perder as 3 bolhas: ele acorda no Centro, na frente da enfermeira (seção 7)
+  // a missão do Zapdos (H-6): caiu na luta e acorda no Centro
+  enfermeira_usina: {
+    name: 'Enfermeira',
+    lines: [{ say: [
+      'Ah, você acordou! Um marinheiro de Vermilion trouxe você da Usina.',
+      'Disse que achou você desmaiado perto de uma escotilha... Seus Pokémon já estão bem. Descanse antes de voltar lá.'
+    ] }]
+  },
   enfermeira_resgate: {
     name: 'Enfermeira',
     lines: [{ say: [

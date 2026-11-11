@@ -45,6 +45,8 @@ export const MUSIC_TRACKS = {
   mus_vs_legend: { loopStart: 13.260181, loopEnd: 45.054558 },
   /** A vila e o mapa da jornada (0.37.7): o tema das Ilhas 1, 2 e 3, calmo. */
   mus_sevii_123: { loopStart: 0.485533, loopEnd: 61.730340 },
+  /** A missão do Zapdos, no fundo da Usina (H-6): a música da Usina no FireRed. */
+  mus_poke_mansion: { loopStart: 14.633107, loopEnd: 65.782086 },
   /** A descida do Dive, Níveis 1 a 3 (0.37.6): a música do mergulho do Emerald. */
   mus_underwater: { loopStart: 25.231247, loopEnd: 86.911338 },
   /** A descida do Dive, Níveis 4 e 5 (0.37.7): a de quando o Kyogre desperta. */

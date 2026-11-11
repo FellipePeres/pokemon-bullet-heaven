@@ -11,7 +11,7 @@ import { getTrainerLook } from '../data/trainers.js';
 
 import { drawFx } from './fx.js';
 import { SceneryCache } from './scenery.js';
-import { drawKyogreWorld, drawKyogreScreen, drawKyogreBossBar } from './kyogreFight.js';
+import { drawFightGround, drawFightWorld, drawFightScreen, drawFightBossBar } from './legendaryFight.js';
 import { stageScenes } from '../data/scenery.js';
 import { abilityFx, zoneFx, STATUS_FX } from '../data/fx.js';
 import { getAbility } from '../data/abilities.js';
@@ -131,6 +131,7 @@ export class Renderer {
       ctx.translate(Math.round((Math.random() - 0.5) * 2 * power), Math.round((Math.random() - 0.5) * 2 * power));
     }
     this._drawGround(ctx, run);
+    drawFightGround(ctx, run);     // a máquina e as correntes do Zapdos (H-6), embaixo de todos
 
     this._drawZones(ctx, run);
     this._drawPickups(ctx, run);
@@ -138,12 +139,12 @@ export class Renderer {
     this._drawOrbs(ctx, run);
     this._drawProjectiles(ctx, run);
     drawSignatures(ctx, run);      // golpes exclusivos dos lendários
-    drawKyogreWorld(ctx, run);     // a luta do Kyogre (0.37): os avisos, a Dive Ball, os balanços
+    drawFightWorld(ctx, run);      // as lutas de lendário (0.37, H-5): os avisos, a bola, os balanços
     this._drawEffects(ctx, run);
     this._drawParticles(ctx, run);
     ctx.restore();
 
-    drawKyogreScreen(ctx, run, this);   // a chuva, a seta da Dive Ball e a maré final (0.37)
+    drawFightScreen(ctx, run, this);    // a chuva, a seta da bola e a leva final (0.37, H-5)
     this._drawBossBar(ctx, run);
   }
 
@@ -768,7 +769,7 @@ export class Renderer {
     ctx.fillStyle = 'rgba(255,255,255,.75)';
     ctx.fillRect(rageX - 1, y - 2, 2, 18);
 
-    drawKyogreBossBar(ctx, run, x, y, w);   // a marca dos 15% e as Dive Balls (0.37)
+    drawFightBossBar(ctx, run, x, y, w);    // a marca dos 15% e as bolas que restam (0.37, H-5)
     ctx.font = `11px ${ARCADE_FONT}`;
     ctx.textAlign = 'center';
     ctx.fillStyle = '#fff';

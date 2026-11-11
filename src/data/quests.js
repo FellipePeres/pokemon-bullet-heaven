@@ -142,6 +142,8 @@ export const QUESTS = {
     desc: 'Preso em terra pelo mar agitado, um marinheiro de Vermilion trabalhou pela Rota 10 e escutou correntes pesadas se arrastando dentro da Usina, fechada desde o apagão.',
     // fecha no fundo da Usina, quando os olhos aparecem no escuro (data/cutscenes.js, usina_fundo)
     objectives: [{ text: 'Investigue a Usina, na Rota 10', on: 'clue', target: 'olhos' }],
+    // H-5: a jornada que já tem o Zapdos não precisa investigar (a missão aparece concluída)
+    doneIf: { freed: 'zapdos' },
     openedBy: 'vermilion_correntes',
     next: ['z_zapdos'],
     reward: null
@@ -149,8 +151,10 @@ export const QUESTS = {
   z_zapdos: {
     kind: 'legendary', chapter: 'usina',
     desc: 'No fundo da Usina, no escuro, dois olhos vermelhos. O Zapdos está lá embaixo, preso por correntes e fora de si. A escotilha fica na sala do gerador.',
-    // a pista chega com a luta do Zapdos (o molde das missões, H-5, e a luta, H-6)
-    objectives: [{ text: 'Derrote e liberte o Zapdos', on: 'clue', target: 'zapdos_livre' }],
+    // fecha com a luta vencida (a fase `zapdos`, H-6), com ou sem a captura; quem já tinha o
+    // Zapdos antes das missões vê a quest concluída (H-5)
+    objectives: [{ text: 'Derrote e liberte o Zapdos', on: 'win', target: 'zapdos', doneIf: { freed: 'zapdos' } }],
+    doneIf: { freed: 'zapdos' },
     next: [],
     reward: null
   }

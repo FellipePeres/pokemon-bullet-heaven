@@ -68,6 +68,11 @@ function nineSlice(grid, x, y, w, h, s) {
 }
 
 /** Área perto do centro, onde o treinador começa: fica limpa. */
+/** O retângulo cai num lugar que o cenário deixa livre (`clear`: a máquina do Zapdos, H-6)? */
+function keptClear(recipe, x, y, w, h) {
+  return (recipe.clear ?? []).some(([cx, cy, cw, ch]) => x < cx + cw && cx < x + w && y < cy + ch && cy < y + h);
+}
+
 function nearCenter(grid, x, y, w, h, radius) {
   const cx = grid.cols / 2, cy = grid.rows / 2;
   return x - radius < cx && cx < x + w + radius && y - radius < cy && cy < y + h + radius;
@@ -355,7 +360,7 @@ function buildRoom(grid, rng, recipe, map) {
       const [, , w, h] = rect;
       const x = gx + Math.floor(rng() * Math.max(1, s - w)), y = gy + Math.floor(rng() * Math.max(1, s - h));
       if (x + w > cols - rightCols - 1 || y + h > rows - bottomRows - 1) continue;
-      if (nearCenter(grid, x, y, w, h, 5) || !taken.free(x, y, w, h, 2)) continue;
+      if (nearCenter(grid, x, y, w, h, 5) || !taken.free(x, y, w, h, 2) || keptClear(recipe, x, y, w, h)) continue;
       stamp(grid, map, rect, x, y);
       taken.add(x, y, w, h);
     }

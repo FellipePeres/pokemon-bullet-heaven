@@ -919,6 +919,7 @@ MUSIC = {
     'mus_poke_center': 'o Centro Pokémon, depois de uma derrota',
     'mus_vs_legend': 'a luta contra o Kyogre, no salão da Caverna Marinha (0.37)',
     'mus_sevii_123': 'a vila e o mapa da jornada (0.37.7): o tema das Ilhas 1, 2 e 3, calmo',
+    'mus_poke_mansion': 'a missão do Zapdos, no fundo da Usina (H-6): a música da Usina no FireRed',
 }
 #: As músicas do Emerald (0.37.6): a partitura e os instrumentos do decomp pret/pokeemerald
 #: (o clone parcial em ../pokeemerald, com a pasta sound). O motor é o mesmo m4a.

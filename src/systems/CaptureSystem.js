@@ -5,6 +5,7 @@ import { weightedPick, weightedPickMany } from '../core/utils.js';
 import { bus, EVENTS } from '../core/events.js';
 import { TeamSystem } from './TeamSystem.js';
 import { isLegendary, LEGENDARY_ENCOUNTERS, LEGENDARY_WEIGHT } from '../data/legendaries.js';
+import { MISSION_SPECIES } from '../data/missions.js';
 
 /**
  * Captura: independente do combate.
@@ -45,13 +46,18 @@ export class CaptureSystem {
    * O sorteio do lendário (0.18, data/legendaries.js): só nas fases da tabela,
    * com a chance dela; um de cada por jornada (fora quem já está na equipe, no PC
    * da partida ou no do lobby) e no máximo uma vez por tentativa.
+   *
+   * A captura muda com as missões (H-5, PLANEJAMENTO-HISTORIA.md seção 6): um lendário
+   * que tem missão (data/missions.js) só entra no sorteio depois de liberado, com ou sem
+   * a captura (`run.liberated`). Os que ainda não têm missão continuam como antes.
    */
   rollLegendary() {
     const encounter = LEGENDARY_ENCOUNTERS[this.run.stage.id];
     if (!encounter || Math.random() >= encounter.chance) return null;
     const owned = (id) => this.run.team.has(id) || this.run.pc.some((m) => m.pokemonId === id)
       || this.run.ownedElsewhere?.has(id) || this.run.legendariesOffered?.has(id);
-    const options = encounter.pool.filter((id) => !owned(id))
+    const locked = (id) => MISSION_SPECIES.includes(id) && !this.run.liberated?.has(id);
+    const options = encounter.pool.filter((id) => !owned(id) && !locked(id))
       .map((id) => ({ id, weight: LEGENDARY_WEIGHT[id] ?? 1 }));
     if (!options.length) return null;
     const id = weightedPick(options).id;

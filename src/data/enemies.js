@@ -1064,6 +1064,31 @@ export const ENEMIES = {
     hp: 460000, speed: 50, damage: 55, xp: 2400, dropChance: 0,
     behavior: 'boss', radius: 56, scale: 3, boss: true, ace: true, legendary: true, enrageAt: 0.2,
     leader: 'Kyogre', abilities: []
+  },
+
+  /* a horda da Usina (H-6, a missão do Zapdos): os Pokémon da Power Plant do FireRed */
+  electrode: {
+    id: 'electrode', dex: 101, name: 'Electrode', types: ['electric'],
+    hp: 58, speed: 124, damage: 9, xp: 13, dropChance: 0.012,
+    behavior: 'chaser', radius: 15, scale: 1.15
+  },
+  electabuzz: {
+    id: 'electabuzz', dex: 125, name: 'Electabuzz', types: ['electric'],
+    hp: 72, speed: 96, damage: 10, xp: 14, dropChance: 0.012,
+    behavior: 'chaser', radius: 15, scale: 1.15
+  },
+  raichu: {
+    id: 'raichu', dex: 26, name: 'Raichu', types: ['electric'],
+    hp: 62, speed: 106, damage: 9, xp: 13, dropChance: 0.012,
+    behavior: 'chaser', radius: 15, scale: 1.15
+  },
+  // o Zapdos (H-6): os ataques dele (a tempestade, o Zap Cannon, a Investida, o Discharge e a
+  // tempestade total) são do systems/zapdosFight.js; `legendary` tira a rajada de líder
+  zapdos_boss: {
+    id: 'zapdos_boss', dex: 145, name: 'Zapdos', types: ['electric', 'flying'], level: 58,
+    hp: 160000, speed: 92, damage: 40, xp: 1600, dropChance: 0,
+    behavior: 'boss', radius: 46, scale: 2.6, boss: true, ace: true, legendary: true, enrageAt: 0.2,
+    leader: 'Zapdos', abilities: []
   }
 };
 

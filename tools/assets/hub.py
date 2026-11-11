@@ -421,6 +421,8 @@ MAPS = {
     'vermilion': (26, 18, build_vermilion),
     'usina': (49, 40, build_usina),
     'usina_fundo': (15, 11, build_usina_fundo),
+    # a mesma sala com a luz de volta, depois da missão do Zapdos (H-6)
+    'usina_luz': (15, 11, build_usina_fundo),
 }
 SOURCES = [P, V, R, F, CE, FU, IP, DS4, DS1, PH1, PH2, LAB, HOUSE1, WARDEN, COPYCAT, GYM1, GYM2, GYM3, VE, PP]
 
@@ -525,7 +527,97 @@ DRAWN = {
         '.KKKKKKKKKKKKKK.',
         '................',
     ]),
+    # a máquina do emblema vermelho que prende o Zapdos (H-6): duas bobinas, o console com o
+    # emblema e a base com a faixa de aviso; e a mesma máquina destruída, depois da luta
+    'maquina_zapdos': (64, 48, {
+        'K': (34, 34, 46, 255), 'G': (70, 72, 88, 255), 'M': (112, 116, 136, 255), 'L': (168, 174, 192, 255),
+        'W': (226, 230, 240, 255), 'R': (206, 34, 34, 255), 'D': (112, 10, 14, 255), 'Y': (232, 192, 64, 255),
+        'B': (16, 16, 22, 255), 'E': (255, 232, 96, 255), 'O': (255, 132, 40, 255),
+    }, lambda: _machine_rows(False)),
+    'maquina_zapdos_quebrada': (64, 48, {
+        'K': (34, 34, 46, 255), 'G': (70, 72, 88, 255), 'M': (112, 116, 136, 255), 'L': (168, 174, 192, 255),
+        'W': (226, 230, 240, 255), 'R': (206, 34, 34, 255), 'D': (112, 10, 14, 255), 'Y': (232, 192, 64, 255),
+        'B': (16, 16, 22, 255), 'E': (255, 232, 96, 255), 'O': (255, 132, 40, 255),
+    }, lambda: _machine_rows(True)),
 }
+
+# o emblema vermelho (um escudo com um pico escuro): ninguém reconhece; é o do uniforme do Maxie
+EMBLEM = [
+    '...RRRRR...',
+    '.RRRRRRRRR.',
+    'RRRRRDRRRRR',
+    'RRRRDDDRRRR',
+    'RRRDDDDDRRR',
+    'RRDDDRDDDRR',
+    'RDDDRRRDDDR',
+    '.RRRRRRRRR.',
+    '..RRRRRRR..',
+    '....RRR....',
+]
+
+
+def _machine_rows(broken):
+    """A máquina de 64x48 em pixel: as bobinas dos lados, o console no meio e a base."""
+    g = [['.'] * 64 for _ in range(48)]
+
+    def rect(x0, y0, x1, y1, ch):
+        for y in range(y0, y1 + 1):
+            for x in range(x0, x1 + 1):
+                g[y][x] = ch
+
+    def box(x0, y0, x1, y1, fill):
+        rect(x0, y0, x1, y1, 'K')
+        rect(x0 + 1, y0 + 1, x1 - 1, y1 - 1, fill)
+
+    # a base, com a faixa de aviso amarela e preta
+    box(0, 37, 63, 47, 'G')
+    rect(1, 38, 62, 38, 'L')
+    for x in range(2, 62):
+        rect(x, 42, x, 44, 'Y' if (x // 3) % 2 == 0 else 'B')
+    # as bobinas (os anéis acendem; na quebrada, a da direita partiu no meio)
+    for x0 in (3, 50):
+        top = 4 if not (broken and x0 == 50) else 20
+        box(x0, top, x0 + 10, 38, 'M')
+        rect(x0 + 1, top + 1, x0 + 2, 37, 'L')
+        for y in range(top + 4, 36, 4):
+            rect(x0 + 1, y, x0 + 9, y + 1, 'G' if broken else 'E')
+            rect(x0 + 1, y, x0 + 1, y + 1, 'K')
+        # o anel de cima, onde a corrente se prende
+        if not (broken and x0 == 50):
+            box(x0 + 2, 0, x0 + 8, 5, 'K')
+            rect(x0 + 4, 2, x0 + 6, 3, 'B' if broken else 'W')
+        else:
+            for i, x in enumerate(range(x0, x0 + 11)):
+                g[top - (i % 3)][x] = 'K'
+    # o console, com o emblema no meio e as luzes dos lados
+    box(17, 17, 46, 38, 'M')
+    rect(18, 18, 45, 18, 'W')
+    rect(18, 19, 45, 19, 'L')
+    box(21, 21, 42, 36, 'G')
+    for j, line in enumerate(EMBLEM):
+        for i, ch in enumerate(line):
+            if ch != '.':
+                g[24 + j][26 + i] = ch
+    for y in (23, 27, 31):
+        g[y][19] = 'G' if broken else 'R'
+        g[y][44] = 'G' if broken else 'E'
+    # os cabos das bobinas até o console
+    for x in range(14, 17):
+        rect(x, 28, x, 30, 'B')
+    for x in range(47, 50):
+        rect(x, 28, x, 30, 'B')
+    if broken:
+        # a rachadura atravessando o emblema e as marcas de queimado
+        for i in range(14):
+            x, y = 24 + i, 22 + i
+            g[y][x] = 'B'
+            if i % 3 == 0:
+                g[y][x + 1] = 'B'
+        for x, y in ((6, 12), (7, 13), (20, 33), (40, 23), (41, 24), (12, 40), (30, 45)):
+            g[y][x] = 'B'
+        rect(52, 21, 58, 22, 'O')
+    return [''.join(r) for r in g]
+
 EYE = [
     'DDD..........',
     'DRRRDD.......',
@@ -548,7 +640,7 @@ def _eyes_rows():
 
 def export_drawn(catalog):
     for key, (w, h, pal, rows) in DRAWN.items():
-        rows = rows or _eyes_rows()
+        rows = rows() if callable(rows) else rows or _eyes_rows()
         image = Image.new('RGBA', (w, h), (0, 0, 0, 0))
         for y, line in enumerate(rows):
             for x, ch in enumerate(line):
@@ -641,10 +733,18 @@ def main():
     sprites = {}
     export_sprites(decomp, sprites)
     export_drawn(sprites)
-    # a Ultra Ball do card das missões de lendário (0.39), dos itens do Pokemon All
+    # a Ultra Ball do card das missões de lendário (0.39), dos itens do Pokemon All; na luta do
+    # Zapdos (H-6) ela cai no campo e balança na faixa da captura
     ball = args.fonte / 'assets' / 'items' / 'default' / 'ultra-ball.png'
     if ball.exists():
         Image.open(ball).convert('RGBA').save(ROOT / 'assets' / 'items' / 'ultra-ball.png', optimize=True)
+    with Image.open(ROOT / 'assets' / 'items' / 'ultra-ball.png') as im:
+        sprites['item/ultra-ball'] = {'src': 'assets/items/ultra-ball.png', 'frameWidth': im.width, 'frameHeight': im.height, 'frames': 1}
+    # o grito do Zapdos (H-6), do Pokemon All, como o do Kyogre
+    cry = args.fonte / 'assets' / 'sound' / 'cries' / '145.ogg'
+    if cry.exists():
+        (ROOT / 'assets' / 'sound' / 'cries').mkdir(parents=True, exist_ok=True)
+        (ROOT / 'assets' / 'sound' / 'cries' / '145.ogg').write_bytes(cry.read_bytes())
     decor = export_decor(sources)
     write_js(maps, sprites, decor)
     print(f'{len(maps)} mapas, {len(sprites)} folhas e {len(decor)} móveis; catálogo em {HUB_MAPS_JS.relative_to(ROOT).as_posix()}')

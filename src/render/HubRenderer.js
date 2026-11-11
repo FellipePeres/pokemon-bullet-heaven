@@ -128,6 +128,42 @@ export class HubRenderer {
       ctx.fillStyle = `rgba(0, 0, 0, ${fade.toFixed(3)})`;
       ctx.fillRect(0, 0, W, H);
     }
+    if (hub.battle) this._battleIntro(hub.battle.t, W, H);
+  }
+
+  /**
+   * A transição de batalha dos lendários do FireRed (B_TRANSITION_BLUR, H-6): duas piscadas
+   * para o cinza RGB(11,11,11) (8 quadros indo, 8 voltando), e o borrão: o mosaico cresce um
+   * bloco a cada 3 quadros até 16 pixels do GBA, e no 10º a tela escurece.
+   */
+  _battleIntro(t, W, H) {
+    const ctx = this.ctx;
+    const frame = t * 60;
+    if (frame < 32) {
+      const k = frame % 16;
+      const blend = (k < 8 ? k : 16 - k) / 8;
+      ctx.fillStyle = `rgba(88, 88, 88, ${blend.toFixed(3)})`;
+      ctx.fillRect(0, 0, W, H);
+      return;
+    }
+    const counter = Math.min(15, Math.floor((frame - 32) / 3) + 1);
+    const block = (counter + 1) * this.scale;
+    const w = Math.max(1, Math.ceil(W / block)), h = Math.max(1, Math.ceil(H / block));
+    this._mosaic ??= typeof document !== 'undefined' ? document.createElement('canvas') : null;
+    const small = this._mosaic;
+    if (small) {
+      small.width = w; small.height = h;
+      const sctx = small.getContext('2d');
+      sctx.imageSmoothingEnabled = false;
+      sctx.drawImage(this.canvas, 0, 0, W, H, 0, 0, w, h);
+      ctx.imageSmoothingEnabled = false;
+      ctx.drawImage(small, 0, 0, w, h, 0, 0, w * block, h * block);
+    }
+    const dark = clamp((frame - 32 - 27) / 14, 0, 1);
+    if (dark > 0) {
+      ctx.fillStyle = `rgba(0, 0, 0, ${dark.toFixed(3)})`;
+      ctx.fillRect(0, 0, W, H);
+    }
   }
 
   /**

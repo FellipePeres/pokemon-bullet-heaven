@@ -1313,5 +1313,113 @@ console.log('\n[o salão do Kyogre — a luta, a captura e o Kyogre na equipe]')
         tracker.profile.pokedex.secret.includes('kyogre') && !tracker.profile.pokedex.caught.includes(382));
 }
 
+// ------------------------------------------- a missão do Zapdos (H-5, o molde; H-6, a luta)
+console.log('\n[a missão do Zapdos — preso, a tempestade, os ataques, a captura e a fuga]');
+{
+  const { MISSIONS, MISSION_SPECIES } = await import('../src/data/missions.js');
+  const start = (opts = {}) => {
+    const run = new Run('zapdos', { starter: 'charmander', ...opts });
+    run.damageCompanion = () => {};
+    return run;
+  };
+  const tick = (run, seconds) => {
+    for (let i = 0; i < 60 * seconds; i++) {
+      run.update(DT, { x: 0, y: 0 });
+      if (run.state === 'intro') { run.pendingIntro = null; run.state = 'running'; }
+      if (run.state === 'levelup' || run.state === 'evolution' || run.state === 'unlock') run.state = 'running';
+    }
+  };
+  const fight = start();
+  const f = fight.fight;
+  check('a fase da missão: o fundo da Usina (as peças da Power Plant), o molde com 3 Ultra Balls de 10%',
+        MISSIONS.zapdos.stage === 'zapdos' && fight.world.scene === 'usina_arena' && f.constructor.name === 'ZapdosFight'
+        && f.balls === 3 && f.cfg.ballName === 'Ultra Ball' && f.cfg.chance === 0.1 && f.cfg.floor === 0.15 && f.cfg.recover === 0.25);
+  const { buildSceneGrid } = await import('../src/systems/terrain.js');
+  check('a arena deixa livre o lugar da máquina do emblema vermelho (nenhum enfeite do cenário ali)',
+        (() => { const g = buildSceneGrid('usina_arena', fight.terrain.cols, fight.terrain.rows, 'zapdos'); const tx = Math.floor(f.machine.x / 32), ty = Math.floor(f.machine.y / 32);
+          for (let y = ty - 4; y <= ty + 3; y++) for (let x = tx - 4; x <= tx + 4; x++) if (g.solid[y * g.cols + x]) return false; return true; })());
+  check('...e a base da máquina bloqueia o caminho, mas não onde o treinador chega',
+        fight.terrain.solidAt(Math.floor(f.machine.x / 32), Math.floor((f.machine.y + 20) / 32))
+        && !fight.terrain.solidAt(Math.floor(fight.player.x / 32), Math.floor(fight.player.y / 32)));
+  // preso: a tempestade já cai, sempre num lugar marcado antes
+  tick(fight, 6);
+  const bolts = f.hazards.filter((h) => h.kind === 'thunder');
+  check('preso na máquina, nos primeiros 45 s: sem o chefe, e a tempestade já marca raios no chão',
+        !fight.boss && !f.snapped && f.state === 'waiting' && (bolts.length > 0 || f.fx.some((x) => x.kind === 'bolt' || x.kind === 'scorch')));
+  check('o raio só cai depois do aviso', bolts.every((h) => h.warn >= 1.2 && !h.fired || h.t >= h.warn));
+  // aos 0:45: entra preso; as correntes arrebentam e ele sai furioso
+  fight.time = fight.stage.duration;
+  tick(fight, 0.1);
+  check('aos 0:45 ele entra em campo ainda preso, intocável', fight.boss?.data.id === 'zapdos_boss' && fight.boss.untouchable && f.state === 'break');
+  tick(fight, 2.4);
+  check('...as correntes arrebentam, a máquina quebra, e a luta começa', f.snapped && f.machine.broken && f.state !== 'break' && !fight.boss.untouchable);
+  check('o Zapdos não traz a rajada dos líderes: os ataques dele são outros', !fight.boss.abilities.some((a) => a.abilityId === 'leader_barrage'));
+  // os ataques: a Investida, o Zap Cannon, o Discharge
+  const boss = fight.boss;
+  f.rng = () => 0.4;
+  f._set('fight');
+  f._startPeck(boss, 1, 0.85);
+  const pk = f.peck;
+  check('a Investida: a faixa acende do Zapdos até depois do treinador', pk.phase === 'aim' && Math.hypot(pk.x1 - pk.x0, pk.y1 - pk.y0) >= 700 - 1);
+  for (let i = 0; i < 60 * 3 && f.peck; i++) fight.update(DT, { x: 0, y: 0 });
+  check('...e ele cruza a arena por ela', !f.peck && Math.hypot(boss.x - pk.x1, boss.y - pk.y1) < 5);
+  f._set('cannon');
+  tick(fight, 1.0);
+  check('o Zap Cannon: ele carrega, solta a esfera e o lugar da explosão fica marcado',
+        !!f.orb && f.hazards.some((h) => h.kind === 'blast' && Math.hypot(h.x - f.orb.end.x, h.y - f.orb.end.y) < 1));
+  f._discharge(boss);
+  check('o Discharge: dois anéis elétricos', f.rings.filter((r) => r.kind === 'discharge' && r.type === 'electric').length >= 2);
+  // a tempestade total aos 66%: ele sobe, o tabuleiro cai em três levas
+  f.orb = null; f.hazards = []; f.rings = [];
+  f._set('fight');
+  boss.hp = boss.maxHp * 0.6;
+  tick(fight, 1 / 60 * 2);
+  check('aos 66%: a tempestade total, e ele some nas nuvens, intocável', f.state === 'sky' && boss.untouchable);
+  tick(fight, 0.8);
+  const cells = f.hazards.filter((h) => h.shape === 'square');
+  const p = fight.player;
+  const mine = cells.filter((h) => Math.abs(p.x - h.x) < h.r && Math.abs(p.y - h.y) < h.r).map((h) => h.wave).sort().join();
+  const side = cells.filter((h) => Math.abs(p.x + f.cfg.stormCell - h.x) < h.r && Math.abs(p.y - h.y) < h.r).map((h) => h.wave).join();
+  check('o tabuleiro: a casa do treinador cai na 1ª e na 3ª leva; a do lado, na 2ª',
+        boss.hidden && cells.length > 20 && mine === '0,2' && side === '1');
+  check('...cada leva com o seu aviso, uma depois da outra', new Set(cells.map((h) => h.warn)).size === 3
+        && Math.min(...cells.map((h) => h.warn)) === f.cfg.stormWarn);
+  tick(fight, f.cfg.stormWarn + 2 * f.cfg.stormGap + 1.8);
+  check('no fim, ele mergulha de volta num lugar marcado e a luta segue', f.state === 'fight' && !boss.hidden && !boss.untouchable && !f.sky);
+  // a captura: o piso, a Ultra Ball no campo, o arremesso
+  const { damageEnemy } = await import('../src/systems/combat.js');
+  damageEnemy(fight, boss, 1e9);
+  check('no piso de 15%, ele fica exausto e a Ultra Ball cai no campo', f.state === 'exhausted' && !!f.ball && boss.hp === boss.maxHp * 0.15);
+  tick(fight, 1.2);
+  f.rng = () => 0.01;   // a bola pega
+  fight.player.x = f.ball.x; fight.player.y = f.ball.y;
+  tick(fight, 0.05);
+  for (let i = 0; i < 60 * 8 && fight.state === 'legendary'; i++) fight.update(DT, { x: 0, y: 0 });
+  check('pegou a bola: ela balança e o Zapdos é capturado (vai para o PC)', f.captured && fight.pendingGift?.choices[0] === 'zapdos'
+        && fight.pendingGift.toPC && f.final?.t === f.cfg.finalTide);
+
+  // sem bolas: derrotado, ele se solta e voa livre (a missão vence sem a captura)
+  const free = start();
+  free.time = free.stage.duration;
+  tick(free, 3);
+  free.fight.balls = 0;
+  tick(free, 2 / 60);   // sem bola, o piso de vida sai no quadro seguinte
+  damageEnemy(free, free.boss, 1e9);
+  tick(free, 0.1);
+  check('sem Ultra Ball: derrotado, ele se solta e voa livre, e a fase é vencida', free.fight.fled && !free.fight.captured && free.state === 'victory');
+
+  // H-5: a captura sem lendários: quem tem missão só cai na Poké Ball depois dela
+  for (const enc of Object.values(LEGENDARY_ENCOUNTERS)) enc.chance = 1;
+  const LEG = Object.keys(LEGENDARY_KITS);
+  const offers = (run) => { const seen = new Set(); for (let i = 0; i < 40; i++) { run.legendariesOffered.clear(); for (const c of run.captureSystem.rollChoices()) if (LEG.includes(c.id)) seen.add(c.id); } return seen; };
+  const before = offers(new Run('gym_8_viridian', { starter: 'charmander' }));
+  const after = offers(new Run('gym_8_viridian', { starter: 'charmander', liberated: ['zapdos'] }));
+  check('antes da missão, o Zapdos nunca aparece na Poké Ball (os outros pássaros, sim, até terem missão)',
+        MISSION_SPECIES.includes('zapdos') && !before.has('zapdos') && before.has('articuno') && before.has('moltres'));
+  check('depois da missão (com ou sem a captura), ele entra no sorteio da fase', after.has('zapdos'));
+  check('...e quem está no PC continua não voltando (um de cada)',
+        !offers(new Run('gym_8_viridian', { starter: 'charmander', liberated: ['zapdos'], ownedElsewhere: ['zapdos'] })).has('zapdos'));
+}
+
 console.log(`\n=== ${failures === 0 ? 'TUDO OK' : failures + ' FALHA(S)'} ===\n`);
 process.exit(failures ? 1 : 0);
