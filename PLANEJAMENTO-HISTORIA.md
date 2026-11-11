@@ -232,10 +232,6 @@ decisões abertas ficaram no padrão, para o Fellipe mudar o que quiser.
 - **A captura do Zapdos é outro momento** (padrão, até o Fellipe decidir): liberado, ele
   entra no sorteio da Poké Ball das fases seguintes (da Fase 7 em diante, com a chance
   baixa de hoje), como na decisão 3 ("se escapar na missão, volta pela Poké Ball").
-- **A jornada que já tinha o Zapdos** (da Poké Ball das fases, antes das missões): a
-  missão aparece concluída (as duas quests da Usina fecham sozinhas e a marca sai do
-  mapa), e o Carvalho comenta uma vez: "O Zapdos está com você? Então foi você quem o
-  encontrou primeiro!". Nada se tira do jogador.
 
 ---
 
@@ -263,10 +259,9 @@ decisões abertas ficaram no padrão, para o Fellipe mudar o que quiser.
   momento" da captura dele (padrão).
 - **O kit continua**: o golpe exclusivo, as melhorias e o Golpe Desperto chegam
   com o lendário quando ele é recuperado.
-- **Jornadas que já têm um lendário continuam com ele**, porque nada se tira do
-  jogador. A missão dele aparece como concluída, com uma fala própria do
-  Carvalho: "Você já estava com ele? Então foi você quem o encontrou primeiro!"
-  (padrão).
+- **Nenhuma jornada chega com um lendário de antes das missões**: o jogo recomeça do
+  zero quando a história subir (decisão 17). A ideia antiga (a missão concluída e a
+  fala do Carvalho para quem já tinha o lendário) saiu.
 - Continua valendo um de cada por jornada.
 - **Efeito no balanceamento:** até hoje, as aves podiam vir na Poké Ball a partir
   da Fase 7, e o Mewtwo e o Mew na Liga. Agora elas chegam pelas missões, em pontos
@@ -665,6 +660,11 @@ do Zapdos, o tipo, as fraquezas e o nível recomendado (36; sem captura, decisã
     momento" da captura, por enquanto, é a Poké Ball das fases seguintes (padrão, como
     na decisão 3). A mesma lógica deve valer para as outras máquinas (o Articuno e o
     Moltres), a confirmar quando chegar a vez de cada um.
+17. **O jogo recomeça do zero quando a história subir** (o Fellipe, 2026-11-11: "o jogo
+    vai ser resetado quando tudo for pro ar, então não vai existir jogadores com
+    lendários ou coisas do tipo"). As etapas daqui para a frente não precisam tratar
+    saves antigos. O que existia só para eles nas missões (o estado 'antes', a fala do
+    Carvalho e as quests da Usina fechando sozinhas para quem já tinha o Zapdos) saiu.
 
 ---
 
@@ -681,19 +681,22 @@ quando passarem da fase, uma tentativa de equilibrar, mas deixa isso no planejam
 - **Por que**: equilibrar. Hoje dá para ficar muito acima de uma fase (repetindo a
   anterior, no Modo Livre, no Endless), e a luta perde a graça; com o teto, cada fase
   e cada missão são jogadas perto do nível em que foram medidas.
+- **A evolução** (decidido pelo Fellipe em 2026-11-11): o teto segura a evolução por
+  nível (quem evolui no 36 só evolui quando o teto chegar lá); **a evolução por item é
+  livre** (as pedras e a troca do Poké Mart funcionam a qualquer hora).
+- **Sem jornadas antigas**: o jogo recomeça do zero quando tudo subir (decisão 17), então
+  não há equipe acima do teto para tratar.
 - **O que decidir quando chegar a vez** (nada disso está decidido):
-  - o valor de cada teto (um ponto de partida: o nível recomendado da fase seguinte,
-    de `data/stages.js`; a Fase 1 pede 25, a 3 pede 33, a 4 pede 40, a 8 pede 60);
+  - **o valor de cada teto** (o Fellipe: "vamos pensar no valor de cada teto no
+    futuro"). Um ponto de partida: o nível recomendado da fase seguinte, de
+    `data/stages.js` (a Fase 1 pede 25, a 3 pede 33, a 4 pede 40, a 8 pede 60);
   - o que acontece com a experiência acima do teto (some, fica guardada para quando o
     teto subir, ou vira outra coisa, como Shards);
-  - a evolução: se o teto também segura a evolução por nível, ou só o nível;
   - quem entra na equipe (a captura, os presentes, os lendários, que chegam no nível
     da equipe) e o PC;
   - o Modo Livre, o Endless e as missões dos lendários: a do Zapdos (nível 36) abre
     depois da Fase 3, então o teto depois da Fase 3 precisa deixar a equipe chegar
     perto de 36;
-  - as jornadas que já passaram do teto (nada se tira do jogador: elas ficam como
-    estão, e o teto só segura dali para frente);
   - como o jogo mostra o teto (na barra de XP, no card da fase, no mapa da jornada).
 - **Antes de construir**: ganha um plano e uma maquete próprios, e o `balance.mjs` mede a
   campanha de novo com o teto.

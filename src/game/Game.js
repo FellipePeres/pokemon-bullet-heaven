@@ -1491,19 +1491,17 @@ export class Game {
 
   /**
    * Como está a missão de um lendário nesta jornada: 'preso' (ainda não), 'capturado'
-   * (vencida, e ele está no PC), 'livre' (vencida sem a captura: ele voou) ou 'antes'
-   * (a jornada já tinha o lendário antes da missão existir; nada se tira do jogador).
+   * (vencida, e ele está no PC) ou 'livre' (vencida sem a captura: o Zapdos foge). O jogo
+   * recomeça do zero quando a história subir (decisão 17): nenhuma jornada chega com um
+   * lendário de antes das missões.
    */
   missionState(id) {
     const done = this.campaign.missions?.[id];
     if (done?.won) return done.captured ? 'capturado' : 'livre';
-    const species = getMission(id)?.species;
-    const journey = this.campaign.journey;
-    const owned = [...(journey?.team?.members ?? []), ...(journey?.pc ?? [])].some((m) => m.pokemonId === species);
-    return owned ? 'antes' : 'preso';
+    return 'preso';
   }
 
-  /** Os lendários liberados nesta jornada (a missão vencida, ou já estavam com ele). */
+  /** Os lendários liberados nesta jornada (a missão dele vencida). */
   liberatedSpecies() {
     return Object.keys(MISSIONS).filter((id) => this.missionState(id) !== 'preso').map((id) => MISSIONS[id].species);
   }

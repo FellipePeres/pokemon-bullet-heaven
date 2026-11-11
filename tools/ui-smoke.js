@@ -993,18 +993,7 @@ game.menus.closeModal();
   hub.say('sabio');
   check('...só uma vez', !dialogText().includes('caçando os pássaros'));
   closeDialog();
-  // a mesma jornada, sem a missão: quem já tinha o Zapdos não perde nada
-  const missions = game.campaign.missions;
-  game.campaign.missions = {};
-  game.campaign.journey.pc = [...(game.campaign.journey.pc ?? []), { uid: 'zap', pokemonId: 'zapdos', level: 58, xp: 0, hp: 0, abilities: ['zap_cannon', 'bolt_strike'], upgrades: {} }];
-  check('a jornada que já tinha o Zapdos (sem a missão) aparece como liberada ("antes")', game.missionState('zapdos') === 'antes'
-        && game.liberatedSpecies().includes('zapdos'));
-  hub.say('carvalho');
-  check('...e o Carvalho comenta uma vez: "foi você quem o encontrou primeiro"', dialogText().includes('encontrou primeiro'));
-  closeDialog();
-  game.campaign.missions = missions;
   game.campaign.journey = JSON.parse(savedJourney);
-  game.campaign.journey.pc = [...(game.campaign.journey.pc ?? []), { uid: 'zap', pokemonId: 'zapdos', level: 58, xp: 0, hp: 0, abilities: ['zap_cannon', 'bolt_strike'], upgrades: {} }];
   hub.enter({ map: 'usina', x: 5, y: 38, dir: 'down' });
   press('down');
   check('o tapete da entrada leva de volta para a vila, sem a tela cheia', hub.mapId === 'vila' && !registry.get('screen-hub').classes.has('cinema'));

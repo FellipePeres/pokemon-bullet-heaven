@@ -578,7 +578,7 @@ export class Hub {
       diveRescued: (campaign.dive?.rescues ?? 0) > 0,
       locked: !!extra.locked,
       quests: game.quests?.state ?? null,   // a história (0.38): as condições quest e questDone
-      // as missões dos lendários (H-5): 'preso', 'capturado', 'livre' ou 'antes' (Game.missionState);
+      // as missões dos lendários (H-5): 'preso', 'capturado' ou 'livre' (Game.missionState);
       // `missao_<id>` é o que o `pick` das cenas lê
       missions: Object.fromEntries(Object.keys(MISSIONS).map((id) => [id, game.missionState?.(id) ?? 'preso'])),
       ...Object.fromEntries(Object.keys(MISSIONS).map((id) => [`missao_${id}`, game.missionState?.(id) ?? 'preso'])),

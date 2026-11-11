@@ -179,7 +179,15 @@ const ROTEIROS = {
     { wait: 1400 }, { shot: 'zap-22-fugiu' },
     { run: 'skip(2)' }, { wait: 3200 }, { shot: 'zap-23-a-maquina' },
     { run: 'skip()' }, { wait: 2600 }, { shot: 'zap-24-a-energia' },
-    { run: 'skip(2)' }, { wait: 1500 }, { shot: 'zap-25-de-proposito' }
+    { run: 'skip(2)' }, { wait: 1500 }, { shot: 'zap-25-de-proposito' },
+    // a volta: em cima, ao lado da escotilha; a sala do fundo quieta; o rapaz e o sábio na vila
+    { run: 'skip()' }, { wait: 2200 }, { shot: 'zap-26-de-volta' },
+    { run: "game.hub.enter({ map: 'usina', x: 4, y: 13, dir: 'up' }); game.hub.clickTile(4, 12)" }, { wait: 2600 }, { shot: 'zap-27-a-sala-quieta' },
+    { run: 'skip()' }, { wait: 1800 },
+    { run: "game.hub.enter({ map: 'vila', x: 16, y: 25, dir: 'left' }); game.hub.interact()" }, { wait: 1600 }, { shot: 'zap-28-o-rapaz' },
+    { run: 'skip()' }, { wait: 300 },
+    { run: "game.hub.enter({ map: 'casa_sabio', x: 3, y: 6, dir: 'up' }); game.hub.interact()" }, { wait: 3200 }, { shot: 'zap-29-o-sabio' },
+    { run: "{ const d = game.hub.dialog; if (d) { d.shown = 999; game.hub.confirm(); } }" }, { wait: 1600 }, { shot: 'zap-30-o-sabio-2' }
   ],
   // a melhoria de UX da 0.31: o card de escolha (o inicial e a Poké Ball) e o painel da fase
   ux: [

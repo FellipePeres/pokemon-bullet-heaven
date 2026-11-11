@@ -918,8 +918,9 @@ Nunca voltar bônus globais para o pool de level up — foi pedido explícito.
   para cima, ao lado da escotilha; perdeu, "Tentar de novo" (`retryLegendary`) ou o
   Centro com a `enfermeira_usina` (sem contar como resgate do Dive). A vitória não
   oferece jogar de novo.
-- **O estado de cada missão** (`Game.missionState`): 'preso', 'capturado', 'livre' ou
-  'antes' (a jornada já tinha o lendário, da Poké Ball). `liberatedSpecies()` vai para
+- **O estado de cada missão** (`Game.missionState`): 'preso', 'capturado' ou 'livre'
+  (o estado 'antes', para jornadas que já tinham o lendário, saiu: o jogo recomeça do
+  zero quando a história subir, decisão 17). `liberatedSpecies()` vai para
   o `doneIf` das quests (`freed`), para as falas e cenas (`freed`, `caged`, `mission`,
   e o `missao_<id>` do `pick`) e para a partida (`options.liberated`).
 - **A captura sem lendários** (H-5): `CaptureSystem.rollLegendary` tira do sorteio
@@ -939,8 +940,8 @@ Nunca voltar bônus globais para o pool de level up — foi pedido explícito.
 - **Os testes**: o `smoke-test` (a arena e a máquina, preso, as correntes, cada ataque,
   o tabuleiro e as levas, sem captura e sem piso de vida, a queda, a regra da Poké Ball),
   o `ui-smoke` (o card sem captura, o Lutar com a transição, sair no meio, a derrota com
-  as duas saídas, a vitória, a cena de depois com a fuga e a energia, a escotilha nova, o
-  sábio, a jornada "antes" e o Carvalho) e o `check-data` (a missão aponta para uma fase com a luta, as
+  as duas saídas, a vitória, a cena de depois com a fuga e a energia, a escotilha nova e o
+  sábio) e o `check-data` (a missão aponta para uma fase com a luta, as
   bolas e o nível do card batem com os da fase, as passagens com `when`). O roteiro de
   screenshots é `zapdos`.
 
@@ -1745,7 +1746,10 @@ O que está planejado:
 - **O Level Cap** (pedido do Fellipe em 2026-11-11, só no planejamento por enquanto:
   PLANEJAMENTO-HISTORIA.md, seção 13.1): cada fase tem um teto de nível, e o próximo
   só abre quando a fase é vencida. Para equilibrar. Ganha plano e maquete próprios, e o
-  `balance.mjs` mede a campanha de novo com ele.
+  `balance.mjs` mede a campanha de novo com ele. O teto segura a evolução por nível; a
+  por item é livre. O valor de cada teto fica para depois.
+- **O jogo recomeça do zero quando a história subir** (o Fellipe, 2026-11-11; decisão 17
+  do PLANEJAMENTO-HISTORIA): as etapas novas não precisam tratar saves antigos.
 - **A vila** ([PLANEJAMENTO-LOBBY.md](PLANEJAMENTO-LOBBY.md)): a L-7 (sons e
   capricho), o modo Endless pelo mato alto e o modo aquático pela lagoa (cada um
   com o seu plano, quando chegar a vez) e as decisões da seção 13 de lá (o nome

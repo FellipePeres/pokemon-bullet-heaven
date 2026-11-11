@@ -117,11 +117,6 @@ export const DIALOGUE = {
         'Você fez o que poucos fizeram. Mas as hordas não acabaram.',
         'Ouvi falar de um mato sem fim, a oeste daqui...'
       ] },
-      // H-5: a jornada que já tinha o Zapdos antes da missão existir (nada se tira do jogador)
-      { when: { mission: { zapdos: 'antes' }, once: 'carvalho_zapdos_antes' }, say: [
-        'O Zapdos está com você? Então foi você quem o encontrou primeiro!',
-        'Dizem que ele sumiu da Usina numa noite de trovões. Que bom que está em boas mãos.'
-      ] },
       // depois do inicial: uma dica por insígnia (uma vez cada) e a avaliação da Pokédex
       { when: { badges: 8, once: 'carvalho_dica_8' }, say: ['Oito insígnias! A Liga Pokémon espera você. Leve uma equipe de tipos variados.'] },
       { when: { badges: 7, once: 'carvalho_dica_7' }, say: ['Falta só uma insígnia. Giovanni não perdoa erro: confira os tipos da sua equipe.'] },
