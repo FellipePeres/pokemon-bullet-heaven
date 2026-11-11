@@ -9,8 +9,10 @@
 > **recuperar os lendários**, cada um com a sua fase. Quem guia o jogador é um
 > sistema novo, o das **quests**, no canto superior da tela.
 >
-> **Status:** planejado, nada construído no jogo. Onde o texto diz "**padrão**", é a
-> escolha recomendada até o Fellipe decidir. As decisões em aberto estão na seção 12.
+> **Status:** o Fellipe aprovou o plano inteiro em 2026-11-10 ("aceito todas suas
+> ideias"): todo "**padrão**" deste texto virou decisão (seção 12). Ele também
+> acrescentou uma regra para a captura dos lendários (seção 6). **A H-1 está no
+> jogo desde a 0.38**: as quests, o rastreador e o prólogo, do quarto ao Brock.
 >
 > **Referência:** o Pokémon Tower Defense (Sam e Dan) segue a jornada que todo
 > mundo conhece (Pallet, o Carvalho, os 8 ginásios, a Liga), mas cada fase é
@@ -150,11 +152,23 @@ passos:
 
 ---
 
-## 6. A captura muda: nenhum lendário na Poké Ball
+## 6. A captura muda: o lendário só depois da missão dele
 
-- **Sai o sorteio dos lendários** (`LEGENDARY_ENCOUNTERS` em
-  `data/legendaries.js`, `CaptureSystem.rollLegendary`). A Poké Ball nunca mais
-  oferece Articuno, Zapdos, Moltres, Mewtwo nem Mew.
+- **Regra do Fellipe** (2026-11-10): "sempre que um lendário é liberado, ele entra
+  na chance de captura nas seguintes fases, com a % reduzida (como é hoje)".
+  - **Liberado** é a missão vencida, com ou sem a captura. Se o jogador derrota o
+    lendário sem pegá-lo, ele foge livre, e a Poké Ball das fases seguintes vira a
+    segunda chance.
+  - **As fases seguintes** são as fases com sorteio de lendário
+    (`LEGENDARY_ENCOUNTERS`), jogadas depois da liberação, com a chance de hoje
+    (3% na Fase 7 a 12% no Campeão). Isso vale para as primeiras vezes e para
+    quem rejoga uma fase.
+  - **Continua valendo um de cada por jornada.** Quem capturou na missão não vê o
+    mesmo lendário de novo na Poké Ball.
+- **Antes da liberação, nenhum lendário aparece na Poké Ball.** O sorteio
+  (`CaptureSystem.rollLegendary`) passa a olhar a lista dos liberados da jornada.
+- **Ordem de construção:** o sorteio de hoje só muda quando as missões
+  existirem (H-5 em diante). Sem isso, as aves sumiriam do jogo.
 - **O kit continua**: o golpe exclusivo, as melhorias e o Golpe Desperto chegam
   com o lendário quando ele é recuperado.
 - **Jornadas que já têm um lendário continuam com ele**, porque nada se tira do
@@ -356,7 +370,7 @@ Bullet Heaven.
 
 | Etapa | O que entra |
 |---|---|
-| **H-1** | O sistema de quests e o prólogo: `data/quests.js`, o `QuestSystem`, o rastreador, o save por jornada com a migração, as condições novas nas falas, a cadeia do prólogo e o discurso novo do Carvalho. Testes no `ui-smoke`. |
+| **H-1** ✅ 0.38 | O sistema de quests e o prólogo: `data/quests.js`, o `QuestSystem`, o rastreador, o save por jornada com a migração, as condições novas nas falas, a cadeia do prólogo e o discurso novo do Carvalho. Testes no `ui-smoke`. |
 | **H-2** | As cenas em dados (`Cutscene.js` a partir da cena do Maxie, que não muda) e o evento de história na partida. |
 | **H-3** | A tela de missões. |
 | **H-4** | Os capítulos 1 a 3: as falas de depois da vitória dos líderes, o velho sábio, os moradores e as quests de cada capítulo. |
@@ -369,21 +383,20 @@ Bullet Heaven.
 
 ---
 
-## 12. Decisões em aberto
+## 12. Decisões (aprovadas pelo Fellipe em 2026-11-10)
 
-1. **O rival** entra na história, no prólogo e em algumas cenas, ou fica só como
-   Campeão? Padrão: entra, em poucas cenas.
-2. **A Liga exige os três pássaros?** Padrão: sim, a Victory Road só abre com eles.
-3. **O lendário recuperado** fica com o jogador (padrão: sim, vai para o PC, como o
-   Kyogre) ou volta para o ninho?
-4. **O Moltres** fica no Monte Brasa, na Ilha 1, como no FireRed (padrão), ou na
-   Victory Road, como no Red e no Blue?
-5. **O Mew** é o Pokémon rosa do epílogo? E ele tem missão própria?
-6. **O Mewtwo** foi roubado, como os pássaros, ou o ladrão tentou e falhou? Padrão:
-   tentou e falhou, e a máquina quebrada fica na caverna.
-7. **Recuperar um pássaro muda as fases** (menos hordas)? Padrão: não, só a
-   história e as falas.
-8. **O rastreador** fica no canto superior direito (padrão) ou no esquerdo? E
-   aparece na partida?
-9. **Hoenn é a próxima vila** (padrão, pelo Maxie e pelos assets)? A equipe de
-   Kanto vai junto ou a jornada recomeça?
+1. **O rival entra na história**: no prólogo e em poucas cenas, e é o Campeão.
+2. **A Liga exige os três pássaros**: a Victory Road só abre com eles.
+3. **O lendário recuperado fica com o jogador**: vai para o PC, como o Kyogre. Se
+   escapar na missão, volta pela Poké Ball (seção 6).
+4. **O Moltres fica no Monte Brasa**, na Ilha 1, como no FireRed.
+5. **O Mew é o Pokémon rosa do epílogo**, que aparece de relance em algumas cenas
+   antes. A missão dele ganha o seu plano quando chegar a vez.
+6. **O ladrão tentou levar o Mewtwo e falhou**: a máquina quebrada fica na caverna.
+7. **Recuperar um pássaro não muda as fases**: muda só a história e as falas.
+8. **O rastreador fica no canto superior direito** e aparece na partida só quando
+   a quest é daquela fase (feito na 0.38).
+9. **Hoenn é a próxima vila**, pelo Maxie e pelos assets. Ainda falta decidir se a
+   equipe de Kanto vai junto ou se a jornada recomeça (fica para quando Hoenn
+   chegar).
+10. **A lagoa só abre depois do Campeão** (seção 5).

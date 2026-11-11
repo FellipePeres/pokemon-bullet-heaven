@@ -24,7 +24,12 @@
  *            locked    a saída que este guarda está travada (a fala da trava)
  *            once      só uma vez por jornada: a chave fica guardada depois de mostrar
  *                      ({badges} vira o número de insígnias: uma vez por insígnia)
- *   then   o que acontece depois da última página: 'starter' (a escolha do
+ *            quest     a quest com este id está ativa (data/quests.js, 0.38)
+ *            questDone a quest com este id já fechou
+ *
+ * A conversa que chega ao fim conta para as quests ("Fale com a mãe"): o
+ * objetivo `talk` olha a chave da fala (mae, carvalho_inicial...).
+ *   then  o que acontece depois da última página: 'starter' (a escolha do
  *          inicial), 'pc', 'mart', 'pokedoll' (o catálogo do quarto), 'badges'
  *          (o Estojo de Insígnias), 'campaign' (o mapa)
  *   ask    uma pergunta de SIM/NÃO na última página: { yes: ação, no: [páginas] }
@@ -97,10 +102,16 @@ export const DIALOGUE = {
         'Ah, aí está você! Pronto para mais uma jornada, hein?',
         'As hordas continuam lá fora. Escolha o seu parceiro.'
       ], then: 'starter' },
+      // o discurso do prólogo (0.38, PLANEJAMENTO-HISTORIA.md seção 8): o sonho e a missão
       { when: { starter: false }, say: [
-        'Ah, aí está você! Chegou a hora, hein?',
-        'Quer ser o Campeão de Kanto? Então preciso ser honesto: as rotas não são mais como antes.',
-        'Os Pokémon selvagens andam em hordas, dezenas de uma vez, esperando um treinador passar.',
+        'Ah, aí está você, {player}! Entre, entre. Antes de tudo, precisamos conversar.',
+        'Você quer ser o Campeão de Kanto, eu sei. E esse sonho continua possível.',
+        'Mas preciso ser honesto: as rotas não são mais como antes. As hordas mudaram.',
+        'Os Pokémon selvagens andam em bandos de dezenas e cercam qualquer treinador que passa.',
+        'Isso não é natural. Um Pokémon não abandona a própria casa sem motivo... Alguma coisa aconteceu.',
+        'Ser Campeão é um sonho bonito. Mas o ideal, de verdade, era resolver o problema das hordas.',
+        'Fazer as rotas voltarem a ser o que eram: um lugar de paz, de encontros, e não de caos.',
+        'Sozinho, eu não consigo. Mas um treinador que atravessa Kanto inteira... talvez consiga.',
         'Ninguém atravessa Kanto sozinho. Por isso quero que você leve um destes três.'
       ], then: 'starter' },
       { when: { champion: true }, say: [
@@ -138,14 +149,16 @@ export const DIALOGUE = {
         'Ah, e leve aqui este mapa. Vai ser útil para você saber o caminho.',
         '{player} recebeu o MAPA DA JORNADA!',
         'Nele estão as rotas de Kanto, fase por fase. Abra pelo botão lá em cima ou pela saída sul da vila.',
-        'Seus Pokémon lutam por você; você só precisa saber onde pisar. Boa sorte!'
+        'Seus Pokémon lutam por você; você só precisa saber onde pisar.',
+        'E, {player}... se descobrir qualquer coisa sobre as hordas, volte e me conte. Boa sorte!'
       ] },
       { say: [
         '{pokemon}! Ótima escolha.',
         'Ah, e leve aqui este mapa. Vai ser útil para você saber o caminho.',
         '{player} recebeu o MAPA DA JORNADA!',
         'Nele estão as rotas de Kanto, fase por fase. Abra pelo botão lá em cima ou pela saída sul da vila.',
-        'Seus Pokémon lutam por você; você só precisa saber onde pisar. Boa sorte!'
+        'Seus Pokémon lutam por você; você só precisa saber onde pisar.',
+        'E, {player}... se descobrir qualquer coisa sobre as hordas, volte e me conte. Boa sorte!'
       ] }
     ]
   },

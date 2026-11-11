@@ -49,5 +49,8 @@ export const EVENTS = {
   STAGE_CLEARED: 'stage:cleared',
   STAGE_FAILED: 'stage:failed',
   BOSS_SPAWNED: 'stage:boss',
+  // a história (0.38, systems/QuestSystem.js): { on, target } — falou com alguém,
+  // entrou num lugar, abriu o mapa, venceu uma fase. O Game repassa para as quests.
+  STORY: 'story:progress',
   TOAST: 'ui:toast'
 };

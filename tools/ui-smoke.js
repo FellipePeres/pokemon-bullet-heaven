@@ -195,6 +195,15 @@ const hubVisible = () => !registry.get('screen-hub').classes.has('hidden');
 
 check('escolher o treinador leva à vila: o jogador acorda no quarto, ainda sem Pokémon',
       game.profile.trainer === 'leaf' && hubVisible() && hub.mapId === 'casa_2f' && !game.campaign.starter);
+// as quests (0.38, PLANEJAMENTO-HISTORIA.md): o rastreador guia o prólogo
+const questBox = () => registry.get('hub-quest');
+check('a jornada nova começa com a quest "Fale com a mãe 0/1" no rastreador, no canto de cima',
+      game.quests.isActive('p_mae') && !questBox().classes.has('hidden')
+      && questBox().innerHTML.includes('Prólogo') && questBox().innerHTML.includes('Fale com a mãe') && questBox().innerHTML.includes('0/1'));
+game.questTracker.toggle();
+check('um clique recolhe o rastreador, e outro abre', questBox().classes.has('collapsed'));
+game.questTracker.toggle();
+check('...aberto de novo', !questBox().classes.has('collapsed'));
 game.hubRenderer.render(hub);
 game.hubHud.update(hub);
 check('a barra da vila mostra o nome do jogador e o Mapa da jornada travado',
@@ -217,7 +226,25 @@ hub.clickTile(8, 4);
 settle();
 check('clicar na mãe anda até ela e conversa: o Carvalho está no laboratório',
       hub.dialog?.name === 'Mãe' && dialogText().includes('laboratório'));
-closeDialog();
+check('a quest só fecha quando a conversa acaba', game.quests.isActive('p_mae'));
+{
+  // aqui o setTimeout segura a comemoração (no resto do teste ele roda na hora)
+  const instant = global.setTimeout;
+  let later = null;
+  global.setTimeout = (fn) => { later = fn; return 1; };
+  closeDialog();
+  check('falou com a mãe: o ✓, o "Missão concluída!" e a próxima é ir ao laboratório',
+        game.quests.isDone('p_mae') && game.quests.isActive('p_lab')
+        && questBox().innerHTML.includes('Missão concluída!') && questBox().innerHTML.includes('✓ Fale com a mãe')
+        && questBox().innerHTML.includes('1/1'));
+  global.setTimeout = instant;
+  later?.();
+  check('...e depois o rastreador passa para "Vá ao laboratório do Prof. Carvalho 0/1", deslizando',
+        questBox().innerHTML.includes('Vá ao laboratório do Prof. Carvalho') && questBox().innerHTML.includes('0/1')
+        && questBox().innerHTML.includes('quest-item quest-story enter'));
+  game.questTracker.render();
+  check('...e o deslizar acontece uma vez só', !questBox().innerHTML.includes(' enter'));
+}
 check('o tapete da saída leva para a vila, na frente de casa',
       goTo(4, 8) && (press('down'), hub.mapId === 'vila' && hub.player.x === 6 && hub.player.y === 17));
 
@@ -239,10 +266,15 @@ settle();
 goTo(26, 7);
 press('up');
 check('a porta do laboratório leva para dentro', hub.mapId === 'lab' && hub.player.x === 6 && hub.player.y === 12);
+check('entrar no laboratório fecha a quest: agora é falar com o Prof. Carvalho',
+      game.quests.isDone('p_lab') && game.quests.isActive('p_carvalho'));
 check('as três Poké Balls estão na mesa', hub.decor.filter((d) => d.sprite === 'item_ball').length === 3);
 hub.clickTile(6, 3);
 settle();
 check('o Carvalho conta a mini-história das hordas', hub.dialog?.name === 'Prof. Carvalho' && dialogText().includes('hordas'));
+check('...o discurso do prólogo: o sonho continua possível, mas o ideal é devolver a paz às rotas',
+      dialogText().includes('Fellipe') && dialogText().includes('esse sonho continua possível') && dialogText().includes('resolver o problema das hordas')
+      && dialogText().includes('um lugar de paz'));
 closeDialog();
 check('...e abre a escolha do inicial com 3 opções',
       !registry.get('screen-starter').classes.has('hidden') && registry.get('starter-choices').children.length === 3);
@@ -266,7 +298,10 @@ closeDialog();
 game.chooseStarter('charmander');
 check('escolhido o inicial, o Carvalho entrega o Mapa da Jornada (0.30)',
       hubVisible() && dialogText().includes('Charmander') && dialogText().includes('Fellipe recebeu o MAPA DA JORNADA'));
+check('...e pede para voltar com o que descobrir sobre as hordas', dialogText().includes('volte e me conte'));
+check('com o inicial escolhido, a quest do Carvalho espera ele terminar de falar', game.quests.isActive('p_carvalho'));
 closeDialog();
+check('ele terminou: a próxima quest é abrir o Mapa da Jornada', game.quests.isDone('p_carvalho') && game.quests.isActive('p_mapa'));
 check('a bola do inicial escolhido some da mesa', hub.decor.filter((d) => d.sprite === 'item_ball').length === 2);
 check('Pokédex registra o inicial escolhido', game.profile.pokedex.caught.includes(4));
 game.hubHud.render();
@@ -329,6 +364,9 @@ closeDialog();
 // a saída sul abre o mapa da jornada (clicar nela anda até lá e sai)
 goTo(17, 27);
 check('clicar na saída sul anda até ela e abre o mapa da jornada', !registry.get('screen-campaign').classes.has('hidden'));
+check('abrir o mapa fecha o prólogo: o Capítulo 1 pede vencer o Brock, no rastreador do mapa',
+      game.quests.isDone('p_mapa') && game.quests.isActive('c1_brock') && !registry.get('lobby-quest').classes.has('hidden')
+      && registry.get('lobby-quest').innerHTML.includes('Capítulo 1') && registry.get('lobby-quest').innerHTML.includes('Vença o Brock'));
 const mapNodes = () => registry.get('lobby-map').children.filter((c) => c.classes.has('map-node'));
 check('o lobby mostra o Town Map com uma marca por cidade (8 ginásios e a Liga)', mapNodes().length === 9,
       `${mapNodes().length} marcas`);
@@ -368,6 +406,8 @@ check('depois de aberto uma vez, o aviso do botão do mapa some', !registry.get(
 // ---- partida ----
 game.startStage('gym_1_pewter');
 check('a fase começa', !!game.run && !registry.get('stage-wrapper').classes.has('hidden'));
+check('na partida, a quest da fase aparece na plaquinha: "Vença o Brock 0/1"',
+      !registry.get('hud-quest').classes.has('hidden') && registry.get('hud-quest').textContent.includes('Vença o Brock, em Pewter 0/1'));
 check('a partida usa o treinador escolhido', game.run.trainerLook === 'leaf');
 check('barra lateral some durante a partida', registry.get('side-rail').classes.has('hidden'));
 
@@ -511,6 +551,8 @@ game.startStage('gym_1_pewter');
 game.run.state = 'victory';
 game._handleRunState();
 check('vitória conclui a fase', game.campaign.clearedStages.includes('gym_1_pewter'));
+check('...e a quest "Vença o Brock" fecha com a comemoração, não em silêncio',
+      game.quests.isDone('c1_brock') && !game.campaign.quests.done.c1_brock.skipped);
 check('vitória mostra Continuar jornada (e não as saídas da derrota)',
       !registry.get('result-victory').classes.has('hidden') && registry.get('result-defeat').classes.has('hidden'));
 check('vitória registra a insígnia do líder',
@@ -1123,6 +1165,31 @@ game.quitToMenu();
   game.deleteJourney(game.profile.activeJourney);
   check('apagar a jornada atual deixa sem jornada ativa, e a outra continua', !game.profile.activeJourney
         && !game.campaign.starter && game.listJourneys().length === 1);
+}
+
+// ---- as quests de uma jornada de antes delas (0.38): o doneIf põe em dia, em silêncio ----
+{
+  const { QuestSystem } = await import('../src/systems/QuestSystem.js');
+  const questsFor = (campaign) => new QuestSystem({
+    campaign: () => campaign,
+    context: () => ({ starter: !!campaign.starter, mapSeen: !!campaign.hub?.flags?.mapa_visto, cleared: campaign.clearedStages })
+  });
+  const veteran = { starter: 'squirtle', clearedStages: ['gym_1_pewter'], hub: { flags: { mapa_visto: true } } };
+  const qv = questsFor(veteran);
+  qv.sync();
+  check('quem já venceu o Brock antes das quests não volta ao "Fale com a mãe": o prólogo e o Brock fecham em silêncio',
+        ['p_mae', 'p_lab', 'p_carvalho', 'p_mapa', 'c1_brock'].every((id) => veteran.quests.done[id]?.skipped)
+        && !veteran.quests.active.length);
+  const fresh = { starter: 'squirtle', clearedStages: [], hub: { flags: {} } };
+  const qf = questsFor(fresh);
+  qf.sync();
+  check('quem tem o inicial mas nunca abriu o mapa cai no "Abra o Mapa da Jornada"', qf.isActive('p_mapa') && !qf.isDone('c1_brock'));
+  check('...e o evento fecha a quest com a comemoração', qf.notify('map').includes('p_mapa') && qf.isActive('c1_brock'));
+  const before = { starter: null, clearedStages: [], hub: null };
+  const qb = questsFor(before);
+  qb.sync();
+  check('sem o inicial, a jornada fica no começo do prólogo', qb.isActive('p_mae') && qb.tracked()[0]?.objectives[0].text === 'Fale com a mãe');
+  check('evento de outro alvo não conta', !qb.notify('talk', 'tv').length && qb.isActive('p_mae'));
 }
 
 console.log(`\n=== ${failures === 0 ? 'TUDO OK' : failures + ' FALHA(S)'} ===\n`);

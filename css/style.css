@@ -2324,6 +2324,69 @@ button { font: inherit; color: inherit; }
 }
 @keyframes hub-place-in { from { transform: translateY(-14px); opacity: 0; } }
 
+/* ===================== O RASTREADOR DE QUESTS (0.38) =====================
+   A janela do FireRed no canto de cima, à direita (o nome do lugar fica à
+   esquerda): o capítulo com o losango da cor do tipo de quest e o objetivo com
+   o placar. Ao fechar, o ✓ verde e o "Missão concluída!"; a próxima desliza.
+   Um clique recolhe (ui/questTracker.js). */
+.quest-tracker {
+  position: absolute;
+  z-index: 2;
+  width: 310px;
+  max-width: calc(100% - 44px);
+  padding: 2px 10px 4px;
+  font-family: var(--font-pixel);
+  color: var(--gba-ink);
+  border: 16px solid transparent;
+  border-image: url(../assets/ui/window-frame-button.png) 16 fill stretch;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, .5));
+  cursor: pointer;
+  user-select: none;
+}
+.hub-quest { top: 104px; right: 22px; }
+/* no mapa da jornada, estreito: cabe no espaço livre ao lado do Town Map */
+.lobby-quest { top: 0; right: 0; width: 200px; padding: 0 6px 2px; filter: drop-shadow(0 3px 5px rgba(0, 0, 0, .25)); }
+.lobby-quest .quest-title { font-size: 11px; }
+.lobby-quest .quest-obj { font-size: 15px; }
+.lobby-quest .quest-done-tag { font-size: 13px; }
+.quest-item + .quest-item { margin-top: 6px; padding-top: 6px; border-top: 2px dashed var(--gba-shade); }
+.quest-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: var(--gba-frame);
+}
+.quest-title i { font-style: normal; color: #d29b17; }   /* história: dourado */
+.quest-legendary .quest-title i { color: #3a7bd5; }       /* lendário: azul */
+.quest-side .quest-title i { color: var(--gba-ink-soft); }
+.quest-obj {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 2px 0 0;
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+.quest-obj b { flex: none; font-weight: 700; color: var(--gba-ink-soft); }
+.quest-obj.met, .quest-obj.met b { color: #2f9e4f; }
+.quest-done-tag { margin: 4px 0 0; font-size: 14px; font-weight: 700; color: #2f9e4f; animation: quest-pop .3s steps(3); }
+.quest-item.enter { animation: quest-in .35s steps(5); }
+@keyframes quest-in { from { transform: translateX(26px); opacity: 0; } }
+@keyframes quest-pop { from { transform: scale(.6); opacity: 0; } }
+/* recolhido: só a linha do capítulo da quest de história */
+.quest-tracker.collapsed .quest-obj,
+.quest-tracker.collapsed .quest-done-tag,
+.quest-tracker.collapsed .quest-item.more { display: none; }
+.quest-tracker.collapsed .quest-title::after { content: '+'; margin-left: auto; font-size: 16px; }
+/* na partida: uma linha na plaquinha da fase, só se a quest for desta fase */
+.hud-quest { font-size: 12px; font-weight: 600; color: #ffe9a8; }
+
 /* a caixa de texto do FireRed, embaixo, com a plaquinha de quem fala */
 .hub-dialog {
   position: absolute;
@@ -2423,6 +2486,7 @@ button { font: inherit; color: inherit; }
 @media (max-width: 900px) {
   .hub-hint { display: none; }
   .hub-place { top: 150px; }
+  .hub-quest { top: 150px; width: 250px; }
 }
 
 /* a loja de Pokédolls: o móvel montado com os tiles e o boneco, em pixels inteiros */

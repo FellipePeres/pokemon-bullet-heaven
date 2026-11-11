@@ -23,6 +23,9 @@ import { MaxieScene, SCENE_SPOTS } from './MaxieScene.js';
 import { showHallCard, hideHallCard } from '../ui/hallCard.js';
 import { HubRenderer } from '../render/HubRenderer.js';
 import { HubHUD } from '../ui/hubHud.js';
+import { QuestSystem } from '../systems/QuestSystem.js';
+import { QuestTracker } from '../ui/questTracker.js';
+import { QUESTS } from '../data/quests.js';
 
 /** X, Y e B põem em campo os da reserva (posições 4, 5 e 6 da equipe). */
 const RESERVE_BUTTONS = { x: 3, y: 4, b: 5 };
@@ -70,6 +73,11 @@ export class Game {
     this.pendingRun = local?.run ?? null;
     this._foldPendingRun();   // a partida que ficou no meio entra na jornada (0.24)
     this.tracker = new ProfileTracker(this.profile);
+    // as quests da jornada (0.38, PLANEJAMENTO-HISTORIA.md): só existem com uma jornada começada
+    this.quests = new QuestSystem({
+      campaign: () => (this.profile.trainer ? this.campaign : null),
+      context: () => this.storyContext()
+    });
 
     // ---- infraestrutura ----
     this.renderer = new Renderer(canvas);
@@ -86,6 +94,7 @@ export class Game {
     const hubCanvas = document.getElementById('hub-canvas');
     this.hubRenderer = new HubRenderer(hubCanvas);
     this.hubHud = new HubHUD(this);
+    this.questTracker = new QuestTracker(this);
     hubCanvas?.addEventListener?.('pointerdown', (e) => this._hubClick(e));
     if (typeof window !== 'undefined') window.addEventListener('resize', () => { if (this.hubOpen) this._resizeHub(); });
     this.hallOpen = false;
@@ -113,6 +122,7 @@ export class Game {
     this.autosaveTimer = 0;
 
     bus.on(EVENTS.TOAST, ({ text, icon }) => toast(text, icon));
+    bus.on(EVENTS.STORY, ({ on, target }) => this.storyEvent(on, target));
 
     // pré-carrega os sprites mais usados
     preload([
@@ -304,6 +314,33 @@ export class Game {
     return getRegion(this.profile.region);
   }
 
+  /* ============================ a história (0.38) ============================ */
+
+  /** O que o `doneIf` das quests olha (systems/QuestSystem.js). */
+  storyContext() {
+    const campaign = this.campaign;
+    return {
+      starter: !!campaign.starter,
+      mapSeen: !!campaign.hub?.flags?.mapa_visto,
+      cleared: campaign.clearedStages
+    };
+  }
+
+  /**
+   * Algo aconteceu na história (EVENTS.STORY): as quests avançam, e as que
+   * fecharam ganham a comemoração no rastreador. Na partida o rastreador não
+   * aparece, então a vitória avisa por um toast.
+   */
+  storyEvent(on, target = null) {
+    const completed = this.quests.notify(on, target);
+    if (!completed.length) return;
+    this.questTracker.celebrate(completed);
+    if (this.run) {
+      for (const id of completed) toast(`Missão concluída: ${QUESTS[id].objectives[0].text}`, '◆');
+    }
+    this.autosave();
+  }
+
   /**
    * Recomeça a jornada ATIVA do zero (o "Reiniciar a jornada" das Opções; até a
    * 0.32, o "Recomeçar a jornada" da tela de derrota). Sem
@@ -383,6 +420,9 @@ export class Game {
     }
     this.menus.buildCampaign();
     this.menus.show('screen-campaign');
+    this.questTracker.render();
+    // a história (0.38): "Abra o Mapa da Jornada"
+    if (this.campaign.starter) bus.emit(EVENTS.STORY, { on: 'map' });
   }
 
   canContinue() {
@@ -397,10 +437,14 @@ export class Game {
    * de onde estava (a volta do mapa ou da escolha do inicial).
    */
   openHub(spawn = null) {
+    // chegando na vila (jornada aberta, carregada ou de volta de uma fase): as
+    // quests que a jornada já cumpriu fecham em silêncio (0.38, QuestSystem.sync)
+    if (spawn || !this.hub.map) this.quests.sync();
     if (spawn || !this.hub.map) this.hub.enter(spawn ?? 'home');
     this.menus.show('screen-hub');
     this._resizeHub();
     this.hubHud.render();
+    this.questTracker.render();
     this.input.clear();
   }
 
@@ -631,6 +675,7 @@ export class Game {
     this.hud.signature = '';
     this.input.clear();
     this.menus.showGame();
+    this.questTracker.renderRun(stage);   // "◆ Vença o Brock 0/1" na plaquinha da fase (0.38)
   }
 
   /** Começa a carregar o que a fase vai mostrar: Pokémon animados (equipe, selvagens, líder) e cenários. */
@@ -966,6 +1011,8 @@ export class Game {
       // vencendo ou não, a equipe, a build e o PC ficam (0.17)
       journey: this._journeyFrom(run)
     });
+    // a história (0.38): "Vença o Brock" fecha aqui
+    if (victory) bus.emit(EVENTS.STORY, { on: 'win', target: run.stage.id });
 
     this.pendingRun = null;
     const champion = victory && run.stage.id === this.region.campaign.filter((e) => e.stage).at(-1)?.stage;

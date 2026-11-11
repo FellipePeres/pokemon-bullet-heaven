@@ -106,7 +106,10 @@ export function createRegionProgress() {
     // a vila (0.29, game/Hub.js): as falas de "uma vez só" que já apareceram ({ flags: {} })
     hub: null,
     // a descida do Dive (0.36, game/Dive.js): { best: o nível mais fundo concluído, rescues, reachedCave }
-    dive: null
+    dive: null,
+    // as quests da história (0.38, systems/QuestSystem.js): { active, progress, done }.
+    // Nasce na primeira vez que a jornada abre; a de antes das quests é posta em dia pelo doneIf.
+    quests: null
   };
 }
 

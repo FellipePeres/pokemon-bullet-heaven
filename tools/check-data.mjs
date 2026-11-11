@@ -28,6 +28,8 @@ import { HUB } from '../src/data/hub.js';
 import { HUB_MAPS, HUB_SPRITES, HUB_DECOR } from '../src/data/hubMaps.js';
 import { DIALOGUE } from '../src/data/dialogue.js';
 import { DECOR, decorMax } from '../src/data/decor.js';
+import { QUESTS, CHAPTERS, FIRST_QUEST, QUEST_EVENTS } from '../src/data/quests.js';
+import { DONE_IF_KEYS } from '../src/systems/QuestSystem.js';
 import { existsSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -254,7 +256,7 @@ badSegments.length ? fail(`trechos com cenário inexistente: ${badSegments.join(
 // a vila (0.29): mapas gerados, portas, saídas, pessoas, objetos e falas
 {
   const issues = [];
-  const KNOWN_WHEN = new Set(['starter', 'starterIs', 'shiny', 'badges', 'champion', 'dex', 'veteran', 'dive', 'diveTm', 'diveRescued', 'kyogre', 'locked', 'once']);
+  const KNOWN_WHEN = new Set(['starter', 'starterIs', 'shiny', 'badges', 'champion', 'dex', 'veteran', 'dive', 'diveTm', 'diveRescued', 'kyogre', 'locked', 'once', 'quest', 'questDone']);
   const KNOWN_ACTIONS = new Set(['starter', 'pc', 'mart', 'save', 'campaign', 'pokedoll', 'badges', 'aquatic']);
   const floor = (mapId, x, y) => {
     const map = HUB_MAPS[mapId];
@@ -348,6 +350,9 @@ badSegments.length ? fail(`trechos com cenário inexistente: ${badSegments.join(
     if (entry.lines.at(-1).when) issues.push(`${key}: a última fala tem condição (alguém pode ficar sem resposta)`);
     for (const line of entry.lines) {
       for (const cond of Object.keys(line.when ?? {})) if (!KNOWN_WHEN.has(cond)) issues.push(`${key}: condição desconhecida (${cond})`);
+      for (const cond of ['quest', 'questDone']) {
+        if (line.when?.[cond] && !QUESTS[line.when[cond]]) issues.push(`${key}: ${cond} de uma quest que não existe (${line.when[cond]})`);
+      }
       for (const action of [line.then, line.ask?.yes].filter(Boolean)) if (!KNOWN_ACTIONS.has(action)) issues.push(`${key}: ação desconhecida (${action})`);
       if (!line.say?.length) issues.push(`${key}: fala sem páginas`);
     }
@@ -358,6 +363,42 @@ badSegments.length ? fail(`trechos com cenário inexistente: ${badSegments.join(
   issues.length
     ? fail(`vila: ${issues.join(' · ')}`)
     : ok(`a vila: ${Object.keys(HUB.maps).length} lugares, ${npcCount} pessoas e Pokémon, ${Object.keys(DIALOGUE).length} falas e ${DECOR.length} enfeites para o quarto, tudo no lugar`);
+}
+
+// as quests da história (0.38, PLANEJAMENTO-HISTORIA.md): cada uma alcançável a
+// partir da primeira, e tudo o que ela cita existe (falas, lugares, fases, capítulos)
+{
+  const issues = [];
+  const KINDS = new Set(['story', 'legendary', 'side']);
+  if (!QUESTS[FIRST_QUEST]) issues.push(`a primeira quest não existe (${FIRST_QUEST})`);
+  for (const [id, quest] of Object.entries(QUESTS)) {
+    if (!KINDS.has(quest.kind)) issues.push(`${id}: tipo desconhecido (${quest.kind})`);
+    if (!CHAPTERS[quest.chapter]) issues.push(`${id}: capítulo que não existe (${quest.chapter})`);
+    if (!quest.objectives?.length) issues.push(`${id}: sem objetivos`);
+    for (const objective of quest.objectives ?? []) {
+      if (!objective.text) issues.push(`${id}: objetivo sem texto`);
+      if (!QUEST_EVENTS.includes(objective.on)) issues.push(`${id}: evento desconhecido (${objective.on})`);
+      if (objective.on === 'talk' && !DIALOGUE[objective.target]) issues.push(`${id}: fala que não existe (${objective.target})`);
+      if (objective.on === 'enter' && !HUB.maps[objective.target]) issues.push(`${id}: lugar que não existe (${objective.target})`);
+      if (objective.on === 'win' && !STAGES[objective.target]) issues.push(`${id}: fase que não existe (${objective.target})`);
+    }
+    for (const key of Object.keys(quest.doneIf ?? {})) if (!DONE_IF_KEYS.includes(key)) issues.push(`${id}: doneIf desconhecido (${key})`);
+    if (quest.doneIf?.cleared && !STAGES[quest.doneIf.cleared]) issues.push(`${id}: doneIf de uma fase que não existe (${quest.doneIf.cleared})`);
+    for (const next of quest.next ?? []) if (!QUESTS[next]) issues.push(`${id}: a seguinte não existe (${next})`);
+  }
+  const reached = new Set();
+  const queue = [FIRST_QUEST];
+  while (queue.length) {
+    const id = queue.shift();
+    if (reached.has(id) || !QUESTS[id]) continue;
+    reached.add(id);
+    queue.push(...(QUESTS[id].next ?? []));
+  }
+  const orphans = Object.keys(QUESTS).filter((id) => !reached.has(id));
+  if (orphans.length) issues.push(`quests que nenhuma outra abre: ${orphans.join(', ')}`);
+  issues.length
+    ? fail(`quests: ${issues.join(' · ')}`)
+    : ok(`a história: ${Object.keys(QUESTS).length} quests em ${Object.keys(CHAPTERS).length} capítulos, todas encadeadas a partir de "${FIRST_QUEST}"`);
 }
 
 // pools de captura: mostra quanto de cada fase já está implementado

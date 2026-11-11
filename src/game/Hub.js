@@ -5,6 +5,7 @@ import { DECOR, decorMax } from '../data/decor.js';
 import { DIALOGUE } from '../data/dialogue.js';
 import { getPokemon } from '../data/pokemon.js';
 import { STAGES } from '../data/stages.js';
+import { bus, EVENTS } from '../core/events.js';
 
 const DIRS = { up: [0, -1], down: [0, 1], left: [-1, 0], right: [1, 0] };
 const OPPOSITE = { up: 'down', down: 'up', left: 'right', right: 'left' };
@@ -63,6 +64,8 @@ export class Hub {
     this.map = HUB_MAPS[mapId];
     this.npcs = (this.place.npcs ?? []).map((npc) => ({ ...npc, timer: between(...CONFIG.hub.lookEvery) }));
     this.banner = { text: this.place.name, t: CONFIG.hub.bannerSeconds };
+    // a história (0.38): "Vá ao laboratório" fecha ao entrar nele
+    bus.emit(EVENTS.STORY, { on: 'enter', target: mapId });
   }
 
   _place(x, y, dir) {
@@ -385,6 +388,7 @@ export class Hub {
     const pages = line.say.map((text) => this._fill(text, ctx));
     if (line.ask) pages.push(this._fill(line.ask.text, ctx));
     this.dialog = {
+      key,
       name: entry.name ?? null,
       pages, index: 0, shown: 0,
       ask: line.ask ? { yes: line.ask.yes, no: (line.ask.no ?? []).map((t) => this._fill(t, ctx)), choice: 0 } : null,
@@ -392,6 +396,11 @@ export class Hub {
       npc: extra.npc ?? null
     };
     return true;
+  }
+
+  /** A conversa `key` chegou ao fim (a história: "Fale com a mãe" fecha aqui, 0.38). */
+  _talked(key) {
+    if (key) bus.emit(EVENTS.STORY, { on: 'talk', target: key });
   }
 
   _updateDialog(dt) {
@@ -407,12 +416,14 @@ export class Hub {
     if (d.index < d.pages.length - 1) { d.index++; d.shown = 0; return; }
     if (d.ask) {
       this.dialog = null;
+      this._talked(d.key);
       if (d.ask.choice === 0) this._act(d.ask.yes);
-      else if (d.ask.no.length) this.dialog = { ...d, pages: d.ask.no, index: 0, shown: 0, ask: null, then: null };
+      else if (d.ask.no.length) this.dialog = { ...d, key: null, pages: d.ask.no, index: 0, shown: 0, ask: null, then: null };
       return;
     }
     this.dialog = null;
     d.after?.();
+    this._talked(d.key);
     if (d.then) this._act(d.then);
   }
 
@@ -484,6 +495,7 @@ export class Hub {
       diveTm: game.martTargets('tm_dive').length > 0,
       diveRescued: (campaign.dive?.rescues ?? 0) > 0,
       locked: !!extra.locked,
+      quests: game.quests?.state ?? null,   // a história (0.38): as condições quest e questDone
       item: extra.item ?? '',
       player: game.playerName,
       pokemon: campaign.starter ? getPokemon(campaign.starter)?.name ?? '' : '',
@@ -502,6 +514,9 @@ export class Hub {
         case 'badges': if (ctx.badges < value) return false; break;
         case 'dex': if (ctx.dex < value[0] || ctx.dex > value[1]) return false; break;
         case 'once': if (this._flags()[this._fill(value, ctx)]) return false; break;
+        // a história (0.38): a quest `value` está ativa / já fechou
+        case 'quest': if (!ctx.quests?.active.includes(value)) return false; break;
+        case 'questDone': if (!ctx.quests?.done[value]) return false; break;
         default: return false;   // condição desconhecida: a fala não vale (o check-data acusa)
       }
     }

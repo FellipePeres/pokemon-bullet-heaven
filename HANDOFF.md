@@ -5,7 +5,7 @@
 > decisão foi tomada e o que falta fazer. O `README.md` é o manual de uso;
 > este aqui é o contexto de desenvolvimento.
 
-**Versão atual:** `0.37.9` · **Última atualização:** 2026-11-10
+**Versão atual:** `0.38.0` · **Última atualização:** 2026-11-10
 **Stack:** HTML + CSS + JavaScript puro (ES Modules). Sem backend, sem build, sem dependências.
 **Repositório:** https://github.com/FellipePeres/pokemon-bullet-heaven (público)
 **Jogo no ar:** https://fellipeperes.github.io/pokemon-bullet-heaven/
@@ -152,7 +152,8 @@ src/
     dive.js           a descida do Dive (0.36): os 6 níveis (aviso, velocidade, hordas, padrões, espécies) e as falas
     diveWorld.js      GERADO por tools/assets/dive.py: os mapas submersos do Emerald, a grade do que é navegável, os tabuleiros, o salão do Kyogre, a arena da luta e as folhas do modo aquático
     sceneTiles.js     as tiras de metatiles de todos os cenários: as do FireRed e a do salão do Kyogre (0.37)
-    dialogue.js       as falas da vila, com as condições (inicial, insígnias, Campeão, uma vez só)
+    dialogue.js       as falas da vila, com as condições (inicial, insígnias, Campeão, uma vez só, quests)
+    quests.js         as quests da história (0.38): capítulos, objetivos, doneIf e a próxima de cada uma
     decor.js          a loja de Pokédolls: os enfeites do quarto, o preço e o lugar de cada um
     types.js          tipos, cores, a tabela de efetividade completa e a defesa (0.32)
     kanto.js          nomes da Pokédex 1-151
@@ -166,6 +167,7 @@ src/
     ProgressionSystem.js  XP, níveis, evolução, TMs, melhorias, a chave do Golpe Desperto
     TeamSystem.js     equipe, slots ativos, troca, desmaio, serialização
     CaptureSystem.js  sorteio da captura (e do lendário)
+    QuestSystem.js    as quests da jornada (0.38): os eventos de história, a comemoração e o doneIf
     SpawnSystem.js    ondas, elites, Poké Balls roteirizadas, time do líder, Modo Livre
     SpatialGrid.js    grade espacial (evita colisão O(n²))
     terrain.js        gera o cenário de cada trecho e diz o que bloqueia (colisão)
@@ -197,6 +199,7 @@ src/
     pcScreen.js       a tela do PC (a do FireRed, portada do Pokemon All): caixas, equipe, pegar e soltar
     lobby.js          o mapa da jornada: o Town Map de Kanto, a fase escolhida, a equipe e a barra do topo
     hubHud.js         a vila (0.29): a barra do topo, a caixa de texto do FireRed, o SIM/NÃO e a placa do lugar
+    questTracker.js   o rastreador de quests (0.38): na vila, no mapa da jornada e uma linha na partida
     badgeCase.js      o Estojo de Insígnias: o Cartão de Treinador e as métricas de cada fase
     dom.js            helpers de DOM e toasts
     pad.js            o controle nas telas: foco nos alvos clicáveis da camada de cima
@@ -585,6 +588,46 @@ Nunca voltar bônus globais para o pool de level up — foi pedido explícito.
   sempre mede quanto vale explorar as fraquezas (seção 5). Ele é um jogador fraco de
   tipos: escolhe só pelo líder da fase e não olha a horda (um Gastly capturado na
   Fase 6 não pega nos Normais da rota).
+
+### A história e as quests (0.38)
+- Pedido do Fellipe (PLANEJAMENTO-HISTORIA.md, aprovado inteiro): uma história
+  própria correndo junto da jornada, como no Pokémon Tower Defense, guiada por
+  **quests**. As conquistas continuam como eram (do jogador, em todas as
+  jornadas); as quests são **da jornada** e contam a história dela. As
+  recompensas ficam para o fim (o campo `reward` existe, vazio).
+- **Os dados** (`data/quests.js`): cada quest tem `kind` (story, legendary, side),
+  `chapter`, `desc`, `objectives` (`{ text, on, target, count }`, com `on` em
+  `talk`, `enter`, `map` ou `win`), `doneIf`, `next` e `reward`. A primeira é
+  `FIRST_QUEST`. O `check-data` confere que cada quest é alcançável a partir dela
+  e que toda fala, lugar e fase citados existem.
+- **A regra** (`systems/QuestSystem.js`): o estado fica na campanha da região
+  (`campaign.quests = { active, progress, done }`), salvo com a jornada. Os
+  sistemas só emitem `EVENTS.STORY` (`{ on, target }`): a vila, ao fim de cada
+  conversa (a chave da fala) e ao entrar num lugar; o Game, ao abrir o mapa da
+  jornada e ao vencer uma fase. O Game repassa para `quests.notify`.
+- **O `doneIf`** (`starter`, `mapSeen`, `cleared`) fecha em silêncio, sem a
+  comemoração, a quest que a jornada já cumpriu. Ele só vale no `sync()` (o
+  `openHub` com um lugar de chegada: carregar, continuar, voltar de uma fase) e
+  para a quest que acabou de abrir. **Não chamar a cada acesso:** com o inicial já
+  escolhido, o "Fale com o Prof. Carvalho" fecharia antes de ele terminar de
+  falar. É assim que uma jornada de antes da 0.38 chega no capítulo certo.
+- **O rastreador** (`ui/questTracker.js`): a janela do FireRed no canto de cima,
+  à direita, na vila (`hub-quest`) e no canto da moldura do mapa da jornada
+  (`lobby-quest`, mais estreito, para não cobrir o Town Map). Mostra a de
+  história e até 2 outras. Ao fechar uma quest: o ✓ verde e "Missão concluída!"
+  por 1,7 s, e a próxima entra deslizando. Um clique recolhe; o navegador lembra.
+  Na partida, só uma linha na plaquinha da fase (`hud-quest`), se a quest pede
+  vencer aquela fase; a vitória avisa por um toast.
+- **O prólogo**: "Fale com a mãe" → "Vá ao laboratório do Prof. Carvalho" →
+  "Fale com o Prof. Carvalho" (fecha no fim da fala de depois do inicial,
+  `carvalho_inicial`) → "Abra o Mapa da Jornada" → "Vença o Brock, em Pewter"
+  (Capítulo 1). O discurso do Carvalho é o da seção 8 do planejamento: o sonho de
+  ser Campeão continua possível, mas o ideal é devolver a paz às rotas.
+- **As falas** ganharam as condições `quest` (a quest está ativa) e `questDone`.
+- **Os testes**: o `ui-smoke` segue o prólogo pelo rastreador (a comemoração, o
+  deslizar uma vez só, a quest do Carvalho esperando a fala acabar, a linha da
+  partida, a vitória com comemoração) e a migração de jornadas antigas. O roteiro
+  de screenshots é `quests`.
 
 ### O lendário secreto da Pokédex (0.35)
 - Pedido do Fellipe: no fim da Pokédex, um Pokémon misterioso, "???", **sem
@@ -1134,6 +1177,7 @@ o Brock como está, todas as outras mais duras, menos níveis.
 | 64 | "Underwater para o nível 1 a 3 e o Abnormal para o 4 e 5; e para a vila, a das Ilhas 1, 2 e 3" | 0.37.7: a vila e o mapa da jornada com as Ilhas 1, 2 e 3 do FireRed (o Pallet saiu); na descida, a Underwater do Emerald nos Níveis 1 a 3 e a Abnormal Weather do Emerald depois do bolsão de ar (no 4 e no 5, e ao continuar do checkpoint) |
 | 65 | uma opção de repetir a fase do Kyogre: hoje é preciso sair e descer tudo de novo | 0.37.8: no fim da luta do Kyogre, a tela de resultado oferece Jogar de novo (na vitória) e Tentar de novo ou Voltar para a vila (na derrota); jogar de novo recomeça a luta com a equipe curada, sem a descida. Com o Kyogre já capturado, o salão é o do Endless aquático. Só voltar para a vila (ou sair pelo card) exige descer de novo |
 | 66 | um tester (o Theo) pegou o Kyogre, usou na mesma fase e o jogo travou; ao voltar, tinha perdido a cena do Maxie. O Kyogre vai sempre para o PC, com um aviso; corrigir o bug; o save dele com tudo, mas carregando como quem acabou de sair da caverna, com a cena | 0.37.9: a causa era o desenho do Origin Pulse do jogador (raio negativo no canvas no 1º quadro de todo disparo), que parava o laço do jogo; a pausa ainda funcionava, e sair por ela marcava a cena como vista sem rodá-la. Corrigidos o desenho, o laço (pede o próximo quadro antes) e a cena (só conta no fim; pendente, Continuar e Carregar save abrem na lagoa com a cena). O Kyogre vai sempre para o PC, com o aviso no card e no toast. O save do Theo voltou com `sceneSeen: false` e nada mais mudado (o Kyogre dele continua na equipe). Testes: o canvas falso do `ui-smoke` agora lança com raio negativo, como o de verdade |
+| 67 | uma história própria, como no Pokémon Tower Defense: o Carvalho diz que as hordas mudaram, o sonho de ser Campeão continua, mas o ideal é devolver a paz às rotas; os pássaros lendários foram roubados pelo Maxie, que só aparece no Kyogre; um sistema de quests ("fale com a mãe 0/1" no canto de cima) com as recompensas no fim; muitas cutscenes; lendários só por missões, cada um com a sua fase; o Kyogre late game; uma vila por geração. Aprovou o plano inteiro e acrescentou: o lendário liberado volta à Poké Ball das fases seguintes, com a chance baixa de hoje | `PLANEJAMENTO-HISTORIA.md` (a premissa, os capítulos de Kanto, as missões dos lendários, as quests, as cenas e as etapas H-1 a H-12). 0.38: a H-1, com as quests (`data/quests.js`, `systems/QuestSystem.js`), o rastreador na vila, no mapa da jornada e na partida, o prólogo do quarto ao Brock, o discurso novo do Carvalho e a migração das jornadas que já existiam |
 | Fase 8 (Giovanni) | 1 → 0,8 | 4,0 | 4,5 | 60 | 84 → 62 |
 | Lorelei | 1,05 → 0,8 | 3,5 | 3,1–4,7 | 64 | 92 → 66 |
 | Bruno | 1,12 → 0,97 | 3,7 | 3,5–6,3 ² | 66 | 99 → 68 |
@@ -1446,13 +1490,19 @@ desde a 0.7), a revanche dos líderes, as outras regiões e, na vila, o modo End
 O que está planejado:
 
 - **A história e as quests** ([PLANEJAMENTO-HISTORIA.md](PLANEJAMENTO-HISTORIA.md),
-  pedido do Fellipe em 2026-11-10, à espera da aprovação dele): uma história
-  própria correndo junto da jornada, como no Pokémon Tower Defense. Os pássaros
-  lendários foram roubados, e é por isso que as hordas mudaram; o ladrão é o
-  Maxie, que só aparece na cena do Kyogre. Entram um sistema de quests (o
-  rastreador no canto superior, "Fale com a mãe 0/1"), as cenas em dados e uma
-  missão para cada lendário, e a Poké Ball deixa de oferecer lendários. O
-  Kyogre vira late game. As etapas vão de H-1 a H-12.
+  pedido do Fellipe em 2026-11-10; ele aprovou o plano inteiro, com todas as
+  decisões da seção 12 no padrão): uma história própria correndo junto da
+  jornada, como no Pokémon Tower Defense. Os pássaros lendários foram roubados, e
+  é por isso que as hordas mudaram; o ladrão é o Maxie, que só aparece na cena do
+  Kyogre. **A H-1 está no jogo desde a 0.38** (as quests, o rastreador e o
+  prólogo; ver a seção 4). Falta, em ordem: a H-2 (as cenas em dados, a partir da
+  do Maxie, e o evento de história na partida), a H-3 (a tela de missões), a H-4
+  (os capítulos 1 a 3), a H-5 (a captura sem lendários e o molde da missão de
+  lendário), uma missão para cada lendário (H-6 a H-11) e as recompensas (H-12).
+  **Regra do Fellipe para a H-5:** um lendário liberado na missão dele (vencida,
+  capturado ou não) volta a aparecer na Poké Ball das fases seguintes, com a
+  chance baixa de hoje; continua valendo um de cada por jornada. **Não tirar o
+  sorteio de hoje antes das missões existirem**, senão as aves somem do jogo.
 - **A vila** ([PLANEJAMENTO-LOBBY.md](PLANEJAMENTO-LOBBY.md)): a L-7 (sons e
   capricho), o modo Endless pelo mato alto e o modo aquático pela lagoa (cada um
   com o seu plano, quando chegar a vez) e as decisões da seção 13 de lá (o nome

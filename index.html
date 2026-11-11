@@ -187,6 +187,9 @@
     <!-- a placa com o nome do lugar, ao chegar -->
     <div id="hub-place" class="hub-place hidden"></div>
 
+    <!-- o rastreador de quests, no canto de cima (ui/questTracker.js, PLANEJAMENTO-HISTORIA.md) -->
+    <div id="hub-quest" class="quest-tracker hub-quest hidden" aria-live="polite"></div>
+
     <!-- a caixa de texto do FireRed, com a plaquinha de quem fala e o SIM/NÃO -->
     <div id="hub-dialog" class="hub-dialog hidden">
       <span id="hub-dialog-name" class="hub-dialog-name hidden"></span>
@@ -280,6 +283,8 @@
 
     <div class="lobby-main">
       <div class="lobby-map-frame">
+        <!-- o rastreador de quests, no canto de cima da moldura do mapa -->
+        <div id="lobby-quest" class="quest-tracker lobby-quest hidden" aria-live="polite"></div>
         <div id="lobby-map" class="lobby-map"></div>
         <!-- fecha o mapa e volta para onde o jogador estava na vila (0.30) -->
         <div class="lobby-map-foot">
@@ -304,6 +309,7 @@
           <span id="stage-name">Fase 1</span>
           <span id="segment-name">Rota 1</span>
           <span id="objective">SOBREVIVA</span>
+          <span id="hud-quest" class="hud-quest hidden"></span>
         </div>
 
         <div class="hud-chip timer-chip">

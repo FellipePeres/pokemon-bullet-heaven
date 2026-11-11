@@ -6,7 +6,7 @@
  * Uso:
  *   node tools/screenshot.mjs <roteiro> [--out pasta] [--size 1280x720]
  *
- * Roteiros: vitrine, treinador, vila, jornada, opcoes, partida, golpes,
+ * Roteiros: vitrine, treinador, vila, quests, jornada, opcoes, partida, golpes,
  * estresse, chefe, cenario e outros (ver ROTEIROS abaixo).
  * Sem --out, as imagens vão para a pasta temporária do sistema (pbh-screens).
  * Para usar outro navegador: variável de ambiente CHROME_PATH.
@@ -54,6 +54,19 @@ const ROTEIROS = {
     { open: 'index.html' }, { wait: 500 },
     { run: "game.newGame(); game.chooseTrainer('leaf'); game.chooseStarter('charmander'); game.openCampaign()" },
     { wait: 1200 }, { shot: 'jornada' }
+  ],
+  // as quests (0.38, PLANEJAMENTO-HISTORIA.md): o prólogo pelo rastreador, do quarto à partida
+  quests: [
+    { open: 'index.html' }, { wait: 500 },
+    { run: "game.newGame(); game.chooseTrainer('leaf'); game.chooseName('Fellipe')" }, { wait: 1500 }, { shot: 'quests-01-quarto' },
+    { run: "game.hub.enter({ map: 'casa_1f', x: 7, y: 4, dir: 'right' }); game.hub.interact()" }, { wait: 300 },
+    { run: 'for (let i = 0; i < 40 && game.hub.dialog; i++) game.hub.confirm()' }, { wait: 250 }, { shot: 'quests-02-mae-concluida' },
+    { wait: 2000 }, { shot: 'quests-03-proxima' },
+    { run: "game.hub.enter({ map: 'lab', x: 6, y: 4, dir: 'up' }); game.hub.interact()" }, { wait: 2600 }, { shot: 'quests-04-discurso' },
+    { run: "game.hub.dialog = null; game.hub.awaitStarter = true; game.chooseStarter('charmander'); for (let i = 0; i < 40 && game.hub.dialog; i++) game.hub.confirm()" },
+    { wait: 2400 }, { shot: 'quests-05-mapa' },
+    { run: 'game.openCampaign()' }, { wait: 2600 }, { shot: 'quests-06-jornada' },
+    { run: "game.startStage('gym_1_pewter')" }, { wait: 1500 }, { shot: 'quests-07-partida' }
   ],
   // a melhoria de UX da 0.31: o card de escolha (o inicial e a Poké Ball) e o painel da fase
   ux: [

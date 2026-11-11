@@ -40,6 +40,12 @@ Pokédolls** vende bonecos e móveis para decorar o seu quarto, e os moradores t
 o que contar. A saída sul abre o mapa da jornada; o mato alto a oeste e a lagoa
 guardam modos que ainda estão por vir.
 
+**O sonho e a missão.** Você quer ser o Campeão de Kanto, mas o Carvalho conta que
+as hordas mudaram, e que o ideal mesmo seria devolver a paz às rotas. Uma história
+própria corre junto da jornada, guiada pelas **quests** no canto de cima da tela
+("Fale com a mãe 0/1"): elas mostram o próximo passo e comemoram cada um que fica
+para trás.
+
 ## Como jogar
 
 | Ação | Tecla |
@@ -133,6 +139,11 @@ não abre até você vencer.
   interiores (a sua casa e o quarto, o laboratório do Carvalho, o Centro Pokémon com
   dois balcões, a loja de Pokédolls, a cabana e a casa do velho sábio), 17 moradores e
   Pokémon com falas que mudam com a jornada, e um quarto que você decora com 10 enfeites.
+- **A história e as quests** (0.38): o rastreador no canto de cima da vila e do mapa da
+  jornada (e uma linha na partida) guia o prólogo, do quarto ao laboratório do
+  Carvalho e daí ao Brock. Ao fechar uma quest, o ✓ e o "Missão concluída!", e a
+  próxima entra deslizando. A história completa está em
+  [PLANEJAMENTO-HISTORIA.md](PLANEJAMENTO-HISTORIA.md) e chega por capítulos.
 - **Os 151 Pokémon de Kanto jogáveis**, cada um com linha de 3 golpes e linha
   evolutiva. Alguns chegam como presente, como no FireRed (Farfetch'd, Lickitung e
   o prêmio do Dojo de Saffron: Hitmonlee ou Hitmonchan).
