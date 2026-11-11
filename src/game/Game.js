@@ -119,9 +119,6 @@ export class Game {
     this.captureOpen = false;
     this.evolutionOpen = false;
     this.introOpen = false;
-    this.storyOpen = false;     // a história antes e depois da fase (0.39)
-    this.storyCard = null;
-    this.storyPage = 0;
     this.lastTime = 0;
     this.autosaveTimer = 0;
 
@@ -295,12 +292,7 @@ export class Game {
       case 'intro':
         if (!this.introOpen) this.openLeaderIntro();
         break;
-      case 'story':
-        if (!this.storyOpen && this.run.pendingStory) this.openStoryCard(this.run.pendingStory);
-        break;
       case 'victory':
-        // a história de depois da fase (0.39) vem antes da tela de resultado
-        if (this.run.storyAfter) { if (!this.storyOpen) this.openStoryCard(this.run.storyAfter); break; }
         this.endRun(true);
         break;
       case 'defeat':
@@ -457,6 +449,16 @@ export class Game {
     this.hubHud.render();
     this.questTracker.render();
     this.input.clear();
+  }
+
+  /**
+   * A vila mudou de lugar (game/Hub.js). Num palco de cena (0.39, `scene` em
+   * data/hub.js), a tela fica cheia: sem a barra da vila e sem o rodapé.
+   */
+  onPlaceChange() {
+    const screen = typeof document !== 'undefined' ? document.getElementById('screen-hub') : null;
+    screen?.classList.toggle('cinema', !!this.hub.place?.scene);
+    this._resizeHub();
   }
 
   /** O canvas da vila acompanha a janela; o mapa fica na área abaixo da barra do topo. */
@@ -637,13 +639,15 @@ export class Game {
   }
 
   /** Inicia uma fase. `snapshot` restaura equipe/upgrades de um save. */
-  startStage(stageId, snapshot = null) {
+  startStage(stageId, snapshot = null, { story = true } = {}) {
     const stage = STAGES[stageId];
     if (!stage) return;
     if (!isStageUnlocked(stageId, this.campaign.clearedStages)) {
       toast('Essa fase ainda está bloqueada.', '🔒');
       return;
     }
+    // a cena de antes desta fase (0.39, o gatilho 'play'): toca primeiro, e a fase começa no fim dela
+    if (!snapshot && story && this._sceneBeforeStage(stageId)) return;
 
     // Ordem de prioridade para montar a partida:
     // 1) snapshot de um save (continuar exatamente de onde parou)
@@ -663,8 +667,6 @@ export class Game {
     options.ownedElsewhere = (journey?.pc ?? []).map((m) => m.pokemonId);   // lendário: um de cada
     options.trainer = this.profile.trainer;
     options.campaignStarter = this.campaign.starter;
-    // a história de antes e de depois da fase (0.39) aparece uma vez por jornada
-    options.storySeen = Object.keys(this.campaign.scenes ?? {}).filter((id) => this.campaign.scenes[id] === 'seen');
 
     this.run = new Run(stageId, options);
     // o Endless aquático (0.37): a fase já começa sem fim, sem líder
@@ -678,7 +680,6 @@ export class Game {
     this.unlockOpen = false;
     this.captureOpen = false;
     this.evolutionOpen = false;
-    this.storyOpen = false;
     this.autosaveTimer = 0;
 
     // registra na Pokédex quem entra em campo
@@ -754,7 +755,6 @@ export class Game {
     if (action.startsWith('pad:')) { this.handlePad(action.slice(4)); return; }
     // o A e o B da vila (Enter/Espaço/Z e X/Backspace)
     if (action === 'confirm' || action === 'cancel') {
-      if (this.storyOpen) { if (action === 'confirm') this.advanceStory(); return; }
       if (this.diveOpen) {
         if (this.diveHud.defeatOpen) { if (action === 'confirm') this.diveContinue(); else this.diveGiveUp(); return; }
         if (action === 'confirm') (this.hall.active ? this.hall : this.dive).confirm();
@@ -810,7 +810,6 @@ export class Game {
       return;
     }
     if (button === 'start' && this.run?.state === 'paused') { this.togglePause(); return; }
-    if (this.storyOpen && button === 'a') { this.advanceStory(); return; }
     // na vila: o A fala, o B cancela (segurado, corre), o Start abre o mapa; o direcional anda
     if (this.hubOpen && !this.menus.openModal) {
       if (button === 'a') this.hub.confirm();
@@ -936,49 +935,6 @@ export class Game {
     this.run.pendingIntro = null;
     if (this.run.state === 'intro') this.run.state = 'running';
     this.input.clear();
-  }
-
-  /**
-   * A história de uma fase (0.39, `stage.story`): antes dela (o relógio ainda não
-   * andou) ou logo depois da vitória. A caixa de texto aparece com o retrato, uma
-   * página por vez. **Nunca no meio da fase** (regra do Fellipe).
-   */
-  openStoryCard(card) {
-    this.storyOpen = true;
-    this.storyCard = card;
-    this.storyPage = 0;
-    this._showStoryPage();
-  }
-
-  _showStoryPage() {
-    const card = this.storyCard;
-    const text = this.hub._fill(card.lines[this.storyPage], this.hub._context());
-    this.hud.showStory(card, text, { last: this.storyPage >= card.lines.length - 1, onNext: () => this.advanceStory() });
-  }
-
-  /**
-   * A próxima página. Depois da última, a conversa conta como vista: a de antes
-   * solta a fase; a de depois leva à tela de resultado.
-   */
-  advanceStory() {
-    if (!this.storyOpen || !this.run) return;
-    const card = this.storyCard;
-    this.storyPage++;
-    if (this.storyPage < card.lines.length) { this._showStoryPage(); return; }
-    this.storyOpen = false;
-    this.storyCard = null;
-    this.hud.hideStory();
-    this.input.clear();
-    this.sceneRecord[card.id] = 'seen';
-    bus.emit(EVENTS.STORY, { on: 'scene', target: card.id });
-    if (card === this.run.storyAfter) {
-      this.run.storyAfter = null;
-      this.endRun(true);   // salva
-      return;
-    }
-    this.autosave();
-    this.run.pendingStory = null;
-    if (this.run.state === 'story') this.run.state = 'running';
   }
 
   /** Mostra a evolução (a partida fica pausada até o jogador confirmar). */
@@ -1310,6 +1266,8 @@ export class Game {
     preloadAssets([...(def.preload ?? []), ...Object.values(def.actors ?? {}).map((a) => a.sprite)]);
     const record = def.record !== false;
     if (record) { this.sceneRecord[id] = 'started'; this.autosave(); }
+    // a fase que a cena de antes dela solta no fim (a ação 'stage')
+    this.sceneStage = def.trigger?.find((t) => t.on === 'play')?.target ?? null;
     this.hub.scene = new Cutscene(this.hub, def, {
       id,
       fill: (text) => this.hub._fill(text, this.hub._context()),
@@ -1335,7 +1293,7 @@ export class Game {
   sceneTrigger(on, target = null) {
     if (!this.profile.trainer || this.hub.scene || !this.hub.map) return false;
     const ctx = this.hub._context();
-    if (on === 'win') return false;   // o de depois da fase só arma (armScenes)
+    if (on === 'win' || on === 'play') return false;   // os de depois e de antes da fase têm caminho próprio
     for (const [id, def] of Object.entries(CUTSCENES)) {
       if (!def.trigger?.some((t) => t.on === on && (t.target == null || t.target === target))) continue;
       if (def.map && def.map !== this.hub.mapId) continue;
@@ -1414,6 +1372,30 @@ export class Game {
     // uma cena que ficou no meio ou devida (0.39) toca do começo, no lugar dela
     if (this._playPendingScene()) return;
     this.openHub('home');
+  }
+
+  /**
+   * A cena de antes de uma fase (o gatilho 'play'): abre o palco dela em tela cheia
+   * e toca. No fim, a ação 'stage' começa a fase. Devolve se havia uma.
+   */
+  _sceneBeforeStage(stageId) {
+    if (!this.profile.trainer) return false;
+    const ctx = this.hub._context();
+    const found = Object.entries(CUTSCENES).find(([id, def]) => def.trigger?.some((t) => t.on === 'play' && t.target === stageId)
+      && this.sceneRecord[id] !== 'seen' && this.hub._matches(def.when, ctx));
+    if (!found) return false;
+    const [id, def] = found;
+    this.hud.hideAllOverlays();
+    this.run = null;
+    this.openHub({ map: def.map, ...def.spot });
+    return this.playScene(id);
+  }
+
+  /** A ação 'stage' do fim de uma cena de antes da fase: a fase começa. */
+  startSceneStage() {
+    const stageId = this.sceneStage;
+    this.sceneStage = null;
+    if (stageId) this.startStage(stageId, null, { story: false });
   }
 
   /** Abre a vila no lugar da cena pendente e a toca. Devolve se havia uma. */

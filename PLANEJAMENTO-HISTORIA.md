@@ -90,17 +90,18 @@ Giovanni (Fase 8) achando que encontrou o culpado, e o Giovanni ri: o emblema n�
 ## 4. A linha da história em Kanto
 
 Cada capítulo cobre uma ou duas fases da campanha de hoje. O que o jogador
-descobre chega sempre **antes ou depois das fases, nunca no meio delas** (regra do
-Fellipe, decisão 11), por três caminhos: **uma fala antes da fase**, **a fala do
-líder depois da vitória** e **uma cena na vila** quando ele volta (seção 9.2).
+descobre chega sempre **antes ou depois das fases, nunca no meio delas**, e sempre
+numa **cena em tela cheia**, num cenário do FireRed, com os personagens em pixel
+(decisões 11 e 12, seção 9.2): o líder no ginásio dele depois da vitória, a vila
+quando o jogador volta, ou o lugar da fase antes dela.
 
 | Capítulo | Quando | O que o jogador descobre | Missão de lendário |
 |---|---|---|---|
 | **Prólogo — O sonho** | na vila, antes da Fase 1 | O Carvalho: as hordas mudaram, ninguém sabe por quê. O sonho de ser Campeão continua possível, mas o ideal é devolver a paz às rotas. | — |
-| **1 — As rotas tomadas** | Fase 1 (Brock) | O Brock: os Geodude desceram do Monte Lua, coisa que nunca fizeram. De volta, o Carvalho manda falar com o velho sábio, que conta a lenda: as hordas começaram quando os três pássaros sumiram dos céus. | — |
+| **1 — As rotas tomadas** | Fase 1 (Brock) | **Feito na 0.39** (pedido do Fellipe). Depois da vitória, no ginásio de Pewter, em tela cheia: o Brock parabeniza o jogador por ter vencido, conta que os Pokémon estão agindo de um jeito que ninguém viu (os Geodude desceram do Monte Lua), diz que é muito sério e pede ajuda para entender o que está acontecendo. Manda investigar a cidade de Cerulean. É a apresentação do problema; o Maxie não aparece, e não há corte de tela. Abre a quest **"Derrote a Misty e encontre pistas sobre o comportamento dos Pokémon"** (o mapa segue para o ginásio dela). A lenda dos pássaros, do velho sábio, que ficava aqui, ganha o lugar dela na H-4. | — |
 | **2 — O céu vazio** | Fases 2 e 3 (Misty, Surge) | A Misty: o mar ficou bravo desde que o Articuno deixou de ser visto sobre as Ilhas Seafoam. O Surge: a Usina pifou, os Voltorb invadiram Vermilion e ninguém vê o Zapdos há meses. Na vila, os moradores culpam a Equipe Rocket. | — |
 | **3 — Os rastros** | Fases 4 e 5 (Erika, Koga) | A Erika acha, no jardim, uma pena dourada e um pedaço de metal com um emblema vermelho, e o jogador leva os dois ao Carvalho. O Koga viu um vulto de capuz vermelho carregando uma máquina pela Rota 10: "não era da Rocket, o uniforme era outro". | — |
-| **4 — O trovão preso** | Fase 6 (Sabrina) | Antes da Fase 6, perto da Usina, um estrondo vem lá de dentro (a fala de antes da fase). A Sabrina vê "três jaulas e um homem olhando para o mar". Abre a quest **"Investigue a Usina"**: o Zapdos está preso numa máquina com o emblema vermelho. Agora é certeza: **alguém roubou os pássaros**. | **Zapdos** |
+| **4 — O trovão preso** | Fase 6 (Sabrina) | Antes da Fase 6, perto da Usina, um estrondo vem lá de dentro (a cena de antes da fase). A Sabrina vê "três jaulas e um homem olhando para o mar". Abre a quest **"Investigue a Usina"**: o Zapdos está preso numa máquina com o emblema vermelho. Agora é certeza: **alguém roubou os pássaros**. | **Zapdos** |
 | **5 — O gelo** | Fase 7 (Blaine) | A Fase 7 passa pelas Ilhas Seafoam. Depois do Blaine, o Carvalho cruza as anotações e aponta o fundo das ilhas. | **Articuno** |
 | **6 — O fogo e a suspeita** | Fase 8 (Giovanni) | O jogador chega achando que é a Rocket. O Giovanni olha o emblema e ri: não é da Rocket. A pista leva ao Monte Brasa, na Ilha 1. | **Moltres** |
 | **7 — O sonho** | Liga e Campeão | A Victory Road só abre com os três pássaros de volta (padrão; decisão 2). O rival no fim, e o Hall da Fama. Depois, o Carvalho: as rotas estão mais calmas, mas não como antes: "ainda falta alguma coisa". | — |
@@ -338,26 +339,38 @@ lagoa e 447 do Centro).
   caminhos só no chão do mapa, as falas, os itens e as quests citados, e o `end`
   no fim.
 
-### 9.2 Antes e depois das fases
+### 9.2 Antes e depois das fases, em tela cheia
 
-**Regra do Fellipe (2026-11-10): não há cena no meio de uma fase.** As cenas são
-antes e depois das fases, apenas isso. A fase é o Bullet Heaven, do começo ao fim,
-sem pausa para história. (A apresentação do líder continua como era: ela é parte
-da luta, não da história.)
+**Regras do Fellipe (2026-11-10):**
 
-- **A fala de antes da fase** (`stage.story.before`): a caixa de texto com o
-  retrato, como na apresentação do líder, mas sem luta, uma página por vez. Abre
-  quando a fase começa, **antes do relógio andar** e antes de qualquer horda.
-- **A fala de depois da fase** (`stage.story.after`): a mesma caixa, logo depois
-  da vitória e antes da tela de resultado. É o lugar da fala do líder vencido.
-- **A cena na vila** (o gatilho `win` de `data/cutscenes.js`): vencer a fase deixa
-  a cena devida, e ela toca quando o jogador chegar na vila (a volta da fase, o
-  Continuar ou o Carregar save), no `spot` dela.
+- **Não há cena no meio de uma fase.** As cenas são antes e depois das fases,
+  apenas isso. A fase é o Bullet Heaven, do começo ao fim, sem pausa para
+  história. (A apresentação do líder continua como era: ela é parte da luta, não
+  da história.)
+- **A cena é em tela cheia, com um cenário e os personagens em pixel**, como os da
+  vila. Nada de caixa com o retrato em PNG abrindo por cima: a conversa acontece
+  no lugar, com o líder em pixel na frente do jogador.
 
-Cada uma aparece uma vez por jornada (o `id` entra em `campaign.scenes`) e conta
-para o objetivo `scene` das quests. O check-data recusa qualquer coisa no meio
-da fase. Está pronto desde a 0.39; as primeiras de verdade chegam com os
-capítulos (H-4).
+Como funciona:
+
+- **Os palcos**: os cenários de fora da vila (`scene: true` em `data/hub.js`),
+  montados dos mapas do FireRed pelo `tools/assets/hub.py`, com a colisão do
+  original. O primeiro é o **ginásio de Pewter**. Num palco, a barra da vila e o
+  rodapé somem (tela cheia), o rastreador continua, e ninguém chega andando: no
+  fim da cena, a tela escurece e o jogador volta para a vila.
+- **Depois da fase** (o gatilho `win`): vencer a fase deixa a cena devida, e ela
+  toca na volta (o "Voltar para a vila" da tela de resultado, a saída do Modo
+  Livre, o Continuar ou o Carregar save), no palco dela. É o lugar da conversa
+  com o líder vencido.
+- **Antes da fase** (o gatilho `play`): ao apertar Jogar, a cena toca primeiro, no
+  palco dela, e a fase começa no fim (`then: 'stage'`).
+- **Uma quest pode nascer na cena** (`openedBy`): a da Misty espera o Brock pedir
+  a ajuda e entra deslizando no rastreador no meio da conversa. Uma jornada de
+  antes das cenas, que não vai ver a cena, recebe a quest direto.
+
+Cada cena aparece uma vez por jornada (o `id` entra em `campaign.scenes`) e conta
+para o objetivo `scene` das quests. O check-data recusa a caixa com retrato
+(`stage.story`) e qualquer coisa no meio da fase.
 
 ### 9.3 As cenas de Kanto
 
@@ -365,24 +378,26 @@ capítulos (H-4).
 |---|---|---|---|---|
 | 1 | O discurso do Carvalho, encenado | laboratório | Prólogo | H-2 ✅ |
 | 2 | O rival pega o inicial dele (decisão 1) | laboratório | Prólogo | H-2 ✅ |
-| 3 | A lenda dos pássaros | casa do velho sábio | 1 | H-4 |
-| 4 | A vila culpa a Equipe Rocket | vila (moradores) | 2 | H-4 |
-| 5 | O vulto de vermelho na Rota 10 | antes da Fase 5 | 3 | H-4 |
-| 6 | O estrondo na Usina | antes da Fase 6 | 4 | H-6 |
-| 7 | A jaula do Zapdos | Usina | 4 (missão) | H-6 |
-| 8 | O Carvalho e o emblema | laboratório | 4 | H-6 |
-| 9 | A jaula do Articuno | Ilhas Seafoam | 5 (missão) | H-7 |
-| 10 | O Giovanni e o emblema | depois da Fase 8 | 6 | H-8 |
-| 11 | A jaula do Moltres | Monte Brasa | 6 (missão) | H-8 |
-| 12 | A Victory Road se abre | mapa da jornada | 7 | H-9 |
-| 13 | O rival Campeão | sala do Campeão | 7 | H-9 |
-| 14 | "Ainda falta alguma coisa" | laboratório | 7 | H-9 |
-| 15 | O Mewtwo e a máquina quebrada | Caverna Desconhecida | 8 (missão) | H-10 |
-| 16 | O Kyogre e o Maxie | lagoa ou Centro (já existe) | 8 | H-11 |
-| 17 | O Pokémon rosa | vila | Epílogo | H-11 |
+| 3 | O Brock pede ajuda | ginásio de Pewter, depois da Fase 1 | 1 | H-2 ✅ |
+| 4 | A lenda dos pássaros | casa do velho sábio | 1 ou 2 (a decidir) | H-4 |
+| 5 | A vila culpa a Equipe Rocket | vila (moradores) | 2 | H-4 |
+| 6 | O vulto de vermelho na Rota 10 | antes da Fase 5 | 3 | H-4 |
+| 7 | O estrondo na Usina | antes da Fase 6 | 4 | H-6 |
+| 8 | A jaula do Zapdos | Usina | 4 (missão) | H-6 |
+| 9 | O Carvalho e o emblema | laboratório | 4 | H-6 |
+| 10 | A jaula do Articuno | Ilhas Seafoam | 5 (missão) | H-7 |
+| 11 | O Giovanni e o emblema | ginásio de Viridian, depois da Fase 8 | 6 | H-8 |
+| 12 | A jaula do Moltres | Monte Brasa | 6 (missão) | H-8 |
+| 13 | A Victory Road se abre | mapa da jornada | 7 | H-9 |
+| 14 | O rival Campeão | sala do Campeão | 7 | H-9 |
+| 15 | "Ainda falta alguma coisa" | laboratório | 7 | H-9 |
+| 16 | O Mewtwo e a máquina quebrada | Caverna Desconhecida | 8 (missão) | H-10 |
+| 17 | O Kyogre e o Maxie | lagoa ou Centro (já existe) | 8 | H-11 |
+| 18 | O Pokémon rosa | vila | Epílogo | H-11 |
 
-Cada cena chega na etapa do capítulo dela. A H-2 trouxe o motor e as duas do
-prólogo, que servem de teste para ele; a do Maxie passou para o motor sem mudar.
+Cada cena chega na etapa do capítulo dela. A H-2 trouxe o motor, as duas do
+prólogo e a do Brock (pedido do Fellipe); a do Maxie passou para o motor sem
+mudar.
 
 **As duas do prólogo (0.39):**
 
@@ -398,6 +413,13 @@ prólogo, que servem de teste para ele; a do Maxie passou para o motor sem mudar
   fecha com a fala de sempre (o Mapa da Jornada). **Padrão até o Fellipe
   decidir:** o rival é o neto do Carvalho, como no FireRed, e se chama "Rival",
   como no Campeão.
+
+**A do Brock (0.39, `depois_brock`):** depois da Fase 1, no ginásio de Pewter (o
+primeiro palco), em tela cheia. O Brock (o sprite dele do FireRed, em pixel) está
+na frente do jogador: parabeniza, olha para o lado ao falar das rotas, volta e diz
+que é muito sério, pede ajuda e manda investigar Cerulean. A quest da Misty entra
+no rastreador no meio da conversa. No fim, a tela escurece e o jogador está na
+vila, na frente de casa.
 
 ---
 
@@ -424,7 +446,7 @@ prólogo, que servem de teste para ele; a do Maxie passou para o motor sem mudar
 | Etapa | O que entra |
 |---|---|
 | **H-1** ✅ 0.38 | O sistema de quests e o prólogo: `data/quests.js`, o `QuestSystem`, o rastreador, o save por jornada com a migração, as condições novas nas falas, a cadeia do prólogo e o discurso novo do Carvalho. Testes no `ui-smoke`. |
-| **H-2** ✅ 0.39 | As cenas em dados (`Cutscene.js` a partir da cena do Maxie, que não muda), a fala de antes e de depois das fases, a cena na vila depois de uma fase e as duas cenas do prólogo: o discurso do Carvalho encenado e o rival pegando o inicial dele (seção 9.3). |
+| **H-2** ✅ 0.39 | As cenas em dados (`Cutscene.js` a partir da cena do Maxie, que não muda), as cenas de antes e de depois das fases, em tela cheia nos palcos (o ginásio de Pewter), as duas cenas do prólogo e a do Brock, com a quest da Misty: o discurso do Carvalho encenado e o rival pegando o inicial dele (seção 9.3). |
 | **H-3** | A tela de missões. |
 | **H-4** | Os capítulos 1 a 3: as falas de depois da vitória dos líderes, o velho sábio, os moradores e as quests de cada capítulo. |
 | **H-5** | A captura sem lendários e o molde da missão de lendário, tirado do salão do Kyogre. |
@@ -457,3 +479,10 @@ prólogo, que servem de teste para ele; a do Maxie passou para o motor sem mudar
     depois da 0.39: "não se pode ter cenas no meio de fases, as cenas são antes e
     depois de fases, apenas isso"). O evento que pausava a fase saiu; as cenas que
     eram no meio da Fase 5 e da Fase 6 passaram para antes delas (seção 9.2).
+12. **As cenas são em tela cheia, com cenário e personagens em pixel** (pedido do
+    Fellipe ao ver a fala do Brock numa caixa com o retrato: "eu penso em ser um
+    full screen com um cenário e ele em formato de pixel personagem da vila, não
+    assim PNG que abre a imagem"). A caixa com retrato saiu; os cenários de fora da
+    vila são palcos montados dos mapas do FireRed. A conversa com o Brock é a
+    apresentação do problema, sem o Maxie e sem corte de tela, e abre a quest da
+    Misty com as pistas em Cerulean (seção 4).

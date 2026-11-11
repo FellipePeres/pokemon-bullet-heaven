@@ -152,6 +152,9 @@ export class QuestSystem {
     const opened = [];
     for (const next of quest.next ?? []) {
       if (state.done[next] || state.active.includes(next) || !QUESTS[next]) continue;
+      // a que uma cena abre (0.39, `openedBy`) espera a cena; em silêncio (a jornada de
+      // antes das cenas, que não vai ver a cena), ela abre direto
+      if (QUESTS[next].openedBy && !silent) continue;
       state.active.push(next);
       opened.push(next);
     }

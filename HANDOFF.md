@@ -671,15 +671,26 @@ Nunca voltar bônus globais para o pool de level up — foi pedido explícito.
 - **Os itens da história** (`KEY_ITEMS` em `data/items.js`, `campaign.keyItems`):
   o passo `give` dá esses ou os da mochila do Poké Mart. Os dois que existem são
   as pistas do Capítulo 3 (H-4).
-- **Antes e depois da fase, nunca no meio** (regra do Fellipe): `stage.story =
-  { before, after }`, cada um `{ id, name, portrait, lines }`. O `before` abre
-  quando a fase começa, antes do relógio andar (o `Run` nasce em `state =
-  'story'`); o `after`, quando a fase é vencida, antes da tela de resultado (o
-  `case 'victory'` do Game espera ele fechar para chamar o `endRun`). O Game
-  mostra o `story-overlay` (o molde da apresentação do líder, sem luta), uma
-  página por vez (o botão, o A ou o Enter). Uma vez por jornada (`storySeen`). O
-  check-data recusa qualquer coisa no meio da fase (uma lista, um `at`). Nenhuma
-  fase tem ainda; as primeiras chegam com os capítulos (H-4).
+- **Antes e depois da fase, nunca no meio, e em tela cheia** (regras do Fellipe):
+  não existe caixa com retrato nem pausa no meio da fase (o `stage.story` saiu, e
+  o check-data recusa). A história em volta das fases é sempre uma cena num
+  **palco**: um lugar de `data/hub.js` com `scene: true`, montado de um mapa do
+  FireRed pelo `tools/assets/hub.py` (o primeiro é o `ginasio_pewter`, com a folha
+  `npc/brock`). Num palco, o `Game.onPlaceChange` põe a classe `cinema` na tela da
+  vila (some a barra e o rodapé; o rastreador fica), e o `Hub` manda o jogador para
+  a vila se não houver cena tocando (`_goHome`). A cena de um palco termina com
+  `then: 'home'` (escurece e volta para a frente de casa) ou `then: 'stage'`.
+  - **Depois da fase** (gatilho `win`): `armScenes` deixa a cena `due` no `endRun`
+    da vitória, e o `quitToMenu`/`_enterVillage` a tocam no palco.
+  - **Antes da fase** (gatilho `play`): o `startStage` toca a cena primeiro
+    (`_sceneBeforeStage`) e a ação `stage` começa a fase no fim
+    (`startSceneStage`, com `{ story: false }`).
+- **A cena do Brock** (`depois_brock`, a primeira do Capítulo 1): parabeniza, conta
+  que os Pokémon estão estranhos, diz que é muito sério, pede ajuda e manda
+  investigar Cerulean. O passo `quest` abre a `c2_misty` no meio da conversa: ela
+  tem `openedBy: 'depois_brock'`, então o `QuestSystem` não a abre quando a
+  `c1_brock` fecha na vitória (espera a cena), mas abre direto no `doneIf`
+  silencioso (a jornada de antes das cenas, que não vai ver a cena).
 - **As falas** ganharam as condições `scene` (vista até o fim) e `flag`, e o
   `{rival}` (o inicial dele).
 - **O check-data** confere cada roteiro (o lugar, os atores, as folhas, os
@@ -687,8 +698,9 @@ Nunca voltar bônus globais para o pool de level up — foi pedido explícito.
   `end` no fim) e a história das fases (só before e after). **Os testes**: o `ui-smoke` toca as duas
   cenas do prólogo inteiras (a câmera, o Carvalho virando, o rival na bola certa,
   a bola sumindo, a cena pendente voltando ao continuar), uma cena de teste com
-  os passos novos, as falas de antes e de depois da fase (nada no meio) e a cena
-  da vila de depois da fase. O roteiro de screenshots é `cenas`.
+  os passos novos, a cena do Brock na volta da Fase 1 (a tela cheia, a quest no
+  meio da conversa, a volta para a vila), uma cena de antes da fase e o palco
+  sem cena devolvendo o jogador à vila. O roteiro de screenshots é `cenas`.
 
 ### O lendário secreto da Pokédex (0.35)
 - Pedido do Fellipe: no fim da Pokédex, um Pokémon misterioso, "???", **sem
@@ -1243,6 +1255,7 @@ o Brock como está, todas as outras mais duras, menos níveis.
 | 67 | uma história própria, como no Pokémon Tower Defense: o Carvalho diz que as hordas mudaram, o sonho de ser Campeão continua, mas o ideal é devolver a paz às rotas; os pássaros lendários foram roubados pelo Maxie, que só aparece no Kyogre; um sistema de quests ("fale com a mãe 0/1" no canto de cima) com as recompensas no fim; muitas cutscenes; lendários só por missões, cada um com a sua fase; o Kyogre late game; uma vila por geração. Aprovou o plano inteiro e acrescentou: o lendário liberado volta à Poké Ball das fases seguintes, com a chance baixa de hoje | `PLANEJAMENTO-HISTORIA.md` (a premissa, os capítulos de Kanto, as missões dos lendários, as quests, as cenas e as etapas H-1 a H-12). 0.38: a H-1, com as quests (`data/quests.js`, `systems/QuestSystem.js`), o rastreador na vila, no mapa da jornada e na partida, o prólogo do quarto ao Brock, o discurso novo do Carvalho e a migração das jornadas que já existiam |
 | 68 | "pode partir para o próximo passo gerando um artifact"; antes: "essas mudanças não vão subir, só depois de tudo pronto no planejamento" e "sempre deve ter um artifact" | 0.39 (H-2 do PLANEJAMENTO-HISTORIA, só na branch): o motor das cenas (`game/Cutscene.js`, `data/cutscenes.js`), com a do Maxie convertida e conferida quadro a quadro; o discurso do Carvalho encenado e a cena do rival (o Blue do FireRed, o inicial com vantagem); a história de antes e de depois das fases (`stage.story`) e a cena da vila depois de uma fase (gatilho `win`); `campaign.scenes` com a cena pendente voltando ao continuar; os itens da história; o check-data das cenas; o roteiro `cenas` e a página do planejamento num artifact |
 | 69 | "não se pode ter cenas no meio de fases, as cenas são antes e depois de fases, apenas isso" | 0.39 (ainda na branch): o evento que pausava a fase saiu; no lugar, a fala de antes da fase (antes do relógio andar) e a de depois (antes da tela de resultado), em `stage.story = { before, after }`, e a cena da vila depois de uma fase (gatilho `win`, devida até a próxima chegada à vila); o check-data recusa qualquer coisa no meio; as cenas 5 e 6 do planejamento passaram para antes das Fases 5 e 6 (decisão 11) |
+| 70 | a fala do Brock numa caixa com o retrato não: "um full screen com um cenário e ele em formato de pixel personagem da vila"; ele parabeniza, pede ajuda para entender o que está acontecendo (muito sério), sem o Maxie e sem corte; manda investigar a cidade; a quest: "derrote a Misty e encontre pistas do comportamento dos Pokémon" | 0.39 (na branch): a caixa com retrato saiu; os palcos (`scene: true`, o ginásio de Pewter extraído do FireRed, o Brock em pixel), a tela cheia (`cinema`), os gatilhos `win` e `play` com `then: 'home'`/`'stage'`; a cena `depois_brock`; a quest `c2_misty` com `openedBy`; decisão 12 no planejamento |
 | Fase 8 (Giovanni) | 1 → 0,8 | 4,0 | 4,5 | 60 | 84 → 62 |
 | Lorelei | 1,05 → 0,8 | 3,5 | 3,1–4,7 | 64 | 92 → 66 |
 | Bruno | 1,12 → 0,97 | 3,7 | 3,5–6,3 ² | 66 | 99 → 68 |
@@ -1561,8 +1574,8 @@ O que está planejado:
   é por isso que as hordas mudaram; o ladrão é o Maxie, que só aparece na cena do
   Kyogre. **A H-1 está no jogo desde a 0.38** (as quests, o rastreador e o
   prólogo; ver a seção 4), e **a H-2 desde a 0.39** (o motor das cenas, as duas do
-  prólogo e as cenas de antes e de depois das fases; **nunca no meio de uma fase**,
-  regra do Fellipe). Falta, em ordem: a H-3 (a tela de missões), a H-4
+  prólogo, a do Brock e as cenas de antes e de depois das fases, em tela cheia nos
+  palcos; **nunca no meio de uma fase**, regra do Fellipe). Falta, em ordem: a H-3 (a tela de missões), a H-4
   (os capítulos 1 a 3), a H-5 (a captura sem lendários e o molde da missão de
   lendário), uma missão para cada lendário (H-6 a H-11) e as recompensas (H-12).
   **Regra do Fellipe para a H-5:** um lendário liberado na missão dele (vencida,

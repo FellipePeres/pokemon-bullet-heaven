@@ -13,11 +13,15 @@
  *                     'enter'  o jogador entrou no lugar `target` da vila (data/hub.js)
  *                     'map'    o mapa da jornada abriu
  *                     'win'    venceu a fase `target` (data/stages.js)
+ *                     'scene'  a cena `target` (data/cutscenes.js) chegou ao fim (0.39)
  *               `count` é quantas vezes (1 se faltar): o rastreador mostra "0/1"
  *   doneIf      quando a quest já está cumprida sem o evento (a jornada que já
  *               existia antes das quests, ou que pulou um passo): ela fecha em
  *               silêncio. Chaves: starter, mapSeen, cleared (o id de uma fase)
  *   next        as quests que abrem quando esta fecha
+ *   openedBy    a cena que abre esta quest (0.39, o passo `quest`): quando a anterior
+ *               fecha, ela espera a cena (o Brock pede a ajuda e só então ela aparece).
+ *               Na jornada de antes das cenas, que nunca vai ver a cena, ela abre direto
  *   reward      vazio por enquanto (as recompensas vêm no fim, pedido do Fellipe)
  *
  * A primeira quest de uma jornada nova é FIRST_QUEST. O check-data confere que
@@ -25,7 +29,8 @@
  */
 export const CHAPTERS = {
   prologo: 'Prólogo',
-  cap1: 'Capítulo 1 — As rotas tomadas'
+  cap1: 'Capítulo 1 — As rotas tomadas',
+  cap2: 'Capítulo 2 — O céu vazio'
 };
 
 export const QUESTS = {
@@ -71,6 +76,19 @@ export const QUESTS = {
     desc: 'O sonho começa em Pewter: atravesse a Rota 1, a Rota 2 e a Floresta de Viridian até o ginásio do Brock.',
     objectives: [{ text: 'Vença o Brock, em Pewter', on: 'win', target: 'gym_1_pewter' }],
     doneIf: { cleared: 'gym_1_pewter' },
+    next: ['c2_misty'],
+    reward: null
+  },
+
+  /* ========================== Capítulo 2: o céu vazio ========================== */
+  // o Brock pede ajuda na cena de depois da Fase 1 (data/cutscenes.js, depois_brock): o mapa
+  // segue para o ginásio da Misty, e em Cerulean o jogador procura pistas
+  c2_misty: {
+    kind: 'story', chapter: 'cap2',
+    desc: 'O Brock pediu ajuda: os Pokémon estão agindo de um jeito que ninguém nunca viu, e isso é muito sério. Siga para Cerulean, vença a Misty e investigue a cidade atrás de pistas.',
+    objectives: [{ text: 'Derrote a Misty e encontre pistas sobre o comportamento dos Pokémon', on: 'win', target: 'gym_2_cerulean' }],
+    doneIf: { cleared: 'gym_2_cerulean' },
+    openedBy: 'depois_brock',
     next: [],
     reward: null
   }
@@ -78,9 +96,5 @@ export const QUESTS = {
 
 export const FIRST_QUEST = 'p_mae';
 
-/**
- * Os eventos que um objetivo pode esperar (o check-data recusa os outros). O
- * `scene` (0.39) é uma cena de data/cutscenes.js, ou a fala de antes ou de depois de uma
- * fase (`stage.story`), que chegou ao fim.
- */
+/** Os eventos que um objetivo pode esperar (o check-data recusa os outros). */
 export const QUEST_EVENTS = ['talk', 'enter', 'map', 'win', 'scene'];

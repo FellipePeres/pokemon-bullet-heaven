@@ -256,7 +256,7 @@ badSegments.length ? fail(`trechos com cenário inexistente: ${badSegments.join(
 
 // as condições e ações das falas da vila (game/Hub.js), que as cenas também usam
 const KNOWN_WHEN = new Set(['starter', 'starterIs', 'shiny', 'badges', 'champion', 'dex', 'veteran', 'dive', 'diveTm', 'diveRescued', 'kyogre', 'locked', 'once', 'quest', 'questDone', 'scene', 'flag']);
-const KNOWN_ACTIONS = new Set(['starter', 'pc', 'mart', 'save', 'campaign', 'pokedoll', 'badges', 'aquatic']);
+const KNOWN_ACTIONS = new Set(['starter', 'pc', 'mart', 'save', 'campaign', 'pokedoll', 'badges', 'aquatic', 'home', 'stage']);
 // o chão da vila: só onde o mapa do FireRed deixa pisar
 const floor = (mapId, x, y) => {
   const map = HUB_MAPS[mapId];
@@ -422,7 +422,7 @@ const inside = (mapId, x, y) => { const m = HUB_MAPS[mapId]; return !!m && x >= 
       if (!CUTSCENE_TRIGGERS.includes(t.on)) issues.push(`${id}: trigger desconhecido (${t.on})`);
       if (t.on === 'enter' && t.target !== def.map) issues.push(`${id}: trigger de entrada em outro lugar (${t.target})`);
       if (t.on === 'npc' && !(place.npcs ?? []).some((n) => n.id === t.target)) issues.push(`${id}: trigger de alguém que não está no lugar (${t.target})`);
-      if (t.on === 'win' && !STAGES[t.target]) issues.push(`${id}: trigger de uma fase que não existe (${t.target})`);
+      if ((t.on === 'win' || t.on === 'play') && !STAGES[t.target]) issues.push(`${id}: trigger de uma fase que não existe (${t.target})`);
     }
     for (const cond of Object.keys(def.when ?? {})) if (!KNOWN_WHEN.has(cond)) issues.push(`${id}: condição desconhecida (${cond})`);
     const actors = new Set(['player', ...Object.keys(def.actors ?? {}), ...(place.npcs ?? []).map((n) => n.id)]);
@@ -433,6 +433,10 @@ const inside = (mapId, x, y) => { const m = HUB_MAPS[mapId]; return !!m && x >= 
     for (const key of [...(def.preload ?? []), ...(def.band ? [def.band] : [])]) if (!SHEETS[key]) issues.push(`${id}: folha que não existe (${key})`);
     const steps = def.steps ?? [];
     if (steps.at(-1)?.do !== 'end') issues.push(`${id}: o último passo não é o end (a cena nunca contaria como vista)`);
+    // a de antes da fase solta a fase no fim; a de um palco volta para a vila (ou solta a fase)
+    const then = steps.at(-1)?.then;
+    if (def.trigger?.some((t) => t.on === 'play') && then !== 'stage') issues.push(`${id}: a cena de antes da fase termina sem a fase (then: 'stage')`);
+    else if (place.scene && then !== 'home' && then !== 'stage') issues.push(`${id}: a cena do palco termina sem voltar (then: 'home' ou 'stage')`);
     steps.forEach((raw, i) => {
       if (raw.pick && !Object.keys(raw.cases ?? {}).length) issues.push(`${id} passo ${i + 1}: pick sem casos`);
       const variants = raw.pick ? Object.values(raw.cases ?? {}).map((c) => ({ ...raw, ...c })) : [raw];
@@ -469,42 +473,30 @@ const inside = (mapId, x, y) => { const m = HUB_MAPS[mapId]; return !!m && x >= 
       }
     });
   }
-  // a história das fases (stage.story): só antes e depois, NUNCA no meio da fase
-  // (regra do Fellipe, seção 9.2 do planejamento)
-  const storyIds = new Set();
-  let storyCount = 0;
+  // a história das fases é sempre uma cena em tela cheia, antes ou depois da fase (os
+  // gatilhos play e win): nada de cartão com retrato, e nada no meio da fase (regra do Fellipe)
   for (const [stageId, stage] of Object.entries(STAGES)) {
-    const story = stage.story;
-    if (!story) continue;
-    if (Array.isArray(story) || typeof story !== 'object' || Object.keys(story).some((k) => k !== 'before' && k !== 'after')) {
-      issues.push(`${stageId}: a história da fase só tem before e after (nada no meio da fase)`);
-      continue;
-    }
-    for (const [moment, e] of Object.entries(story)) {
-      storyCount++;
-      const at = `${stageId} (${moment})`;
-      if (e.at != null) issues.push(`${at}: tem 'at', mas nada acontece no meio da fase`);
-      if (!e.id) issues.push(`${at}: sem id`);
-      else if (CUTSCENES[e.id] || storyIds.has(e.id)) issues.push(`${at}: id repetido (${e.id})`);
-      storyIds.add(e.id);
-      if (!e.lines?.length) issues.push(`${at}: sem falas`);
-      if (e.portrait && !ASSET_MANIFEST[e.portrait]) issues.push(`${at}: retrato que não existe (${e.portrait})`);
-    }
+    if (stage.story) issues.push(`${stageId}: a história da fase é uma cena em tela cheia (data/cutscenes.js, gatilho play ou win), não um cartão`);
   }
   for (const [qid, quest] of Object.entries(QUESTS)) {
     for (const o of quest.objectives ?? []) {
-      if (o.on === 'scene' && !CUTSCENES[o.target] && !storyIds.has(o.target)) issues.push(`${qid}: cena que não existe (${o.target})`);
+      if (o.on === 'scene' && !CUTSCENES[o.target]) issues.push(`${qid}: cena que não existe (${o.target})`);
+    }
+    // a cena que abre a quest precisa existir e ter o passo que a abre
+    if (quest.openedBy && !CUTSCENES[quest.openedBy]?.steps.some((step) => step.do === 'quest' && step.id === qid)) {
+      issues.push(`${qid}: openedBy de uma cena que não abre esta quest (${quest.openedBy})`);
     }
   }
   for (const [key, entry] of Object.entries(DIALOGUE)) {
     for (const line of entry.lines ?? []) {
       const scene = line.when?.scene;
-      if (scene && !CUTSCENES[scene] && !storyIds.has(scene)) issues.push(`${key}: condição de uma cena que não existe (${scene})`);
+      if (scene && !CUTSCENES[scene]) issues.push(`${key}: condição de uma cena que não existe (${scene})`);
     }
   }
+  const stages = Object.keys(HUB.maps).filter((id) => HUB.maps[id].scene);
   issues.length
     ? fail(`cenas: ${issues.join(' · ')}`)
-    : ok(`as cenas: ${Object.keys(CUTSCENES).length} roteiros com ${stepCount} passos, caminhos só no chão; ${storyCount} fala(s) de antes e depois das fases, nenhuma no meio`);
+    : ok(`as cenas: ${Object.keys(CUTSCENES).length} roteiros com ${stepCount} passos, caminhos só no chão; ${stages.length} palco(s) em tela cheia (${stages.join(', ')}); nada no meio das fases`);
 }
 
 // pools de captura: mostra quanto de cada fase já está implementado

@@ -161,6 +161,11 @@ export const DIALOGUE = {
       ] }
     ]
   },
+  // o Brock, no palco da cena de depois da Fase 1 (0.39, data/cutscenes.js)
+  brock: {
+    name: 'Brock',
+    lines: [{ say: ['Siga para Cerulean, {player}. E fique de olho em qualquer coisa estranha.'] }]
+  },
   // quem desiste da escolha (o Voltar da tela de iniciais)
   carvalho_espera: {
     name: 'Prof. Carvalho',

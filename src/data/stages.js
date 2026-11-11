@@ -41,10 +41,6 @@
  *   maxBalls       teto de Poké Balls da fase (controla o ritmo das capturas)
  *   scriptedBalls  segundos em que uma Poké Ball aparece garantida (0.10: só uma,
  *                  na Fase 1, para o inicial ganhar companhia; o resto é sorte)
- *   story          a história da fase (0.39), só antes e depois dela, nunca no meio:
- *                  { before: { id, name, portrait, lines }, after: {...} }. O `before`
- *                  abre antes do relógio andar; o `after`, logo depois da vitória.
- *                  Uma vez por jornada (o id entra em `campaign.scenes`).
  *   reward         Shards da primeira vitória (0.22: só ela paga; 100 nos ginásios, 150 na Liga, 300 no Campeão)
  */
 export const STAGES = {

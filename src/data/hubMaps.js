@@ -149,12 +149,34 @@ export const HUB_MAPS = {
       '#...........#',
       '#############'
     ]
+  },
+  ginasio_pewter: {
+    src: 'assets/hub/ginasio_pewter.png', top: 'assets/hub/ginasio_pewter-top.png', width: 13, height: 16,
+    walk: [
+      '#############',
+      '####.....####',
+      '#############',
+      '#....#.#....#',
+      '#...........#',
+      '#...#...#...#',
+      '#...........#',
+      '#..#.#.#.#..#',
+      '##.........##',
+      '#...#...#...#',
+      '##.........##',
+      '#...........#',
+      '#...#...#...#',
+      '#...........#',
+      '#...........#',
+      '#############'
+    ]
   }
 };
 
 /** As folhas dos personagens e objetos da vila (tiras de quadros, em 1x). */
 export const HUB_SPRITES = {
   'npc/beauty': { src: 'assets/hub/npc/beauty.png', frameWidth: 16, frameHeight: 32, frames: 10 },
+  'npc/brock': { src: 'assets/hub/npc/brock.png', frameWidth: 16, frameHeight: 32, frames: 3 },
   'npc/clefairy': { src: 'assets/hub/npc/clefairy.png', frameWidth: 16, frameHeight: 16, frames: 3 },
   'npc/clerk': { src: 'assets/hub/npc/clerk.png', frameWidth: 16, frameHeight: 32, frames: 9 },
   'npc/fisher': { src: 'assets/hub/npc/fisher.png', frameWidth: 16, frameHeight: 32, frames: 10 },

@@ -178,6 +178,18 @@ export const HUB = {
       things: []
     },
 
+    // os palcos das cenas (0.39, data/cutscenes.js): lugares fora da vila, só para as cenas de
+    // antes e depois das fases, em tela cheia. Ninguém chega andando; no fim da cena, a volta é
+    // para a vila (e, sem cena tocando, o jogador volta sozinho)
+    ginasio_pewter: {
+      name: 'Ginásio de Pewter',
+      scene: true,
+      npcs: [
+        { id: 'brock', sprite: 'brock', x: 6, y: 5, dir: 'down', talk: 'brock' }
+      ],
+      things: []
+    },
+
     casa_sabio: {
       name: 'Casa do velho sábio',
       warps: [

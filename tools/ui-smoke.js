@@ -631,6 +631,29 @@ check('"Voltar para o Centro Pokémon" guarda o que a equipe ganhou e volta para
       !game.run && hubVisible() &&
       game.campaign.journey.team.members[0].level === 17 && game.campaign.clearedStages.includes('gym_1_pewter'));
 
+// a cena de depois da Fase 1 (0.39): o Brock, no ginásio dele, em tela cheia, com os personagens em pixel
+check('vencido o Brock, a volta passa pelo ginásio dele: a cena de depois da fase, em tela cheia (sem a barra da vila)',
+      hub.mapId === 'ginasio_pewter' && hub.scene?.id === 'depois_brock' && registry.get('screen-hub').classes.has('cinema')
+      && hub.player.x === 6 && hub.player.y === 6 && hub.npcs.some((n) => n.id === 'brock' && n.sprite === 'brock'));
+check('...e a quest da Misty ainda não apareceu: quem pede é o Brock', game.quests.isDone('c1_brock') && !game.quests.isActive('c2_misty'));
+{
+  let askedFirst = false;
+  const brockScene = runScene((d) => { if (d.text.includes('preciso da sua ajuda')) askedFirst = !game.quests.isActive('c2_misty'); });
+  check('o Brock parabeniza o jogador por ter vencido', said(brockScene, 'Que batalha, Fellipe!') && said(brockScene, 'Insígnia Pedra'));
+  check('...conta que os Pokémon estão estranhos, que é muito sério, e pede ajuda',
+        said(brockScene, 'Os Geodude desceram do Monte Lua') && said(brockScene, 'Isso é muito sério') && said(brockScene, 'preciso da sua ajuda'));
+  check('...e manda investigar Cerulean; o Maxie ainda não aparece', said(brockScene, 'investigue a cidade') && !said(brockScene, 'Maxie')
+        && brockScene.every((d) => d.name === 'Brock'));
+  check('a quest nova abre no meio da conversa, depois do pedido', askedFirst && game.quests.isActive('c2_misty'));
+  settle();
+  check('no fim, a tela escurece e o jogador volta para a vila, na frente de casa (com a barra de volta)',
+        hub.mapId === 'vila' && hub.player.x === 6 && hub.player.y === 17 && !registry.get('screen-hub').classes.has('cinema')
+        && game.sceneRecord.depois_brock === 'seen');
+  game.questTracker.render();
+  check('o rastreador mostra: derrote a Misty e encontre pistas sobre o comportamento dos Pokémon',
+        questBox().innerHTML.includes('Capítulo 2') && questBox().innerHTML.includes('Derrote a Misty e encontre pistas sobre o comportamento dos Pokémon'));
+}
+
 // conquistas: concluídas ficam para coletar, não entram sozinhas
 const claimable = game.tracker.claimableAchievements;
 check('conquistas concluídas ficam disponíveis para coletar', claimable.length > 0,
@@ -835,57 +858,34 @@ check('depois da escolha, o Continuar segue para a jornada (na vila); sem nome, 
   delete game.campaign.scenes.teste_cena; delete game.campaign.hub.flags.teste_flag; delete game.campaign.keyItems.pena_dourada;
   game.profile.bag.revive = revives;
 
-  // a história da fase: só antes e depois dela, nunca no meio (regra do Fellipe)
-  const stage = STAGES.gym_1_pewter;
-  stage.story = {
-    before: { id: 'teste_antes', name: 'Rota 1', lines: ['A Rota 1 está tomada, {player}.', 'Vamos lá.'] },
-    after: { id: 'teste_depois', name: 'Brock', portrait: stage.leader.portrait, lines: ['Os Geodude desceram do Monte Lua, {player}.'] }
-  };
-  // e uma cena da vila para depois desta fase (o gatilho 'win')
-  CUTSCENES.teste_volta = { map: 'vila', spot: { x: 6, y: 17, dir: 'down' }, trigger: [{ on: 'win', target: 'gym_1_pewter' }],
-    steps: [{ do: 'say', name: 'Mãe', lines: ['Você voltou, {player}!'] }, { do: 'end' }] };
+  // antes da fase (o gatilho 'play'): a cena toca em tela cheia, num palco, e a fase começa no fim.
+  // Nada de cartão com retrato nem de história no meio da fase (regra do Fellipe)
+  CUTSCENES.teste_antes = { map: 'ginasio_pewter', spot: { x: 6, y: 8, dir: 'up' }, trigger: [{ on: 'play', target: 'gym_1_pewter' }],
+    steps: [{ do: 'say', name: 'Brock', lines: ['Pronto para a revanche, {player}?'] }, { do: 'end', then: 'stage' }] };
+  game.quitToMenu();
   game.startStage('gym_1_pewter');
-  game._handleRunState();
-  check('a fala de antes da fase abre antes do relógio andar, com a caixa de texto',
-        game.run.state === 'story' && game.storyOpen && !registry.get('story-overlay').classes.has('hidden')
-        && registry.get('story-name').textContent === 'Rota 1' && registry.get('story-text').textContent === `A Rota 1 está tomada, ${game.playerName}.`
-        && registry.get('story-portrait').classes.has('hidden'));
-  for (let i = 0; i < 30; i++) { game.run.update(1 / 60, { x: 0, y: 0 }); game._handleRunState(); }
-  check('...e nada anda enquanto ela está aberta (nem o relógio, nem a horda)', game.run.time === 0 && game.run.enemies.length === 0);
-  game.handleAction('confirm');
-  check('...uma página por vez (o A ou o Enter)', game.storyOpen && registry.get('story-text').textContent === 'Vamos lá.');
-  game.handleAction('confirm');
-  check('...e depois da última a fase começa, com a fala contada como vista', !game.storyOpen && game.run.state === 'running'
-        && registry.get('story-overlay').classes.has('hidden') && game.sceneRecord.teste_antes === 'seen');
+  check('com uma cena de antes da fase, o Jogar abre o palco dela em tela cheia, antes da fase',
+        !game.run && hubVisible() && hub.mapId === 'ginasio_pewter' && hub.scene?.id === 'teste_antes' && registry.get('screen-hub').classes.has('cinema'));
+  const antes = runScene();
+  check('...e no fim dela a fase começa', antes.some((d) => d.text === `Pronto para a revanche, ${game.playerName}?`)
+        && game.run?.stage.id === 'gym_1_pewter' && game.run.state === 'running' && game.sceneRecord.teste_antes === 'seen');
   for (let i = 0; i < 60 * 5; i++) {
     game.run.update(1 / 60, { x: 0, y: 0 });
     if (game.run.state === 'intro') game.closeLeaderIntro();
     if (game.run.state !== 'running') game.run.state = 'running';
   }
-  check('no meio da fase não aparece história nenhuma', !game.storyOpen && game.run.time > 4);
-  game.run.state = 'victory';
-  game._handleRunState();
-  check('vencida a fase, a fala de depois vem antes da tela de resultado', game.storyOpen && !game.runEnded
-        && registry.get('story-name').textContent === 'Brock' && !registry.get('story-portrait').classes.has('hidden')
-        && registry.get('result-overlay').classes.has('hidden'));
-  game.handleAction('confirm');
-  check('...e depois dela, a tela de resultado', !game.storyOpen && game.runEnded && !registry.get('result-overlay').classes.has('hidden')
-        && game.sceneRecord.teste_depois === 'seen');
-  check('a vitória deixa devida a cena da vila de depois da fase', game.sceneRecord.teste_volta === 'due');
+  check('no meio da fase não há história: ela corre do começo ao fim', game.run.state === 'running' && !hub.scene && game.run.time > 4);
   game.quitToMenu();
-  check('...e voltando para a vila ela toca, no lugar dela', hubVisible() && hub.mapId === 'vila' && hub.player.x === 6 && hub.player.y === 17
-        && hub.scene?.id === 'teste_volta' && game.sceneRecord.teste_volta === 'started');
-  const volta = runScene();
-  check('...até o fim, e conta como vista', volta.some((d) => d.text === `Você voltou, ${game.playerName}!`) && !hub.scene && game.sceneRecord.teste_volta === 'seen');
   game.startStage('gym_1_pewter');
-  game._handleRunState();
-  check('rejogando a fase, as falas já vistas não voltam', game.run.state === 'running' && !game.run.pendingStory && !game.run.storyAfter && !game.storyOpen);
-  game.run.state = 'victory';
-  game._handleRunState();
+  check('vista, a cena não volta: o Jogar começa a fase direto', !!game.run && !hub.scene);
   game.quitToMenu();
-  check('...nem a cena da vila', !hub.scene && game.sceneRecord.teste_volta === 'seen');
-  delete stage.story; delete CUTSCENES.teste_volta;
-  for (const id of ['teste_antes', 'teste_depois', 'teste_volta']) delete game.campaign.scenes[id];
+  game.openHub({ map: 'ginasio_pewter', x: 6, y: 8, dir: 'up' });
+  hub.update(1 / 60);
+  settle();
+  check('um palco sem cena tocando não é lugar de andar: o jogador volta para a vila', hub.mapId === 'vila' && !registry.get('screen-hub').classes.has('cinema'));
+  check('nenhuma fase tem cartão de história (stage.story saiu)', Object.values(STAGES).every((st) => !st.story));
+  delete CUTSCENES.teste_antes;
+  delete game.campaign.scenes.teste_antes;
 }
 
 const HUB_RESCUE_SPOT_TEST = { map: 'centro', x: 4, y: 5, dir: 'up' };
@@ -1318,8 +1318,12 @@ game.quitToMenu();
   const qv = questsFor(veteran);
   qv.sync();
   check('quem já venceu o Brock antes das quests não volta ao "Fale com a mãe": o prólogo e o Brock fecham em silêncio',
-        ['p_mae', 'p_lab', 'p_carvalho', 'p_mapa', 'c1_brock'].every((id) => veteran.quests.done[id]?.skipped)
-        && !veteran.quests.active.length);
+        ['p_mae', 'p_lab', 'p_carvalho', 'p_mapa', 'c1_brock'].every((id) => veteran.quests.done[id]?.skipped));
+  check('...e, como não vai ver a cena do Brock, a quest da Misty abre direto', qv.isActive('c2_misty') && veteran.quests.active.length === 1);
+  const vetMisty = { starter: 'squirtle', clearedStages: ['gym_1_pewter', 'gym_2_cerulean'], hub: { flags: { mapa_visto: true } } };
+  const qm = questsFor(vetMisty);
+  qm.sync();
+  check('quem já venceu a Misty também fecha a dela em silêncio', vetMisty.quests.done.c2_misty?.skipped && !qm.isActive('c2_misty'));
   const fresh = { starter: 'squirtle', clearedStages: [], hub: { flags: {} } };
   const qf = questsFor(fresh);
   qf.sync();

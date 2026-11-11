@@ -231,6 +231,7 @@ IP, DS4, DS1 = 'IndigoPlateau_PokemonCenter_1F', 'CeladonCity_DepartmentStore_4F
 PH1, PH2 = 'PalletTown_PlayersHouse_1F', 'PalletTown_PlayersHouse_2F'
 LAB, HOUSE1, WARDEN = 'PalletTown_ProfessorOaksLab', 'House1', 'FuchsiaCity_WardensHouse'
 COPYCAT = 'SaffronCity_CopycatsHouse_2F'
+GYM1 = 'PewterCity_Gym'
 
 
 def build_vila(s):
@@ -352,6 +353,11 @@ def build_casa_sabio(s):
     s.stamp(0, 0, WARDEN, 0, 0, 13, 11)
 
 
+def build_ginasio_pewter(s):
+    """O ginásio do Brock, inteiro, como no FireRed: o palco das cenas de depois da Fase 1 (0.39)."""
+    s.stamp(0, 0, GYM1, 0, 0, 13, 16)
+
+
 MAPS = {
     # id: (largura, altura, montagem)
     'vila':       (36, 28, build_vila),
@@ -362,8 +368,10 @@ MAPS = {
     'lab':        (13, 14, build_lab),
     'cabana':     (11, 9, build_cabana),
     'casa_sabio': (13, 11, build_casa_sabio),
+    # os palcos das cenas (0.39): lugares fora da vila, só para as cenas de antes e depois das fases
+    'ginasio_pewter': (13, 16, build_ginasio_pewter),
 }
-SOURCES = [P, V, R, F, CE, FU, IP, DS4, DS1, PH1, PH2, LAB, HOUSE1, WARDEN, COPYCAT]
+SOURCES = [P, V, R, F, CE, FU, IP, DS4, DS1, PH1, PH2, LAB, HOUSE1, WARDEN, COPYCAT, GYM1]
 
 
 # ============================ os móveis do quarto ============================
@@ -418,6 +426,8 @@ SPRITES = {
     'worker_f':    ('people/worker_f', 'npc_green', 16, 32),
     # o rival (0.39, PLANEJAMENTO-HISTORIA.md seção 9.3): o Blue do FireRed
     'rival':       ('people/blue', 'npc_green', 16, 32),
+    # os líderes, para as cenas de depois das fases (0.39)
+    'brock':       ('people/brock', 'npc_green', 16, 32),
     'meowth':      ('pokemon/meowth', 'npc_blue', 16, 16),
     'clefairy':    ('pokemon/clefairy', 'npc_pink', 16, 16),
     'pidgey':      ('pokemon/pidgey', 'npc_blue', 16, 16),

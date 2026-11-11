@@ -366,27 +366,6 @@ export class HUD {
 
   hideLeaderIntro() { hide(el('leader-overlay')); }
 
-  /* ===================== EVENTO DE HISTÓRIA NA FASE (0.39) ===================== */
-
-  /**
-   * A partida pausa para a história (PLANEJAMENTO-HISTORIA.md seção 9.2): o retrato,
-   * o nome e uma página da fala, como na apresentação do líder, mas sem luta.
-   */
-  showStory(event, text, { last = true, onNext } = {}) {
-    const portrait = el('story-portrait');
-    const src = event.portrait ? assetUrl(event.portrait) : event.dex ? spriteUrl(event.dex) : null;
-    portrait.classList.toggle('hidden', !src);
-    if (src) { portrait.src = src; portrait.alt = event.name ?? ''; }
-    el('story-name').textContent = event.name ?? '';
-    el('story-text').textContent = text;
-    const next = el('story-next');
-    next.innerHTML = `<span class="btn-text">${last ? 'Continuar' : 'Próximo ▸'}</span>`;
-    next.onclick = onNext;
-    show(el('story-overlay'));
-  }
-
-  hideStory() { hide(el('story-overlay')); }
-
   /** A contagem da apresentação do líder: a luta começa sozinha no fim (0.25). */
   setLeaderCountdown(seconds) {
     el('leader-countdown').textContent = `A luta começa em ${Math.max(0, Math.ceil(seconds - 1e-6))}s`;   // (somar passos de 0,05 s não dá exato)
@@ -586,7 +565,6 @@ export class HUD {
 
   hideAllOverlays() {
     this.hideLeaderIntro();
-    this.hideStory();
     this.hideEvolution();
     this.hideLevelUp();
     this.hideCapture();

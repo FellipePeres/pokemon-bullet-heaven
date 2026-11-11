@@ -708,11 +708,6 @@ button { font: inherit; color: inherit; }
   color: var(--yellow); text-shadow: 3px 3px 0 var(--logo-blue-deep), 0 0 0 transparent;
 }
 .leader-intro-text .menu-btn { min-width: 200px; }
-/* o evento de história na fase (0.39): o mesmo molde, com a caixa de texto mais larga */
-.story-intro .leader-intro-portrait { width: 200px; height: 200px; }
-.story-intro .leader-intro-text { flex: 1; min-width: 0; }
-.story-intro .fr-window { width: min(560px, 100%); }
-.story-intro .fr-window p { min-height: 2.6em; }
 
 /* Hall da Fama: a equipe campeã entra um Pokémon por vez */
 .hall-card { max-width: 940px; width: 100%; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 14px; }
@@ -2328,6 +2323,12 @@ button { font: inherit; color: inherit; }
   pointer-events: none;
 }
 @keyframes hub-place-in { from { transform: translateY(-14px); opacity: 0; } }
+
+/* os palcos das cenas (0.39): a cena em tela cheia, sem a barra da vila e o rodapé */
+.screen.hub.cinema .hub-bar,
+.screen.hub.cinema .hub-hint { display: none; }
+.screen.hub.cinema .hub-place,
+.screen.hub.cinema .hub-quest { top: 22px; }
 
 /* ===================== O RASTREADOR DE QUESTS (0.38) =====================
    A janela do FireRed no canto de cima, à direita (o nome do lugar fica à

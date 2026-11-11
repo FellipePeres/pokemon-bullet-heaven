@@ -38,7 +38,7 @@ export class Run {
 
     this.world = { ...this.stage.world };
     this.time = 0;
-    this.state = 'running';   // running | levelup | capture | paused | victory | defeat | intro | story
+    this.state = 'running';   // running | levelup | capture | paused | victory | defeat | intro
     this.objective = 'SOBREVIVA';
 
     // ---- entidades ----
@@ -97,14 +97,6 @@ export class Run {
     this.pendingBall = false;
     this.pendingGift = null;     // presente da fase esperando a escolha (ver stage.gifts)
     this.pendingIntro = null;    // líder que acabou de chegar e se apresenta
-    // a história da fase (0.39, PLANEJAMENTO-HISTORIA.md seção 9.2): só ANTES e DEPOIS dela,
-    // nunca no meio (regra do Fellipe). O `before` abre antes do relógio andar; o `after`,
-    // logo depois da vitória, antes da tela de resultado. Uma vez por jornada (`storySeen`).
-    const seen = new Set(options.storySeen ?? []);
-    const unseen = (card) => (card && !seen.has(card.id) && !this.stage.endlessOnly ? card : null);
-    this.pendingStory = unseen(this.stage.story?.before);
-    this.storyAfter = unseen(this.stage.story?.after);
-    if (this.pendingStory) this.state = 'story';
     this.levelUpMember = null;   // Pokémon que está com a tela de melhoria aberta
     this.unlockQueue = [];       // Golpes Despertos esperando o anúncio ({ member, moveId })
 

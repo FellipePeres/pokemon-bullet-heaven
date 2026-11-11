@@ -66,6 +66,8 @@ export class Hub {
     this.map = HUB_MAPS[mapId];
     this.npcs = (this.place.npcs ?? []).map((npc) => ({ ...npc, timer: between(...CONFIG.hub.lookEvery) }));
     this.banner = { text: this.place.name, t: CONFIG.hub.bannerSeconds };
+    // num palco de cena (0.39), a tela fica cheia
+    this.game.onPlaceChange?.();
     // a história (0.38): "Vá ao laboratório" fecha ao entrar nele
     bus.emit(EVENTS.STORY, { on: 'enter', target: mapId });
   }
@@ -171,6 +173,8 @@ export class Hub {
       }
       return;
     }
+    // um palco de cena (0.39) sem cena tocando não é lugar de andar: volta para a vila
+    if (this.place.scene && !this.dialog) { this._goHome(); return; }
     this._updateNpcs(dt);
     if (this.dialog) { this._updateDialog(dt); return; }
 
@@ -439,6 +443,16 @@ export class Hub {
     if (d.then) this._act(d.then);
   }
 
+  /** De um palco de cena (0.39) para a vila, na frente de casa, escurecendo a tela. */
+  _goHome() {
+    const spot = HUB.spawn.home;
+    this._fadeOut(() => {
+      this._load(spot.map);
+      this._place(spot.x, spot.y, spot.dir);
+      this.game.autosave?.();
+    });
+  }
+
   /** Um passo na direção contrária, sem virar de costas (o empurrão do guarda). */
   _stepBack(dir) {
     const p = this.player;
@@ -459,6 +473,9 @@ export class Hub {
       case 'pokedoll': game.menus.showModal('modal-decor'); break;
       case 'badges': game.menus.showModal('modal-badges'); break;
       case 'aquatic': this._fadeOut(() => game.openDive()); break;   // escurece e aparece lá embaixo (0.37.1)
+      // o fim das cenas dos palcos (0.39): de volta para a vila, ou a fase que vem depois da cena
+      case 'home': this._goHome(); break;
+      case 'stage': game.startSceneStage(); break;
       default: break;
     }
   }

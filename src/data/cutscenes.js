@@ -10,13 +10,15 @@
  *   spot      onde o jogador fica quando ela volta pendente
  *   trigger   o que começa a cena: { on: 'enter', target: lugar } (entrou no lugar),
  *             { on: 'npc', target: id } (falou com alguém do lugar), { on: 'starter' }
- *             (acabou de escolher o inicial) ou { on: 'win', target: fase } (venceu a fase:
- *             a cena fica devida e toca quando o jogador chegar na vila, no `spot`). Sem
- *             trigger, só o código a começa (a do Maxie).
+ *             (acabou de escolher o inicial), { on: 'win', target: fase } (venceu a fase:
+ *             a cena fica devida e toca na volta, no `spot`) ou { on: 'play', target: fase }
+ *             (apertou Jogar: a cena toca antes, e a fase começa no fim, com `then: 'stage'`).
+ *             Sem trigger, só o código a começa (a do Maxie).
  *
- * As cenas são ANTES e DEPOIS das fases, nunca no meio (regra do Fellipe). A fala de
- * antes e a de depois de uma fase, com o retrato, ficam na própria fase (`stage.story`
- * em data/stages.js).
+ * As cenas são ANTES e DEPOIS das fases, nunca no meio, e sempre em tela cheia, num
+ * cenário do FireRed, com os personagens em pixel (regra do Fellipe). Fora da vila, o
+ * cenário é um palco (`scene: true` em data/hub.js): a barra da vila some, e a cena
+ * termina com `then: 'home'` (de volta para a vila) ou `then: 'stage'` (a fase).
  *   when      as condições das falas (data/dialogue.js) para o trigger valer
  *   record    false: não se registra em `campaign.scenes` (a do Maxie usa o registro do Kyogre)
  *   band      a faixa do corte de tela (passo `cutin`)
@@ -207,6 +209,42 @@ export const CUTSCENES = {
       { do: 'talk', key: 'carvalho_inicial', npc: 'carvalho' },
       { do: 'end' }
     ]
+  },
+
+  /* ============================ o Capítulo 1 (0.39) ============================ */
+
+  // depois da Fase 1, no ginásio dele: o Brock parabeniza, conta que os Pokémon estão
+  // estranhos e pede ajuda. É a apresentação do problema (o Maxie ainda não aparece), e
+  // abre a quest da Misty, com as pistas em Cerulean
+  depois_brock: {
+    map: 'ginasio_pewter', spot: { x: 6, y: 6, dir: 'up' },
+    trigger: [{ on: 'win', target: 'gym_1_pewter' }],
+    steps: [
+      { do: 'face', who: 'brock', dir: 'down' },
+      { do: 'wait', t: 0.8 },
+      { do: 'say', name: 'Brock', lines: [
+        'Que batalha, {player}! Fazia tempo que ninguém me vencia desse jeito.',
+        'A Insígnia Pedra é sua. Você e o {pokemon} mereceram.'
+      ] },
+      { do: 'wait', t: 0.5 },
+      // ele olha para o lado, para a saída do ginásio, como quem pensa nas rotas lá fora
+      { do: 'face', who: 'brock', dir: 'left' },
+      { do: 'wait', t: 0.5 },
+      { do: 'say', name: 'Brock', lines: [
+        'Mas tem uma coisa que eu preciso te contar. Você atravessou as rotas até aqui e viu as hordas.',
+        'Os Geodude desceram do Monte Lua, coisa que nunca fizeram. Os Pokémon estão agindo de um jeito que eu nunca vi.'
+      ] },
+      { do: 'face', who: 'brock', dir: 'down' },
+      { do: 'wait', t: 0.4 },
+      { do: 'say', name: 'Brock', lines: [
+        'Isso é muito sério, {player}. Eu quero entender o que está acontecendo, e preciso da sua ajuda.',
+        'O seu próximo ginásio é o da Misty, em Cerulean. Quando chegar lá, investigue a cidade e veja se acha alguma pista.'
+      ] },
+      { do: 'quest', id: 'c2_misty' },
+      { do: 'say', name: 'Brock', lines: ['Conto com você. Qualquer coisa que descobrir pode ser importante.'] },
+      { do: 'wait', t: 0.6 },
+      { do: 'end', then: 'home' }
+    ]
   }
 };
 
@@ -215,4 +253,4 @@ export const CUTSCENE_STEPS = ['wait', 'say', 'talk', 'show', 'hide', 'place', '
   'bird', 'fade', 'camera', 'shake', 'give', 'quest', 'flag', 'end'];
 
 /** O que pode começar uma cena. */
-export const CUTSCENE_TRIGGERS = ['enter', 'npc', 'starter', 'win'];
+export const CUTSCENE_TRIGGERS = ['enter', 'npc', 'starter', 'win', 'play'];
