@@ -105,7 +105,8 @@ export class HubRenderer {
     // os atores da cena (o Maxie, o rival...) andam pela vila como as pessoas dela
     for (const a of scene?.cast ?? []) {
       if (a.hidden || a.glow) continue;
-      actors.push({ y: a.y, order: 1, draw: () => this._sprite(a.sprite, actorFrame(a), a.dir === 'right', a.x, a.y, 0) });
+      // `jx` treme de lado e `lift` sobe (os passos tremble e fly das cenas, em pixels do GBA)
+      actors.push({ y: a.y, order: 1, draw: () => this._sprite(a.sprite, actorFrame(a), a.dir === 'right', a.x + (a.jx ?? 0) / T, a.y, -(a.lift ?? 0)) });
     }
     actors.sort((a, b) => a.y - b.y || a.order - b.order);
     for (const actor of actors) actor.draw();

@@ -41,14 +41,19 @@ export function showMissionCard(game, missionId, { onPlay, onBack }) {
   who.appendChild(create('b', '', mission.name));
   who.appendChild(create('span', 'panel-badge-name', mission.about));
   const balls = create('span', 'panel-balls');
-  balls.title = `${mission.balls.count} ${mission.balls.name} por luta, ${Math.round(mission.balls.chance * 100)}% de captura em cada`;
-  for (let i = 0; i < mission.balls.count; i++) {
-    const ball = create('img');
-    ball.src = mission.balls.icon;
-    ball.alt = '';
-    balls.appendChild(ball);
+  if (mission.balls) {
+    balls.title = `${mission.balls.count} ${mission.balls.name} por luta, ${Math.round(mission.balls.chance * 100)}% de captura em cada`;
+    for (let i = 0; i < mission.balls.count; i++) {
+      const ball = create('img');
+      ball.src = mission.balls.icon;
+      ball.alt = '';
+      balls.appendChild(ball);
+    }
+    balls.appendChild(create('span', 'panel-balls-text', `${mission.balls.count} ${mission.balls.name} · ${Math.round(mission.balls.chance * 100)}% cada`));
+  } else {
+    // a luta sem captura (o Zapdos, H-6): a captura dele fica para outro momento
+    balls.appendChild(create('span', 'panel-balls-text', 'Sem captura nesta luta'));
   }
-  balls.appendChild(create('span', 'panel-balls-text', `${mission.balls.count} ${mission.balls.name} · ${Math.round(mission.balls.chance * 100)}% cada`));
   who.appendChild(balls);
   strip.appendChild(who);
   panel.appendChild(strip);
@@ -66,7 +71,7 @@ export function showMissionCard(game, missionId, { onPlay, onBack }) {
   const play = create('button', 'panel-play');
   play.type = 'button';
   play.id = 'mission-play';
-  play.innerHTML = `<img src="${mission.balls.icon}" alt="" /><span>Lutar</span>`;
+  play.innerHTML = `<img src="${mission.balls?.icon ?? 'assets/items/poke-ball.png'}" alt="" /><span>Lutar</span>`;
   play.onclick = () => onPlay();
   actions.appendChild(play);
   const back = create('button', 'menu-btn hall-back');

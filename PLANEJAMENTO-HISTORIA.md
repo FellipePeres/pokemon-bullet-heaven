@@ -61,6 +61,14 @@ perderam o rumo, abandonaram as suas casas e passaram a andar em hordas. Cada
 pássaro recuperado acalma um pedaço de Kanto. O ladrão é o **Maxie**, que
 aparece na cena do Kyogre: ele chegou tarde, porque o Kyogre era o próximo da lista.
 
+**As máquinas que sugam a energia** (refino do Fellipe, depois da luta do Zapdos): as
+máquinas que prendem os lendários **sugam a energia deles**, canalizam e mandam em ondas
+para um lugar que o jogador ainda não conhece. Lá, numa base do Maxie (não
+necessariamente em Kanto), essa energia alimenta uma **máquina central**, e é ela que
+desorienta os Pokémon: a causa de toda a confusão das hordas. É a ideia de um **End Game**
+no futuro. Ela também explica por que um jogador de nível baixo vence um lendário: preso
+há muito tempo, com a energia sendo sugada, ele está **enfraquecido**.
+
 **A regra da escrita:** o jogador descobre antes de entender. Ninguém diz "Maxie"
 antes da cena do Kyogre. O que aparece são **rastros**: as máquinas vazias, um
 vulto de capuz vermelho visto de longe e um **emblema vermelho** que ninguém
@@ -127,15 +135,17 @@ passos:
    confuso.
 2. **A transição de batalha**, e então **a luta**: um Bullet Heaven com o kit do
    lendário (o golpe exclusivo, que já existe) e um **desafio próprio** de cada um.
-3. **A captura**: 3 bolas especiais por luta (a Dive Ball fica com o Kyogre; a
-   Ultra Ball serve aos outros, padrão). A vida não cai abaixo de 15% enquanto
-   houver bola, e na falha ela volta a 25%.
+3. **A captura**, quando a missão tem: 3 bolas especiais por luta (a Dive Ball do
+   Kyogre). A vida não cai abaixo de 15% enquanto houver bola, e na falha ela volta a
+   25%. **Os pássaros não são capturados na missão** (refino do Fellipe, decisão 16):
+   enfraquecidos e assustados, eles fogem na cena de depois, e a captura fica para
+   outro momento.
 4. **A recuperação**: o lendário vai para o PC, como o Kyogre (decisão 3), e uma
    cena fecha o capítulo.
 
 | Lendário | Onde (mapa do FireRed) | Abre quando | Nível recomendado (padrão) | O desafio próprio (ideia) |
 |---|---|---|---|---|
-| **Zapdos** | o fundo da Usina (`PowerPlant`), pela escotilha da sala do gerador | o card aparece depois da Fase 3 (a Usina andável); a luta pede o nível dela | ~58 | Tempestade: raios marcados no chão antes de cair |
+| **Zapdos** | o fundo da Usina (`PowerPlant`), pela escotilha da sala do gerador | o card aparece depois da Fase 3 (a Usina andável) | 36 (enfraquecido pela máquina) | Tempestade: raios marcados no chão antes de cair |
 | **Articuno** | Ilhas Seafoam, o fundo (`SeafoamIslands_B4F`) | depois do Blaine | ~62 | Nevasca: neblina que esconde a horda e chão que desacelera |
 | **Moltres** | o cume do Monte Brasa, na Ilha 1 (`MtEmber_Summit`) | depois do Giovanni | ~66 | Sol forte: Fogo ×1,5 e Água ×0,5, o contrário do Drizzle |
 | **Mewtwo** | a Caverna Desconhecida (`CeruleanCave_B1F`) | depois do Campeão | ~82 | Psíquico: teletransporte e uma barreira que devolve golpes |
@@ -155,7 +165,9 @@ passos:
 ### 5.1 A missão do Zapdos (H-5 e H-6, feita na 0.39)
 
 Pedido do Fellipe: "pode construir isso" (a luta do Zapdos, para o "Lutar" do card
-funcionar: o molde das missões, tirado do salão do Kyogre, e a tempestade). As
+funcionar: o molde das missões, tirado do salão do Kyogre, e a tempestade). Depois de
+ver a luta, ele refinou a história (decisão 16): a máquina suga a energia do Zapdos, por
+isso ele está fraco; e não dá para capturá-lo agora, porque ele foge, assustado. As
 decisões abertas ficaram no padrão, para o Fellipe mudar o que quiser.
 
 - **O Lutar**: o grito do Zapdos e a transição de batalha do FireRed para os
@@ -168,15 +180,15 @@ decisões abertas ficaram no padrão, para o Fellipe mudar o que quiser.
   faixa de aviso), e a base dela bloqueia o caminho. A música é a da Usina no FireRed
   (`mus_poke_mansion`), e a do lendário quando ele se solta.
 - **Preso (0:00 a 0:45)**: o Zapdos acorrentado à máquina (quatro correntes, das
-  bobinas e do console), se debatendo e soltando faíscas, enquanto a horda elétrica da
-  Usina vem (Voltorb, Magnemite, Pikachu, Electrode, Magneton, Electabuzz e Raichu,
-  níveis 54 a 58, com dois Electrode e um Electabuzz mais fortes). A tempestade já cai.
-  Nos últimos segundos, a máquina sobrecarrega (o emblema acende, um arco entre as
-  bobinas, "A máquina está sobrecarregando!").
-- **As correntes arrebentam**: ele entra em campo ainda preso (a apresentação do
-  lendário vem por cima), e logo depois o clarão, o grito, os elos voando, a máquina
-  quebra, e ele sobe furioso: "As correntes arrebentaram! O Zapdos está livre, e
-  furioso!".
+  bobinas e do console), se debatendo e soltando faíscas. **A energia dele escorre**: as
+  bolhas de luz descem pelas correntes até a máquina, e ondas sobem das bobinas, para
+  longe. A horda elétrica da Usina vem (Voltorb, Magnemite, Pikachu, Electrode, Magneton,
+  Electabuzz e Raichu, níveis 32 a 36, com dois Electrode e um Electabuzz mais fortes).
+  A tempestade já cai. Nos últimos segundos, a máquina sobrecarrega.
+- **As correntes arrebentam**: ele entra em campo ainda preso (a apresentação diz "A
+  máquina sugou a energia dele por muito tempo. Ele está fraco, mas fora de si!"), e
+  logo depois o clarão, o grito, os elos voando, a máquina quebra, e ele sobe: "As
+  correntes arrebentaram! O Zapdos está fraco, mas furioso!".
 - **A tempestade (o desafio dele)**: os raios caem o tempo todo, sempre num lugar
   marcado no chão antes (1,25 s de aviso). Um a cada 3,2 s com ele preso; 1 ou 2 a cada
   2,4 s solto; 2 a cada 1,8 s abaixo de 50%; 3 a cada 1,3 s na fúria.
@@ -194,28 +206,32 @@ decisões abertas ficaram no padrão, para o Fellipe mudar o que quiser.
   depois as da primeira de novo, com 1 s entre as levas. Só a próxima leva acende
   forte, e a casa queimada fica escura: **fica a salvo quem pisa onde o raio acabou de
   cair**. No fim, ele mergulha de volta num lugar marcado, com um Discharge.
-- **A captura** é a do molde: 3 Ultra Balls de 10%, o piso de 15% enquanto houver bola,
-  a volta a 25%, 8 s exausto com a bola caindo num feixe de luz. Capturado, ele vai
-  **sempre para o PC** (o card avisa), e a máquina entra em sobrecarga: 25 s de leva
-  final. **Sem bolas, derrotado, ele se solta e voa livre** ("O Zapdos se soltou e voou
-  para longe, livre!"): a missão vence do mesmo jeito.
-- **A força**: o nível recomendado do card (58) é o da luta. Medida com o jogador
-  automático e uma equipe comum de meio de jornada (`node tools/kyogre.mjs 58 12
-  zapdos`): no nível 50 vence 2 de 12; no 54, 8 de 12; **no 58, 11 de 12, com 3 a 4
-  desmaios**; no 62, 11 de 12. Primeira vitória: 300 Shards.
+- **Sem captura**: a luta não tem bolas (o card diz "Sem captura nesta luta"), e ele não
+  tem piso de vida. Derrotado, **ele cai sem forças** ("O Zapdos caiu, sem forças!") e
+  a fase é vencida.
+- **A força**: fraco pela máquina, ele é para **logo depois da Fase 3** (o nível
+  recomendado do card é 36; a Fase 3 pede 33, a Fase 4, 40). Medida com o jogador
+  automático e uma equipe comum (`node tools/kyogre.mjs 36 12 zapdos`): no nível 28
+  vence 5 de 12; no 30, 8 de 12; no 32, 11 de 12; **no 36, 11 de 12, com 3 a 4
+  desmaios**; no 40, 12 de 12. Primeira vitória: 300 Shards.
 - **Perdeu**: a tela de resultado oferece "Tentar de novo" (a equipe curada, sem
   atravessar a Usina) e "Voltar para a vila" (acorda no Centro: um marinheiro de
   Vermilion achou o jogador desmaiado perto da escotilha). Saiu no meio: volta para
   cima, ao lado da escotilha.
-- **Venceu** (capturando ou não): a missão fica registrada na jornada, a quest
-  "Derrote e liberte o Zapdos" fecha, e o "Continuar Jornada" leva à **cena de depois**
-  (`zapdos_livre`), na sala do fundo **com a luz de volta**: as lâmpadas piscam e
-  acendem, "o Zapdos descansa na Ultra Ball" (ou "voou, livre"), o jogador vai até a
-  máquina destruída e vê, no meio dela, **um emblema vermelho que nunca viu**: "Alguém
-  prendeu o Zapdos aqui de propósito." O jogador fica em cima, ao lado da escotilha,
-  e a escotilha passa a levar à sala iluminada, só com os pedaços da máquina. Na vila,
-  o rapaz conta que a Usina voltou a funcionar, e o velho sábio, uma vez: "Alguém está
-  caçando os pássaros lendários. E o Articuno ainda não voltou."
+- **Venceu**: a missão fica registrada na jornada, a quest "Derrote e liberte o Zapdos"
+  fecha, e o "Continuar Jornada" leva à **cena de depois** (`zapdos_livre`), na sala do
+  fundo **com a luz de volta**. O Zapdos está caído no chão, sem forças. Ele treme, vê o
+  jogador (o "!"), grita, treme de medo e **foge pelo alto, assustado**: "Ele ainda está
+  fraco demais para confiar em alguém." O jogador vai até a máquina destruída: "Ela
+  sugava a energia do Zapdos pelas correntes e mandava para longe, em ondas. Para
+  onde?", e no meio dela, **um emblema vermelho que nunca viu**: "Alguém prendeu o
+  Zapdos aqui de propósito." O jogador fica em cima, ao lado da escotilha, e a
+  escotilha passa a levar à sala iluminada, só com os pedaços da máquina. Na vila, o
+  rapaz conta que a Usina voltou a funcionar, e o velho sábio, uma vez, fala da máquina
+  que sugava a energia e de alguém caçando os pássaros.
+- **A captura do Zapdos é outro momento** (padrão, até o Fellipe decidir): liberado, ele
+  entra no sorteio da Poké Ball das fases seguintes (da Fase 7 em diante, com a chance
+  baixa de hoje), como na decisão 3 ("se escapar na missão, volta pela Poké Ball").
 - **A jornada que já tinha o Zapdos** (da Poké Ball das fases, antes das missões): a
   missão aparece concluída (as duas quests da Usina fecham sozinhas e a marca sai do
   mapa), e o Carvalho comenta uma vez: "O Zapdos está com você? Então foi você quem o
@@ -242,7 +258,9 @@ decisões abertas ficaram no padrão, para o Fellipe mudar o que quiser.
   existirem (H-5 em diante). Sem isso, as aves sumiriam do jogo. **Feito na 0.39,
   lendário por lendário**: quem já tem missão (o Zapdos) só cai na Poké Ball depois de
   liberado; os outros (Articuno, Moltres, Mewtwo, Mew) continuam como antes até a
-  missão deles existir (`MISSION_SPECIES` em `data/missions.js`).
+  missão deles existir (`MISSION_SPECIES` em `data/missions.js`). Como o Zapdos foge na
+  missão (decisão 16), a Poké Ball das fases seguintes é, por enquanto, o "outro
+  momento" da captura dele (padrão).
 - **O kit continua**: o golpe exclusivo, as melhorias e o Golpe Desperto chegam
   com o lendário quando ele é recuperado.
 - **Jornadas que já têm um lendário continuam com ele**, porque nada se tira do
@@ -460,7 +478,7 @@ para o objetivo `scene` das quests. O check-data recusa a caixa com retrato
 | 10 | A Usina andável e o fundo: os olhos e o card do Zapdos | Usina, pela marca no mapa da jornada | 2 | H-4 ✅ |
 | 11 | O vulto de vermelho na Rota 10 | antes da Fase 5 | 3 | H-4 |
 | 12 | ~~O estrondo na Usina~~ (saiu: a Usina andável e a missão vieram para depois da Fase 3, decisão 14) | — | — | — |
-| 13 | A jaula do Zapdos: a luta e, depois, a sala com a luz de volta e o emblema vermelho na máquina destruída (`zapdos_livre`) | o fundo da Usina | 2 (missão) | H-6 ✅ |
+| 13 | A jaula do Zapdos: a luta e, depois, a sala com a luz de volta, o Zapdos fugindo assustado e a máquina que sugava a energia dele, com o emblema vermelho (`zapdos_livre`) | o fundo da Usina | 2 (missão) | H-6 ✅ |
 | 14 | O Carvalho e o emblema | laboratório | 3 ou 4 | depois |
 | 15 | A jaula do Articuno | Ilhas Seafoam | 5 (missão) | H-7 |
 | 16 | O Giovanni e o emblema | ginásio de Viridian, depois da Fase 8 | 6 | H-8 |
@@ -549,9 +567,9 @@ com um círculo fraco de luz em volta, em degraus de pixel. Dois segundos depois
 os olhos vermelhos do Zapdos, desenhados em pixel num tile do mapa, por cima do
 escuro (a pista `olhos` fecha "Investigue a Usina" e abre **"Derrote e liberte o
 Zapdos"**). Mais dois segundos e sobe o card, no padrão do card de fase, com a foto
-do Zapdos, o tipo, as fraquezas, as 3 Ultra Balls e o nível recomendado (58).
-"Voltar" devolve o jogador para cima, ao lado da escotilha; "Lutar" espera a luta
-(o molde das missões, H-5, e a do Zapdos, H-6).
+do Zapdos, o tipo, as fraquezas e o nível recomendado (36; sem captura, decisão 16).
+"Voltar" devolve o jogador para cima, ao lado da escotilha; "Lutar" começa a luta
+(o molde das missões, H-5, e a do Zapdos, H-6: seção 5.1).
 
 ---
 
@@ -582,7 +600,7 @@ do Zapdos, o tipo, as fraquezas, as 3 Ultra Balls e o nível recomendado (58).
 | **H-3** | A tela de missões. |
 | **H-4** (em andamento) | Os capítulos 1 a 3: as falas de depois da vitória dos líderes, o velho sábio, os moradores e as quests de cada capítulo. **Feito na 0.39:** o Capítulo 1 inteiro (o Brock e o velho sábio) e o Capítulo 2 inteiro (a Misty, a casa roubada, os moradores; o Surge, o marinheiro e a Usina andável, com a missão do Zapdos, H-5 e H-6). Falta o Capítulo 3 (Erika e Koga). |
 | **H-5** ✅ 0.39 | A captura sem lendários e o molde da missão de lendário, tirado do salão do Kyogre: `systems/legendaryFight.js` (a captura, os avisos, os anéis, a leva final), o Kyogre por cima dele sem mudar nada (o mesmo rastro, quadro a quadro), o registro das missões na jornada, a volta pela missão e a regra da Poké Ball para quem tem missão. |
-| **H-6** ✅ 0.39 | O Zapdos (seção 5.1): o Lutar com a transição, a luta no fundo da Usina, a tempestade, a captura com Ultra Ball e a cena de depois. |
+| **H-6** ✅ 0.39 | O Zapdos (seção 5.1): o Lutar com a transição, a luta no fundo da Usina com ele enfraquecido pela máquina, a tempestade, e a cena de depois, em que ele foge assustado (sem captura, decisão 16). |
 | **H-7 e H-8** | O Articuno e o Moltres, cada um com o seu plano e a sua maquete. |
 | **H-9** | A Liga com os pássaros e o fim do Capítulo 7 (o rival e o "ainda falta alguma coisa"). |
 | **H-10** | O Mewtwo. |
@@ -628,10 +646,22 @@ do Zapdos, o tipo, as fraquezas, as 3 Ultra Balls e o nível recomendado (58).
     o jogador explora por conta, acha as Poké Balls e a escotilha, e no fundo, no
     escuro, os olhos (em pixel, num tile, nada de imagem desfocada) e o card de
     fase "Derrote e liberte o Zapdos", com a foto dele. O card aparece depois da
-    Fase 3, e a luta pede o nível dela (~58, padrão). A visão da Sabrina no
+    Fase 3, e a luta pede o nível dela (~58, padrão; depois, 36: decisão 16). A visão da Sabrina no
     Capítulo 4 passa a apontar para os outros dois pássaros.
 15. **A luta do Zapdos** (pedido do Fellipe: "pode construir isso"; os detalhes no
     padrão, seção 5.1): preso na máquina nos primeiros 45 s, as correntes arrebentando,
     a tempestade marcada no chão o tempo todo, o Zap Cannon, a Investida, o Discharge e
-    a tempestade total em tabuleiro; 3 Ultra Balls; derrotado sem captura, ele voa livre.
-    Depois, a sala com a luz de volta e o emblema vermelho na máquina destruída.
+    a tempestade total em tabuleiro. Depois, a sala com a luz de volta e o emblema
+    vermelho na máquina destruída.
+16. **As máquinas sugam a energia dos lendários, e o Zapdos foge** (refino do Fellipe
+    depois de ver a luta: "essas máquinas que prendem os lendários sugam a energia
+    deles, canaliza e manda por ondas para um outro lugar até então misterioso para o
+    jogador"; "ao derrotar o Zapdos, rola uma cutscene do Zapdos voando e fugindo,
+    assustado, então não é possível capturar o Zapdos por enquanto, vai ter um outro
+    momento para isso"). A energia alimenta uma máquina central numa base do Maxie, a
+    causa da desorientação dos Pokémon: ideia de End Game, para o futuro (seção 2).
+    Enfraquecido, o Zapdos é uma luta para logo depois da Fase 3 (nível 36, padrão). Sem
+    captura na missão: derrotado, ele cai; na cena de depois, foge pelo alto. O "outro
+    momento" da captura, por enquanto, é a Poké Ball das fases seguintes (padrão, como
+    na decisão 3). A mesma lógica deve valer para as outras máquinas (o Articuno e o
+    Moltres), a confirmar quando chegar a vez de cada um.

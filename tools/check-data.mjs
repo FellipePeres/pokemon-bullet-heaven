@@ -576,7 +576,8 @@ const inside = (mapId, x, y) => { const m = HUB_MAPS[mapId]; return !!m && x >= 
     if (!place.text || !place.seenText || !place.go || !place.goSeen) issues.push(`lugar ${id}: sem os textos do painel`);
   }
   for (const [id, mission] of Object.entries(MISSIONS)) {
-    for (const file of [mission.banner, mission.balls?.icon, `assets/pokemon/gen3/front/${mission.dex}.png`]) {
+    // a luta sem captura (o Zapdos, H-6) não tem bolas no card
+    for (const file of [mission.banner, ...(mission.balls ? [mission.balls.icon] : []), `assets/pokemon/gen3/front/${mission.dex}.png`]) {
       if (!file || !existsSync(join(root, file))) issues.push(`missão ${id}: falta ${file}`);
     }
     if (!(mission.recommendedLevel > 0) || !mission.title || !mission.weak?.length) issues.push(`missão ${id}: card incompleto`);
@@ -588,11 +589,15 @@ const inside = (mapId, x, y) => { const m = HUB_MAPS[mapId]; return !!m && x >= 
     else {
       if (stage.mission !== id || stage.returnTo !== 'mission' || !stage.secret) issues.push(`missão ${id}: a fase ${mission.stage} precisa de mission, returnTo 'mission' e secret`);
       if (cfg.species !== mission.species || !LEGENDARY_KITS[mission.species]) issues.push(`missão ${id}: o lendário da luta (${cfg.species}) não é o da missão (${mission.species})`);
-      if (cfg.balls !== mission.balls.count || cfg.chance !== mission.balls.chance) issues.push(`missão ${id}: o card mostra bolas diferentes das da luta`);
+      if ((cfg.balls ?? 0) !== (mission.balls?.count ?? 0) || (mission.balls && cfg.chance !== mission.balls.chance)) issues.push(`missão ${id}: o card mostra bolas diferentes das da luta`);
       if (stage.recommendedLevel !== mission.recommendedLevel) issues.push(`missão ${id}: o nível do card não é o da fase`);
-      if (!cfg.ballSheet || !existsSync(join(root, ...(MANIFEST_FOR[cfg.ballSheet] ?? 'x').split('/')))) issues.push(`missão ${id}: a bola da luta (${cfg.ballSheet}) não tem folha`);
-      for (const key of ['name', 'dex', 'ballName', 'lostBall', 'finalObjective', 'finalToast', 'finalEnd', 'finalBanner']) {
-        if (cfg[key] == null) issues.push(`missão ${id}: o legendaryFight da fase não tem ${key}`);
+      for (const key of ['name', 'dex']) if (cfg[key] == null) issues.push(`missão ${id}: o legendaryFight da fase não tem ${key}`);
+      // com captura, a bola, os textos dela e os da leva final
+      if (cfg.balls > 0) {
+        if (!cfg.ballSheet || !existsSync(join(root, ...(MANIFEST_FOR[cfg.ballSheet] ?? 'x').split('/')))) issues.push(`missão ${id}: a bola da luta (${cfg.ballSheet}) não tem folha`);
+        for (const key of ['ballName', 'lostBall', 'finalObjective', 'finalToast', 'finalEnd', 'finalBanner', 'chance', 'floor', 'recover', 'exhaust', 'finalTide']) {
+          if (cfg[key] == null) issues.push(`missão ${id}: o legendaryFight da fase não tem ${key}`);
+        }
       }
     }
   }

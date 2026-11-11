@@ -895,9 +895,10 @@ game.menus.closeModal();
   for (let i = 0; i < 60 * 2.2; i++) hub.update(1 / 60);
   const card = registry.get('mission-card');
   const cardHtml = () => JSON.stringify(card.children.map((c) => [c.className, c.innerHTML, c.children.map((k) => [k.className, k.innerHTML, k.src])]));
+  const deepText = (n) => [n.innerHTML ?? '', n.textContent ?? '', ...(n.children ?? []).map(deepText)].join(' ');
   check('mais 2 segundos e o card sobe, no padrão do card de fase, com a foto do Zapdos',
         game.missionCard?.id === 'zapdos' && !card.classes.has('hidden') && cardHtml().includes('Derrote e liberte o Zapdos') && cardHtml().includes('145.png')
-        && cardHtml().includes('ultra-ball.png') && cardHtml().includes('Nível recomendado'));
+        && deepText(card).includes('Sem captura nesta luta') && cardHtml().includes('Nível recomendado'));
   game.handleAction('cancel');
   for (let i = 0; i < 4; i++) hub.update(1 / 60);
   settle();
@@ -923,8 +924,8 @@ game.menus.closeModal();
   for (let i = 0; i < 20; i++) hub.update(1 / 60, STEP.down);
   check('...durante a transição, nada anda', `${hub.mapId}:${hub.player.x},${hub.player.y}` === where && !hub.player.moving && !!hub.battle);
   for (let i = 0; i < 60 * BATTLE_INTRO + 2; i++) hub.update(1 / 60);
-  check('no fim dela, a luta do Zapdos: o fundo da Usina, o Zapdos preso na máquina e 3 Ultra Balls',
-        game.run?.stage.id === 'zapdos' && game.run.fight?.kind === 'zapdos' && game.run.fight.balls === 3 && !game.run.fight.snapped
+  check('no fim dela, a luta do Zapdos: o fundo da Usina e o Zapdos preso na máquina, sem captura',
+        game.run?.stage.id === 'zapdos' && game.run.fight?.kind === 'zapdos' && game.run.fight.balls === 0 && !game.run.fight.snapped
         && game.run.world.scene === 'usina_arena' && !hub.battle && !hub.scene);
   // sair no meio: de volta para cima, ao lado da escotilha
   game.quitToMenu();
@@ -953,34 +954,28 @@ game.menus.closeModal();
         && (game.campaign.dive?.rescues ?? 0) === rescues);
   closeDialog();
   check('perder não libera o Zapdos', game.missionState('zapdos') === 'preso' && game.quests.isActive('z_zapdos'));
-  // a vitória com a captura
+  // a vitória (sem captura: ele cai sem forças)
   toTheCard();
   game.handleAction('confirm');
   for (let i = 0; i < 60 * BATTLE_INTRO + 2; i++) hub.update(1 / 60);
-  // a captura: o presente da luta (toPC) abre a tela de sempre, e ele vai para o PC mesmo com espaço
-  const teamSize = game.run.team.members.length;
-  game.run.pendingGift = { choices: ['zapdos'], title: 'Gotcha! O Zapdos foi capturado!', mandatory: true, toPC: true };
-  game.run.state = 'capture';
-  game._handleRunState();
-  check('capturou: a tela da captura avisa que ele vai para o PC', game.captureOpen && game.run.pendingGift?.toPC);
-  game.pickCapture('zapdos');
-  check('...e ele vai para o PC, mesmo com espaço na equipe', game.run.pc.some((m) => m.pokemonId === 'zapdos')
-        && game.run.team.members.length === teamSize && !game.run.team.has('zapdos'));
-  game.run.fight.captured = true;
   game.run.state = 'victory';
   game._handleRunState();
-  check('venceu e capturou: a missão fica registrada, o Zapdos vai para o PC e a quest fecha',
-        game.missionState('zapdos') === 'capturado' && game.campaign.journey.pc.some((m) => m.pokemonId === 'zapdos')
+  check('venceu: a missão fica registrada (o Zapdos livre, não capturado) e a quest fecha',
+        game.missionState('zapdos') === 'livre' && !game.campaign.journey.pc.some((m) => m.pokemonId === 'zapdos')
         && game.quests.isDone('z_zapdos') && game.sceneRecord.zapdos_livre === 'due');
   check('a vitória não oferece jogar de novo (o Zapdos está livre)', registry.get('btn-result-retry').classes.has('hidden'));
   check('depois da missão, o Zapdos pode cair na Poké Ball das fases seguintes', game.liberatedSpecies().includes('zapdos'));
   registry.get('btn-result-menu').click();
-  check('Continuar Jornada: a sala do fundo com a luz de volta e a máquina destruída (a cena de depois)',
+  check('Continuar Jornada: a sala do fundo com a luz de volta, a máquina destruída e o Zapdos caído (a cena de depois)',
         hubVisible() && hub.mapId === 'usina_luz' && hub.scene?.id === 'zapdos_livre' && !hub.place.dark
-        && hub.decor.some((d) => d.sprite === 'maquina_zapdos_quebrada'));
-  const livre = runScene();
-  check('a cena: a luz volta, o Zapdos descansa na Ultra Ball e o emblema vermelho na máquina',
-        said(livre, 'Ultra Ball') && said(livre, 'emblema vermelho') && said(livre, 'de propósito') && game.sceneRecord.zapdos_livre === 'seen');
+        && hub.decor.some((d) => d.sprite === 'maquina_zapdos_quebrada') && hub.scene.actor('zapdos')?.sprite === 'npc/zapdos');
+  // quando a caixa diz que ele fugiu, ele já subiu e sumiu (o passo fly)
+  let flew = false;
+  const livre = runScene((d) => { if (d.text.includes('fugiu')) flew = !!hub.scene?.actor('zapdos')?.hidden; });
+  check('a cena: o Zapdos se assusta e foge pelo alto; a captura fica para outro momento',
+        said(livre, 'fugiu, assustado') && flew && game.sceneRecord.zapdos_livre === 'seen');
+  check('...e a máquina: a energia sugada, mandada para longe em ondas, e o emblema vermelho',
+        said(livre, 'sugava a energia') && said(livre, 'em ondas') && said(livre, 'emblema vermelho') && said(livre, 'de propósito'));
   settle();
   check('...e o jogador fica em cima, ao lado da escotilha', hub.mapId === 'usina' && hub.player.x === 5 && hub.player.y === 12);
   hub.enter({ map: 'usina', x: 4, y: 13, dir: 'up' });
@@ -1001,6 +996,7 @@ game.menus.closeModal();
   // a mesma jornada, sem a missão: quem já tinha o Zapdos não perde nada
   const missions = game.campaign.missions;
   game.campaign.missions = {};
+  game.campaign.journey.pc = [...(game.campaign.journey.pc ?? []), { uid: 'zap', pokemonId: 'zapdos', level: 58, xp: 0, hp: 0, abilities: ['zap_cannon', 'bolt_strike'], upgrades: {} }];
   check('a jornada que já tinha o Zapdos (sem a missão) aparece como liberada ("antes")', game.missionState('zapdos') === 'antes'
         && game.liberatedSpecies().includes('zapdos'));
   hub.say('carvalho');

@@ -32,9 +32,9 @@ export class Cutscene {
    * @param options id; fill(text) troca {player} e companhia; value(key) lê o contexto
    *                das falas (o `pick` dos passos); give(item, count) dá um item e devolve o
    *                nome; quest(id) abre uma quest; emit(on, target) conta um acontecimento da
-   *                história (a pista); onEnd() no fim
+   *                história (a pista); cry(dex) toca o grito de um Pokémon; onEnd() no fim
    */
-  constructor(hub, def, { id = null, fill = (text) => text, value = () => null, give = null, quest = null, emit = null, card = null, onEnd = null } = {}) {
+  constructor(hub, def, { id = null, fill = (text) => text, value = () => null, give = null, quest = null, emit = null, card = null, cry = null, onEnd = null } = {}) {
     this.hub = hub;
     this.id = id;
     this.band = def.band ?? null;
@@ -55,6 +55,7 @@ export class Cutscene {
     this._quest = quest;
     this._emit = emit;
     this._card = card;
+    this._cry = cry;
     this._onEnd = onEnd;
   }
 
@@ -194,6 +195,24 @@ export class Cutscene {
         done = !!local.closed;
         break;
       case 'quest': this._quest?.(a.id); done = true; break;
+      case 'cry': this._cry?.(a.dex); done = true; break;
+      case 'tremble': {
+        // tremendo no lugar (o Zapdos assustado, H-6): de um lado para o outro, em pixels do GBA
+        const m = this.actor(a.who);
+        m.jx = this.t < (a.t ?? 0.6) ? Math.round(Math.sin(this.t * 60) * (a.power ?? 2)) : 0;
+        done = this.t >= (a.t ?? 0.6);
+        break;
+      }
+      case 'fly': {
+        // levanta voo e some pelo alto da tela (`height` pixels do GBA em `t` segundos, acelerando)
+        const m = this.actor(a.who);
+        const k = Math.min(1, this.t / (a.t ?? 0.9));
+        m.lift = (a.height ?? 200) * k * k;
+        m.jx = Math.round(Math.sin(this.t * 25) * 2 * (1 - k));
+        done = k >= 1;
+        if (done) { m.hidden = true; m.lift = 0; m.jx = 0; }
+        break;
+      }
       case 'emit': this._emit?.(a.on, a.target ?? null); done = true; break;
       case 'card':
         // o card de uma missão (data/missions.js): a cena espera o Lutar ou o Voltar. No

@@ -1083,10 +1083,11 @@ export const ENEMIES = {
     behavior: 'chaser', radius: 15, scale: 1.15
   },
   // o Zapdos (H-6): os ataques dele (a tempestade, o Zap Cannon, a Investida, o Discharge e a
-  // tempestade total) são do systems/zapdosFight.js; `legendary` tira a rajada de líder
+  // tempestade total) são do systems/zapdosFight.js; `legendary` tira a rajada de líder. Está
+  // fraco: a máquina sugou a energia dele, e a luta é para logo depois da Fase 3
   zapdos_boss: {
-    id: 'zapdos_boss', dex: 145, name: 'Zapdos', types: ['electric', 'flying'], level: 58,
-    hp: 160000, speed: 92, damage: 40, xp: 1600, dropChance: 0,
+    id: 'zapdos_boss', dex: 145, name: 'Zapdos', types: ['electric', 'flying'], level: 36,
+    hp: 85000, speed: 92, damage: 33, xp: 1600, dropChance: 0,
     behavior: 'boss', radius: 46, scale: 2.6, boss: true, ace: true, legendary: true, enrageAt: 0.2,
     leader: 'Zapdos', abilities: []
   }

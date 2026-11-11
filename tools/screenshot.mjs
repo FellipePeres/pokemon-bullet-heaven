@@ -141,13 +141,13 @@ const ROTEIROS = {
     { run: 'skip(3)' }, { wait: 1900 }, { shot: 'cenas-49-maxie-crobat' }
   ],
   // a missão do Zapdos (H-5, o molde; H-6, a luta): o card no escuro, a transição de batalha,
-  // a luta (preso, as correntes, os ataques, a tempestade total), a captura com a Ultra Ball e a
-  // cena de depois, com a luz de volta e a máquina destruída
+  // a luta (preso, com a energia sugada; as correntes, os ataques, a tempestade total), a vitória
+  // e a cena de depois: a luz de volta, o Zapdos fugindo assustado e a máquina destruída
   zapdos: [
     { open: 'index.html' }, { wait: 500 },
     { run: "window.skip = (n = 1) => { for (let i = 0; i < n; i++) { const h = game.hub; if (!h.dialog) return; h.dialog.shown = 999; h.confirm(); } };" +
            "game.newGame(); game.chooseTrainer('leaf'); game.chooseName('Fellipe'); game.chooseStarter('charmander');" +
-           "const mon = (uid, id, abilities) => ({ uid, pokemonId: id, level: 58, xp: 0, hp: 0, abilities, upgrades: {} });" +
+           "const mon = (uid, id, abilities) => ({ uid, pokemonId: id, level: 36, xp: 0, hp: 0, abilities, upgrades: {} });" +
            "game.campaign.journey = { team: { members: [mon('a', 'charizard', ['flamethrower']), mon('b', 'gyarados', ['hydro_pump']), mon('c', 'arcanine', ['flamethrower'])], active: ['a', 'b', 'c'] }, pc: [] };" +
            "game.campaign.clearedStages.push('gym_1_pewter', 'gym_2_cerulean', 'gym_3_vermilion'); (game.campaign.scenes ??= {}).usina_entrada = 'seen';" +
            "document.getElementById('toast-container').style.display = 'none';" +
@@ -172,15 +172,14 @@ const ROTEIROS = {
     { wait: 1000 }, { shot: 'zap-16-segunda-leva', raw: true },
     { wait: 2600 }, { run: "{ const f = game.run.fight; f.attackTimer = 99; f.stormTimer = 99; f._discharge(f.boss); }" }, { wait: 380 }, { shot: 'zap-17-discharge', raw: true },
     { wait: 1200 }, { run: "import('./src/systems/combat.js').then(({ damageEnemy }) => damageEnemy(game.run, game.run.boss, 1e9))" },
-    { wait: 400 }, { shot: 'zap-18-bola-caindo', raw: true }, { wait: 1000 }, { shot: 'zap-19-ultra-ball', raw: true },
-    { run: "{ const r = game.run; r.fight.t = 0; r.fight.rng = () => 0.01; r.player.x = r.fight.ball.x; r.player.y = r.fight.ball.y; }" },
-    { wait: 2300 }, { shot: 'zap-20-faixa', raw: true }, { wait: 3300 }, { shot: 'zap-21-gotcha', raw: true },
-    { wait: 1200 }, { shot: 'zap-22-captura', raw: true },
-    { run: "game.pickCapture('zapdos')" }, { wait: 2200 }, { shot: 'zap-23-sobrecarga-final', raw: true },
-    { run: "game.run.fight.final.t = 0.05" }, { wait: 1500 }, { shot: 'zap-24-vitoria' },
-    { run: "game.quitToMenu()" }, { wait: 2600 }, { shot: 'zap-25-a-luz-volta' },
-    { run: 'skip()' }, { wait: 2600 }, { shot: 'zap-26-a-maquina' },
-    { run: 'skip(2)' }, { wait: 1500 }, { shot: 'zap-27-de-proposito' }
+    { wait: 900 }, { shot: 'zap-18-vitoria' },
+    { run: "game.quitToMenu()" }, { wait: 2600 }, { shot: 'zap-19-caido' },
+    { run: 'skip()' }, { wait: 1650 }, { shot: 'zap-20-assustado' },
+    { wait: 1550 }, { shot: 'zap-21-fugindo' },
+    { wait: 1400 }, { shot: 'zap-22-fugiu' },
+    { run: 'skip(2)' }, { wait: 3200 }, { shot: 'zap-23-a-maquina' },
+    { run: 'skip()' }, { wait: 2600 }, { shot: 'zap-24-a-energia' },
+    { run: 'skip(2)' }, { wait: 1500 }, { shot: 'zap-25-de-proposito' }
   ],
   // a melhoria de UX da 0.31: o card de escolha (o inicial e a Poké Ball) e o painel da fase
   ux: [

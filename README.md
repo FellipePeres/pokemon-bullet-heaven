@@ -157,11 +157,12 @@ não abre até você vencer.
   mapa da jornada, e o jogador entra para explorar o labirinto, pegar Poké Balls e
   achar a escotilha para o fundo, onde dois olhos vermelhos esperam no escuro.
 - **A missão do Zapdos**: no fundo da Usina, ele está acorrentado a uma máquina com um
-  emblema vermelho. A horda elétrica vem, as correntes arrebentam e ele luta com uma
-  tempestade de raios marcados no chão, o Zap Cannon, investidas e um tabuleiro de raios
-  em que só fica a salvo quem pisa onde o raio acabou de cair. Três Ultra Balls para
-  capturá-lo; sem elas, ele voa livre. Só depois de liberado ele aparece nas Poké Balls
-  das fases.
+  emblema vermelho, que suga a energia dele e manda para longe, em ondas. Enfraquecido,
+  ele é uma luta para logo depois da Fase 3. A horda elétrica vem, as correntes
+  arrebentam e ele luta com uma tempestade de raios marcados no chão, o Zap Cannon,
+  investidas e um tabuleiro de raios em que só fica a salvo quem pisa onde o raio acabou
+  de cair. Derrotado, ele foge, assustado: a captura fica para outro momento (só depois
+  de liberado ele aparece nas Poké Balls das fases).
 - **Os 151 Pokémon de Kanto jogáveis**, cada um com linha de 3 golpes e linha
   evolutiva. Alguns chegam como presente, como no FireRed (Farfetch'd, Lickitung e
   o prêmio do Dojo de Saffron: Hitmonlee ou Hitmonchan).

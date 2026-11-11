@@ -1305,6 +1305,7 @@ export class Game {
       quest: (questId) => this.openQuest(questId),
       emit: (on, target) => bus.emit(EVENTS.STORY, { on, target }),
       card: (missionId, answer) => this.showMission(missionId, answer),
+      cry: (dex) => playCry(dex),
       onEnd: () => {
         if (record) this.sceneRecord[id] = 'seen';
         onEnd?.();

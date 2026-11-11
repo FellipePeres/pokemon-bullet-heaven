@@ -37,8 +37,11 @@ function toSegment(px, py, ax, ay, bx, by) {
  *     caem, depois as da outra, depois as da primeira de novo. Fica a salvo quem pisa
  *     onde o raio acabou de cair. No fim ele mergulha de volta num lugar marcado.
  * - A fúria abaixo de 20%: os ataques e a tempestade mais densos.
- * - A captura é a do molde, com 3 Ultra Balls. Capturado, a máquina entra em
- *   sobrecarga (a leva final). Derrotado sem captura, ele se solta e voa livre.
+ * - FRACO (o refino do Fellipe): a máquina suga a energia dele pelas correntes e manda para
+ *   longe, em ondas (o desenho mostra), há muito tempo. Por isso uma equipe logo depois da
+ *   Fase 3 consegue vencê-lo.
+ * - SEM CAPTURA: a fase não tem bolas (o molde fica sem piso de vida). Derrotado, ele cai sem
+ *   forças, e a fase é vencida; na cena de depois (`zapdos_livre`) ele foge, assustado.
  *
  * O desenho está em render/zapdosFight.js. Roda sem navegador (os testes).
  */
@@ -61,7 +64,7 @@ export class ZapdosFight extends LegendaryFight {
     this.orb = null;                         // a esfera do Zap Cannon
     this.peck = null;                        // a Investida
     this.sky = null;                         // a tempestade total
-    this.fled = false;                       // derrotado sem captura: voou livre
+    this.downed = false;                     // derrotado: caiu sem forças (foge na cena de depois)
     this._blockMachine();
   }
 
@@ -95,7 +98,7 @@ export class ZapdosFight extends LegendaryFight {
 
   /** A tempestade: os raios caem o tempo todo, sempre num lugar marcado antes. */
   _storm(dt) {
-    if (this.sky || this.quiet || this.final || this.fled || this.state === 'gone' || this.state === 'break') return;
+    if (this.sky || this.quiet || this.final || this.downed || this.state === 'gone' || this.state === 'break') return;
     this.stormTimer -= dt;
     if (this.stormTimer > 0) return;
     const boss = this.boss;
@@ -146,7 +149,7 @@ export class ZapdosFight extends LegendaryFight {
       this.fx.push({ kind: 'chainsnap', x: perch.x, y: perch.y, t: 0, life: 1.4, seed: this.rng() * 1000 });
       this.fx.push({ kind: 'blast', x: this.machine.x, y: this.machine.y, t: 0, life: 0.9, r: 230 });
       for (let i = 0; i < 30; i++) burst(this.run.particles, this.machine.x + rand(-130, 130), this.machine.y + rand(-60, 60), i % 2 ? '#ffe066' : '#ffffff', 2, 300, 4, 1);
-      bus.emit(EVENTS.TOAST, { text: 'As correntes arrebentaram! O Zapdos está livre, e furioso!', icon: 'boss' });
+      bus.emit(EVENTS.TOAST, { text: 'As correntes arrebentaram! O Zapdos está fraco, mas furioso!', icon: 'boss' });
     }
     if (this.t >= 2.2) { boss.untouchable = false; this.attackTimer = 1.2; this._set('fight'); }
   }
@@ -393,16 +396,16 @@ export class ZapdosFight extends LegendaryFight {
     burst(this.run.particles, h.x, h.y, '#ffe066', 22, 360, 4, 0.6);
   }
 
-  /** Derrotado sem a captura (combat.killEnemy): ele se solta e voa para longe, livre. */
+  /** Derrotado (combat.killEnemy): ele cai sem forças; a fuga, assustado, é a cena de depois. */
   onBossDown(boss) {
-    if (boss.captured || this.fled || !boss.data.legendary) return;
-    this.fled = true;
+    if (boss.captured || this.downed || !boss.data.legendary) return;
+    this.downed = true;
     this.hazards = [];
     this.rings = [];
     this.orb = null;
+    this.peck = null;
     this._flash(0.5, '255,250,200');
-    this.fx.push({ kind: 'flyaway', x: boss.x, y: boss.y, t: 0, life: 1.6 });
     playCry(this.dex);
-    bus.emit(EVENTS.TOAST, { text: 'O Zapdos se soltou e voou para longe, livre!', icon: 'boss' });
+    bus.emit(EVENTS.TOAST, { text: 'O Zapdos caiu, sem forças!', icon: 'boss' });
   }
 }

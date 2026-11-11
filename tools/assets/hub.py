@@ -489,6 +489,8 @@ SPRITES = {
     'lt_surge':    ('people/lt_surge', 'npc_green', 16, 32),
     'sailor':      ('people/sailor', 'npc_pink', 16, 32),
     'voltorb':     ('pokemon/voltorb', 'npc_white', 16, 16),
+    # o Zapdos do FireRed (o da Power Plant), na cena de depois da missão (H-6)
+    'zapdos':      ('pokemon/zapdos', 'npc_blue', 32, 32),
     'meowth':      ('pokemon/meowth', 'npc_blue', 16, 16),
     'clefairy':    ('pokemon/clefairy', 'npc_pink', 16, 16),
     'pidgey':      ('pokemon/pidgey', 'npc_blue', 16, 16),

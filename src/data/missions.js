@@ -10,7 +10,8 @@
  *   dex         o número na Pokédex (a foto: assets/pokemon/gen3/front/<dex>.png)
  *   type, weak  o tipo e as fraquezas (as pílulas do banner)
  *   banner      a faixa do lugar (assets/ui/gym-banners)
- *   balls       as bolas especiais da luta: { icon, name, count, chance }
+ *   balls       as bolas especiais da luta: { icon, name, count, chance }, ou null numa luta
+ *               sem captura (o Zapdos: fraco e assustado, ele foge; a captura é outro momento)
  *   trail       a linha de baixo do card
  *   recommendedLevel  o nível recomendado
  *   note        o aviso embaixo dos botões
@@ -28,9 +29,9 @@ export const MISSIONS = {
     type: 'electric',
     weak: ['ice', 'rock'],
     banner: 'assets/ui/gym-banners/usina.png',
-    balls: { icon: 'assets/items/ultra-ball.png', name: 'Ultra Balls', count: 3, chance: 0.1 },
-    trail: 'O fundo da Usina · no escuro · preso por correntes, fora de si',
-    recommendedLevel: 58,
+    balls: null,
+    trail: 'O fundo da Usina · preso por correntes · enfraquecido e fora de si',
+    recommendedLevel: 36,
     note: 'Volte quando estiver pronto: a escotilha continua no mesmo lugar.',
     stage: 'zapdos',
     species: 'zapdos'

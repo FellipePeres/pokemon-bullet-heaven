@@ -15,8 +15,10 @@ const easeOut = (t) => 1 - Math.pow(1 - clamp01(t), 3);
  * - embaixo de todos: a máquina do emblema vermelho (o desenho em pixel do
  *   tools/assets/hub.py), o Zapdos acorrentado nela nos primeiros 45 s, as correntes,
  *   a sobrecarga e, depois, a máquina destruída com as correntes partidas;
+ * - a energia sugada (o refino do Fellipe): enquanto ele está preso, as bolhas de luz descem
+ *   pelas correntes até a máquina, e ondas saem das bobinas para o alto, para longe;
  * - por cima: a carga e a esfera do Zap Cannon, os choques dela, a faixa da Investida
- *   e o rastro, as explosões, os elos voando e o Zapdos voando livre;
+ *   e o rastro, as explosões e os elos voando;
  * - na tela: o letreiro da tempestade total.
  * Só lê o estado.
  */
@@ -106,6 +108,7 @@ export function drawZapdosGround(ctx, run, fight) {
     }
     const bx = boss ? boss.x : perch.x + struggle * 0.4, by = boss ? boss.y : perch.y + struggle;
     for (const a of anchors(m)) chain(ctx, a.x, a.y, bx + a.to[0], by + a.to[1], m.overload, now);
+    drain(ctx, m, bx, by, now);
     // os choques presos: faíscas saindo dele de tempos em tempos
     const tick = Math.floor(now * 6);
     if (hash(tick, 1) < 0.5 + 0.5 * m.overload) {
@@ -133,6 +136,37 @@ export function drawZapdosGround(ctx, run, fight) {
     const ph = (now * 0.35 + i / 3) % 1;
     ctx.fillStyle = `rgba(60,60,70,${0.35 * (1 - ph)})`;
     ctx.beginPath(); ctx.arc(m.x + 40 + Math.sin(i * 3 + now) * 8, m.y - 10 - ph * 120, 10 + ph * 22, 0, TAU); ctx.fill();
+  }
+}
+
+/**
+ * A energia sugada: bolhas de luz amarela descem pelas correntes, do Zapdos até a máquina, e
+ * das duas bobinas sobem ondas em arco, para o alto, mandando a energia para longe.
+ */
+function drain(ctx, m, bx, by, now) {
+  for (const [i, a] of anchors(m).entries()) {
+    const sx = bx + a.to[0], sy = by + a.to[1];
+    const len = Math.hypot(a.x - sx, a.y - sy);
+    const sag = Math.min(26, len * 0.12);
+    for (let j = 0; j < 3; j++) {
+      const k = (now * 0.9 + j / 3 + i * 0.17) % 1;
+      const x = sx + (a.x - sx) * k;
+      const y = sy + (a.y - sy) * k + Math.sin(k * Math.PI) * sag;
+      glowCircle(ctx, x, y, 12, 'rgba(255,236,120,.75)');
+      ctx.fillStyle = '#fffbe0';
+      ctx.beginPath(); ctx.arc(x, y, 2.5, 0, TAU); ctx.fill();
+    }
+  }
+  const [l, r] = anchors(m);
+  for (const top of [l, r]) {
+    for (let j = 0; j < 3; j++) {
+      const k = (now * 0.6 + j / 3) % 1;
+      ctx.strokeStyle = `rgba(255,${200 - 120 * k},90,${0.7 * (1 - k)})`;
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.arc(top.x, top.y - 6 - 150 * k, 14 + 46 * k, Math.PI * 1.15, Math.PI * 1.85);
+      ctx.stroke();
+    }
   }
 }
 
@@ -222,7 +256,6 @@ export function drawZapdosWorld(ctx, run, fight) {
     if (f.kind === 'zap') arc(ctx, f.x, f.y, f.tx, f.ty, f.seed, 2.5, 1 - f.t / f.life);
     else if (f.kind === 'blast') blast(ctx, f);
     else if (f.kind === 'chainsnap') chainSnap(ctx, f, now);
-    else if (f.kind === 'flyaway') flyaway(ctx, f, run);
   }
 }
 
@@ -258,14 +291,6 @@ function chainSnap(ctx, f) {
     ctx.beginPath(); ctx.ellipse(0, 0, 7, 4, 0, 0, TAU); ctx.stroke();
     ctx.restore();
   }
-}
-
-/** Derrotado sem a captura: ele sobe e some, livre. */
-function flyaway(ctx, f, run) {
-  const k = f.t / f.life;
-  const data = getEnemy('zapdos_boss');
-  drawPokemon(ctx, 145, f.x + Math.sin(k * 6) * 20, f.y - easeOut(k) * 560, 42 * data.scale * (1 - 0.3 * k),
-    { facing: 1, types: data.types, time: run.time, alpha: 1 - k * k, shadow: false });
 }
 
 /** O aviso da explosão (a esfera do Zap Cannon, o mergulho de volta): o círculo laranja que se fecha. */

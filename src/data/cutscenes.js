@@ -52,6 +52,9 @@
  *                                      pista: o objetivo das quests que espera por ela fecha ali)
  *     card   { mission }               o card de uma missão de lendário (data/missions.js), no
  *                                      padrão do card de fase; espera o Lutar ou o Voltar
+ *     cry    { dex }                   o grito de um Pokémon (assets/sound/cries)
+ *     tremble { who, t, power }        alguém treme no lugar (o Zapdos assustado)
+ *     fly    { who, t, height }        alguém levanta voo e some pelo alto da tela
  *     flag   { name, value }           marca uma flag da vila (as falas `once`, os enfeites `hideIf`)
  *     end    { then }                  o fim: só aqui a cena conta como vista; `then` é uma
  *                                      ação das falas (data/dialogue.js), como 'starter', ou
@@ -475,11 +478,14 @@ export const CUTSCENES = {
   },
 
   // depois da missão do Zapdos (H-6, o gatilho 'win' da fase `zapdos`): a sala do fundo com a
-  // luz de volta e a máquina do emblema vermelho destruída no meio dela. Toca na volta da luta
-  // (o "Continuar Jornada" da vitória) e deixa o jogador em cima, ao lado da escotilha
+  // luz de volta. O Zapdos, caído e sem forças, vê o jogador, se assusta e foge pelo alto (o
+  // refino do Fellipe: a captura dele fica para outro momento). Na máquina destruída, a energia
+  // sugada e mandada para longe, e o emblema vermelho. Toca na volta da luta (o "Continuar
+  // Jornada" da vitória) e deixa o jogador em cima, ao lado da escotilha
   zapdos_livre: {
     map: 'usina_luz', spot: { x: 7, y: 9, dir: 'up' },
     trigger: [{ on: 'win', target: 'zapdos' }],
+    actors: { zapdos: { sprite: 'npc/zapdos', x: 7, y: 7, dir: 'down' } },
     steps: [
       { do: 'fade', to: 1, t: 0 },
       { do: 'wait', t: 0.5 },
@@ -488,16 +494,26 @@ export const CUTSCENES = {
       { do: 'fade', to: 0.2, t: 0.08 }, { do: 'fade', to: 0.8, t: 0.12 }, { do: 'wait', t: 0.15 },
       { do: 'fade', to: 0, t: 0.6 },
       { do: 'wait', t: 0.4 },
-      { do: 'say', pick: 'missao_zapdos', lines: ['A luz voltou à Usina. O Zapdos descansa na Ultra Ball: ele vai esperar no PC.'], cases: {
-        livre: { lines: [
-          'A luz voltou à Usina. Lá em cima, um trovão bem longe: o Zapdos voou, livre.',
-          'Quem sabe ele não cruza o seu caminho de novo, numa Poké Ball pelas rotas.'
-        ] }
-      } },
+      { do: 'say', lines: ['A luz voltou à Usina. O Zapdos está caído no chão, sem forças.'] },
+      { do: 'wait', t: 0.4 },
+      { do: 'tremble', who: 'zapdos', t: 0.5, power: 1 },
+      { do: 'wait', t: 0.3 },
+      // ele vê o jogador, se assusta e foge pelo alto
+      { do: 'emote', who: 'zapdos' },
+      { do: 'cry', dex: 145 },
+      { do: 'tremble', who: 'zapdos', t: 0.6, power: 3 },
+      { do: 'shake', t: 0.5, power: 1.5, wait: false },
+      { do: 'fly', who: 'zapdos', t: 0.9, height: 230 },
+      { do: 'wait', t: 0.5 },
+      { do: 'say', lines: [
+        'O Zapdos fugiu, assustado.',
+        'Ele ainda está fraco demais para confiar em alguém.'
+      ] },
       { do: 'walk', who: 'player', to: [[7, 6, 'up']] },
       { do: 'emote', who: 'player' },
       { do: 'say', lines: [
         'A máquina que prendia o Zapdos está destruída. As correntes saíam dela.',
+        'Ela sugava a energia do Zapdos pelas correntes e mandava para longe, em ondas. Para onde?',
         'No meio, um emblema vermelho que {player} nunca viu.',
         'Alguém prendeu o Zapdos aqui de propósito.'
       ] },
@@ -521,7 +537,7 @@ export const CUTSCENES = {
 
 /** Os passos que o game/Cutscene.js conhece (o check-data confere). */
 export const CUTSCENE_STEPS = ['wait', 'say', 'talk', 'show', 'hide', 'place', 'walk', 'face', 'emote', 'throw', 'cutin',
-  'bird', 'fade', 'camera', 'shake', 'give', 'quest', 'emit', 'card', 'flag', 'end'];
+  'bird', 'fade', 'camera', 'shake', 'give', 'quest', 'emit', 'card', 'flag', 'cry', 'tremble', 'fly', 'end'];
 
 /** O que pode começar uma cena. */
 export const CUTSCENE_TRIGGERS = ['enter', 'npc', 'starter', 'win', 'play'];

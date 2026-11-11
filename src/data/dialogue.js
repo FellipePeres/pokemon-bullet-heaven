@@ -295,7 +295,7 @@ export const DIALOGUE = {
       { when: { champion: true }, say: ['Você venceu a Liga. Mas me diga: já foi até o fim do mato a oeste? Ninguém nunca foi.'] },
       // a missão do Zapdos (H-6): uma vez, depois da cena da máquina destruída
       { when: { scene: 'zapdos_livre', once: 'sabio_zapdos' }, say: [
-        'O Zapdos preso numa máquina, com um emblema vermelho? Então eu tinha razão, {player}.',
+        'O Zapdos preso numa máquina que sugava a energia dele? E com um emblema vermelho? Então eu tinha razão, {player}.',
         'Alguém está caçando os pássaros lendários. E o Articuno ainda não voltou para Seafoam.'
       ] },
       // a história (0.39): o que ele diz depois de cada cena, enquanto a quest daquele momento está ativa

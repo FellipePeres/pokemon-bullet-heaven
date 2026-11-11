@@ -745,7 +745,8 @@ Nunca voltar bônus globais para o pool de level up — foi pedido explícito.
 - **O card de missão** (`data/missions.js`, `ui/missionCard.js`, o `#mission-card`
   na tela da vila): o padrão do card de fase (as classes `panel-*`), com o banner do
   lugar (`assets/ui/gym-banners/usina.png`, do `gym_banners.py`), a foto do
-  lendário, o tipo, as fraquezas, as bolas (a Ultra Ball veio do Pokemon All) e o
+  lendário, o tipo, as fraquezas, as bolas quando a luta tem captura (a do Zapdos não
+  tem: "Sem captura nesta luta"; a Ultra Ball veio do Pokemon All) e o
   nível. O passo `card` das cenas o abre e espera a escolha; o A/Enter luta, o
   B/ESC volta. No Lutar, a cena acaba ali (sem o `then`) e `Game.startMission` começa
   a luta (a seção "O molde das missões e a luta do Zapdos"). No Voltar, a cena
@@ -863,7 +864,10 @@ Nunca voltar bônus globais para o pool de level up — foi pedido explícito.
 ### O molde das missões e a luta do Zapdos (H-5 e H-6, 0.39 na branch)
 - Pedido do Fellipe ("pode construir isso": a luta do Zapdos, para o Lutar do card
   funcionar). Os detalhes que ele não decidiu ficaram no padrão
-  (PLANEJAMENTO-HISTORIA.md, seção 5.1, e a decisão 15).
+  (PLANEJAMENTO-HISTORIA.md, seção 5.1, e as decisões 15 e 16). **Refino dele depois de
+  ver a luta (decisão 16)**: a máquina suga a energia do Zapdos (por isso ele está fraco:
+  a luta é de nível 36, para logo depois da Fase 3), e não há captura na missão: derrotado,
+  ele cai, e na cena de depois foge, assustado.
 - **O molde** (`systems/legendaryFight.js`, a classe `LegendaryFight`): o que toda luta
   de lendário tem, tirado da do Kyogre: os avisos no chão (círculos, ou as casas
   quadradas, `shape: 'square'`), os anéis (`ring.type` diz o tipo do dano), a captura
@@ -889,11 +893,16 @@ Nunca voltar bônus globais para o pool de level up — foi pedido explícito.
   os ataques (`cannon`, `peck`, `discharge`), a tempestade total (`sky`, o tabuleiro de
   `_grid` em três levas; o desenho acende só a próxima) e o mergulho de volta; a fúria
   abaixo de 20%. Derrotado sem a captura (`onBossDown`, chamado pelo
-  `combat.killEnemy`), ele voa livre. Os danos ficam em `legendaryFight.damage`.
+  `combat.killEnemy`), ele cai sem forças (`downed`). A fase tem `balls: 0`: sem bolas, o
+  molde não põe piso de vida nem leva final, e o card mostra "Sem captura nesta luta"
+  (`balls: null` em `data/missions.js`). Enquanto ele está preso, o desenho mostra a
+  energia sugada (`drain` em `render/zapdosFight.js`: bolhas pelas correntes e ondas das
+  bobinas). Os danos ficam em `legendaryFight.damage`.
 - **A arena** é um salão `room` montado com a tira `scene/power_plant` (o `extract.py`
   ganhou a Power Plant) e um campo novo nas receitas: `clear`, os retângulos (em casas
   da arena) onde os enfeites não caem (o lugar da máquina). A máquina, a máquina
-  destruída, a Ultra Ball (`item/ultra-ball`) e o grito do Zapdos (`cries/145.ogg`)
+  destruída, o Zapdos do FireRed (`npc/zapdos`), a Ultra Ball (`item/ultra-ball`, para as
+  missões que tiverem captura) e o grito do Zapdos (`cries/145.ogg`)
   saem do `tools/assets/hub.py`; a música, do `render_music.py` (`mus_poke_mansion`).
 - **O Lutar** (`Game.startMission`): o grito e a transição de batalha
   (`hub.battle`, `BATTLE_INTRO` em `game/Hub.js`, desenhada pelo
@@ -902,7 +911,10 @@ Nunca voltar bônus globais para o pool de level up — foi pedido explícito.
 - **A volta** (`returnTo: 'mission'`): venceu, o `endRun` grava
   `campaign.missions[id] = { won, captured, date }`, a quest fecha (o objetivo é o `win`
   da fase), e o "Continuar Jornada" toca a cena devida `zapdos_livre` no palco
-  `usina_luz` (a sala do fundo com a luz, a mesma do `usina_fundo`); saiu no meio, volta
+  `usina_luz` (a sala do fundo com a luz, a mesma do `usina_fundo`): o Zapdos do FireRed
+  (`npc/zapdos`, a folha da Power Plant) caído, que treme e foge pelo alto com os passos
+  novos das cenas (`cry`, `tremble` e `fly`; o `HubRenderer` desenha o `jx` e o `lift` dos
+  atores), e a máquina destruída com a energia e o emblema; saiu no meio, volta
   para cima, ao lado da escotilha; perdeu, "Tentar de novo" (`retryLegendary`) ou o
   Centro com a `enfermeira_usina` (sem contar como resgate do Dive). A vitória não
   oferece jogar de novo.
@@ -918,16 +930,17 @@ Nunca voltar bônus globais para o pool de level up — foi pedido explícito.
   pedaços da máquina).
 - **O presente `toPC`** vale para qualquer lendário (`Game.pickCapture` e o aviso da
   tela de captura com o nome dele).
-- **A medição**: `node tools/kyogre.mjs 58 12 zapdos` (a equipe comum de meio de
-  jornada, no nível pedido, com as melhorias de quem subiu até ali). Nível 50 vence 2 de
-  12; 54, 8 de 12; 58, 11 de 12 (3 a 4 desmaios); 62, 11 de 12. As alavancas: a vida do
-  `zapdos_boss` (160.000), a `difficulty` da fase (1,18) e os danos do `legendaryFight`.
+- **A medição**: `node tools/kyogre.mjs 36 12 zapdos` (a equipe comum, no nível pedido,
+  com as melhorias de quem subiu até ali). Nível 28 vence 5 de 12; 30, 8 de 12; 32, 11 de
+  12; 36, 11 de 12 (3 a 4 desmaios); 40, 12 de 12. As alavancas: a vida do `zapdos_boss`
+  (85.000, nível 36), a `difficulty` da fase (1,1) e os danos do `legendaryFight`. (Na
+  primeira versão, com a captura, ele era de nível 58, com 160.000 de vida.)
   O bot lê o tabuleiro (vai para a casa que cai mais tarde) e sai de lado da Investida.
 - **Os testes**: o `smoke-test` (a arena e a máquina, preso, as correntes, cada ataque,
-  o tabuleiro e as levas, a captura com a Ultra Ball, a fuga, a regra da Poké Ball), o
-  `ui-smoke` (o Lutar com a transição, sair no meio, a derrota com as duas saídas, a
-  vitória com a captura no PC, a cena de depois, a escotilha nova, o sábio, a jornada
-  "antes" e o Carvalho) e o `check-data` (a missão aponta para uma fase com a luta, as
+  o tabuleiro e as levas, sem captura e sem piso de vida, a queda, a regra da Poké Ball),
+  o `ui-smoke` (o card sem captura, o Lutar com a transição, sair no meio, a derrota com
+  as duas saídas, a vitória, a cena de depois com a fuga e a energia, a escotilha nova, o
+  sábio, a jornada "antes" e o Carvalho) e o `check-data` (a missão aponta para uma fase com a luta, as
   bolas e o nível do card batem com os da fase, as passagens com `when`). O roteiro de
   screenshots é `zapdos`.
 
@@ -1401,6 +1414,7 @@ o Brock como está, todas as outras mais duras, menos níveis.
 | 73 | a Fase 3 na história, com as mudanças do Fellipe: nada chega de barco, o Surge não viu clarão; o Surge conta que pareceu haver um combate dentro da Usina, como se o Zapdos estivesse brigando; o marinheiro, preso no porto pela maré agitada, escutou correntes vindo da Usina, e o jogador pode ir verificar; "pode fazer seguindo o planejamento" | 0.39 (na branch): os palcos do ginásio de Vermilion, do cais e da entrada da Usina; as cenas `depois_surge`, `vermilion_correntes` e `usina_porta`; a quest da Erika (Capítulo 3) e as da Usina (azuis); os lugares da história no mapa da jornada (`STORY_PLACES`, `visitPlace`), com a Usina como o primeiro |
 | 74 | a Usina andável: "ao clicar no investigar no card da usina, a gente vai ter tiles jogáveis", uma escada para o fundo, a tela preta com um círculo de brilho fraco, os olhos vermelhos e o card "derrote e liberte Zapdos"; depois: os olhos em pixel e 2D, num tile; 13 Poké Balls (2 no caminho, 11 nas salas sem saída) com Reviver e Novo Sorteio; o card só depois dos olhos (2 s e 2 s), no padrão dos cards de fase, com a foto do Zapdos | 0.39 (na branch): a Usina inteira do FireRed como lugar para explorar (`explore`), as Poké Balls do chão (`loot`), a escotilha e os olhos desenhados em pixel, o escuro em degraus (`dark`), o card de missão (`data/missions.js`), as quests `z_usina` e `z_zapdos`; o card do Kyogre corrigido (o banner sumia) |
 | 75 | "pode construir isso" (a luta do Zapdos, para o Lutar do card funcionar: o molde das missões, tirado do salão do Kyogre, e a tempestade) | 0.39 (na branch): o molde `systems/legendaryFight.js` (o Kyogre por cima dele, idêntico quadro a quadro), a luta do Zapdos (preso na máquina do emblema vermelho, as correntes arrebentando, a tempestade marcada, o Zap Cannon, a Investida, o Discharge, o tabuleiro de raios, 3 Ultra Balls, a fuga sem captura), a arena da Power Plant, a transição de batalha do FireRed, a volta pela missão, a cena `zapdos_livre` com a luz de volta e o emblema, a regra da Poké Ball para quem tem missão; medido: no nível 58 vence 11 de 12 |
+| 76 | o refino da história: "essas maquinas que prendem os lendários sugam a energia deles" e mandam em ondas para um lugar misterioso, onde uma máquina central numa base do Maxie desorienta os Pokémon (ideia de End Game); o Zapdos enfraquecido explica a vitória de um jogador de nível baixo; "ao derrotar o Zapdos, rola uma cutscene do Zapdos voando e fugindo, assustado", sem captura por enquanto | 0.39 (na branch): a luta sem captura e de nível 36 (medida: 11 de 12 no 36), a energia escorrendo pelas correntes, a cena com o Zapdos do FireRed caído que foge pelo alto (os passos `cry`, `tremble` e `fly`) e a pista da energia mandada para longe; o card "Sem captura nesta luta" |
 | Fase 8 (Giovanni) | 1 → 0,8 | 4,0 | 4,5 | 60 | 84 → 62 |
 | Lorelei | 1,05 → 0,8 | 3,5 | 3,1–4,7 | 64 | 92 → 66 |
 | Bruno | 1,12 → 0,97 | 3,7 | 3,5–6,3 ² | 66 | 99 → 68 |

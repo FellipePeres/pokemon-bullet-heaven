@@ -1331,9 +1331,12 @@ console.log('\n[a missão do Zapdos — preso, a tempestade, os ataques, a captu
   };
   const fight = start();
   const f = fight.fight;
-  check('a fase da missão: o fundo da Usina (as peças da Power Plant), o molde com 3 Ultra Balls de 10%',
+  check('a fase da missão: o fundo da Usina (as peças da Power Plant), no molde, sem captura (o refino do Fellipe)',
         MISSIONS.zapdos.stage === 'zapdos' && fight.world.scene === 'usina_arena' && f.constructor.name === 'ZapdosFight'
-        && f.balls === 3 && f.cfg.ballName === 'Ultra Ball' && f.cfg.chance === 0.1 && f.cfg.floor === 0.15 && f.cfg.recover === 0.25);
+        && f.balls === 0 && MISSIONS.zapdos.balls === null);
+  check('enfraquecido pela máquina: a luta é para logo depois da Fase 3',
+        fight.stage.recommendedLevel < STAGES.gym_4_celadon.recommendedLevel && fight.stage.recommendedLevel > STAGES.gym_3_vermilion.recommendedLevel
+        && MISSIONS.zapdos.recommendedLevel === fight.stage.recommendedLevel);
   const { buildSceneGrid } = await import('../src/systems/terrain.js');
   check('a arena deixa livre o lugar da máquina do emblema vermelho (nenhum enfeite do cenário ali)',
         (() => { const g = buildSceneGrid('usina_arena', fight.terrain.cols, fight.terrain.rows, 'zapdos'); const tx = Math.floor(f.machine.x / 32), ty = Math.floor(f.machine.y / 32);
@@ -1386,27 +1389,13 @@ console.log('\n[a missão do Zapdos — preso, a tempestade, os ataques, a captu
         && Math.min(...cells.map((h) => h.warn)) === f.cfg.stormWarn);
   tick(fight, f.cfg.stormWarn + 2 * f.cfg.stormGap + 1.8);
   check('no fim, ele mergulha de volta num lugar marcado e a luta segue', f.state === 'fight' && !boss.hidden && !boss.untouchable && !f.sky);
-  // a captura: o piso, a Ultra Ball no campo, o arremesso
+  // sem captura: nenhum piso de vida; derrotado, ele cai sem forças e a fase é vencida
   const { damageEnemy } = await import('../src/systems/combat.js');
+  check('sem bolas, não há piso de vida (ele pode ser derrotado)', boss.hpFloor == null);
   damageEnemy(fight, boss, 1e9);
-  check('no piso de 15%, ele fica exausto e a Ultra Ball cai no campo', f.state === 'exhausted' && !!f.ball && boss.hp === boss.maxHp * 0.15);
-  tick(fight, 1.2);
-  f.rng = () => 0.01;   // a bola pega
-  fight.player.x = f.ball.x; fight.player.y = f.ball.y;
-  tick(fight, 0.05);
-  for (let i = 0; i < 60 * 8 && fight.state === 'legendary'; i++) fight.update(DT, { x: 0, y: 0 });
-  check('pegou a bola: ela balança e o Zapdos é capturado (vai para o PC)', f.captured && fight.pendingGift?.choices[0] === 'zapdos'
-        && fight.pendingGift.toPC && f.final?.t === f.cfg.finalTide);
-
-  // sem bolas: derrotado, ele se solta e voa livre (a missão vence sem a captura)
-  const free = start();
-  free.time = free.stage.duration;
-  tick(free, 3);
-  free.fight.balls = 0;
-  tick(free, 2 / 60);   // sem bola, o piso de vida sai no quadro seguinte
-  damageEnemy(free, free.boss, 1e9);
-  tick(free, 0.1);
-  check('sem Ultra Ball: derrotado, ele se solta e voa livre, e a fase é vencida', free.fight.fled && !free.fight.captured && free.state === 'victory');
+  tick(fight, 0.1);
+  check('derrotado, ele cai sem forças (a fuga é a cena de depois), sem captura, e a fase é vencida',
+        f.downed && !f.captured && !f.ball && !fight.pendingGift && fight.state === 'victory');
 
   // H-5: a captura sem lendários: quem tem missão só cai na Poké Ball depois dela
   for (const enc of Object.values(LEGENDARY_ENCOUNTERS)) enc.chance = 1;

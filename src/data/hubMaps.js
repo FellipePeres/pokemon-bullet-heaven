@@ -379,7 +379,8 @@ export const HUB_SPRITES = {
   'npc/voltorb': { src: 'assets/hub/npc/voltorb.png', frameWidth: 16, frameHeight: 16, frames: 3 },
   'npc/woman_1': { src: 'assets/hub/npc/woman_1.png', frameWidth: 16, frameHeight: 32, frames: 10 },
   'npc/worker_f': { src: 'assets/hub/npc/worker_f.png', frameWidth: 16, frameHeight: 32, frames: 10 },
-  'npc/youngster': { src: 'assets/hub/npc/youngster.png', frameWidth: 16, frameHeight: 32, frames: 10 }
+  'npc/youngster': { src: 'assets/hub/npc/youngster.png', frameWidth: 16, frameHeight: 32, frames: 10 },
+  'npc/zapdos': { src: 'assets/hub/npc/zapdos.png', frameWidth: 32, frameHeight: 32, frames: 1 }
 };
 
 /** Os móveis do quarto (data/decor.js): o chão, a camada de cima e as células que bloqueiam. */
