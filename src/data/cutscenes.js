@@ -47,6 +47,8 @@
  *     shake  { t, power, wait }        treme a tela (wait: false segue sem esperar)
  *     give   { item, count, silent }   dá um item (da mochila ou da história) e avisa na caixa
  *     quest  { id }                    abre uma quest (data/quests.js)
+ *     emit   { on, target }            um acontecimento da história no meio da cena (a `clue`, uma
+ *                                      pista: o objetivo das quests que espera por ela fecha ali)
  *     flag   { name, value }           marca uma flag da vila (as falas `once`, os enfeites `hideIf`)
  *     end    { then }                  o fim: só aqui a cena conta como vista; `then` é uma
  *                                      ação das falas (data/dialogue.js), como 'starter'
@@ -292,12 +294,81 @@ export const CUTSCENES = {
       { do: 'camera', to: 'player', t: 0.5 },
       { do: 'end' }
     ]
+  },
+
+  /* ============================ o Capítulo 2 (0.39) ============================ */
+
+  // depois da Fase 2, no ginásio dela: a Misty conta que o mar ficou bravo desde que o
+  // Articuno sumiu (a primeira prova de que o sábio tem razão) e aponta o Surge e o Zapdos
+  depois_misty: {
+    map: 'ginasio_cerulean', spot: { x: 8, y: 7, dir: 'up' },
+    trigger: [{ on: 'win', target: 'gym_2_cerulean' }],
+    steps: [
+      { do: 'face', who: 'misty', dir: 'down' },
+      { do: 'wait', t: 0.8 },
+      { do: 'say', name: 'Misty', lines: [
+        'Nada mal, {player}! Pouca gente sai deste ginásio vitoriosa e seca.',
+        'O Brock me avisou que você vinha. Disse que você está investigando as hordas.'
+      ] },
+      // ela se vira para a piscina
+      { do: 'face', who: 'misty', dir: 'left' },
+      { do: 'wait', t: 0.6 },
+      { do: 'say', name: 'Misty', lines: [
+        'Olhe a água. Meus Pokémon andam agitados, e não é só aqui. Os pescadores do Cabo dizem que o mar ficou bravo.',
+        'Começou quando o Articuno deixou de ser visto sobre as Ilhas Seafoam. Ele voava por lá desde que eu era criança.'
+      ] },
+      { do: 'face', who: 'misty', dir: 'down' },
+      { do: 'wait', t: 0.4 },
+      { do: 'say', name: 'Misty', lines: [
+        'Os pássaros lendários, você diz? Então o Articuno é um deles. E se os outros dois também sumiram?',
+        'O Zapdos aparecia perto da Usina, para os lados de Vermilion. O Lt. Surge conhece aquele lugar melhor que ninguém.'
+      ] },
+      // a pista: fecha o "Encontre pistas" e abre a quest do Surge, no rastreador
+      { do: 'emit', on: 'clue', target: 'articuno' },
+      { do: 'wait', t: 0.4 },
+      { do: 'say', name: 'Misty', lines: ['Se descobrir alguma coisa, me avise também. Boa sorte, {player}!'] },
+      { do: 'wait', t: 0.6 },
+      { do: 'end', then: 'home' }
+    ]
+  },
+
+  // logo depois, na rua: a casa assaltada (como no FireRed). Todos culpam a Rocket (a pista
+  // falsa), mas o ladrão só levou peças de máquina (as máquinas que prendem os pássaros, no
+  // Capítulo 4). O rival passa correndo, a caminho de Vermilion
+  cerulean_roubo: {
+    map: 'cerulean', spot: { x: 10, y: 10, dir: 'up' },
+    trigger: [{ on: 'win', target: 'gym_2_cerulean' }],
+    actors: { rival: { sprite: 'npc/rival', x: 1, y: 9, dir: 'right', hidden: true } },
+    steps: [
+      { do: 'wait', t: 0.8 },
+      { do: 'say', name: 'Policial', lines: ['Circulando! Ninguém entra na cena do crime.'] },
+      { do: 'face', who: 'dono', toward: 'player' },
+      { do: 'say', name: 'Dono da casa', lines: ['Entraram pelo muro de trás, de madrugada!'] },
+      { do: 'face', who: 'policial', toward: 'dono' },
+      { do: 'say', name: 'Policial', lines: ['Só pode ser a Equipe Rocket. Eles estão aprontando por toda Kanto.'] },
+      { do: 'face', who: 'policial', dir: 'down' },
+      { do: 'wait', t: 0.4 },
+      { do: 'say', name: 'Dono da casa', lines: [
+        'Mas eu não entendo... Não levaram dinheiro, nem Pokémon.',
+        'Só as peças de máquina que eu guardava: motores, cabos, chapas de metal.'
+      ] },
+      { do: 'wait', t: 0.5 },
+      // o rival chega correndo
+      { do: 'show', who: 'rival' },
+      { do: 'walk', who: 'rival', to: [[9, 10, 'right']], speed: 0.13 },
+      { do: 'face', who: 'player', toward: 'rival' },
+      { do: 'say', name: 'Rival', lines: ['Brincando de detetive, {player}? Eu já estou indo para Vermilion. Até mais!'] },
+      { do: 'walk', who: 'rival', to: [[0, 9]], speed: 0.13 },
+      { do: 'hide', who: 'rival' },
+      { do: 'wait', t: 0.6 },
+      { do: 'end', then: 'home' }
+    ]
   }
 };
 
 /** Os passos que o game/Cutscene.js conhece (o check-data confere). */
 export const CUTSCENE_STEPS = ['wait', 'say', 'talk', 'show', 'hide', 'place', 'walk', 'face', 'emote', 'throw', 'cutin',
-  'bird', 'fade', 'camera', 'shake', 'give', 'quest', 'flag', 'end'];
+  'bird', 'fade', 'camera', 'shake', 'give', 'quest', 'emit', 'flag', 'end'];
 
 /** O que pode começar uma cena. */
 export const CUTSCENE_TRIGGERS = ['enter', 'npc', 'starter', 'win', 'play'];

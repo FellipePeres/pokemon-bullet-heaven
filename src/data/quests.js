@@ -14,6 +14,9 @@
  *                     'map'    o mapa da jornada abriu
  *                     'win'    venceu a fase `target` (data/stages.js)
  *                     'scene'  a cena `target` (data/cutscenes.js) chegou ao fim (0.39)
+ *                     'clue'   a pista `target` apareceu numa cena (o passo `emit`, 0.39)
+ *               `doneIf` no objetivo: ele fica cumprido, sem comemorar, quando a jornada já
+ *               fez aquilo (a vitória de antes das cenas). A quest continua esperando o resto
  *               `count` é quantas vezes (1 se faltar): o rastreador mostra "0/1"
  *   doneIf      quando a quest já está cumprida sem o evento (a jornada que já
  *               existia antes das quests, ou que pulou um passo): ela fecha em
@@ -86,9 +89,28 @@ export const QUESTS = {
   c2_misty: {
     kind: 'story', chapter: 'cap2',
     desc: 'O Brock pediu ajuda: os Pokémon estão agindo de um jeito que ninguém nunca viu, e isso é muito sério. Siga para Cerulean, vença a Misty e investigue a cidade atrás de pistas.',
-    objectives: [{ text: 'Derrote a Misty e encontre pistas sobre o comportamento dos Pokémon', on: 'win', target: 'gym_2_cerulean' }],
-    doneIf: { cleared: 'gym_2_cerulean' },
+    // as duas linhas (pedido do Fellipe): a vitória e a pista, que vem na conversa com a Misty
+    objectives: [
+      { text: 'Derrote a Misty', on: 'win', target: 'gym_2_cerulean', doneIf: { cleared: 'gym_2_cerulean' } },
+      { text: 'Encontre pistas sobre o comportamento dos Pokémon', on: 'clue', target: 'articuno' }
+    ],
+    // a jornada que já venceu a Misty antes das cenas rejoga a fase para ouvir a pista; quem
+    // já passou do Surge fecha em silêncio
+    doneIf: { cleared: 'gym_3_vermilion' },
     openedBy: 'depois_brock',
+    next: ['c2_surge'],
+    reward: null
+  },
+  // a Misty aponta o caminho (data/cutscenes.js, depois_misty): o Surge, a Usina e o Zapdos
+  c2_surge: {
+    kind: 'story', chapter: 'cap2',
+    desc: 'A Misty contou que o mar ficou bravo desde que o Articuno sumiu do céu de Seafoam. Se os outros pássaros também sumiram... O Zapdos aparecia perto da Usina, e o Lt. Surge, em Vermilion, conhece aquele lugar.',
+    objectives: [
+      { text: 'Vença o Lt. Surge, em Vermilion', on: 'win', target: 'gym_3_vermilion', doneIf: { cleared: 'gym_3_vermilion' } },
+      // a pista chega com a cena de depois da Fase 3 (H-4)
+      { text: 'Descubra se o Zapdos também sumiu', on: 'clue', target: 'zapdos' }
+    ],
+    doneIf: { cleared: 'gym_4_celadon' },
     next: [],
     reward: null
   }
@@ -97,4 +119,4 @@ export const QUESTS = {
 export const FIRST_QUEST = 'p_mae';
 
 /** Os eventos que um objetivo pode esperar (o check-data recusa os outros). */
-export const QUEST_EVENTS = ['talk', 'enter', 'map', 'win', 'scene'];
+export const QUEST_EVENTS = ['talk', 'enter', 'map', 'win', 'scene', 'clue'];

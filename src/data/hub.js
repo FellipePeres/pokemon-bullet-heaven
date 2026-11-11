@@ -189,6 +189,24 @@ export const HUB = {
       ],
       things: []
     },
+    ginasio_cerulean: {
+      name: 'Ginásio de Cerulean',
+      scene: true,
+      npcs: [
+        { id: 'misty', sprite: 'misty', x: 8, y: 6, dir: 'down', talk: 'misty' }
+      ],
+      things: []
+    },
+    // um recorte de Cerulean: a casa assaltada do FireRed, com o policial na porta
+    cerulean: {
+      name: 'Cidade de Cerulean',
+      scene: true,
+      npcs: [
+        { id: 'policial', sprite: 'policeman', x: 11, y: 8, dir: 'down', talk: 'policial' },
+        { id: 'dono', sprite: 'old_man_2', x: 9, y: 8, dir: 'down', talk: 'dono_casa' }
+      ],
+      things: []
+    },
 
     casa_sabio: {
       name: 'Casa do velho sábio',

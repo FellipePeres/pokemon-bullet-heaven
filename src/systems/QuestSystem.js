@@ -161,14 +161,25 @@ export class QuestSystem {
     return opened;
   }
 
-  /** Das quests `ids`, as que já estão cumpridas fecham em silêncio (e as que elas abrem também). */
+  /**
+   * Das quests `ids`, as que já estão cumpridas fecham em silêncio (e as que elas abrem
+   * também). Os objetivos com `doneIf` (0.39) que a jornada já fez ficam marcados, e a
+   * quest com todos eles marcados fecha em silêncio também.
+   */
   _catchUp(state, ids) {
     const ctx = this._context();
     const queue = [...ids];
     for (let guard = 0; queue.length && guard < 200; guard++) {
       const id = queue.shift();
-      const cond = QUESTS[id]?.doneIf;
-      if (!state.active.includes(id) || !cond || !matchesDoneIf(cond, ctx)) continue;
+      const quest = QUESTS[id];
+      if (!quest || !state.active.includes(id)) continue;
+      quest.objectives.forEach((objective, i) => {
+        if (!objective.doneIf || !matchesDoneIf(objective.doneIf, ctx)) return;
+        const have = state.progress[id] ??= quest.objectives.map(() => 0);
+        have[i] = Math.max(have[i] ?? 0, objective.count ?? 1);
+      });
+      const allMet = quest.objectives.every((objective, i) => (state.progress[id]?.[i] ?? 0) >= (objective.count ?? 1));
+      if (!allMet && !(quest.doneIf && matchesDoneIf(quest.doneIf, ctx))) continue;
       queue.push(...this._complete(state, id, true));
     }
   }

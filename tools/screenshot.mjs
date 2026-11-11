@@ -70,7 +70,7 @@ const ROTEIROS = {
     { run: "game.startStage('gym_1_pewter')" }, { wait: 1500 }, { shot: 'quests-07-partida' }
   ],
   // as cenas (0.39, data/cutscenes.js): o discurso do Carvalho encenado, o rival, as cenas do Brock
-  // e do velho sábio depois da Fase 1 (em tela cheia, nunca no meio da fase) e a do Maxie, no motor novo (game/Cutscene.js)
+  // e do velho sábio depois da Fase 1, as da Misty e da casa roubada depois da Fase 2 (em tela cheia, nunca no meio da fase) e a do Maxie, no motor novo (game/Cutscene.js)
   cenas: [
     { open: 'index.html' }, { wait: 500 },
     { run: "window.skip = (n = 1) => { for (let i = 0; i < n; i++) { const h = game.hub; if (!h.dialog) return; h.dialog.shown = 999; h.confirm(); } };" +
@@ -100,10 +100,21 @@ const ROTEIROS = {
     { run: 'skip(2)' }, { wait: 2400 }, { shot: 'cenas-19-os-passaros' },
     { run: 'skip(2)' }, { wait: 2400 }, { shot: 'cenas-20-deve-ter-a-ver' },
     { run: 'skip(2)' }, { wait: 3200 }, { shot: 'cenas-21-livre' },
+    // depois da Fase 2: a Misty e o Articuno, e a casa roubada de Cerulean (com o rival)
+    { run: "game.openCampaign(); game.startStage('gym_2_cerulean'); game.run.state = 'victory'" }, { wait: 1500 },
+    { run: 'game.quitToMenu()' }, { wait: 2600 }, { shot: 'cenas-22-misty' },
+    { run: 'skip(2)' }, { wait: 2600 }, { shot: 'cenas-23-o-articuno' },
+    { run: 'skip(2)' }, { wait: 2400 }, { run: 'skip(2)' }, { wait: 1000 }, { shot: 'cenas-24-a-pista' },
+    { wait: 2000 }, { shot: 'cenas-25-a-quest-do-surge' },
+    { run: 'skip()' }, { wait: 2600 }, { shot: 'cenas-26-a-casa-roubada' },
+    { run: 'skip()' }, { wait: 1500 }, { run: 'skip()' }, { wait: 1800 }, { shot: 'cenas-27-a-rocket' },
+    { run: 'skip()' }, { wait: 2000 }, { run: 'skip()' }, { wait: 2000 }, { shot: 'cenas-28-as-pecas' },
+    { run: 'skip()' }, { wait: 2600 }, { shot: 'cenas-29-o-rival' },
+    { run: 'skip()' }, { wait: 3200 }, { shot: 'cenas-30-o-surge-no-rastreador' },
     { run: "game.hub.scene = null; game.hub.enter({ map: 'vila', x: 30, y: 11, dir: 'down' });" +
            " game.diveRecord.captured = true; game.diveRecord.sceneSeen = false; game._maybeMaxieScene('lagoa')" },
-    { wait: 1000 }, { run: 'skip()' }, { wait: 3600 }, { shot: 'cenas-22-maxie' },
-    { run: 'skip(3)' }, { wait: 1900 }, { shot: 'cenas-23-maxie-crobat' }
+    { wait: 1000 }, { run: 'skip()' }, { wait: 3600 }, { shot: 'cenas-31-maxie' },
+    { run: 'skip(3)' }, { wait: 1900 }, { shot: 'cenas-32-maxie-crobat' }
   ],
   // a melhoria de UX da 0.31: o card de escolha (o inicial e a Poké Ball) e o painel da fase
   ux: [

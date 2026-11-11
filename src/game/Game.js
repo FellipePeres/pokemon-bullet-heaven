@@ -1274,6 +1274,7 @@ export class Game {
       value: (key) => this.hub._context()[key] ?? null,
       give: (item, count) => this.giveItem(item, count),
       quest: (questId) => this.openQuest(questId),
+      emit: (on, target) => bus.emit(EVENTS.STORY, { on, target }),
       onEnd: () => {
         if (record) this.sceneRecord[id] = 'seen';
         onEnd?.();

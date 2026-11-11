@@ -385,6 +385,8 @@ const inside = (mapId, x, y) => { const m = HUB_MAPS[mapId]; return !!m && x >= 
       if (objective.on === 'talk' && !DIALOGUE[objective.target]) issues.push(`${id}: fala que não existe (${objective.target})`);
       if (objective.on === 'enter' && !HUB.maps[objective.target]) issues.push(`${id}: lugar que não existe (${objective.target})`);
       if (objective.on === 'win' && !STAGES[objective.target]) issues.push(`${id}: fase que não existe (${objective.target})`);
+      for (const key of Object.keys(objective.doneIf ?? {})) if (!DONE_IF_KEYS.includes(key)) issues.push(`${id}: doneIf de objetivo desconhecido (${key})`);
+      if (objective.doneIf?.cleared && !STAGES[objective.doneIf.cleared]) issues.push(`${id}: doneIf de objetivo de uma fase que não existe (${objective.doneIf.cleared})`);
     }
     for (const key of Object.keys(quest.doneIf ?? {})) if (!DONE_IF_KEYS.includes(key)) issues.push(`${id}: doneIf desconhecido (${key})`);
     if (quest.doneIf?.cleared && !STAGES[quest.doneIf.cleared]) issues.push(`${id}: doneIf de uma fase que não existe (${quest.doneIf.cleared})`);
@@ -412,6 +414,7 @@ const inside = (mapId, x, y) => { const m = HUB_MAPS[mapId]; return !!m && x >= 
   const SHEETS = { ...ASSET_MANIFEST, ...HUB_SPRITES, ...DIVE_WORLD.sprites };
   const DIRS = ['up', 'down', 'left', 'right'];
   const NEEDS_WHO = new Set(['show', 'hide', 'place', 'walk', 'face', 'emote', 'throw', 'bird']);
+  const emitted = new Set();   // as pistas que alguma cena dá (o passo emit)
   let stepCount = 0;
   for (const [id, def] of Object.entries(CUTSCENES)) {
     const place = HUB.maps[def.map];
@@ -468,6 +471,10 @@ const inside = (mapId, x, y) => { const m = HUB_MAPS[mapId]; return !!m && x >= 
         if (step.do === 'bird' && !['in', 'grab', 'away', 'gone'].includes(step.mode)) issues.push(`${at}: modo desconhecido (${step.mode})`);
         if (step.do === 'give' && getMartItem(step.item)?.kind !== 'bag' && !KEY_ITEMS[step.item]) issues.push(`${at}: item que não existe (${step.item})`);
         if (step.do === 'quest' && !QUESTS[step.id]) issues.push(`${at}: quest que não existe (${step.id})`);
+        if (step.do === 'emit') {
+          if (!QUEST_EVENTS.includes(step.on)) issues.push(`${at}: acontecimento desconhecido (${step.on})`);
+          else emitted.add(`${step.on}:${step.target ?? ''}`);
+        }
         if (step.do === 'flag' && !step.name) issues.push(`${at}: flag sem nome`);
         if (step.do === 'end' && step.then && !KNOWN_ACTIONS.has(step.then)) issues.push(`${at}: ação desconhecida (${step.then})`);
       }
@@ -478,9 +485,12 @@ const inside = (mapId, x, y) => { const m = HUB_MAPS[mapId]; return !!m && x >= 
   for (const [stageId, stage] of Object.entries(STAGES)) {
     if (stage.story) issues.push(`${stageId}: a história da fase é uma cena em tela cheia (data/cutscenes.js, gatilho play ou win), não um cartão`);
   }
+  const waiting = [];
   for (const [qid, quest] of Object.entries(QUESTS)) {
     for (const o of quest.objectives ?? []) {
       if (o.on === 'scene' && !CUTSCENES[o.target]) issues.push(`${qid}: cena que não existe (${o.target})`);
+      // uma pista sem cena ainda é o próximo capítulo por fazer: aviso, não falha
+      if (o.on === 'clue' && !emitted.has(`clue:${o.target}`)) waiting.push(`${o.target} (${qid})`);
     }
     // a cena que abre a quest precisa existir e ter o passo que a abre
     if (quest.openedBy && !CUTSCENES[quest.openedBy]?.steps.some((step) => step.do === 'quest' && step.id === qid)) {
@@ -497,6 +507,7 @@ const inside = (mapId, x, y) => { const m = HUB_MAPS[mapId]; return !!m && x >= 
   issues.length
     ? fail(`cenas: ${issues.join(' · ')}`)
     : ok(`as cenas: ${Object.keys(CUTSCENES).length} roteiros com ${stepCount} passos, caminhos só no chão; ${stages.length} palco(s) em tela cheia (${stages.join(', ')}); nada no meio das fases`);
+  if (waiting.length) console.log(`  …    | pistas que as quests esperam e ainda não têm cena: ${waiting.join(', ')}`);
 }
 
 // pools de captura: mostra quanto de cada fase já está implementado

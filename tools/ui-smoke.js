@@ -671,8 +671,9 @@ check('...e a quest da Misty ainda não apareceu: quem pede é o Brock', game.qu
   closeDialog();
   hub.enter('home');
   game.questTracker.render();
-  check('o rastreador mostra: derrote a Misty e encontre pistas sobre o comportamento dos Pokémon',
-        questBox().innerHTML.includes('Capítulo 2') && questBox().innerHTML.includes('Derrote a Misty e encontre pistas sobre o comportamento dos Pokémon'));
+  check('o rastreador mostra as duas linhas: derrote a Misty e encontre pistas sobre o comportamento dos Pokémon',
+        questBox().innerHTML.includes('Capítulo 2') && questBox().innerHTML.includes('Derrote a Misty')
+        && questBox().innerHTML.includes('Encontre pistas sobre o comportamento dos Pokémon'));
 }
 
 // conquistas: concluídas ficam para coletar, não entram sozinhas
@@ -750,6 +751,54 @@ check('o Estojo de Insígnias abre com o cartão, as 8 casas e a Liga',
       && registry.get('trainer-card').children.filter((c) => c.classes.has('card-slot')).length === 8
       && registry.get('league-row').children.filter((c) => c.classes.has('league-chip')).length === 5);
 game.menus.closeModal();
+
+// ---- a volta da Fase 2 (0.39): a Misty e o Articuno, e a casa roubada de Cerulean ----
+{
+  const mistyQuest = () => game.quests.view('c2_misty');
+  check('antes da Fase 2, a quest da Misty tem as duas linhas: a vitória e a pista',
+        mistyQuest().objectives.map((o) => o.text).join(' | ') === 'Derrote a Misty | Encontre pistas sobre o comportamento dos Pokémon');
+  game.startStage('gym_2_cerulean');
+  check('na partida, a plaquinha mostra a linha da vitória', registry.get('hud-quest').textContent.includes('Derrote a Misty 0/1'));
+  game.run.state = 'victory';
+  game._handleRunState();
+  check('vencida a Misty, a primeira linha fecha e a quest espera a pista',
+        game.quests.isActive('c2_misty') && mistyQuest().objectives[0].have === 1 && mistyQuest().objectives[1].have === 0);
+  game.quitToMenu();
+  check('a volta passa pelo ginásio dela, em tela cheia, com a Misty em pixel',
+        hub.mapId === 'ginasio_cerulean' && hub.scene?.id === 'depois_misty' && registry.get('screen-hub').classes.has('cinema')
+        && hub.npcs.some((n) => n.id === 'misty' && n.sprite === 'misty'));
+  let atLastLine = null;
+  const misty = runScene((d) => {
+    if (d.text.includes('Se descobrir alguma coisa')) atLastLine = { done: game.quests.isDone('c2_misty'), surge: game.quests.isActive('c2_surge') };
+  });
+  check('a Misty conta que o mar ficou bravo desde que o Articuno sumiu, e aponta o Surge e o Zapdos',
+        said(misty, 'o mar ficou bravo') && said(misty, 'Articuno deixou de ser visto sobre as Ilhas Seafoam') && said(misty, 'O Zapdos aparecia perto da Usina'));
+  check('...e a pista fecha a quest no meio da conversa (com a comemoração) e abre a do Surge',
+        atLastLine?.done && atLastLine.surge && !game.campaign.quests.done.c2_misty.skipped);
+  settle();
+  check('emendada, a cena da casa roubada, na rua de Cerulean (outro palco, em tela cheia)',
+        hub.mapId === 'cerulean' && hub.scene?.id === 'cerulean_roubo' && registry.get('screen-hub').classes.has('cinema'));
+  let rivalAt = null;
+  const roubo = runScene((d) => { if (d.name === 'Rival') { const r = hub.scene.actor('rival'); rivalAt = `${r.x},${r.y}`; } });
+  check('o policial culpa a Equipe Rocket (a pista falsa)', said(roubo, 'Só pode ser a Equipe Rocket'));
+  check('...e o dono da casa estranha: só levaram peças de máquina', said(roubo, 'Não levaram dinheiro, nem Pokémon') && said(roubo, 'peças de máquina'));
+  check('o rival passa correndo, a caminho de Vermilion', said(roubo, 'Brincando de detetive') && rivalAt === '9,10', rivalAt);
+  settle();
+  game.questTracker.render();
+  check('no fim, a vila, na frente de casa, com a quest do Surge em duas linhas',
+        hub.mapId === 'vila' && hub.player.x === 6 && hub.player.y === 17 && !hub.scene && !registry.get('screen-hub').classes.has('cinema')
+        && questBox().innerHTML.includes('Vença o Lt. Surge, em Vermilion') && questBox().innerHTML.includes('Descubra se o Zapdos também sumiu'));
+  hub.enter({ map: 'vila', x: 15, y: 24, dir: 'down' });
+  hub.interact();
+  check('na vila, os moradores culpam a Equipe Rocket', dialogText().includes('A Equipe Rocket assaltou uma casa em Cerulean'));
+  closeDialog();
+  hub.enter({ map: 'casa_sabio', x: 3, y: 6, dir: 'up' });
+  hub.interact();
+  check('...e só o velho sábio estranha o que o ladrão levou', dialogText().includes('Que ladrão faz isso?'));
+  closeDialog();
+  hub.enter('home');
+  game.openCampaign();
+}
 
 // ---- Campeão e Hall da Fama ----
 game.region.campaign.slice(0, -1).forEach((e) => {
@@ -1344,7 +1393,13 @@ game.quitToMenu();
   const vetMisty = { starter: 'squirtle', clearedStages: ['gym_1_pewter', 'gym_2_cerulean'], hub: { flags: { mapa_visto: true } } };
   const qm = questsFor(vetMisty);
   qm.sync();
-  check('quem já venceu a Misty também fecha a dela em silêncio', vetMisty.quests.done.c2_misty?.skipped && !qm.isActive('c2_misty'));
+  check('quem já venceu a Misty antes das cenas fica com a vitória marcada, esperando a pista (rejoga a fase para ouvir a Misty)',
+        qm.isActive('c2_misty') && vetMisty.quests.progress.c2_misty?.[0] === 1 && !vetMisty.quests.progress.c2_misty?.[1]);
+  const vetSurge = { starter: 'squirtle', clearedStages: ['gym_1_pewter', 'gym_2_cerulean', 'gym_3_vermilion'], hub: { flags: { mapa_visto: true } } };
+  const qs = questsFor(vetSurge);
+  qs.sync();
+  check('quem já passou do Surge fecha a da Misty em silêncio e cai na do Surge, com a vitória marcada',
+        vetSurge.quests.done.c2_misty?.skipped && qs.isActive('c2_surge') && vetSurge.quests.progress.c2_surge?.[0] === 1);
   const fresh = { starter: 'squirtle', clearedStages: [], hub: { flags: {} } };
   const qf = questsFor(fresh);
   qf.sync();

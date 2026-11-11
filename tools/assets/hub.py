@@ -232,6 +232,7 @@ PH1, PH2 = 'PalletTown_PlayersHouse_1F', 'PalletTown_PlayersHouse_2F'
 LAB, HOUSE1, WARDEN = 'PalletTown_ProfessorOaksLab', 'House1', 'FuchsiaCity_WardensHouse'
 COPYCAT = 'SaffronCity_CopycatsHouse_2F'
 GYM1 = 'PewterCity_Gym'
+GYM2 = 'CeruleanCity_Gym'
 
 
 def build_vila(s):
@@ -358,6 +359,19 @@ def build_ginasio_pewter(s):
     s.stamp(0, 0, GYM1, 0, 0, 13, 16)
 
 
+def build_ginasio_cerulean(s):
+    """O ginásio da Misty, inteiro, com a piscina: o palco da cena de depois da Fase 2 (0.39)."""
+    s.stamp(0, 0, GYM2, 0, 0, 17, 20)
+
+
+def build_cerulean(s):
+    """
+    Um recorte de Cerulean (0.39): a casa assaltada do FireRed (a porta da frente em
+    30,11, o policial em 31,12), a rua na frente dela e o caminho para a esquerda.
+    """
+    s.stamp(0, 0, CE, 20, 4, 22, 15)
+
+
 MAPS = {
     # id: (largura, altura, montagem)
     'vila':       (36, 28, build_vila),
@@ -370,8 +384,10 @@ MAPS = {
     'casa_sabio': (13, 11, build_casa_sabio),
     # os palcos das cenas (0.39): lugares fora da vila, só para as cenas de antes e depois das fases
     'ginasio_pewter': (13, 16, build_ginasio_pewter),
+    'ginasio_cerulean': (17, 20, build_ginasio_cerulean),
+    'cerulean': (22, 15, build_cerulean),
 }
-SOURCES = [P, V, R, F, CE, FU, IP, DS4, DS1, PH1, PH2, LAB, HOUSE1, WARDEN, COPYCAT, GYM1]
+SOURCES = [P, V, R, F, CE, FU, IP, DS4, DS1, PH1, PH2, LAB, HOUSE1, WARDEN, COPYCAT, GYM1, GYM2]
 
 
 # ============================ os móveis do quarto ============================
@@ -428,6 +444,10 @@ SPRITES = {
     'rival':       ('people/blue', 'npc_green', 16, 32),
     # os líderes, para as cenas de depois das fases (0.39)
     'brock':       ('people/brock', 'npc_green', 16, 32),
+    'misty':       ('people/misty', 'npc_blue', 16, 32),
+    # a casa assaltada de Cerulean (0.39)
+    'policeman':   ('people/policeman', 'npc_blue', 16, 32),
+    'old_man_2':   ('people/old_man_2', 'npc_white', 16, 32),
     'meowth':      ('pokemon/meowth', 'npc_blue', 16, 16),
     'clefairy':    ('pokemon/clefairy', 'npc_pink', 16, 16),
     'pidgey':      ('pokemon/pidgey', 'npc_blue', 16, 16),

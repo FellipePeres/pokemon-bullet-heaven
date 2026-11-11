@@ -99,7 +99,7 @@ quando o jogador volta, ou o lugar da fase antes dela.
 |---|---|---|---|
 | **Prólogo — O sonho** | na vila, antes da Fase 1 | O Carvalho: as hordas mudaram, ninguém sabe por quê. O sonho de ser Campeão continua possível, mas o ideal é devolver a paz às rotas. | — |
 | **1 — As rotas tomadas** | Fase 1 (Brock) | **Feito na 0.39** (pedido do Fellipe). Depois da vitória, no ginásio de Pewter, em tela cheia: o Brock parabeniza o jogador por ter vencido, conta que os Pokémon estão agindo de um jeito que ninguém viu (os Geodude desceram do Monte Lua), diz que é muito sério e pede ajuda para entender o que está acontecendo. Manda investigar a cidade de Cerulean. É a apresentação do problema; o Maxie não aparece, e não há corte de tela. Abre a quest **"Derrote a Misty e encontre pistas sobre o comportamento dos Pokémon"** (o mapa segue para o ginásio dela). Logo depois, de volta à vila: o **velho sábio** sai de casa, vê o jogador (o "!"), vem até ele e conta que soube do pedido do Brock, que os pássaros lendários sumiram dos céus e que foi depois disso que tudo começou ("deve ter alguma coisa a ver"), mas que é tudo o que ele pode ajudar por enquanto. Ele volta para casa, e o jogador fica livre. | — |
-| **2 — O céu vazio** | Fases 2 e 3 (Misty, Surge) | A Misty: o mar ficou bravo desde que o Articuno deixou de ser visto sobre as Ilhas Seafoam. O Surge: a Usina pifou, os Voltorb invadiram Vermilion e ninguém vê o Zapdos há meses. Na vila, os moradores culpam a Equipe Rocket. | — |
+| **2 — O céu vazio** | Fases 2 e 3 (Misty, Surge) | **A parte da Misty está feita na 0.39** (proposta "Cerulean: o mar bravo", aprovada inteira pelo Fellipe). Depois da Fase 2, duas cenas: no ginásio, a Misty conta que o mar ficou bravo desde que o Articuno deixou de ser visto sobre as Ilhas Seafoam (a primeira prova de que o sábio tem razão) e aponta o Surge e a Usina, onde o Zapdos aparecia; na rua de Cerulean, a casa assaltada do FireRed: o policial culpa a Equipe Rocket (a pista falsa) e o dono estranha que só levaram peças de máquina (as máquinas dos pássaros, no Capítulo 4); o rival passa correndo, a caminho de Vermilion. Na vila, os moradores culpam a Rocket, e só o velho sábio estranha o ladrão. **Falta (H-4):** o Surge, com a Usina que pifou, os Voltorb em Vermilion e o Zapdos que ninguém vê há meses (a pista `zapdos` da quest do Surge). | — |
 | **3 — Os rastros** | Fases 4 e 5 (Erika, Koga) | A Erika acha, no jardim, uma pena dourada e um pedaço de metal com um emblema vermelho, e o jogador leva os dois ao Carvalho. O Koga viu um vulto de capuz vermelho carregando uma máquina pela Rota 10: "não era da Rocket, o uniforme era outro". | — |
 | **4 — O trovão preso** | Fase 6 (Sabrina) | Antes da Fase 6, perto da Usina, um estrondo vem lá de dentro (a cena de antes da fase). A Sabrina vê "três jaulas e um homem olhando para o mar". Abre a quest **"Investigue a Usina"**: o Zapdos está preso numa máquina com o emblema vermelho. Agora é certeza: **alguém roubou os pássaros**. | **Zapdos** |
 | **5 — O gelo** | Fase 7 (Blaine) | A Fase 7 passa pelas Ilhas Seafoam. Depois do Blaine, o Carvalho cruza as anotações e aponta o fundo das ilhas. | **Articuno** |
@@ -380,20 +380,23 @@ para o objetivo `scene` das quests. O check-data recusa a caixa com retrato
 | 2 | O rival pega o inicial dele (decisão 1) | laboratório | Prólogo | H-2 ✅ |
 | 3 | O Brock pede ajuda | ginásio de Pewter, depois da Fase 1 | 1 | H-2 ✅ |
 | 4 | O velho sábio e os pássaros | vila, na volta da Fase 1 | 1 | H-2 ✅ |
-| 5 | A vila culpa a Equipe Rocket | vila (moradores) | 2 | H-4 |
-| 6 | O vulto de vermelho na Rota 10 | antes da Fase 5 | 3 | H-4 |
-| 7 | O estrondo na Usina | antes da Fase 6 | 4 | H-6 |
-| 8 | A jaula do Zapdos | Usina | 4 (missão) | H-6 |
-| 9 | O Carvalho e o emblema | laboratório | 4 | H-6 |
-| 10 | A jaula do Articuno | Ilhas Seafoam | 5 (missão) | H-7 |
-| 11 | O Giovanni e o emblema | ginásio de Viridian, depois da Fase 8 | 6 | H-8 |
-| 12 | A jaula do Moltres | Monte Brasa | 6 (missão) | H-8 |
-| 13 | A Victory Road se abre | mapa da jornada | 7 | H-9 |
-| 14 | O rival Campeão | sala do Campeão | 7 | H-9 |
-| 15 | "Ainda falta alguma coisa" | laboratório | 7 | H-9 |
-| 16 | O Mewtwo e a máquina quebrada | Caverna Desconhecida | 8 (missão) | H-10 |
-| 17 | O Kyogre e o Maxie | lagoa ou Centro (já existe) | 8 | H-11 |
-| 18 | O Pokémon rosa | vila | Epílogo | H-11 |
+| 5 | O mar bravo: a Misty e o Articuno | ginásio de Cerulean, depois da Fase 2 | 2 | H-4 ✅ |
+| 6 | A casa roubada (e o rival passa) | cidade de Cerulean, depois da Fase 2 | 2 | H-4 ✅ |
+| 7 | A vila culpa a Equipe Rocket | vila (falas dos moradores, sem cena) | 2 | H-4 ✅ |
+| 8 | O Surge, a Usina e o Zapdos | ginásio de Vermilion, depois da Fase 3 | 2 | H-4 |
+| 9 | O vulto de vermelho na Rota 10 | antes da Fase 5 | 3 | H-4 |
+| 10 | O estrondo na Usina | antes da Fase 6 | 4 | H-6 |
+| 11 | A jaula do Zapdos | Usina | 4 (missão) | H-6 |
+| 12 | O Carvalho e o emblema | laboratório | 4 | H-6 |
+| 13 | A jaula do Articuno | Ilhas Seafoam | 5 (missão) | H-7 |
+| 14 | O Giovanni e o emblema | ginásio de Viridian, depois da Fase 8 | 6 | H-8 |
+| 15 | A jaula do Moltres | Monte Brasa | 6 (missão) | H-8 |
+| 16 | A Victory Road se abre | mapa da jornada | 7 | H-9 |
+| 17 | O rival Campeão | sala do Campeão | 7 | H-9 |
+| 18 | "Ainda falta alguma coisa" | laboratório | 7 | H-9 |
+| 19 | O Mewtwo e a máquina quebrada | Caverna Desconhecida | 8 (missão) | H-10 |
+| 20 | O Kyogre e o Maxie | lagoa ou Centro (já existe) | 8 | H-11 |
+| 21 | O Pokémon rosa | vila | Epílogo | H-11 |
 
 Cada cena chega na etapa do capítulo dela. A H-2 trouxe o motor, as duas do
 prólogo e as duas da volta da Fase 1, a do Brock e a do velho sábio (pedidos do
@@ -432,6 +435,16 @@ ver. Mas isso é tudo que eu posso te ajudar, por enquanto". Ele volta para casa
 a câmera volta ao jogador e o jogo segue livre. Na casa dele, depois, ele lembra
 da conversa.
 
+**As da Misty (0.39, `depois_misty` e `cerulean_roubo`):** depois da Fase 2, duas
+cenas emendadas, em dois palcos novos (o ginásio de Cerulean inteiro e um recorte
+da cidade com a casa assaltada, os dois do FireRed). A Misty, na beira da
+piscina, conta do mar bravo e do Articuno; quando ela aponta o Surge, a pista
+(`emit` da `clue` `articuno`) fecha o "Encontre pistas" com a comemoração, e a
+quest do Surge entra no rastreador. Na rua, o policial culpa a Rocket, o dono da
+casa estranha as peças de máquina, e o rival passa correndo ("Brincando de
+detetive?"). Depois, na vila, os moradores comentam o assalto, e só o sábio
+estranha; essas falas valem enquanto a quest do Surge está ativa.
+
 ---
 
 ## 10. Depois de Kanto: as vilas das outras gerações
@@ -459,7 +472,7 @@ da conversa.
 | **H-1** ✅ 0.38 | O sistema de quests e o prólogo: `data/quests.js`, o `QuestSystem`, o rastreador, o save por jornada com a migração, as condições novas nas falas, a cadeia do prólogo e o discurso novo do Carvalho. Testes no `ui-smoke`. |
 | **H-2** ✅ 0.39 | As cenas em dados (`Cutscene.js` a partir da cena do Maxie, que não muda), as cenas de antes e de depois das fases, em tela cheia nos palcos (o ginásio de Pewter), as duas cenas do prólogo e as duas da volta da Fase 1 (o Brock, com a quest da Misty, e o velho sábio): o discurso do Carvalho encenado e o rival pegando o inicial dele (seção 9.3). |
 | **H-3** | A tela de missões. |
-| **H-4** | Os capítulos 1 a 3: as falas de depois da vitória dos líderes, o velho sábio, os moradores e as quests de cada capítulo. |
+| **H-4** (em andamento) | Os capítulos 1 a 3: as falas de depois da vitória dos líderes, o velho sábio, os moradores e as quests de cada capítulo. **Feito na 0.39:** o Capítulo 1 inteiro (o Brock e o velho sábio) e a parte da Misty do Capítulo 2 (a Misty, a casa roubada, os moradores). Falta o Surge e o Capítulo 3. |
 | **H-5** | A captura sem lendários e o molde da missão de lendário, tirado do salão do Kyogre. |
 | **H-6 a H-8** | O Zapdos, o Articuno e o Moltres, cada um com o seu plano e a sua maquete. |
 | **H-9** | A Liga com os pássaros e o fim do Capítulo 7 (o rival e o "ainda falta alguma coisa"). |

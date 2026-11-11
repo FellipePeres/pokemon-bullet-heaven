@@ -166,6 +166,19 @@ export const DIALOGUE = {
     name: 'Brock',
     lines: [{ say: ['Siga para Cerulean, {player}. E fique de olho em qualquer coisa estranha.'] }]
   },
+  // os palcos da volta da Fase 2 (0.39, data/cutscenes.js)
+  misty: {
+    name: 'Misty',
+    lines: [{ say: ['O Zapdos aparecia perto da Usina. Fale com o Lt. Surge, em Vermilion.'] }]
+  },
+  policial: {
+    name: 'Policial',
+    lines: [{ say: ['Circulando! Ninguém entra na cena do crime.'] }]
+  },
+  dono_casa: {
+    name: 'Dono da casa',
+    lines: [{ say: ['Peças de máquina... Para que alguém ia querer isso?'] }]
+  },
   // quem desiste da escolha (o Voltar da tela de iniciais)
   carvalho_espera: {
     name: 'Prof. Carvalho',
@@ -254,14 +267,18 @@ export const DIALOGUE = {
     name: 'Velho sábio',
     lines: [
       { when: { champion: true }, say: ['Você venceu a Liga. Mas me diga: já foi até o fim do mato a oeste? Ninguém nunca foi.'] },
-      { when: { badges: 6 }, say: ['Existe um Pokémon criado pelo homem, escondido numa caverna perto de Cerulean. Nem as hordas chegam perto dele.'] },
-      { when: { badges: 4 }, say: ['Na Floresta de Viridian, as árvores escondem mais olhos do que folhas. Nunca pare de andar lá dentro.'] },
-      { when: { badges: 2 }, say: ['Dizem que as hordas começaram depois que três pássaros lendários sumiram dos céus de Kanto.', 'Gelo, trovão e fogo... onde estarão?'] },
-      // depois da cena da volta da Fase 1 (0.39, data/cutscenes.js): ele já contou dos pássaros
-      { when: { scene: 'sabio_passaros' }, say: [
+      // a história (0.39): o que ele diz depois de cada cena, enquanto a quest daquele momento está ativa
+      { when: { scene: 'cerulean_roubo', quest: 'c2_surge' }, say: [
+        'Levaram peças de máquina e deixaram o dinheiro? Que ladrão faz isso?',
+        'Tem alguma coisa errada nessa história, {player}.'
+      ] },
+      { when: { scene: 'sabio_passaros', quest: 'c2_misty' }, say: [
         'Os pássaros lendários sumiram, e as hordas vieram logo depois. Isso eu não esqueço.',
         'Se descobrir alguma coisa em Cerulean, volte aqui e me conte.'
       ] },
+      { when: { badges: 6 }, say: ['Existe um Pokémon criado pelo homem, escondido numa caverna perto de Cerulean. Nem as hordas chegam perto dele.'] },
+      { when: { badges: 4 }, say: ['Na Floresta de Viridian, as árvores escondem mais olhos do que folhas. Nunca pare de andar lá dentro.'] },
+      { when: { badges: 2 }, say: ['Dizem que as hordas começaram depois que três pássaros lendários sumiram dos céus de Kanto.', 'Gelo, trovão e fogo... onde estarão?'] },
       { say: ['Sente-se, jovem. Quando eu era criança, os Pokémon andavam sozinhos ou em pares.', 'Hoje andam em bandos de cem.'] }
     ]
   },
@@ -288,6 +305,8 @@ export const DIALOGUE = {
     name: 'Rapaz',
     lines: [
       { when: { locked: true }, say: ['Ei! Vai sair sem Pokémon? As hordas te pegam na primeira curva.', 'Passa no laboratório do Prof. Carvalho antes!'] },
+      // depois da casa roubada de Cerulean (0.39): a vila culpa a Equipe Rocket
+      { when: { scene: 'cerulean_roubo', quest: 'c2_surge' }, say: ['Viu o jornal? A Equipe Rocket assaltou uma casa em Cerulean!'] },
       { say: ['Daqui para o sul, é Kanto inteira. Boa sorte!'] }
     ]
   },
@@ -304,7 +323,10 @@ export const DIALOGUE = {
   },
   moca: {
     name: 'Moça',
-    lines: [{ say: ['Já tenho três Pikachus de pelúcia. Falta um para completar a coleção!'] }]
+    lines: [
+      { when: { scene: 'cerulean_roubo', quest: 'c2_surge' }, say: ['Primeiro as hordas, agora a Equipe Rocket... Kanto está de cabeça para baixo.'] },
+      { say: ['Já tenho três Pikachus de pelúcia. Falta um para completar a coleção!'] }
+    ]
   },
   meowth: { lines: [{ say: ['Miau! Meowth procura moedinhas no chão.'] }] },
   clefairy: { lines: [{ say: ['Clefairy dá uma voltinha e acena.'] }] },

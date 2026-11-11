@@ -31,9 +31,10 @@ export class Cutscene {
    * @param def     o roteiro (data/cutscenes.js)
    * @param options id; fill(text) troca {player} e companhia; value(key) lê o contexto
    *                das falas (o `pick` dos passos); give(item, count) dá um item e devolve o
-   *                nome; quest(id) abre uma quest; onEnd() no fim
+   *                nome; quest(id) abre uma quest; emit(on, target) conta um acontecimento da
+   *                história (a pista); onEnd() no fim
    */
-  constructor(hub, def, { id = null, fill = (text) => text, value = () => null, give = null, quest = null, onEnd = null } = {}) {
+  constructor(hub, def, { id = null, fill = (text) => text, value = () => null, give = null, quest = null, emit = null, onEnd = null } = {}) {
     this.hub = hub;
     this.id = id;
     this.band = def.band ?? null;
@@ -52,6 +53,7 @@ export class Cutscene {
     this._value = value;
     this._give = give;
     this._quest = quest;
+    this._emit = emit;
     this._onEnd = onEnd;
   }
 
@@ -191,6 +193,7 @@ export class Cutscene {
         done = !!local.closed;
         break;
       case 'quest': this._quest?.(a.id); done = true; break;
+      case 'emit': this._emit?.(a.on, a.target ?? null); done = true; break;
       case 'flag': hub._flags()[a.name] = a.value ?? true; done = true; break;
       case 'end':
         this.done = true;

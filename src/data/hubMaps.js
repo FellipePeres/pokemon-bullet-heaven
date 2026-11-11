@@ -170,6 +170,51 @@ export const HUB_MAPS = {
       '#...........#',
       '#############'
     ]
+  },
+  ginasio_cerulean: {
+    src: 'assets/hub/ginasio_cerulean.png', top: 'assets/hub/ginasio_cerulean-top.png', width: 17, height: 20,
+    walk: [
+      '#################',
+      '#####.#...#.#####',
+      '#################',
+      '#...............#',
+      '#......###......#',
+      '#.#############.#',
+      '#.#####...#####.#',
+      '#.##.........##.#',
+      '#.#####...##.##.#',
+      '#.##########.##.#',
+      '#.##.........##.#',
+      '#.##.####.#####.#',
+      '#.##.####..####.#',
+      '#.##......#####.#',
+      '#.#######.#####.#',
+      '#.#######.#####.#',
+      '#.####.....####.#',
+      '#.#####...#####.#',
+      '#...............#',
+      '#################'
+    ]
+  },
+  cerulean: {
+    src: 'assets/hub/cerulean.png', top: 'assets/hub/cerulean-top.png', width: 22, height: 15,
+    walk: [
+      '##...#...#############',
+      '##...#...#.........###',
+      '.#...#...#.........###',
+      '.#...#...#.........###',
+      '##.......#...##...####',
+      '##......#######...####',
+      '##......#######...####',
+      '##......#######......#',
+      '..............#......#',
+      '..............#......#',
+      '..............#......#',
+      '..............#......#',
+      '#####.........#......#',
+      '#####.........#......#',
+      '###############.......'
+    ]
   }
 };
 
@@ -187,11 +232,14 @@ export const HUB_SPRITES = {
   'npc/lass': { src: 'assets/hub/npc/lass.png', frameWidth: 16, frameHeight: 32, frames: 10 },
   'npc/little_girl': { src: 'assets/hub/npc/little_girl.png', frameWidth: 16, frameHeight: 16, frames: 10 },
   'npc/meowth': { src: 'assets/hub/npc/meowth.png', frameWidth: 16, frameHeight: 16, frames: 3 },
+  'npc/misty': { src: 'assets/hub/npc/misty.png', frameWidth: 16, frameHeight: 32, frames: 3 },
   'npc/mom': { src: 'assets/hub/npc/mom.png', frameWidth: 16, frameHeight: 32, frames: 3 },
   'npc/nurse': { src: 'assets/hub/npc/nurse.png', frameWidth: 16, frameHeight: 32, frames: 4 },
   'npc/old_man_1': { src: 'assets/hub/npc/old_man_1.png', frameWidth: 16, frameHeight: 32, frames: 10 },
+  'npc/old_man_2': { src: 'assets/hub/npc/old_man_2.png', frameWidth: 16, frameHeight: 32, frames: 9 },
   'npc/pidgey': { src: 'assets/hub/npc/pidgey.png', frameWidth: 16, frameHeight: 16, frames: 3 },
   'npc/pikachu': { src: 'assets/hub/npc/pikachu.png', frameWidth: 16, frameHeight: 16, frames: 3 },
+  'npc/policeman': { src: 'assets/hub/npc/policeman.png', frameWidth: 16, frameHeight: 32, frames: 9 },
   'npc/prof_oak': { src: 'assets/hub/npc/prof_oak.png', frameWidth: 16, frameHeight: 32, frames: 9 },
   'npc/rival': { src: 'assets/hub/npc/rival.png', frameWidth: 16, frameHeight: 32, frames: 9 },
   'npc/scientist': { src: 'assets/hub/npc/scientist.png', frameWidth: 16, frameHeight: 32, frames: 10 },

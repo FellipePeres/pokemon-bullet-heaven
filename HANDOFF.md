@@ -697,6 +697,27 @@ Nunca voltar bônus globais para o pool de level up — foi pedido explícito.
   próxima cena devida (`Game.pendingSceneSpot`) e a toca; sem nenhuma, à frente de
   casa. O jogador aparece na rua embaixo da casa do sábio, a câmera sobe dois
   tiles para o rastreador não cobrir a porta, e no fim volta ao jogador, livre.
+- **As da Misty** (`depois_misty` e `cerulean_roubo`, os dois com o gatilho `win` da
+  Fase 2): em dois palcos novos, `ginasio_cerulean` e `cerulean` (um recorte de
+  22×15 da cidade com a casa assaltada do FireRed), com as folhas `npc/misty`,
+  `npc/policeman` e `npc/old_man_2`. A da Misty termina com `then: 'home'`, e a
+  saída leva direto ao palco da próxima cena devida (de palco para palco).
+- **O passo `emit`** (`{ on, target }`) conta um acontecimento da história no meio
+  da cena; o primeiro é a pista (`clue`). A quest da Misty tem duas linhas (a
+  vitória e a pista `articuno`), e a pista a fecha com a comemoração no meio da
+  conversa; a próxima (`c2_surge`, abre por `next`) espera a pista `zapdos`, que
+  chega com a cena do Surge. O check-data avisa (sem falhar) as pistas que ainda
+  não têm cena.
+- **O `doneIf` do objetivo** (`QuestSystem._catchUp`): marca, sem comemorar, o
+  objetivo que a jornada já fez (a vitória de antes das cenas). Assim, quem venceu
+  a Misty antes da 0.39 fica com a vitória marcada e a pista esperando (rejoga a
+  fase para ouvir a Misty); o `doneIf` da quest (passar do Surge) fecha tudo em
+  silêncio. **Por que não `cleared` da própria fase:** o `sync()` da chegada ao
+  palco fecharia a quest em silêncio antes da pista.
+- **As falas da história presas à quest**: as linhas dos moradores e do sábio de
+  depois de uma cena usam `scene` e `quest` juntos (valem enquanto a quest daquele
+  momento está ativa) e vêm antes das dicas por insígnia, que senão as
+  esconderiam.
 - **As falas** ganharam as condições `scene` (vista até o fim) e `flag`, e o
   `{rival}` (o inicial dele).
 - **O check-data** confere cada roteiro (o lugar, os atores, as folhas, os
@@ -1263,6 +1284,7 @@ o Brock como está, todas as outras mais duras, menos níveis.
 | 69 | "não se pode ter cenas no meio de fases, as cenas são antes e depois de fases, apenas isso" | 0.39 (ainda na branch): o evento que pausava a fase saiu; no lugar, a fala de antes da fase (antes do relógio andar) e a de depois (antes da tela de resultado), em `stage.story = { before, after }`, e a cena da vila depois de uma fase (gatilho `win`, devida até a próxima chegada à vila); o check-data recusa qualquer coisa no meio; as cenas 5 e 6 do planejamento passaram para antes das Fases 5 e 6 (decisão 11) |
 | 70 | a fala do Brock numa caixa com o retrato não: "um full screen com um cenário e ele em formato de pixel personagem da vila"; ele parabeniza, pede ajuda para entender o que está acontecendo (muito sério), sem o Maxie e sem corte; manda investigar a cidade; a quest: "derrote a Misty e encontre pistas do comportamento dos Pokémon" | 0.39 (na branch): a caixa com retrato saiu; os palcos (`scene: true`, o ginásio de Pewter extraído do FireRed, o Brock em pixel), a tela cheia (`cinema`), os gatilhos `win` e `play` com `then: 'home'`/`'stage'`; a cena `depois_brock`; a quest `c2_misty` com `openedBy`; decisão 12 no planejamento |
 | 71 | depois da Fase 1, ao aparecer na vila: o velho sábio sai de casa, vê o jogador ("!"), "soube que o Brock te pediu ajuda", conta que depois que os pássaros lendários sumiram dos céus isso começou, "deve ter algo a ver, mas isso é tudo que posso ajudar"; depois o jogador volta a jogar livre | 0.39 (na branch): a cena `sabio_passaros` (gatilho `win` da Fase 1, depois da do Brock), a saída do palco levando à próxima cena devida, a câmera enquadrando a porta, a fala nova do sábio na casa dele |
+| 72 | a continuação da Fase 2: "perfeito essas cenas, pode seguir com tudo que sugeriu, aceito todas as recomendações" (a proposta "Cerulean: o mar bravo") | 0.39 (na branch): os palcos do ginásio de Cerulean e da casa assaltada, a Misty, o policial e o dono em pixel; as cenas `depois_misty` e `cerulean_roubo` (com o rival); o passo `emit` e as pistas (`clue`); a quest da Misty em duas linhas e a do Surge; o `doneIf` por objetivo; as falas da vila culpando a Rocket, presas à quest |
 | Fase 8 (Giovanni) | 1 → 0,8 | 4,0 | 4,5 | 60 | 84 → 62 |
 | Lorelei | 1,05 → 0,8 | 3,5 | 3,1–4,7 | 64 | 92 → 66 |
 | Bruno | 1,12 → 0,97 | 3,7 | 3,5–6,3 ² | 66 | 99 → 68 |
