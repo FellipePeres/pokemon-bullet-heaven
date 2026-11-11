@@ -69,8 +69,8 @@ const ROTEIROS = {
     { run: 'game.openCampaign()' }, { wait: 2600 }, { shot: 'quests-06-jornada' },
     { run: "game.startStage('gym_1_pewter')" }, { wait: 1500 }, { shot: 'quests-07-partida' }
   ],
-  // as cenas (0.39, data/cutscenes.js): o discurso do Carvalho encenado, o rival, o evento
-  // de história na fase e a cena do Maxie, que agora roda no motor novo (game/Cutscene.js)
+  // as cenas (0.39, data/cutscenes.js): o discurso do Carvalho encenado, o rival, a história
+  // antes e depois de uma fase (nunca no meio) e a cena do Maxie, no motor novo (game/Cutscene.js)
   cenas: [
     { open: 'index.html' }, { wait: 500 },
     { run: "window.skip = (n = 1) => { for (let i = 0; i < n; i++) { const h = game.hub; if (!h.dialog) return; h.dialog.shown = 999; h.confirm(); } };" +
@@ -88,13 +88,18 @@ const ROTEIROS = {
     { run: 'skip(2)' }, { wait: 500 }, { run: 'skip()' }, { wait: 3500 }, { shot: 'cenas-10-o-neto' },
     { run: 'skip()' }, { wait: 1200 }, { run: 'skip(2)' }, { wait: 1400 }, { shot: 'cenas-11-o-mapa' },
     { run: 'skip(9)' }, { wait: 1200 }, { shot: 'cenas-12-depois' },
-    { run: "import('./src/data/stages.js').then(({ STAGES }) => { STAGES.gym_1_pewter.story = [{ id: 'exemplo', at: 1, name: 'BROCK', portrait: 'portrait/brock'," +
-           " lines: ['{player}... os Geodude desceram do Monte Lua. Eles nunca fizeram isso.'] }]; game.startStage('gym_1_pewter'); })" },
-    { wait: 3000 }, { shot: 'cenas-13-evento-na-fase' },
-    { run: "game.advanceStory(); game.quitToMenu(); game.hub.enter({ map: 'vila', x: 30, y: 11, dir: 'down' });" +
+    // a história de uma fase, só antes e depois dela (nunca no meio): um exemplo na Fase 1
+    { run: "import('./src/data/stages.js').then(({ STAGES }) => { STAGES.gym_1_pewter.story = {" +
+           " before: { id: 'exemplo_antes', name: 'ROTA 1', lines: ['Na saída da vila, a Rota 1 está tomada por Pokémon selvagens. Nunca foi assim.'] }," +
+           " after: { id: 'exemplo_depois', name: 'BROCK', portrait: 'portrait/brock', lines: ['{player}... os Geodude desceram do Monte Lua. Eles nunca fizeram isso.'] } };" +
+           " game.startStage('gym_1_pewter'); })" },
+    { wait: 2500 }, { shot: 'cenas-13-antes-da-fase' },
+    { run: 'game.advanceStory()' }, { wait: 2500 },
+    { run: "game.run.state = 'victory'" }, { wait: 1500 }, { shot: 'cenas-14-depois-da-fase' },
+    { run: "game.advanceStory(); game.quitToMenu(); game.hub.scene = null; game.hub.enter({ map: 'vila', x: 30, y: 11, dir: 'down' });" +
            " game.diveRecord.captured = true; game.diveRecord.sceneSeen = false; game._maybeMaxieScene('lagoa')" },
-    { wait: 1000 }, { run: 'skip()' }, { wait: 3600 }, { shot: 'cenas-14-maxie' },
-    { run: 'skip(3)' }, { wait: 1900 }, { shot: 'cenas-15-maxie-crobat' }
+    { wait: 1000 }, { run: 'skip()' }, { wait: 3600 }, { shot: 'cenas-15-maxie' },
+    { run: 'skip(3)' }, { wait: 1900 }, { shot: 'cenas-16-maxie-crobat' }
   ],
   // a melhoria de UX da 0.31: o card de escolha (o inicial e a Poké Ball) e o painel da fase
   ux: [

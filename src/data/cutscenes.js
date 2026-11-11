@@ -9,8 +9,14 @@
  *   map       o lugar da vila (data/hub.js) onde ela acontece
  *   spot      onde o jogador fica quando ela volta pendente
  *   trigger   o que começa a cena: { on: 'enter', target: lugar } (entrou no lugar),
- *             { on: 'npc', target: id } (falou com alguém do lugar) ou { on: 'starter' }
- *             (acabou de escolher o inicial). Sem trigger, só o código a começa (a do Maxie).
+ *             { on: 'npc', target: id } (falou com alguém do lugar), { on: 'starter' }
+ *             (acabou de escolher o inicial) ou { on: 'win', target: fase } (venceu a fase:
+ *             a cena fica devida e toca quando o jogador chegar na vila, no `spot`). Sem
+ *             trigger, só o código a começa (a do Maxie).
+ *
+ * As cenas são ANTES e DEPOIS das fases, nunca no meio (regra do Fellipe). A fala de
+ * antes e a de depois de uma fase, com o retrato, ficam na própria fase (`stage.story`
+ * em data/stages.js).
  *   when      as condições das falas (data/dialogue.js) para o trigger valer
  *   record    false: não se registra em `campaign.scenes` (a do Maxie usa o registro do Kyogre)
  *   band      a faixa do corte de tela (passo `cutin`)
@@ -209,4 +215,4 @@ export const CUTSCENE_STEPS = ['wait', 'say', 'talk', 'show', 'hide', 'place', '
   'bird', 'fade', 'camera', 'shake', 'give', 'quest', 'flag', 'end'];
 
 /** O que pode começar uma cena. */
-export const CUTSCENE_TRIGGERS = ['enter', 'npc', 'starter'];
+export const CUTSCENE_TRIGGERS = ['enter', 'npc', 'starter', 'win'];

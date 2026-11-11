@@ -422,6 +422,7 @@ const inside = (mapId, x, y) => { const m = HUB_MAPS[mapId]; return !!m && x >= 
       if (!CUTSCENE_TRIGGERS.includes(t.on)) issues.push(`${id}: trigger desconhecido (${t.on})`);
       if (t.on === 'enter' && t.target !== def.map) issues.push(`${id}: trigger de entrada em outro lugar (${t.target})`);
       if (t.on === 'npc' && !(place.npcs ?? []).some((n) => n.id === t.target)) issues.push(`${id}: trigger de alguém que não está no lugar (${t.target})`);
+      if (t.on === 'win' && !STAGES[t.target]) issues.push(`${id}: trigger de uma fase que não existe (${t.target})`);
     }
     for (const cond of Object.keys(def.when ?? {})) if (!KNOWN_WHEN.has(cond)) issues.push(`${id}: condição desconhecida (${cond})`);
     const actors = new Set(['player', ...Object.keys(def.actors ?? {}), ...(place.npcs ?? []).map((n) => n.id)]);
@@ -468,21 +469,26 @@ const inside = (mapId, x, y) => { const m = HUB_MAPS[mapId]; return !!m && x >= 
       }
     });
   }
-  // os eventos de história das fases (stage.story): no máximo um por fase, para não
-  // quebrar o ritmo do Bullet Heaven (seção 9.2 do planejamento)
+  // a história das fases (stage.story): só antes e depois, NUNCA no meio da fase
+  // (regra do Fellipe, seção 9.2 do planejamento)
   const storyIds = new Set();
   let storyCount = 0;
   for (const [stageId, stage] of Object.entries(STAGES)) {
-    const events = stage.story ?? [];
-    if (events.length > 1) issues.push(`${stageId}: mais de um evento de história`);
-    for (const e of events) {
+    const story = stage.story;
+    if (!story) continue;
+    if (Array.isArray(story) || typeof story !== 'object' || Object.keys(story).some((k) => k !== 'before' && k !== 'after')) {
+      issues.push(`${stageId}: a história da fase só tem before e after (nada no meio da fase)`);
+      continue;
+    }
+    for (const [moment, e] of Object.entries(story)) {
       storyCount++;
-      if (!e.id) issues.push(`${stageId}: evento de história sem id`);
-      else if (CUTSCENES[e.id] || storyIds.has(e.id)) issues.push(`${stageId}: id de evento repetido (${e.id})`);
+      const at = `${stageId} (${moment})`;
+      if (e.at != null) issues.push(`${at}: tem 'at', mas nada acontece no meio da fase`);
+      if (!e.id) issues.push(`${at}: sem id`);
+      else if (CUTSCENES[e.id] || storyIds.has(e.id)) issues.push(`${at}: id repetido (${e.id})`);
       storyIds.add(e.id);
-      if (!(e.at >= 0 && e.at < stage.duration)) issues.push(`${stageId}: evento fora da fase (${e.at}s)`);
-      if (!e.lines?.length) issues.push(`${stageId}: evento sem falas`);
-      if (e.portrait && !ASSET_MANIFEST[e.portrait]) issues.push(`${stageId}: retrato que não existe (${e.portrait})`);
+      if (!e.lines?.length) issues.push(`${at}: sem falas`);
+      if (e.portrait && !ASSET_MANIFEST[e.portrait]) issues.push(`${at}: retrato que não existe (${e.portrait})`);
     }
   }
   for (const [qid, quest] of Object.entries(QUESTS)) {
@@ -498,7 +504,7 @@ const inside = (mapId, x, y) => { const m = HUB_MAPS[mapId]; return !!m && x >= 
   }
   issues.length
     ? fail(`cenas: ${issues.join(' · ')}`)
-    : ok(`as cenas: ${Object.keys(CUTSCENES).length} roteiros com ${stepCount} passos, caminhos só no chão; ${storyCount} evento(s) de história nas fases`);
+    : ok(`as cenas: ${Object.keys(CUTSCENES).length} roteiros com ${stepCount} passos, caminhos só no chão; ${storyCount} fala(s) de antes e depois das fases, nenhuma no meio`);
 }
 
 // pools de captura: mostra quanto de cada fase já está implementado

@@ -146,8 +146,9 @@ não abre até você vencer.
   [PLANEJAMENTO-HISTORIA.md](PLANEJAMENTO-HISTORIA.md) e chega por capítulos.
 - **As cenas** (0.39): o Carvalho encena o discurso do prólogo, e o rival chega
   atrasado ao laboratório para pegar o inicial com vantagem sobre o seu. As cenas
-  são roteiros em dados, com câmera, gente andando, itens e quests, e a fase pode
-  pausar para um momento da história, com o retrato de quem fala.
+  são roteiros em dados, com câmera, gente andando, itens e quests. A história
+  acontece antes e depois das fases, nunca no meio delas: uma fala com o retrato
+  antes do relógio andar, outra depois da vitória, e cenas na vila na volta.
 - **Os 151 Pokémon de Kanto jogáveis**, cada um com linha de 3 golpes e linha
   evolutiva. Alguns chegam como presente, como no FireRed (Farfetch'd, Lickitung e
   o prêmio do Dojo de Saffron: Hitmonlee ou Hitmonchan).

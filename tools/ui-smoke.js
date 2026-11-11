@@ -793,7 +793,7 @@ check('depois da escolha, o Continuar segue para a jornada (na vila); sem nome, 
   game.quitToMenu();
 }
 
-// ---- o motor das cenas (0.39): os passos novos numa cena de teste, e o evento de história na fase ----
+// ---- o motor das cenas (0.39): os passos novos numa cena de teste, e a história antes e depois da fase (nunca no meio) ----
 {
   const { CUTSCENES } = await import('../src/data/cutscenes.js');
   const { QUESTS } = await import('../src/data/quests.js');
@@ -835,26 +835,57 @@ check('depois da escolha, o Continuar segue para a jornada (na vila); sem nome, 
   delete game.campaign.scenes.teste_cena; delete game.campaign.hub.flags.teste_flag; delete game.campaign.keyItems.pena_dourada;
   game.profile.bag.revive = revives;
 
+  // a história da fase: só antes e depois dela, nunca no meio (regra do Fellipe)
   const stage = STAGES.gym_1_pewter;
-  stage.story = [{ id: 'teste_historia', at: 0.5, name: 'Brock', portrait: stage.leader.portrait, lines: ['O Brock olha para você, {player}.', 'E volta para a luta.'] }];
+  stage.story = {
+    before: { id: 'teste_antes', name: 'Rota 1', lines: ['A Rota 1 está tomada, {player}.', 'Vamos lá.'] },
+    after: { id: 'teste_depois', name: 'Brock', portrait: stage.leader.portrait, lines: ['Os Geodude desceram do Monte Lua, {player}.'] }
+  };
+  // e uma cena da vila para depois desta fase (o gatilho 'win')
+  CUTSCENES.teste_volta = { map: 'vila', spot: { x: 6, y: 17, dir: 'down' }, trigger: [{ on: 'win', target: 'gym_1_pewter' }],
+    steps: [{ do: 'say', name: 'Mãe', lines: ['Você voltou, {player}!'] }, { do: 'end' }] };
   game.startStage('gym_1_pewter');
-  for (let i = 0; i < 120 && game.run.state === 'running'; i++) { game.run.update(1 / 60, { x: 0, y: 0 }); game._handleRunState(); }
-  check('o evento de história da fase pausa a partida e abre a caixa com o retrato',
+  game._handleRunState();
+  check('a fala de antes da fase abre antes do relógio andar, com a caixa de texto',
         game.run.state === 'story' && game.storyOpen && !registry.get('story-overlay').classes.has('hidden')
-        && registry.get('story-name').textContent === 'Brock' && registry.get('story-text').textContent === `O Brock olha para você, ${game.playerName}.`);
-  const paused = game.run.time;
-  game.run.update(1 / 60, { x: 0, y: 0 });
-  check('...com o relógio da fase parado', game.run.time === paused);
+        && registry.get('story-name').textContent === 'Rota 1' && registry.get('story-text').textContent === `A Rota 1 está tomada, ${game.playerName}.`
+        && registry.get('story-portrait').classes.has('hidden'));
+  for (let i = 0; i < 30; i++) { game.run.update(1 / 60, { x: 0, y: 0 }); game._handleRunState(); }
+  check('...e nada anda enquanto ela está aberta (nem o relógio, nem a horda)', game.run.time === 0 && game.run.enemies.length === 0);
   game.handleAction('confirm');
-  check('...uma página por vez (o A ou o Enter)', game.storyOpen && registry.get('story-text').textContent === 'E volta para a luta.');
+  check('...uma página por vez (o A ou o Enter)', game.storyOpen && registry.get('story-text').textContent === 'Vamos lá.');
   game.handleAction('confirm');
-  check('...e depois da última a partida segue, com o evento contado como visto', !game.storyOpen && game.run.state === 'running'
-        && registry.get('story-overlay').classes.has('hidden') && game.sceneRecord.teste_historia === 'seen');
+  check('...e depois da última a fase começa, com a fala contada como vista', !game.storyOpen && game.run.state === 'running'
+        && registry.get('story-overlay').classes.has('hidden') && game.sceneRecord.teste_antes === 'seen');
+  for (let i = 0; i < 60 * 5; i++) {
+    game.run.update(1 / 60, { x: 0, y: 0 });
+    if (game.run.state === 'intro') game.closeLeaderIntro();
+    if (game.run.state !== 'running') game.run.state = 'running';
+  }
+  check('no meio da fase não aparece história nenhuma', !game.storyOpen && game.run.time > 4);
+  game.run.state = 'victory';
+  game._handleRunState();
+  check('vencida a fase, a fala de depois vem antes da tela de resultado', game.storyOpen && !game.runEnded
+        && registry.get('story-name').textContent === 'Brock' && !registry.get('story-portrait').classes.has('hidden')
+        && registry.get('result-overlay').classes.has('hidden'));
+  game.handleAction('confirm');
+  check('...e depois dela, a tela de resultado', !game.storyOpen && game.runEnded && !registry.get('result-overlay').classes.has('hidden')
+        && game.sceneRecord.teste_depois === 'seen');
+  check('a vitória deixa devida a cena da vila de depois da fase', game.sceneRecord.teste_volta === 'due');
   game.quitToMenu();
+  check('...e voltando para a vila ela toca, no lugar dela', hubVisible() && hub.mapId === 'vila' && hub.player.x === 6 && hub.player.y === 17
+        && hub.scene?.id === 'teste_volta' && game.sceneRecord.teste_volta === 'started');
+  const volta = runScene();
+  check('...até o fim, e conta como vista', volta.some((d) => d.text === `Você voltou, ${game.playerName}!`) && !hub.scene && game.sceneRecord.teste_volta === 'seen');
   game.startStage('gym_1_pewter');
-  check('rejogando a fase, o evento já visto não volta', game.run.storyQueue.length === 0);
+  game._handleRunState();
+  check('rejogando a fase, as falas já vistas não voltam', game.run.state === 'running' && !game.run.pendingStory && !game.run.storyAfter && !game.storyOpen);
+  game.run.state = 'victory';
+  game._handleRunState();
   game.quitToMenu();
-  delete stage.story; delete game.campaign.scenes.teste_historia;
+  check('...nem a cena da vila', !hub.scene && game.sceneRecord.teste_volta === 'seen');
+  delete stage.story; delete CUTSCENES.teste_volta;
+  for (const id of ['teste_antes', 'teste_depois', 'teste_volta']) delete game.campaign.scenes[id];
 }
 
 const HUB_RESCUE_SPOT_TEST = { map: 'centro', x: 4, y: 5, dir: 'up' };

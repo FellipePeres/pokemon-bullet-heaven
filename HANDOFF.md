@@ -651,7 +651,11 @@ Nunca voltar bônus globais para o pool de level up — foi pedido explícito.
   (a cena nunca trava).
 - **O registro** (`campaign.scenes`): `started` ao começar (o jogo salva), `seen`
   no fim. Uma `started` com `spot` volta do começo no **Continuar** e no
-  **Carregar save** (`Game.pendingScene`, `_enterVillage`). A do Maxie tem
+  **Carregar save** (`Game.pendingScene`, `_enterVillage`). O gatilho `win` não
+  toca na hora: vencer a fase deixa a cena `due` (`Game.armScenes`), e ela toca na
+  próxima chegada à vila (`quitToMenu` e `_enterVillage`, pelo
+  `_playPendingScene`). Jornadas antigas não ganham cenas atrasadas, porque só a
+  vitória arma. A do Maxie tem
   `record: false` e usa o registro de sempre (`campaign.dive.sceneSeen`).
 - **O fim**: `onEnd` marca a cena, salva e emite `EVENTS.STORY` (`scene`), o
   objetivo novo das quests. O `then` (o do `end` ou o de uma fala do passo
@@ -667,19 +671,24 @@ Nunca voltar bônus globais para o pool de level up — foi pedido explícito.
 - **Os itens da história** (`KEY_ITEMS` em `data/items.js`, `campaign.keyItems`):
   o passo `give` dá esses ou os da mochila do Poké Mart. Os dois que existem são
   as pistas do Capítulo 3 (H-4).
-- **O evento de história na fase** (`stage.story: [{ id, at, name, portrait, lines }]`):
-  o `Run` pausa (`state = 'story'`) no segundo `at`, e o Game mostra o
-  `story-overlay` (o molde da apresentação do líder, sem luta), uma página por
-  vez (o botão, o A ou o Enter). Uma vez por jornada (`storySeen`), no máximo um
-  por fase. Nenhuma fase tem ainda; o primeiro é o da Fase 5 (H-4).
+- **Antes e depois da fase, nunca no meio** (regra do Fellipe): `stage.story =
+  { before, after }`, cada um `{ id, name, portrait, lines }`. O `before` abre
+  quando a fase começa, antes do relógio andar (o `Run` nasce em `state =
+  'story'`); o `after`, quando a fase é vencida, antes da tela de resultado (o
+  `case 'victory'` do Game espera ele fechar para chamar o `endRun`). O Game
+  mostra o `story-overlay` (o molde da apresentação do líder, sem luta), uma
+  página por vez (o botão, o A ou o Enter). Uma vez por jornada (`storySeen`). O
+  check-data recusa qualquer coisa no meio da fase (uma lista, um `at`). Nenhuma
+  fase tem ainda; as primeiras chegam com os capítulos (H-4).
 - **As falas** ganharam as condições `scene` (vista até o fim) e `flag`, e o
   `{rival}` (o inicial dele).
 - **O check-data** confere cada roteiro (o lugar, os atores, as folhas, os
   caminhos só no chão do mapa e de tile em tile, as falas, os itens, as quests e o
-  `end` no fim) e os eventos das fases. **Os testes**: o `ui-smoke` toca as duas
+  `end` no fim) e a história das fases (só before e after). **Os testes**: o `ui-smoke` toca as duas
   cenas do prólogo inteiras (a câmera, o Carvalho virando, o rival na bola certa,
   a bola sumindo, a cena pendente voltando ao continuar), uma cena de teste com
-  os passos novos e o evento na fase. O roteiro de screenshots é `cenas`.
+  os passos novos, as falas de antes e de depois da fase (nada no meio) e a cena
+  da vila de depois da fase. O roteiro de screenshots é `cenas`.
 
 ### O lendário secreto da Pokédex (0.35)
 - Pedido do Fellipe: no fim da Pokédex, um Pokémon misterioso, "???", **sem
@@ -1232,7 +1241,8 @@ o Brock como está, todas as outras mais duras, menos níveis.
 | 65 | uma opção de repetir a fase do Kyogre: hoje é preciso sair e descer tudo de novo | 0.37.8: no fim da luta do Kyogre, a tela de resultado oferece Jogar de novo (na vitória) e Tentar de novo ou Voltar para a vila (na derrota); jogar de novo recomeça a luta com a equipe curada, sem a descida. Com o Kyogre já capturado, o salão é o do Endless aquático. Só voltar para a vila (ou sair pelo card) exige descer de novo |
 | 66 | um tester (o Theo) pegou o Kyogre, usou na mesma fase e o jogo travou; ao voltar, tinha perdido a cena do Maxie. O Kyogre vai sempre para o PC, com um aviso; corrigir o bug; o save dele com tudo, mas carregando como quem acabou de sair da caverna, com a cena | 0.37.9: a causa era o desenho do Origin Pulse do jogador (raio negativo no canvas no 1º quadro de todo disparo), que parava o laço do jogo; a pausa ainda funcionava, e sair por ela marcava a cena como vista sem rodá-la. Corrigidos o desenho, o laço (pede o próximo quadro antes) e a cena (só conta no fim; pendente, Continuar e Carregar save abrem na lagoa com a cena). O Kyogre vai sempre para o PC, com o aviso no card e no toast. O save do Theo voltou com `sceneSeen: false` e nada mais mudado (o Kyogre dele continua na equipe). Testes: o canvas falso do `ui-smoke` agora lança com raio negativo, como o de verdade |
 | 67 | uma história própria, como no Pokémon Tower Defense: o Carvalho diz que as hordas mudaram, o sonho de ser Campeão continua, mas o ideal é devolver a paz às rotas; os pássaros lendários foram roubados pelo Maxie, que só aparece no Kyogre; um sistema de quests ("fale com a mãe 0/1" no canto de cima) com as recompensas no fim; muitas cutscenes; lendários só por missões, cada um com a sua fase; o Kyogre late game; uma vila por geração. Aprovou o plano inteiro e acrescentou: o lendário liberado volta à Poké Ball das fases seguintes, com a chance baixa de hoje | `PLANEJAMENTO-HISTORIA.md` (a premissa, os capítulos de Kanto, as missões dos lendários, as quests, as cenas e as etapas H-1 a H-12). 0.38: a H-1, com as quests (`data/quests.js`, `systems/QuestSystem.js`), o rastreador na vila, no mapa da jornada e na partida, o prólogo do quarto ao Brock, o discurso novo do Carvalho e a migração das jornadas que já existiam |
-| 68 | "pode partir para o próximo passo gerando um artifact"; antes: "essas mudanças não vão subir, só depois de tudo pronto no planejamento" e "sempre deve ter um artifact" | 0.39 (H-2 do PLANEJAMENTO-HISTORIA, só na branch): o motor das cenas (`game/Cutscene.js`, `data/cutscenes.js`), com a do Maxie convertida e conferida quadro a quadro; o discurso do Carvalho encenado e a cena do rival (o Blue do FireRed, o inicial com vantagem); o evento de história na fase (`stage.story`); `campaign.scenes` com a cena pendente voltando ao continuar; os itens da história; o check-data das cenas; o roteiro `cenas` e a página do planejamento num artifact |
+| 68 | "pode partir para o próximo passo gerando um artifact"; antes: "essas mudanças não vão subir, só depois de tudo pronto no planejamento" e "sempre deve ter um artifact" | 0.39 (H-2 do PLANEJAMENTO-HISTORIA, só na branch): o motor das cenas (`game/Cutscene.js`, `data/cutscenes.js`), com a do Maxie convertida e conferida quadro a quadro; o discurso do Carvalho encenado e a cena do rival (o Blue do FireRed, o inicial com vantagem); a história de antes e de depois das fases (`stage.story`) e a cena da vila depois de uma fase (gatilho `win`); `campaign.scenes` com a cena pendente voltando ao continuar; os itens da história; o check-data das cenas; o roteiro `cenas` e a página do planejamento num artifact |
+| 69 | "não se pode ter cenas no meio de fases, as cenas são antes e depois de fases, apenas isso" | 0.39 (ainda na branch): o evento que pausava a fase saiu; no lugar, a fala de antes da fase (antes do relógio andar) e a de depois (antes da tela de resultado), em `stage.story = { before, after }`, e a cena da vila depois de uma fase (gatilho `win`, devida até a próxima chegada à vila); o check-data recusa qualquer coisa no meio; as cenas 5 e 6 do planejamento passaram para antes das Fases 5 e 6 (decisão 11) |
 | Fase 8 (Giovanni) | 1 → 0,8 | 4,0 | 4,5 | 60 | 84 → 62 |
 | Lorelei | 1,05 → 0,8 | 3,5 | 3,1–4,7 | 64 | 92 → 66 |
 | Bruno | 1,12 → 0,97 | 3,7 | 3,5–6,3 ² | 66 | 99 → 68 |
@@ -1551,7 +1561,8 @@ O que está planejado:
   é por isso que as hordas mudaram; o ladrão é o Maxie, que só aparece na cena do
   Kyogre. **A H-1 está no jogo desde a 0.38** (as quests, o rastreador e o
   prólogo; ver a seção 4), e **a H-2 desde a 0.39** (o motor das cenas, as duas do
-  prólogo e o evento de história na fase). Falta, em ordem: a H-3 (a tela de missões), a H-4
+  prólogo e as cenas de antes e de depois das fases; **nunca no meio de uma fase**,
+  regra do Fellipe). Falta, em ordem: a H-3 (a tela de missões), a H-4
   (os capítulos 1 a 3), a H-5 (a captura sem lendários e o molde da missão de
   lendário), uma missão para cada lendário (H-6 a H-11) e as recompensas (H-12).
   **Regra do Fellipe para a H-5:** um lendário liberado na missão dele (vencida,

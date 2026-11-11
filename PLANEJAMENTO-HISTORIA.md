@@ -90,8 +90,9 @@ Giovanni (Fase 8) achando que encontrou o culpado, e o Giovanni ri: o emblema n�
 ## 4. A linha da história em Kanto
 
 Cada capítulo cobre uma ou duas fases da campanha de hoje. O que o jogador
-descobre chega por três caminhos: **a fala do líder depois da vitória**, **uma cena
-na vila** quando ele volta e, às vezes, **um evento no meio da fase** (seção 9.2).
+descobre chega sempre **antes ou depois das fases, nunca no meio delas** (regra do
+Fellipe, decisão 11), por três caminhos: **uma fala antes da fase**, **a fala do
+líder depois da vitória** e **uma cena na vila** quando ele volta (seção 9.2).
 
 | Capítulo | Quando | O que o jogador descobre | Missão de lendário |
 |---|---|---|---|
@@ -99,7 +100,7 @@ na vila** quando ele volta e, às vezes, **um evento no meio da fase** (seção 
 | **1 — As rotas tomadas** | Fase 1 (Brock) | O Brock: os Geodude desceram do Monte Lua, coisa que nunca fizeram. De volta, o Carvalho manda falar com o velho sábio, que conta a lenda: as hordas começaram quando os três pássaros sumiram dos céus. | — |
 | **2 — O céu vazio** | Fases 2 e 3 (Misty, Surge) | A Misty: o mar ficou bravo desde que o Articuno deixou de ser visto sobre as Ilhas Seafoam. O Surge: a Usina pifou, os Voltorb invadiram Vermilion e ninguém vê o Zapdos há meses. Na vila, os moradores culpam a Equipe Rocket. | — |
 | **3 — Os rastros** | Fases 4 e 5 (Erika, Koga) | A Erika acha, no jardim, uma pena dourada e um pedaço de metal com um emblema vermelho, e o jogador leva os dois ao Carvalho. O Koga viu um vulto de capuz vermelho carregando uma máquina pela Rota 10: "não era da Rocket, o uniforme era outro". | — |
-| **4 — O trovão preso** | Fase 6 (Sabrina) | No trecho da Usina da Fase 6, um estrondo vem lá de dentro (evento na fase). A Sabrina vê "três jaulas e um homem olhando para o mar". Abre a quest **"Investigue a Usina"**: o Zapdos está preso numa máquina com o emblema vermelho. Agora é certeza: **alguém roubou os pássaros**. | **Zapdos** |
+| **4 — O trovão preso** | Fase 6 (Sabrina) | Antes da Fase 6, perto da Usina, um estrondo vem lá de dentro (a fala de antes da fase). A Sabrina vê "três jaulas e um homem olhando para o mar". Abre a quest **"Investigue a Usina"**: o Zapdos está preso numa máquina com o emblema vermelho. Agora é certeza: **alguém roubou os pássaros**. | **Zapdos** |
 | **5 — O gelo** | Fase 7 (Blaine) | A Fase 7 passa pelas Ilhas Seafoam. Depois do Blaine, o Carvalho cruza as anotações e aponta o fundo das ilhas. | **Articuno** |
 | **6 — O fogo e a suspeita** | Fase 8 (Giovanni) | O jogador chega achando que é a Rocket. O Giovanni olha o emblema e ri: não é da Rocket. A pista leva ao Monte Brasa, na Ilha 1. | **Moltres** |
 | **7 — O sonho** | Liga e Campeão | A Victory Road só abre com os três pássaros de volta (padrão; decisão 2). O rival no fim, e o Hall da Fama. Depois, o Carvalho: as rotas estão mais calmas, mas não como antes: "ainda falta alguma coisa". | — |
@@ -321,29 +322,42 @@ lagoa e 447 do Centro).
 
 **O que entrou na 0.39 (H-2):**
 
-- **Os gatilhos**: entrar num lugar (`enter`), falar com alguém (`npc`) ou escolher
-  o inicial (`starter`), com as condições das falas (`when`).
+- **Os gatilhos**: entrar num lugar (`enter`), falar com alguém (`npc`), escolher
+  o inicial (`starter`) ou vencer uma fase (`win`: a cena fica devida e toca quando
+  o jogador chegar na vila), com as condições das falas (`when`).
 - **Os passos novos**: `fade`, `camera`, `show`/`hide` (também das pessoas do
   lugar), `place`, `shake`, `give` (da mochila ou um item da história),
   `quest`, `flag` e `talk` (uma fala de `data/dialogue.js`, que conta para as
   quests). O `walk` anda por um `path` ou até o primeiro tile livre de `to`, pelo
   caminho mais curto. Um passo pode mudar com a jornada (`pick` e `cases`).
-- **O registro**: `campaign.scenes = { id: 'started' | 'seen' }`. A cena se
-  registra ao começar (e o jogo salva) e só vira `seen` no fim. Uma `started`
-  volta do começo ao continuar, no `spot` dela.
+- **O registro**: `campaign.scenes = { id: 'due' | 'started' | 'seen' }`. A cena
+  se registra ao começar (e o jogo salva) e só vira `seen` no fim. Uma `started`
+  volta do começo ao continuar, no `spot` dela; uma `due` (a de depois de uma fase
+  vencida) toca na próxima chegada à vila, também ao continuar.
 - **O check-data** confere cada roteiro: o lugar, os atores e as folhas, os
   caminhos só no chão do mapa, as falas, os itens e as quests citados, e o `end`
   no fim.
 
-### 9.2 Na partida
+### 9.2 Antes e depois das fases
 
-O **evento de história**, `stage.story: [{ id, at, name, portrait, lines }]`: a
-partida pausa e a caixa de texto aparece com o retrato, como na apresentação do
-líder, mas sem luta, uma página por vez. O uso é pequeno, no máximo um por fase
-(o check-data recusa mais), para não quebrar o ritmo do Bullet Heaven. Ele
-aparece uma vez por jornada (o `id` entra em `campaign.scenes`) e conta para o
-objetivo `scene` das quests. Está pronto desde a 0.39; o primeiro de verdade é o
-vulto de vermelho na Fase 5 (H-4).
+**Regra do Fellipe (2026-11-10): não há cena no meio de uma fase.** As cenas são
+antes e depois das fases, apenas isso. A fase é o Bullet Heaven, do começo ao fim,
+sem pausa para história. (A apresentação do líder continua como era: ela é parte
+da luta, não da história.)
+
+- **A fala de antes da fase** (`stage.story.before`): a caixa de texto com o
+  retrato, como na apresentação do líder, mas sem luta, uma página por vez. Abre
+  quando a fase começa, **antes do relógio andar** e antes de qualquer horda.
+- **A fala de depois da fase** (`stage.story.after`): a mesma caixa, logo depois
+  da vitória e antes da tela de resultado. É o lugar da fala do líder vencido.
+- **A cena na vila** (o gatilho `win` de `data/cutscenes.js`): vencer a fase deixa
+  a cena devida, e ela toca quando o jogador chegar na vila (a volta da fase, o
+  Continuar ou o Carregar save), no `spot` dela.
+
+Cada uma aparece uma vez por jornada (o `id` entra em `campaign.scenes`) e conta
+para o objetivo `scene` das quests. O check-data recusa qualquer coisa no meio
+da fase. Está pronto desde a 0.39; as primeiras de verdade chegam com os
+capítulos (H-4).
 
 ### 9.3 As cenas de Kanto
 
@@ -353,8 +367,8 @@ vulto de vermelho na Fase 5 (H-4).
 | 2 | O rival pega o inicial dele (decisão 1) | laboratório | Prólogo | H-2 ✅ |
 | 3 | A lenda dos pássaros | casa do velho sábio | 1 | H-4 |
 | 4 | A vila culpa a Equipe Rocket | vila (moradores) | 2 | H-4 |
-| 5 | O vulto de vermelho na Rota 10 | evento na Fase 5 | 3 | H-4 |
-| 6 | O estrondo na Usina | evento na Fase 6 | 4 | H-6 |
+| 5 | O vulto de vermelho na Rota 10 | antes da Fase 5 | 3 | H-4 |
+| 6 | O estrondo na Usina | antes da Fase 6 | 4 | H-6 |
 | 7 | A jaula do Zapdos | Usina | 4 (missão) | H-6 |
 | 8 | O Carvalho e o emblema | laboratório | 4 | H-6 |
 | 9 | A jaula do Articuno | Ilhas Seafoam | 5 (missão) | H-7 |
@@ -410,7 +424,7 @@ prólogo, que servem de teste para ele; a do Maxie passou para o motor sem mudar
 | Etapa | O que entra |
 |---|---|
 | **H-1** ✅ 0.38 | O sistema de quests e o prólogo: `data/quests.js`, o `QuestSystem`, o rastreador, o save por jornada com a migração, as condições novas nas falas, a cadeia do prólogo e o discurso novo do Carvalho. Testes no `ui-smoke`. |
-| **H-2** ✅ 0.39 | As cenas em dados (`Cutscene.js` a partir da cena do Maxie, que não muda), o evento de história na partida e as duas cenas do prólogo: o discurso do Carvalho encenado e o rival pegando o inicial dele (seção 9.3). |
+| **H-2** ✅ 0.39 | As cenas em dados (`Cutscene.js` a partir da cena do Maxie, que não muda), a fala de antes e de depois das fases, a cena na vila depois de uma fase e as duas cenas do prólogo: o discurso do Carvalho encenado e o rival pegando o inicial dele (seção 9.3). |
 | **H-3** | A tela de missões. |
 | **H-4** | Os capítulos 1 a 3: as falas de depois da vitória dos líderes, o velho sábio, os moradores e as quests de cada capítulo. |
 | **H-5** | A captura sem lendários e o molde da missão de lendário, tirado do salão do Kyogre. |
@@ -439,3 +453,7 @@ prólogo, que servem de teste para ele; a do Maxie passou para o motor sem mudar
    equipe de Kanto vai junto ou se a jornada recomeça (fica para quando Hoenn
    chegar).
 10. **A lagoa só abre depois do Campeão** (seção 5).
+11. **As cenas são antes e depois das fases, nunca no meio** (pedido do Fellipe
+    depois da 0.39: "não se pode ter cenas no meio de fases, as cenas são antes e
+    depois de fases, apenas isso"). O evento que pausava a fase saiu; as cenas que
+    eram no meio da Fase 5 e da Fase 6 passaram para antes delas (seção 9.2).

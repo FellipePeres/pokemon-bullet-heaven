@@ -80,7 +80,7 @@ export const FIRST_QUEST = 'p_mae';
 
 /**
  * Os eventos que um objetivo pode esperar (o check-data recusa os outros). O
- * `scene` (0.39) é uma cena de data/cutscenes.js, ou um evento de história de uma
+ * `scene` (0.39) é uma cena de data/cutscenes.js, ou a fala de antes ou de depois de uma
  * fase (`stage.story`), que chegou ao fim.
  */
 export const QUEST_EVENTS = ['talk', 'enter', 'map', 'win', 'scene'];
