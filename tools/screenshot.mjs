@@ -124,15 +124,21 @@ const ROTEIROS = {
     { run: 'skip()' }, { wait: 1500 }, { run: 'skip()' }, { wait: 1200 }, { shot: 'cenas-38-a-quest-da-usina' },
     { wait: 3000 }, { shot: 'cenas-39-vila-com-a-usina' },
     { run: "game.openCampaign(); game.menus.lobby.selected = 'place:usina'; game.menus.lobby.render()" }, { wait: 1500 }, { shot: 'cenas-40-mapa-usina' },
-    { run: "game.visitPlace('usina')" }, { wait: 2600 }, { shot: 'cenas-41-a-usina' },
-    { run: 'skip(2)' }, { wait: 2600 }, { shot: 'cenas-42-correntes-na-usina' },
-    { run: 'skip()' }, { wait: 1200 }, { shot: 'cenas-43-o-grito' },
-    { run: 'skip()' }, { wait: 2200 }, { run: 'skip()' }, { wait: 1500 }, { shot: 'cenas-44-perigoso' },
-    { run: 'skip()' }, { wait: 2000 },
+    { run: "game.visitPlace('usina')" }, { wait: 2200 }, { shot: 'cenas-41-a-usina' },
+    { run: 'skip()' }, { wait: 2400 }, { run: 'skip()' }, { wait: 800 },
+    // a Usina andável: perto de uma Poké Ball do caminho, pegar, e a escotilha na sala do gerador
+    { run: "game.hub.enter({ map: 'usina', x: 18, y: 12, dir: 'left' })" }, { wait: 1000 }, { shot: 'cenas-42-usina-explorando' },
+    { run: "game.hub.enter({ map: 'usina', x: 17, y: 12, dir: 'up' }); game.hub.interact()" }, { wait: 1400 }, { shot: 'cenas-43-usina-pokebola' },
+    { run: "skip(); game.hub.enter({ map: 'usina', x: 5, y: 12, dir: 'left' })" }, { wait: 1200 }, { shot: 'cenas-44-usina-escotilha' },
+    // a descida: o escuro (só o brilho em volta do jogador), 2 s depois os olhos, mais 2 s e o card
+    { run: "game.hub.enter({ map: 'usina', x: 4, y: 13, dir: 'up' }); game.hub.clickTile(4, 12)" }, { wait: 1600 }, { shot: 'cenas-45-fundo-escuro' },
+    { wait: 2000 }, { shot: 'cenas-46-fundo-olhos' },
+    { wait: 2200 }, { shot: 'cenas-47-fundo-card' },
+    { run: "game.handleAction('cancel')" }, { wait: 1500 },
     { run: "game.hub.scene = null; game.hub.enter({ map: 'vila', x: 30, y: 11, dir: 'down' });" +
            " game.diveRecord.captured = true; game.diveRecord.sceneSeen = false; game._maybeMaxieScene('lagoa')" },
-    { wait: 1000 }, { run: 'skip()' }, { wait: 3600 }, { shot: 'cenas-45-maxie' },
-    { run: 'skip(3)' }, { wait: 1900 }, { shot: 'cenas-46-maxie-crobat' }
+    { wait: 1000 }, { run: 'skip()' }, { wait: 3600 }, { shot: 'cenas-48-maxie' },
+    { run: 'skip(3)' }, { wait: 1900 }, { shot: 'cenas-49-maxie-crobat' }
   ],
   // a melhoria de UX da 0.31: o card de escolha (o inicial e a Poké Ball) e o painel da fase
   ux: [

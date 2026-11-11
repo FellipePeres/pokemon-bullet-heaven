@@ -140,16 +140,17 @@ export const QUESTS = {
   z_usina: {
     kind: 'legendary', chapter: 'usina',
     desc: 'Preso em terra pelo mar agitado, um marinheiro de Vermilion trabalhou pela Rota 10 e escutou correntes pesadas se arrastando dentro da Usina, fechada desde o apagão.',
-    objectives: [{ text: 'Investigue a Usina, na Rota 10', on: 'scene', target: 'usina_porta' }],
+    // fecha no fundo da Usina, quando os olhos aparecem no escuro (data/cutscenes.js, usina_fundo)
+    objectives: [{ text: 'Investigue a Usina, na Rota 10', on: 'clue', target: 'olhos' }],
     openedBy: 'vermilion_correntes',
-    next: ['z_usina_fundo'],
+    next: ['z_zapdos'],
     reward: null
   },
-  z_usina_fundo: {
+  z_zapdos: {
     kind: 'legendary', chapter: 'usina',
-    desc: 'As paredes da Usina estão marcadas por raios, e alguma coisa grita lá no fundo, presa por correntes. Os Voltorb fecham o corredor: por enquanto, é perigoso demais seguir.',
-    // a pista chega com a missão do Zapdos (Capítulo 4)
-    objectives: [{ text: 'Chegue ao fundo da Usina', on: 'clue', target: 'zapdos_preso' }],
+    desc: 'No fundo da Usina, no escuro, dois olhos vermelhos. O Zapdos está lá embaixo, preso por correntes e fora de si. A escotilha fica na sala do gerador.',
+    // a pista chega com a luta do Zapdos (o molde das missões, H-5, e a luta, H-6)
+    objectives: [{ text: 'Derrote e liberte o Zapdos', on: 'clue', target: 'zapdos_livre' }],
     next: [],
     reward: null
   }

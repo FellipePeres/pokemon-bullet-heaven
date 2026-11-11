@@ -709,8 +709,10 @@ button { font: inherit; color: inherit; }
 }
 .leader-intro-text .menu-btn { min-width: 200px; }
 
-/* Hall da Fama: a equipe campeã entra um Pokémon por vez */
-.hall-card { max-width: 940px; width: 100%; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 14px; }
+/* Hall da Fama: a equipe campeã entra um Pokémon por vez. Só o card do Hall da Fama (o
+   overlay-card): o card do salão do Kyogre e o das missões também usam .hall-card, e com
+   esta regra o banner deles encolhia a zero (0.39) */
+.overlay-card.hall-card { max-width: 940px; width: 100%; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 14px; }
 .hall-row { display: flex; align-items: center; gap: 20px; }
 .hall-trainer { width: 192px; height: 192px; flex-shrink: 0; image-rendering: pixelated; }
 .hall-team { display: grid; grid-template-columns: repeat(3, 150px); gap: 10px; }
@@ -2343,9 +2345,10 @@ button { font: inherit; color: inherit; }
 }
 @keyframes hub-place-in { from { transform: translateY(-14px); opacity: 0; } }
 
-/* os palcos das cenas (0.39): a cena em tela cheia, sem a barra da vila e o rodapé */
+/* os palcos das cenas (0.39): a cena em tela cheia, sem a barra da vila e o rodapé; num
+   lugar para explorar (a Usina), o rodapé dos controles fica */
 .screen.hub.cinema .hub-bar,
-.screen.hub.cinema .hub-hint { display: none; }
+.screen.hub.cinema:not(.explore) .hub-hint { display: none; }
 .screen.hub.cinema .hub-place,
 .screen.hub.cinema .hub-quest { top: 22px; }
 

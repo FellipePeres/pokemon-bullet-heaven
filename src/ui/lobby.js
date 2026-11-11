@@ -363,8 +363,7 @@ export class Lobby {
     const actions = create('div', 'panel-actions');
     const go = create('button', 'panel-play');
     go.type = 'button';
-    go.innerHTML = `<span>${seen ? 'Perigoso demais por enquanto' : 'Investigar'}</span>`;
-    go.disabled = seen;
+    go.innerHTML = `<span>${seen ? place.goSeen : place.go}</span>`;
     go.onclick = () => this.game.visitPlace(id);
     actions.appendChild(go);
     panel.appendChild(actions);

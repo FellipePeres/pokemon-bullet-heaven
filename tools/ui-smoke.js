@@ -851,27 +851,71 @@ game.menus.closeModal();
   const goButton = () => placePanel().find((c) => c.classes.has('panel-actions'))?.children[0];
   check('...e o painel dela conta do marinheiro, com o Investigar',
         placePanel().some((c) => c.classes.has('panel-place-text') && c.innerHTML.includes('correntes')) && goButton()?.innerHTML.includes('Investigar') && !goButton().disabled);
-  check('a visita abre a Usina em tela cheia, com os Voltorb fechando o corredor',
-        game.visitPlace('usina') && hub.mapId === 'usina' && hub.scene?.id === 'usina_porta' && registry.get('screen-hub').classes.has('cinema')
-        && hub.npcs.filter((n) => n.sprite === 'voltorb').length === 2);
-  let shook = false;
-  const usina = [];
-  for (let i = 0; i < 60 * 60 && hub.scene; i++) {
-    shook ||= !!hub.scene.fx.shake;
-    if (hub.dialog) { usina.push(hub.dialog.pages.join(' ')); hub.dialog.shown = 999; hub.confirm(); }
-    hub.update(1 / 60);
+
+  // a Usina andável (pedido do Fellipe): o jogador explora, acha as Poké Balls e a escotilha
+  check('o Investigar leva para dentro da Usina, em tela cheia, com o rodapé dos controles',
+        game.visitPlace('usina') && hub.mapId === 'usina' && hub.player.x === 5 && hub.player.y === 37
+        && registry.get('screen-hub').classes.has('cinema') && registry.get('screen-hub').classes.has('explore'));
+  check('...e a chegada toca uma vez: as luzes piscam, as marcas de raio, as correntes',
+        hub.scene?.id === 'usina_entrada');
+  const chegada = runScene();
+  check('...e depois o jogador anda à vontade', chegada.some((d) => d.text.includes('marcadas por raios')) && chegada.some((d) => d.text.includes('correntes'))
+        && !hub.scene && (press('up'), hub.player.y === 36));
+  const balls = () => hub.decor.filter((d) => d.loot);
+  check('13 Poké Balls no chão da Usina (2 no caminho, 11 nas salas sem saída)', balls().length === 13);
+  {
+    const revives = game.profile.bag.revive ?? 0;
+    hub.enter({ map: 'usina', x: 46, y: 25, dir: 'up' });
+    hub.interact();
+    check('pegar uma Poké Ball: o item vai para a mochila', dialogText() === `${game.playerName} encontrou um REVIVER!` && game.profile.bag.revive === revives + 1);
+    closeDialog();
+    check('...e ela some do chão, de vez nesta jornada', balls().length === 12 && (hub.enter({ map: 'usina', x: 5, y: 37, dir: 'up' }), balls().length === 12));
+    const rerolls = game.profile.bag.reroll ?? 0;
+    hub.enter({ map: 'usina', x: 17, y: 12, dir: 'up' });
+    hub.interact();
+    check('...as outras guardam Novos Sorteios', dialogText().includes('NOVO SORTEIO') && game.profile.bag.reroll === rerolls + 1);
+    closeDialog();
+    // a mochila volta como estava (a loja, mais adiante, conta com ela)
+    game.profile.bag.revive = revives;
+    game.profile.bag.reroll = rerolls;
   }
-  check('lá dentro: as marcas de raio, as correntes, o grito elétrico (com tremor)',
-        usina.some((t) => t.includes('marcadas por raios')) && usina.some((t) => t.includes('Correntes')) && usina.some((t) => t.includes('grito elétrico')) && shook);
-  check('...e é perigoso demais seguir: a quest passa para "Chegue ao fundo da Usina"',
-        usina.some((t) => t.includes('perigoso demais seguir')) && game.quests.isDone('z_usina') && game.quests.isActive('z_usina_fundo'));
+  check('a escotilha fica na sala do gerador, e o caminho até ela existe com todas as bolas no lugar',
+        hub.decor.some((d) => d.sprite === 'escotilha' && d.x === 4 && d.y === 12) && hub._route([{ x: 4, y: 12, then: null }]) !== null
+        || (hub.enter({ map: 'usina', x: 5, y: 37, dir: 'up' }), hub._route([{ x: 4, y: 12, then: null }]) !== null));
+  hub.enter({ map: 'usina', x: 4, y: 13, dir: 'up' });
+  press('up');
+  check('descer a escotilha leva ao fundo da Usina, no escuro', hub.mapId === 'usina_fundo' && hub.place.dark && hub.scene?.id === 'usina_fundo');
+  const olhos = () => hub.scene?.actor('olhos');
+  for (let i = 0; i < 60 * 1.8; i++) hub.update(1 / 60);
+  check('nos 2 primeiros segundos, só o jogador com o brilho em volta', olhos()?.hidden && !game.missionCard);
+  for (let i = 0; i < 60 * 0.4; i++) hub.update(1 / 60);
+  check('depois, os olhos vermelhos (em pixel, num tile, por cima do escuro), e a Usina vira a missão do Zapdos',
+        !olhos()?.hidden && olhos().glow && olhos().sprite === 'npc/olhos_zapdos' && game.quests.isDone('z_usina') && game.quests.isActive('z_zapdos')
+        && !game.missionCard);
+  for (let i = 0; i < 60 * 2.2; i++) hub.update(1 / 60);
+  const card = registry.get('mission-card');
+  const cardHtml = () => JSON.stringify(card.children.map((c) => [c.className, c.innerHTML, c.children.map((k) => [k.className, k.innerHTML, k.src])]));
+  check('mais 2 segundos e o card sobe, no padrão do card de fase, com a foto do Zapdos',
+        game.missionCard?.id === 'zapdos' && !card.classes.has('hidden') && cardHtml().includes('Derrote e liberte o Zapdos') && cardHtml().includes('145.png')
+        && cardHtml().includes('ultra-ball.png') && cardHtml().includes('Nível recomendado'));
+  game.handleAction('confirm');
+  check('o Lutar ainda avisa que a luta chega na próxima etapa (o card fica)', !!game.missionCard && !!hub.scene);
+  game.handleAction('cancel');
+  for (let i = 0; i < 4; i++) hub.update(1 / 60);
   settle();
-  check('no fim, a volta para a vila', hub.mapId === 'vila' && !registry.get('screen-hub').classes.has('cinema'));
+  check('o Voltar fecha o card e devolve o jogador à Usina, ao lado da escotilha',
+        !game.missionCard && card.classes.has('hidden') && !hub.scene && hub.mapId === 'usina' && hub.player.x === 5 && hub.player.y === 12);
+  game.questTracker.render();
+  check('no rastreador: "Derrote e liberte o Zapdos" (azul)', questBox().innerHTML.includes('Derrote e liberte o Zapdos'));
+  hub.enter({ map: 'usina', x: 5, y: 38, dir: 'down' });
+  press('down');
+  check('o tapete da entrada leva de volta para a vila, sem a tela cheia', hub.mapId === 'vila' && !registry.get('screen-hub').classes.has('cinema'));
   game.openCampaign();
   game.menus.lobby.selected = 'place:usina';
   game.menus.lobby.render();
-  check('depois, a marca continua (a missão vem depois), e o painel avisa que é perigoso demais',
-        !!placeNode() && goButton()?.disabled && goButton().innerHTML.includes('Perigoso demais') && !game.visitPlace('usina'));
+  check('depois, a marca da Usina continua no mapa, com o "Entrar na Usina"',
+        !!placeNode() && goButton()?.innerHTML.includes('Entrar na Usina') && !goButton().disabled);
+  check('...e voltar lá não repete a chegada', game.visitPlace('usina') && !hub.scene && hub.mapId === 'usina');
   hub.enter('home');
   game.openCampaign();
 }

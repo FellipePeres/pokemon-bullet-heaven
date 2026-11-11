@@ -42,6 +42,8 @@ HALLS = {
     'agatha_room':   ('PokemonLeague_AgathasRoom', 'AGATHA', 0, 0),
     'lance_room':    ('PokemonLeague_LancesRoom', 'LANCE', 0, 0),
     'champion_room': ('PokemonLeague_ChampionsRoom', 'BLUE', 0, 0),
+    # o card da missão do Zapdos (0.39): a sala do gerador da Usina, onde ele fica no FireRed
+    'usina': ('PowerPlant', 'ZAPDOS', 0, 0),
 }
 
 

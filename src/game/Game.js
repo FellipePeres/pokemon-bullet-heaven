@@ -22,6 +22,8 @@ import { KyogreHallRenderer } from '../render/KyogreHallRenderer.js';
 import { Cutscene } from './Cutscene.js';
 import { CUTSCENES } from '../data/cutscenes.js';
 import { STORY_PLACES } from '../data/regionMap.js';
+import { getMission } from '../data/missions.js';
+import { showMissionCard, hideMissionCard } from '../ui/missionCard.js';
 import { showHallCard, hideHallCard } from '../ui/hallCard.js';
 import { HubRenderer } from '../render/HubRenderer.js';
 import { HubHUD } from '../ui/hubHud.js';
@@ -458,7 +460,8 @@ export class Game {
    */
   onPlaceChange() {
     const screen = typeof document !== 'undefined' ? document.getElementById('screen-hub') : null;
-    screen?.classList.toggle('cinema', !!this.hub.place?.scene);
+    screen?.classList.toggle('cinema', !!(this.hub.place?.scene || this.hub.place?.explore));
+    screen?.classList.toggle('explore', !!this.hub.place?.explore);
     this._resizeHub();
   }
 
@@ -756,6 +759,8 @@ export class Game {
     if (action.startsWith('pad:')) { this.handlePad(action.slice(4)); return; }
     // o A e o B da vila (Enter/Espaço/Z e X/Backspace)
     if (action === 'confirm' || action === 'cancel') {
+      // o card de uma missão (0.39): o A/Enter luta, o B volta
+      if (this.missionCard) { if (action === 'confirm') this._playMission(); else this._closeMission('back'); return; }
       if (this.diveOpen) {
         if (this.diveHud.defeatOpen) { if (action === 'confirm') this.diveContinue(); else this.diveGiveUp(); return; }
         if (action === 'confirm') (this.hall.active ? this.hall : this.dive).confirm();
@@ -768,6 +773,7 @@ export class Game {
       return;
     }
     if (action === 'pause') {
+      if (this.missionCard) { this._closeMission('back'); return; }
       if (this.diveOpen) { if (!this.hall.active) this.dive.togglePause(); this.input.clear(); return; }
       // fora da partida, ESC fecha a janela aberta (e, na vila, a conversa)
       if (this.menus.openModal) { this.menus.closeModal(); return; }
@@ -811,6 +817,7 @@ export class Game {
       return;
     }
     if (button === 'start' && this.run?.state === 'paused') { this.togglePause(); return; }
+    if (this.missionCard && (button === 'a' || button === 'b')) { if (button === 'a') this._playMission(); else this._closeMission('back'); return; }
     // na vila: o A fala, o B cancela (segurado, corre), o Start abre o mapa; o direcional anda
     if (this.hubOpen && !this.menus.openModal) {
       if (button === 'a') this.hub.confirm();
@@ -1276,6 +1283,7 @@ export class Game {
       give: (item, count) => this.giveItem(item, count),
       quest: (questId) => this.openQuest(questId),
       emit: (on, target) => bus.emit(EVENTS.STORY, { on, target }),
+      card: (missionId, answer) => this.showMission(missionId, answer),
       onEnd: () => {
         if (record) this.sceneRecord[id] = 'seen';
         onEnd?.();
@@ -1295,7 +1303,7 @@ export class Game {
   sceneTrigger(on, target = null) {
     if (!this.profile.trainer || this.hub.scene || !this.hub.map) return false;
     const ctx = this.hub._context();
-    if (on === 'win' || on === 'play' || on === 'visit') return false;   // os de depois e de antes da fase e a visita têm caminho próprio
+    if (on === 'win' || on === 'play') return false;   // os de depois e de antes da fase têm caminho próprio
     for (const [id, def] of Object.entries(CUTSCENES)) {
       if (!def.trigger?.some((t) => t.on === on && (t.target == null || t.target === target))) continue;
       if (def.map && def.map !== this.hub.mapId) continue;
@@ -1400,15 +1408,50 @@ export class Game {
   }
 
   /**
-   * A visita a um lugar da história (0.39, a marca dele no mapa da jornada): a cena dele
-   * no palco, em tela cheia, e a volta para a vila. Uma vez só: depois, o painel avisa.
+   * A visita a um lugar da história (0.39, a marca dele no mapa da jornada): o jogador entra
+   * no lugar (a Usina, para explorar) enquanto a quest dele está ativa. A cena da chegada
+   * toca pelo gatilho 'enter' dela, uma vez.
    */
   visitPlace(id) {
     const place = STORY_PLACES[id];
-    const def = place && CUTSCENES[place.scene];
-    if (!def || this.sceneRecord[place.scene] === 'seen' || !place.quests.some((q) => this.quests.isActive(q))) return false;
-    this.openHub({ map: def.map, ...def.spot });
-    return this.playScene(place.scene);
+    if (!place || !place.quests.some((q) => this.quests.isActive(q))) return false;
+    this.openHub({ map: place.map, ...place.spot });
+    return true;
+  }
+
+  /**
+   * O card de uma missão de lendário (0.39, data/missions.js), no padrão do card de fase.
+   * `answer` recebe a escolha ('play' ou 'back'): é o passo `card` das cenas.
+   */
+  showMission(id, answer) {
+    if (!getMission(id)) { answer?.('back'); return; }
+    this.missionCard = { id, answer };
+    showMissionCard(this, id, {
+      onPlay: () => { if (this.startMission(id)) this._closeMission('play'); },
+      onBack: () => this._closeMission('back')
+    });
+  }
+
+  _playMission() {
+    const open = this.missionCard;
+    if (open && this.startMission(open.id)) this._closeMission('play');
+  }
+
+  _closeMission(choice) {
+    const open = this.missionCard;
+    if (!open) return;
+    this.missionCard = null;
+    hideMissionCard();
+    open.answer?.(choice);
+  }
+
+  /**
+   * A luta de uma missão. Ela vem com o molde das missões (H-5, tirado do salão do Kyogre)
+   * e a do Zapdos (H-6): até lá, o card avisa e continua aberto.
+   */
+  startMission(id) {
+    toast(`A luta do ${getMission(id).name.charAt(0)}${getMission(id).name.slice(1).toLowerCase()} chega na próxima etapa.`, '⚡');
+    return false;
   }
 
   /** A ação 'stage' do fim de uma cena de antes da fase: a fase começa. */

@@ -43,16 +43,19 @@ export const STAGE_CITY = {
 
 /**
  * Os lugares da história no mapa (0.39): marcas que não são fases. Cada uma aparece
- * enquanto uma das quests de `quests` está ativa, e o painel dela tem o botão da visita,
- * que toca a cena `scene` (data/cutscenes.js, gatilho 'visit') no palco dela.
+ * enquanto uma das quests de `quests` está ativa, e o botão do painel leva o jogador para
+ * dentro do lugar (`map`, no `spot`), para andar à vontade. A cena `scene` é a da chegada
+ * (o gatilho 'enter' dela): o painel muda o texto depois dela.
  */
 export const STORY_PLACES = {
   usina: {
     name: 'A Usina', area: 'Rota 10', cell: [18, 4],
-    quests: ['z_usina', 'z_usina_fundo'],
-    scene: 'usina_porta',
+    map: 'usina', spot: { x: 5, y: 37, dir: 'up' },
+    quests: ['z_usina', 'z_zapdos'],
+    scene: 'usina_entrada',
     text: 'Um marinheiro de Vermilion escutou correntes pesadas se arrastando aqui dentro. A Usina está fechada desde o apagão.',
-    seenText: 'As paredes estão marcadas por raios, e alguma coisa grita lá no fundo, presa por correntes. Os Voltorb fecham o corredor: por enquanto, é perigoso demais seguir.'
+    seenText: 'As paredes estão marcadas por raios, e um barulho de correntes vem lá do fundo. Em algum lugar do labirinto, um caminho leva para baixo.',
+    go: 'Investigar', goSeen: 'Entrar na Usina'
   }
 };
 

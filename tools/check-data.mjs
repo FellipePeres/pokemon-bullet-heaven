@@ -32,6 +32,7 @@ import { QUESTS, CHAPTERS, FIRST_QUEST, QUEST_EVENTS } from '../src/data/quests.
 import { DONE_IF_KEYS } from '../src/systems/QuestSystem.js';
 import { CUTSCENES, CUTSCENE_STEPS, CUTSCENE_TRIGGERS } from '../src/data/cutscenes.js';
 import { STORY_PLACES } from '../src/data/regionMap.js';
+import { MISSIONS } from '../src/data/missions.js';
 import { existsSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -408,6 +409,57 @@ const inside = (mapId, x, y) => { const m = HUB_MAPS[mapId]; return !!m && x >= 
     : ok(`a história: ${Object.keys(QUESTS).length} quests em ${Object.keys(CHAPTERS).length} capítulos, todas encadeadas a partir de "${FIRST_QUEST}"`);
 }
 
+// as Poké Balls do chão (0.39, `loot` em data/hub.js): cada uma no chão, com um item da
+// mochila, alcançável de onde o jogador chega; e, com todas no lugar, as escadas ('step')
+// continuam alcançáveis (uma bola nunca fecha o caminho)
+{
+  const issues = [];
+  let count = 0;
+  for (const [mapId, place] of Object.entries(HUB.maps)) {
+    if (!place.loot?.length) continue;
+    const map = HUB_MAPS[mapId];
+    const solid = new Set([
+      ...(place.npcs ?? []).map((n) => `${n.x},${n.y}`),
+      ...(place.decor ?? []).filter((d) => d.solid).map((d) => `${d.x},${d.y}`),
+      ...place.loot.map((l) => `${l.x},${l.y}`)
+    ]);
+    const ids = new Set();
+    for (const l of place.loot) {
+      count++;
+      if (ids.has(l.id)) issues.push(`${mapId}: bola com id repetido (${l.id})`);
+      ids.add(l.id);
+      if (!floor(mapId, l.x, l.y)) issues.push(`${mapId}: bola ${l.id} fora do chão (${l.x},${l.y})`);
+      if (getMartItem(l.item)?.kind !== 'bag') issues.push(`${mapId}: bola ${l.id} com um item que não é da mochila (${l.item})`);
+      if ((place.npcs ?? []).some((n) => n.x === l.x && n.y === l.y) || (place.warps ?? []).some((w) => w.x === l.x && w.y === l.y)) issues.push(`${mapId}: bola ${l.id} em cima de alguém ou de uma porta`);
+    }
+    // de onde o jogador chega: as portas que levam para cá e os lugares da história deste mapa
+    const starts = [];
+    for (const other of Object.values(HUB.maps)) for (const w of other.warps ?? []) if (w.to === mapId) starts.push([w.tx, w.ty]);
+    for (const sp of Object.values(STORY_PLACES)) if (sp.map === mapId) starts.push([sp.spot.x, sp.spot.y]);
+    const seen = new Set(starts.map(([x, y]) => `${x},${y}`));
+    const queue = [...starts];
+    while (queue.length) {
+      const [x, y] = queue.shift();
+      for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+        const k = `${x + dx},${y + dy}`;
+        if (seen.has(k) || solid.has(k) || !floor(mapId, x + dx, y + dy)) continue;
+        seen.add(k);
+        queue.push([x + dx, y + dy]);
+      }
+    }
+    for (const l of place.loot) {
+      if (![[1, 0], [-1, 0], [0, 1], [0, -1]].some(([dx, dy]) => seen.has(`${l.x + dx},${l.y + dy}`))) issues.push(`${mapId}: a bola ${l.id} não tem como ser alcançada`);
+    }
+    for (const w of place.warps ?? []) {
+      if (w.on === 'step' && !seen.has(`${w.x},${w.y}`)) issues.push(`${mapId}: com as bolas no lugar, a escada ${w.x},${w.y} fica sem caminho`);
+    }
+    if (!map) issues.push(`${mapId}: sem mapa`);
+  }
+  issues.length
+    ? fail(`Poké Balls do chão: ${issues.join(' · ')}`)
+    : ok(`${count} Poké Balls do chão, todas alcançáveis e sem fechar nenhuma escada`);
+}
+
 // as cenas (0.39, data/cutscenes.js): o lugar, os atores, os caminhos só no chão, e
 // as falas, os itens e as quests que elas citam; e os eventos de história das fases
 {
@@ -441,7 +493,7 @@ const inside = (mapId, x, y) => { const m = HUB_MAPS[mapId]; return !!m && x >= 
     // a de antes da fase solta a fase no fim; a de um palco volta para a vila (ou solta a fase)
     const then = steps.at(-1)?.then;
     if (def.trigger?.some((t) => t.on === 'play') && then !== 'stage') issues.push(`${id}: a cena de antes da fase termina sem a fase (then: 'stage')`);
-    else if (place.scene && then !== 'home' && then !== 'stage') issues.push(`${id}: a cena do palco termina sem voltar (then: 'home' ou 'stage')`);
+    else if (place.scene && then !== 'home' && then !== 'stage' && !then?.go) issues.push(`${id}: a cena do palco termina sem voltar (then: 'home', 'stage' ou { go })`);
     steps.forEach((raw, i) => {
       if (raw.pick && !Object.keys(raw.cases ?? {}).length) issues.push(`${id} passo ${i + 1}: pick sem casos`);
       const variants = raw.pick ? Object.values(raw.cases ?? {}).map((c) => ({ ...raw, ...c })) : [raw];
@@ -478,7 +530,11 @@ const inside = (mapId, x, y) => { const m = HUB_MAPS[mapId]; return !!m && x >= 
           else emitted.add(`${step.on}:${step.target ?? ''}`);
         }
         if (step.do === 'flag' && !step.name) issues.push(`${at}: flag sem nome`);
-        if (step.do === 'end' && step.then && !KNOWN_ACTIONS.has(step.then)) issues.push(`${at}: ação desconhecida (${step.then})`);
+        if (step.do === 'end' && step.then?.go) {
+          const go = step.then.go;
+          if (!HUB.maps[go.map] || !floor(go.map, go.x, go.y)) issues.push(`${at}: o go leva para fora do chão (${go.map} ${go.x},${go.y})`);
+        } else if (step.do === 'end' && step.then && !KNOWN_ACTIONS.has(step.then)) issues.push(`${at}: ação desconhecida (${step.then})`);
+        if (step.do === 'card' && !MISSIONS[step.mission]) issues.push(`${at}: missão que não existe (${step.mission})`);
       }
     });
   }
@@ -507,12 +563,20 @@ const inside = (mapId, x, y) => { const m = HUB_MAPS[mapId]; return !!m && x >= 
   }
   // os lugares da história no mapa (data/regionMap.js): a cena da visita e as quests que os mostram
   for (const [id, place] of Object.entries(STORY_PLACES)) {
-    if (!CUTSCENES[place.scene]?.trigger?.some((t) => t.on === 'visit' && t.target === id)) issues.push(`lugar ${id}: a cena da visita não existe ou não é dele (${place.scene})`);
+    if (!HUB.maps[place.map]) issues.push(`lugar ${id}: o lugar da vila não existe (${place.map})`);
+    else if (!floor(place.map, place.spot?.x, place.spot?.y)) issues.push(`lugar ${id}: a chegada fica fora do chão`);
+    if (place.scene && !CUTSCENES[place.scene]?.trigger?.some((t) => t.on === 'enter' && t.target === place.map)) issues.push(`lugar ${id}: a cena da chegada não existe ou não é do lugar (${place.scene})`);
     for (const q of place.quests ?? []) if (!QUESTS[q]) issues.push(`lugar ${id}: quest que não existe (${q})`);
     if (!place.quests?.length) issues.push(`lugar ${id}: sem quest (nunca apareceria no mapa)`);
     const [cx, cy] = place.cell ?? [];
     if (!(cx >= 0 && cx < 22 && cy >= 0 && cy < 15)) issues.push(`lugar ${id}: fora da grade do Town Map`);
-    if (!place.text || !place.seenText) issues.push(`lugar ${id}: sem o texto do painel`);
+    if (!place.text || !place.seenText || !place.go || !place.goSeen) issues.push(`lugar ${id}: sem os textos do painel`);
+  }
+  for (const [id, mission] of Object.entries(MISSIONS)) {
+    for (const file of [mission.banner, mission.balls?.icon, `assets/pokemon/gen3/front/${mission.dex}.png`]) {
+      if (!file || !existsSync(join(root, file))) issues.push(`missão ${id}: falta ${file}`);
+    }
+    if (!(mission.recommendedLevel > 0) || !mission.title || !mission.weak?.length) issues.push(`missão ${id}: card incompleto`);
   }
   const stages = Object.keys(HUB.maps).filter((id) => HUB.maps[id].scene);
   issues.length

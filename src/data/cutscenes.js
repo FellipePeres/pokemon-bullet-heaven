@@ -12,9 +12,7 @@
  *             { on: 'npc', target: id } (falou com alguém do lugar), { on: 'starter' }
  *             (acabou de escolher o inicial), { on: 'win', target: fase } (venceu a fase:
  *             a cena fica devida e toca na volta, no `spot`) ou { on: 'play', target: fase }
- *             (apertou Jogar: a cena toca antes, e a fase começa no fim, com `then: 'stage'`)
- *             ou { on: 'visit', target: lugar } (a visita a um lugar da história, pela marca dele
- *             no mapa da jornada: STORY_PLACES em data/regionMap.js).
+ *             (apertou Jogar: a cena toca antes, e a fase começa no fim, com `then: 'stage'`).
  *             Sem trigger, só o código a começa (a do Maxie).
  *
  * As cenas são ANTES e DEPOIS das fases, nunca no meio, e sempre em tela cheia, num
@@ -24,7 +22,8 @@
  *   when      as condições das falas (data/dialogue.js) para o trigger valer
  *   record    false: não se registra em `campaign.scenes` (a do Maxie usa o registro do Kyogre)
  *   band      a faixa do corte de tela (passo `cutin`)
- *   actors    quem entra só na cena: { id: { sprite, x, y, dir, hidden } }. As pessoas do
+ *   actors    quem entra só na cena: { id: { sprite, x, y, dir, hidden, glow } } (`glow`: aparece
+ *             por cima do escuro, como os olhos do Zapdos). As pessoas do
  *             lugar (pelo id de data/hub.js) e o jogador ('player') também atuam.
  *   preload   folhas para carregar antes (as dos atores entram sozinhas)
  *   steps     os passos, um de cada vez:
@@ -51,9 +50,12 @@
  *     quest  { id }                    abre uma quest (data/quests.js)
  *     emit   { on, target }            um acontecimento da história no meio da cena (a `clue`, uma
  *                                      pista: o objetivo das quests que espera por ela fecha ali)
+ *     card   { mission }               o card de uma missão de lendário (data/missions.js), no
+ *                                      padrão do card de fase; espera o Lutar ou o Voltar
  *     flag   { name, value }           marca uma flag da vila (as falas `once`, os enfeites `hideIf`)
  *     end    { then }                  o fim: só aqui a cena conta como vista; `then` é uma
- *                                      ação das falas (data/dialogue.js), como 'starter'
+ *                                      ação das falas (data/dialogue.js), como 'starter', ou
+ *                                      { go: { map, x, y, dir } } (leva a outro lugar, escurecendo)
  *   Um passo pode mudar com a jornada: `pick: 'rivalStarter'` e `cases: { squirtle: {...} }`
  *   juntam ao passo o caso daquele valor do contexto das falas.
  */
@@ -431,11 +433,11 @@ export const CUTSCENES = {
     ]
   },
 
-  // a visita à Usina (pela marca dela no mapa da jornada): as paredes marcadas por raios, as
-  // correntes, o grito elétrico e os Voltorb fechando o corredor. Ainda não dá para entrar
-  usina_porta: {
-    map: 'usina', spot: { x: 5, y: 16, dir: 'up' },
-    trigger: [{ on: 'visit', target: 'usina' }],
+  // a chegada na Usina (pela marca dela no mapa da jornada), uma vez: as luzes piscam, as paredes
+  // estão marcadas por raios e um barulho de correntes vem lá do fundo. Depois, o jogador explora
+  usina_entrada: {
+    map: 'usina', spot: { x: 5, y: 37, dir: 'up' },
+    trigger: [{ on: 'enter', target: 'usina' }],
     steps: [
       { do: 'wait', t: 0.5 },
       // as luzes piscam
@@ -443,28 +445,37 @@ export const CUTSCENES = {
       { do: 'wait', t: 0.25 },
       { do: 'fade', to: 0.7, t: 0.08 }, { do: 'fade', to: 0, t: 0.14 },
       { do: 'wait', t: 0.4 },
-      { do: 'say', lines: ['As luzes piscam, e as paredes estão marcadas por raios.', 'Houve uma batalha aqui. Das grandes.'] },
-      { do: 'walk', who: 'player', to: [[6, 11, 'up']] },
+      { do: 'say', lines: ['As luzes piscam, e as paredes estão marcadas por raios. Houve uma batalha aqui.'] },
       { do: 'shake', t: 0.6, power: 1.5 },
-      { do: 'say', lines: ['Clanc... clanc... Correntes, se arrastando no escuro, lá no fundo.'] },
-      { do: 'shake', t: 0.9, power: 3, wait: false },
-      { do: 'emote', who: 'player' },
-      { do: 'say', lines: ['Um grito elétrico atravessa a Usina!'] },
-      // os Voltorb (que parecem Poké Balls) reagem: são Pokémon, e estão nervosos
-      { do: 'emote', who: 'voltorb1' },
-      { do: 'say', lines: [
-        'Os Voltorb fecham o corredor, e a energia que escapa lá de dentro arrepia o {pokemon}.',
-        'É perigoso demais seguir agora.'
-      ] },
-      { do: 'wait', t: 0.4 },
-      { do: 'end', then: 'home' }
+      { do: 'say', lines: ['Clanc... clanc... Um barulho de correntes vem lá do fundo da Usina.'] },
+      { do: 'end' }
+    ]
+  },
+
+  // o fundo da Usina (pela escotilha da sala do gerador), toda vez: o escuro, só o jogador com um
+  // brilho fraco em volta; 2 s depois os olhos vermelhos (em pixel, num tile do mapa); mais 2 s e
+  // o card da missão (pedido do Fellipe)
+  usina_fundo: {
+    map: 'usina_fundo', spot: { x: 7, y: 9, dir: 'up' }, record: false,
+    trigger: [{ on: 'enter', target: 'usina_fundo' }],
+    actors: { olhos: { sprite: 'npc/olhos_zapdos', x: 7, y: 4, dir: 'down', hidden: true, glow: true } },
+    steps: [
+      { do: 'wait', t: 2 },
+      { do: 'show', who: 'olhos' },
+      { do: 'shake', t: 0.5, power: 1, wait: false },
+      // a pista: fecha "Investigue a Usina" e abre "Derrote e liberte o Zapdos"
+      { do: 'emit', on: 'clue', target: 'olhos' },
+      { do: 'wait', t: 2 },
+      { do: 'card', mission: 'zapdos' },
+      // Voltar: de volta para cima, ao lado da escotilha
+      { do: 'end', then: { go: { map: 'usina', x: 5, y: 12, dir: 'left' } } }
     ]
   }
 };
 
 /** Os passos que o game/Cutscene.js conhece (o check-data confere). */
 export const CUTSCENE_STEPS = ['wait', 'say', 'talk', 'show', 'hide', 'place', 'walk', 'face', 'emote', 'throw', 'cutin',
-  'bird', 'fade', 'camera', 'shake', 'give', 'quest', 'emit', 'flag', 'end'];
+  'bird', 'fade', 'camera', 'shake', 'give', 'quest', 'emit', 'card', 'flag', 'end'];
 
 /** O que pode começar uma cena. */
-export const CUTSCENE_TRIGGERS = ['enter', 'npc', 'starter', 'win', 'play', 'visit'];
+export const CUTSCENE_TRIGGERS = ['enter', 'npc', 'starter', 'win', 'play'];

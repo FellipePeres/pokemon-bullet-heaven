@@ -97,11 +97,28 @@ export class Hub {
    */
   get decor() {
     const ctx = { starterId: this.campaign.starter };
+    const loot = this.loot.map((l) => ({ sprite: 'item_ball', x: l.x, y: l.y, solid: true, loot: l }));
     // `hideIf` é uma condição ou uma lista delas (some se qualquer uma bater: a bola do
     // inicial do jogador e, depois da cena do rival, a dele, 0.39)
     const hidden = (cond) => (Array.isArray(cond) ? cond : [cond]).some((c) => this._matches(c, ctx));
     const fixed = (this.place.decor ?? []).filter((d) => !d.hideIf || !hidden(d.hideIf));
-    return this.mapId === HUB.room ? [...fixed, ...this._roomDecor()] : fixed;
+    return this.mapId === HUB.room ? [...fixed, ...this._roomDecor()] : [...fixed, ...loot];
+  }
+
+  /** As Poké Balls do chão (0.39, `loot` em data/hub.js) que ainda não foram pegas nesta jornada. */
+  get loot() {
+    const flags = this._flags();
+    return (this.place?.loot ?? []).filter((l) => !flags[`loot:${this.mapId}:${l.id}`]);
+  }
+
+  /** Pega a Poké Ball do chão: o item vai para a mochila, e a bola some (uma vez por jornada). */
+  _pickup(loot) {
+    const count = loot.count ?? 1;
+    const name = this.game.giveItem?.(loot.item, count) ?? loot.item;
+    this._flags()[`loot:${this.mapId}:${loot.id}`] = true;
+    const what = `${count > 1 ? `${count} ` : 'um '}${name.toUpperCase()}`;
+    this.dialog = { key: null, name: null, pages: [`${this.game.playerName} encontrou ${what}!`], index: 0, shown: 0, ask: null, then: null, npc: null };
+    this.game.autosave?.();
   }
 
   _roomDecor() {
@@ -386,6 +403,9 @@ export class Hub {
       this.say(npc.talk, { npc });
       return true;
     }
+    // uma Poké Ball no chão (0.39): pega
+    const loot = this.decor.find((d) => d.loot && d.x === fx && d.y === fy)?.loot;
+    if (loot) { this._pickup(loot); return true; }
     const thing = this._thing(fx, fy);
     if (thing) { this.say(thing.talk, thing.extra ?? {}); return true; }
     return false;
@@ -481,7 +501,13 @@ export class Hub {
       // o fim das cenas dos palcos (0.39): de volta para a vila, ou a fase que vem depois da cena
       case 'home': this._goHome(); break;
       case 'stage': game.startSceneStage(); break;
-      default: break;
+      default:
+        // { go: { map, x, y, dir } }: leva a outro lugar, escurecendo (o fim do fundo da Usina)
+        if (action?.go) {
+          const go = action.go;
+          this._fadeOut(() => { this._load(go.map); this._place(go.x, go.y, go.dir); game.autosave?.(); });
+        }
+        break;
     }
   }
 

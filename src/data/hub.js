@@ -215,14 +215,54 @@ export const HUB = {
       ],
       things: []
     },
-    // a entrada da Usina: os Voltorb fecham o corredor para o norte
+    // a Usina inteira (pedido do Fellipe): o jogador explora em tela cheia (`explore`), acha as
+    // 13 Poké Balls (2 no caminho, 11 nas salas que não levam a nada) e a escotilha para o fundo.
+    // A saída é o tapete da entrada. Os Voltorb fecham um corredor (sem isolar a escotilha)
     usina: {
       name: 'Usina',
-      scene: true,
-      npcs: [
-        { id: 'voltorb1', sprite: 'voltorb', x: 6, y: 9, dir: 'down', talk: 'voltorb_usina' },
-        { id: 'voltorb2', sprite: 'voltorb', x: 7, y: 9, dir: 'down', talk: 'voltorb_usina' }
+      explore: true,
+      warps: [
+        { x: 5, y: 38, on: 'mat', to: 'vila', tx: 6, ty: 17, dir: 'down' },
+        { x: 4, y: 12, on: 'step', to: 'usina_fundo', tx: 7, ty: 9, dir: 'up' }
       ],
+      npcs: [
+        { id: 'voltorb1', sprite: 'voltorb', x: 23, y: 14, dir: 'down', talk: 'voltorb_usina' },
+        { id: 'voltorb2', sprite: 'voltorb', x: 24, y: 14, dir: 'down', talk: 'voltorb_usina' }
+      ],
+      things: [
+        { cells: [[6, 36], [7, 36], [8, 36]], talk: 'usina_raios' },
+        { cells: [[7, 10], [8, 10], [9, 10], [7, 11], [8, 11], [9, 11]], talk: 'usina_gerador' }
+      ],
+      // a escotilha de metal com a escada de mão, na sala do gerador (onde o Zapdos fica no FireRed)
+      decor: [
+        { sprite: 'escotilha', x: 4, y: 12 }
+      ],
+      // as Poké Balls do chão: cada uma uma vez por jornada (a flag loot:usina:<id>). Nenhuma fica
+      // num tile com a camada de cima da parede (ela sumiria atrás dela)
+      loot: [
+        // no caminho
+        { id: 'c1', x: 17, y: 11, item: 'reroll' },
+        { id: 'c2', x: 46, y: 24, item: 'revive' },
+        // nas salas que não levam a nada
+        { id: 's1', x: 22, y: 26, item: 'revive' },
+        { id: 's2', x: 40, y: 22, item: 'revive' },
+        { id: 's3', x: 45, y: 4, item: 'revive' },
+        { id: 's4', x: 46, y: 8, item: 'revive' },
+        { id: 's5', x: 31, y: 38, item: 'revive' },
+        { id: 's6', x: 35, y: 6, item: 'reroll' },
+        { id: 's7', x: 44, y: 12, item: 'reroll' },
+        { id: 's8', x: 11, y: 38, item: 'reroll' },
+        { id: 's9', x: 18, y: 36, item: 'reroll' },
+        { id: 's10', x: 46, y: 37, item: 'reroll' },
+        { id: 's11', x: 36, y: 34, item: 'reroll' }
+      ]
+    },
+    // o fundo da Usina: no escuro (`dark`), só o círculo de luz em volta do jogador
+    usina_fundo: {
+      name: 'O fundo da Usina',
+      scene: true,
+      dark: true,
+      npcs: [],
       things: []
     },
     // um recorte de Cerulean: a casa assaltada do FireRed, com o policial na porta

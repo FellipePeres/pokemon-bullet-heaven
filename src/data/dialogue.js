@@ -192,7 +192,14 @@ export const DIALOGUE = {
     name: 'Marinheiro',
     lines: [{ say: ['Com o mar desse jeito, o navio não sai do porto.'] }]
   },
-  voltorb_usina: { lines: [{ say: ['O Voltorb faísca. É melhor não chegar perto.'] }] },
+  voltorb_usina: { lines: [{ say: ['O Voltorb faísca. É melhor procurar outro caminho.'] }] },
+  usina_raios: { lines: [{ say: ['As paredes estão marcadas por raios. Houve uma batalha aqui. Das grandes.'] }] },
+  usina_gerador: {
+    lines: [
+      { when: { scene: 'usina_entrada' }, say: ['O gerador está morto. Cabos arrancados somem por uma escotilha no chão, logo ali.'] },
+      { say: ['O gerador está morto.'] }
+    ]
+  },
   // quem desiste da escolha (o Voltar da tela de iniciais)
   carvalho_espera: {
     name: 'Prof. Carvalho',

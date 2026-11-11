@@ -104,7 +104,7 @@ export class HubRenderer {
     actors.push({ y: p.fy, order: 2, draw: () => this._player(hub) });
     // os atores da cena (o Maxie, o rival...) andam pela vila como as pessoas dela
     for (const a of scene?.cast ?? []) {
-      if (a.hidden) continue;
+      if (a.hidden || a.glow) continue;
       actors.push({ y: a.y, order: 1, draw: () => this._sprite(a.sprite, actorFrame(a), a.dir === 'right', a.x, a.y, 0) });
     }
     actors.sort((a, b) => a.y - b.y || a.order - b.order);
@@ -113,6 +113,13 @@ export class HubRenderer {
     const cover = getSheet(`hub/${hub.mapId}-top`);
     if (cover) ctx.drawImage(cover.img, ox, oy, mapW, mapH);
     for (const item of decor) if (item.piece) this._piece(item, '-top');
+
+    // um lugar escuro (0.39, `dark` em data/hub.js): só um círculo fraco de luz em volta do
+    // jogador, em degraus de pixel, como sem o Flash; o que brilha (os olhos) vem por cima
+    if (hub.place?.dark) {
+      this._dark(hub);
+      for (const a of scene?.cast ?? []) if (a.glow && !a.hidden) this._sprite(a.sprite, actorFrame(a), a.dir === 'right', a.x, a.y, 0);
+    }
 
     if (scene) this._scene(scene);
 
@@ -182,6 +189,38 @@ export class HubRenderer {
       ctx.drawImage(crobat.img, Math.round(cx), H / 2 - 32 * S, 64 * S, 64 * S);
     }
     ctx.restore();
+  }
+
+  /**
+   * O escuro: uma camada preta na resolução do GBA (um pixel por pixel do jogo), com um
+   * círculo em volta do jogador em três degraus (claro, meio, quase escuro). Refeita só
+   * quando o jogador ou a tela mudam.
+   */
+  _dark(hub) {
+    if (typeof document === 'undefined') return;
+    const S = this.scale, size = T * S;
+    const w = Math.ceil(this.canvas.width / S), h = Math.ceil(this.canvas.height / S);
+    const p = hub.player;
+    const cx = Math.round((this.offset.x + (p.fx + 0.5) * size) / S);
+    const cy = Math.round((this.offset.y + (p.fy + 0.5) * size) / S) - 4;
+    const key = `${w}x${h}@${cx},${cy}`;
+    if (this._darkKey !== key) {
+      this._darkKey = key;
+      const canvas = (this._darkCanvas ??= document.createElement('canvas'));
+      canvas.width = w;
+      canvas.height = h;
+      const g = canvas.getContext('2d');
+      const image = g.createImageData(w, h);
+      for (let y = 0; y < h; y++) {
+        for (let x = 0; x < w; x++) {
+          const d = Math.hypot(x - cx, y - cy);
+          image.data[(y * w + x) * 4 + 3] = d < 18 ? 0 : d < 23 ? 110 : d < 28 ? 195 : 255;
+        }
+      }
+      g.putImageData(image, 0, 0);
+    }
+    this.ctx.imageSmoothingEnabled = false;
+    this.ctx.drawImage(this._darkCanvas, 0, 0, w * S, h * S);
   }
 
   /** Um móvel do quarto (o chão dele, ou a camada de cima com `layer` = '-top'). */

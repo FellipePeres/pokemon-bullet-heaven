@@ -721,13 +721,39 @@ Nunca voltar bônus globais para o pool de level up — foi pedido explícito.
   azul) tem `openedBy` e quem abre é o marinheiro.
 - **Os lugares da história no mapa** (`STORY_PLACES` em `data/regionMap.js`): marcas
   que não são fases. Cada uma aparece enquanto uma das quests dela está ativa
-  (`Lobby.places`), com o painel do lugar (`_placePanel`: o texto e o
-  "Investigar"; depois de visto, "Perigoso demais por enquanto"). O botão chama
-  `Game.visitPlace`, que abre o palco da cena (gatilho `visit`) e a toca; a cena
-  termina com `then: 'home'`. A primeira é a Usina (a célula 18,4 do Town Map), com
-  o palco `usina` (a entrada da Usina do FireRed) e dois Voltorb (`npc/voltorb`)
-  fechando o corredor. O check-data confere que a cena e as quests de cada lugar
-  existem. É a base das marcas das missões de lendário (H-5).
+  (`Lobby.places`), com o painel do lugar (`_placePanel`: o texto e o botão, que
+  muda depois da cena da chegada). O botão chama `Game.visitPlace`, que abre o
+  lugar (`map`, no `spot`) para o jogador andar. A primeira é a Usina (a célula
+  18,4 do Town Map). É a base das marcas das missões de lendário (H-5).
+- **Os lugares para explorar** (`explore: true` em `data/hub.js`): a tela cheia
+  (`cinema`) sem a barra, mas com o rodapé dos controles (a classe `explore`). A
+  Usina é o mapa inteiro do FireRed, com a saída pelo tapete da entrada (para a
+  vila), a escotilha (`npc/escotilha`, um warp `step` para o fundo) e a cena da
+  chegada (`usina_entrada`, gatilho `enter`, uma vez).
+- **As Poké Balls do chão** (`loot` em `data/hub.js`): `{ id, x, y, item, count }`,
+  desenhadas como enfeites sólidos (`npc/item_ball`) enquanto a flag
+  `loot:<lugar>:<id>` não está marcada. O A pega (`Hub._pickup`): o item vai para a
+  mochila (`Game.giveItem`) e a caixa diz "{player} encontrou um REVIVER!". O
+  check-data confere que cada uma está no chão, guarda um item da mochila e pode
+  ser alcançada, e que nenhuma fecha uma escada. **Cuidado:** um tile andável pode
+  ter a camada de cima da parede (o personagem some atrás dela); confira no
+  `usina-top.png` antes de pôr uma bola ou um ponto de chegada.
+- **O escuro** (`dark: true`): o `HubRenderer._dark` cobre a tela com uma camada na
+  resolução do GBA, com um círculo em volta do jogador em três degraus de pixel. Os
+  atores com `glow` (os olhos do Zapdos, `npc/olhos_zapdos`, desenhados em pixel
+  pelo `tools/assets/hub.py`) vêm por cima do escuro.
+- **O card de missão** (`data/missions.js`, `ui/missionCard.js`, o `#mission-card`
+  na tela da vila): o padrão do card de fase (as classes `panel-*`), com o banner do
+  lugar (`assets/ui/gym-banners/usina.png`, do `gym_banners.py`), a foto do
+  lendário, o tipo, as fraquezas, as bolas (a Ultra Ball veio do Pokemon All) e o
+  nível. O passo `card` das cenas o abre e espera a escolha; o A/Enter luta, o
+  B/ESC volta. `Game.startMission` ainda só avisa (a luta é a H-5 e a H-6). A cena
+  `usina_fundo` (`record: false`, toca a cada descida) termina com `then: { go }`,
+  a ação nova que leva a outro lugar escurecendo.
+- **O `.hall-card` do Hall da Fama** passou a ser `.overlay-card.hall-card`: a
+  regra antiga também pegava o card do salão do Kyogre (e o das missões) e
+  encolhia o banner a zero. **O card do Kyogre que está no ar (0.37.9) tem esse
+  defeito**; a correção está nesta branch.
 - **As falas da história presas à quest**: as linhas dos moradores e do sábio de
   depois de uma cena usam `scene` e `quest` juntos (valem enquanto a quest daquele
   momento está ativa) e vêm antes das dicas por insígnia, que senão as
@@ -1300,6 +1326,7 @@ o Brock como está, todas as outras mais duras, menos níveis.
 | 71 | depois da Fase 1, ao aparecer na vila: o velho sábio sai de casa, vê o jogador ("!"), "soube que o Brock te pediu ajuda", conta que depois que os pássaros lendários sumiram dos céus isso começou, "deve ter algo a ver, mas isso é tudo que posso ajudar"; depois o jogador volta a jogar livre | 0.39 (na branch): a cena `sabio_passaros` (gatilho `win` da Fase 1, depois da do Brock), a saída do palco levando à próxima cena devida, a câmera enquadrando a porta, a fala nova do sábio na casa dele |
 | 72 | a continuação da Fase 2: "perfeito essas cenas, pode seguir com tudo que sugeriu, aceito todas as recomendações" (a proposta "Cerulean: o mar bravo") | 0.39 (na branch): os palcos do ginásio de Cerulean e da casa assaltada, a Misty, o policial e o dono em pixel; as cenas `depois_misty` e `cerulean_roubo` (com o rival); o passo `emit` e as pistas (`clue`); a quest da Misty em duas linhas e a do Surge; o `doneIf` por objetivo; as falas da vila culpando a Rocket, presas à quest |
 | 73 | a Fase 3 na história, com as mudanças do Fellipe: nada chega de barco, o Surge não viu clarão; o Surge conta que pareceu haver um combate dentro da Usina, como se o Zapdos estivesse brigando; o marinheiro, preso no porto pela maré agitada, escutou correntes vindo da Usina, e o jogador pode ir verificar; "pode fazer seguindo o planejamento" | 0.39 (na branch): os palcos do ginásio de Vermilion, do cais e da entrada da Usina; as cenas `depois_surge`, `vermilion_correntes` e `usina_porta`; a quest da Erika (Capítulo 3) e as da Usina (azuis); os lugares da história no mapa da jornada (`STORY_PLACES`, `visitPlace`), com a Usina como o primeiro |
+| 74 | a Usina andável: "ao clicar no investigar no card da usina, a gente vai ter tiles jogáveis", uma escada para o fundo, a tela preta com um círculo de brilho fraco, os olhos vermelhos e o card "derrote e liberte Zapdos"; depois: os olhos em pixel e 2D, num tile; 13 Poké Balls (2 no caminho, 11 nas salas sem saída) com Reviver e Novo Sorteio; o card só depois dos olhos (2 s e 2 s), no padrão dos cards de fase, com a foto do Zapdos | 0.39 (na branch): a Usina inteira do FireRed como lugar para explorar (`explore`), as Poké Balls do chão (`loot`), a escotilha e os olhos desenhados em pixel, o escuro em degraus (`dark`), o card de missão (`data/missions.js`), as quests `z_usina` e `z_zapdos`; o card do Kyogre corrigido (o banner sumia) |
 | Fase 8 (Giovanni) | 1 → 0,8 | 4,0 | 4,5 | 60 | 84 → 62 |
 | Lorelei | 1,05 → 0,8 | 3,5 | 3,1–4,7 | 64 | 92 → 66 |
 | Bruno | 1,12 → 0,97 | 3,7 | 3,5–6,3 ² | 66 | 99 → 68 |

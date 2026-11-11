@@ -99,7 +99,7 @@ quando o jogador volta, ou o lugar da fase antes dela.
 |---|---|---|---|
 | **Prólogo — O sonho** | na vila, antes da Fase 1 | O Carvalho: as hordas mudaram, ninguém sabe por quê. O sonho de ser Campeão continua possível, mas o ideal é devolver a paz às rotas. | — |
 | **1 — As rotas tomadas** | Fase 1 (Brock) | **Feito na 0.39** (pedido do Fellipe). Depois da vitória, no ginásio de Pewter, em tela cheia: o Brock parabeniza o jogador por ter vencido, conta que os Pokémon estão agindo de um jeito que ninguém viu (os Geodude desceram do Monte Lua), diz que é muito sério e pede ajuda para entender o que está acontecendo. Manda investigar a cidade de Cerulean. É a apresentação do problema; o Maxie não aparece, e não há corte de tela. Abre a quest **"Derrote a Misty e encontre pistas sobre o comportamento dos Pokémon"** (o mapa segue para o ginásio dela). Logo depois, de volta à vila: o **velho sábio** sai de casa, vê o jogador (o "!"), vem até ele e conta que soube do pedido do Brock, que os pássaros lendários sumiram dos céus e que foi depois disso que tudo começou ("deve ter alguma coisa a ver"), mas que é tudo o que ele pode ajudar por enquanto. Ele volta para casa, e o jogador fica livre. | — |
-| **2 — O céu vazio** | Fases 2 e 3 (Misty, Surge) | **A parte da Misty está feita na 0.39** (proposta "Cerulean: o mar bravo", aprovada inteira pelo Fellipe). Depois da Fase 2, duas cenas: no ginásio, a Misty conta que o mar ficou bravo desde que o Articuno deixou de ser visto sobre as Ilhas Seafoam (a primeira prova de que o sábio tem razão) e aponta o Surge e a Usina, onde o Zapdos aparecia; na rua de Cerulean, a casa assaltada do FireRed: o policial culpa a Equipe Rocket (a pista falsa) e o dono estranha que só levaram peças de máquina (as máquinas dos pássaros, no Capítulo 4); o rival passa correndo, a caminho de Vermilion. Na vila, os moradores culpam a Rocket, e só o velho sábio estranha o ladrão. **A parte do Surge também, na 0.39** (proposta "Vermilion: a Usina apagou", versão 2, com as mudanças do Fellipe: nada chega de barco, ninguém viu clarão). No ginásio, o Surge conta que a Usina apagou, que os Voltorb e os Magnemite invadiram Vermilion e que ninguém vê o Zapdos ("com o Articuno, já são dois"); naquela noite, pareceu haver um combate dentro da Usina, como se o Zapdos estivesse brigando. No cais, um marinheiro, preso em terra pelo mar agitado (o mesmo da Misty), conta que trabalhando pela Rota 10 escutou correntes dentro da Usina fechada: abre a quest paralela **"Investigue a Usina"**, e a visita (pela marca da Usina no mapa) mostra as paredes marcadas por raios, as correntes, um grito elétrico e os Voltorb fechando o corredor. Fica a quest "Chegue ao fundo da Usina", esperando a missão do Zapdos. | — |
+| **2 — O céu vazio** | Fases 2 e 3 (Misty, Surge) | **A parte da Misty está feita na 0.39** (proposta "Cerulean: o mar bravo", aprovada inteira pelo Fellipe). Depois da Fase 2, duas cenas: no ginásio, a Misty conta que o mar ficou bravo desde que o Articuno deixou de ser visto sobre as Ilhas Seafoam (a primeira prova de que o sábio tem razão) e aponta o Surge e a Usina, onde o Zapdos aparecia; na rua de Cerulean, a casa assaltada do FireRed: o policial culpa a Equipe Rocket (a pista falsa) e o dono estranha que só levaram peças de máquina (as máquinas dos pássaros, no Capítulo 4); o rival passa correndo, a caminho de Vermilion. Na vila, os moradores culpam a Rocket, e só o velho sábio estranha o ladrão. **A parte do Surge também, na 0.39** (proposta "Vermilion: a Usina apagou", versão 2, com as mudanças do Fellipe: nada chega de barco, ninguém viu clarão). No ginásio, o Surge conta que a Usina apagou, que os Voltorb e os Magnemite invadiram Vermilion e que ninguém vê o Zapdos ("com o Articuno, já são dois"); naquela noite, pareceu haver um combate dentro da Usina, como se o Zapdos estivesse brigando. No cais, um marinheiro, preso em terra pelo mar agitado (o mesmo da Misty), conta que trabalhando pela Rota 10 escutou correntes dentro da Usina fechada: abre a quest paralela **"Investigue a Usina"**, e o "Investigar" (pela marca da Usina no mapa) leva o jogador para dentro da **Usina andável**: ele explora o labirinto do FireRed, pega Poké Balls com Reviver e Novo Sorteio e acha a escotilha da sala do gerador; lá embaixo, no escuro, dois olhos vermelhos e o card **"Derrote e liberte o Zapdos"** (seção 5). | — |
 | **3 — Os rastros** | Fases 4 e 5 (Erika, Koga) | A Erika acha, no jardim, uma pena dourada e um pedaço de metal com um emblema vermelho, e o jogador leva os dois ao Carvalho. O Koga viu um vulto de capuz vermelho carregando uma máquina pela Rota 10: "não era da Rocket, o uniforme era outro". | — |
 | **4 — O trovão preso** | Fase 6 (Sabrina) | Antes da Fase 6, perto da Usina, um estrondo vem lá de dentro (a cena de antes da fase). A Sabrina vê "três jaulas e um homem olhando para o mar". Abre a quest **"Investigue a Usina"**: o Zapdos está preso numa máquina com o emblema vermelho. Agora é certeza: **alguém roubou os pássaros**. | **Zapdos** |
 | **5 — O gelo** | Fase 7 (Blaine) | A Fase 7 passa pelas Ilhas Seafoam. Depois do Blaine, o Carvalho cruza as anotações e aponta o fundo das ilhas. | **Articuno** |
@@ -135,7 +135,7 @@ passos:
 
 | Lendário | Onde (mapa do FireRed) | Abre quando | Nível recomendado (padrão) | O desafio próprio (ideia) |
 |---|---|---|---|---|
-| **Zapdos** | a Usina (`PowerPlant`) | depois da Sabrina | ~58 | Tempestade: raios marcados no chão antes de cair |
+| **Zapdos** | o fundo da Usina (`PowerPlant`), pela escotilha da sala do gerador | o card aparece depois da Fase 3 (a Usina andável); a luta pede o nível dela | ~58 | Tempestade: raios marcados no chão antes de cair |
 | **Articuno** | Ilhas Seafoam, o fundo (`SeafoamIslands_B4F`) | depois do Blaine | ~62 | Nevasca: neblina que esconde a horda e chão que desacelera |
 | **Moltres** | o cume do Monte Brasa, na Ilha 1 (`MtEmber_Summit`) | depois do Giovanni | ~66 | Sol forte: Fogo ×1,5 e Água ×0,5, o contrário do Drizzle |
 | **Mewtwo** | a Caverna Desconhecida (`CeruleanCave_B1F`) | depois do Campeão | ~82 | Psíquico: teletransporte e uma barreira que devolve golpes |
@@ -385,7 +385,7 @@ para o objetivo `scene` das quests. O check-data recusa a caixa com retrato
 | 7 | A vila culpa a Equipe Rocket | vila (falas dos moradores, sem cena) | 2 | H-4 ✅ |
 | 8 | A Usina apagou: o Surge e o combate | ginásio de Vermilion, depois da Fase 3 | 2 | H-4 ✅ |
 | 9 | As correntes: o marinheiro | porto de Vermilion, depois da Fase 3 | 2 | H-4 ✅ |
-| 10 | A porta da Usina (a visita) | Usina, pela marca no mapa da jornada | 2 | H-4 ✅ |
+| 10 | A Usina andável e o fundo: os olhos e o card do Zapdos | Usina, pela marca no mapa da jornada | 2 | H-4 ✅ |
 | 11 | O vulto de vermelho na Rota 10 | antes da Fase 5 | 3 | H-4 |
 | 12 | O estrondo na Usina | antes da Fase 6 | 4 | H-6 |
 | 13 | A jaula do Zapdos | Usina | 4 (missão) | H-6 |
@@ -447,20 +447,39 @@ casa estranha as peças de máquina, e o rival passa correndo ("Brincando de
 detetive?"). Depois, na vila, os moradores comentam o assalto, e só o sábio
 estranha; essas falas valem enquanto a quest do Surge está ativa.
 
-**As do Surge (0.39, `depois_surge`, `vermilion_correntes` e `usina_porta`):**
+**As do Surge (0.39, `depois_surge` e `vermilion_correntes`) e a Usina andável (`usina_entrada` e `usina_fundo`):**
 depois da Fase 3, duas cenas emendadas em dois palcos novos (o ginásio de
 Vermilion inteiro e o cais da cidade). O Surge conta a Usina apagada, os Voltorb
 na cidade e o Zapdos sumido; quando ele fala do combate dentro da Usina, a pista
 `zapdos` fecha a quest dele (e o Capítulo 2) e abre a da Erika. No cais, o
 marinheiro vê o jogador (o "!"), vem até ele e conta das correntes; ele abre a
-quest paralela da Usina (azul). **A visita à Usina** é a primeira marca de lugar
-da história no mapa da jornada (`STORY_PLACES` em `data/regionMap.js`): aparece
-enquanto a quest da Usina está ativa, e o painel tem o "Investigar". Lá dentro
-(um terceiro palco, a entrada da Usina do FireRed), as luzes piscam, as paredes
-têm marcas de raio, as correntes se arrastam, um grito elétrico faz tudo tremer, e
-dois Voltorb fecham o corredor estreito para o norte. A quest passa para "Chegue
-ao fundo da Usina", que fecha com a missão do Zapdos (H-6). Na vila, o sábio diz
-que aquilo não é coisa da natureza.
+quest paralela da Usina (azul). Na vila, o sábio diz que aquilo não é coisa da
+natureza.
+
+**A Usina andável** (pedido do Fellipe, maquete "Usina: o fundo"): a primeira marca
+de lugar da história no mapa da jornada (`STORY_PLACES` em `data/regionMap.js`),
+enquanto a quest da Usina está ativa. O "Investigar" leva o jogador para dentro
+da Usina inteira do FireRed (49×40, andável só onde o original deixa), em tela
+cheia, com o rodapé dos controles. Na primeira vez, uma cena curta: as luzes
+piscam, as marcas de raio, as correntes ao fundo. Depois ele explora à vontade:
+- **13 Poké Balls no chão**: 2 no caminho e 11 nas salas que não levam a nada, com
+  6 Revivers e 7 Novos Sorteios (os Revivers nas mais escondidas). Cada uma uma vez
+  por jornada. Nenhuma fica embaixo da camada de cima da parede.
+- **Dois Voltorb** fecham um corredor do salão de cima (e uma sala que só se abre
+  por ali). Parecem Poké Balls, como os Voltorb e Electrode disfarçados de item da
+  Usina do FireRed.
+- **A escotilha** (desenhada em pixel: metal, escada de mão, cantos de aviso) fica
+  na sala do gerador grande, onde o Zapdos fica no FireRed; o caminho mais curto
+  até ela tem 170 passos. A saída é o tapete da entrada.
+
+**O fundo da Usina** (toda vez que o jogador desce): a tela escura, só o jogador
+com um círculo fraco de luz em volta, em degraus de pixel. Dois segundos depois,
+os olhos vermelhos do Zapdos, desenhados em pixel num tile do mapa, por cima do
+escuro (a pista `olhos` fecha "Investigue a Usina" e abre **"Derrote e liberte o
+Zapdos"**). Mais dois segundos e sobe o card, no padrão do card de fase, com a foto
+do Zapdos, o tipo, as fraquezas, as 3 Ultra Balls e o nível recomendado (58).
+"Voltar" devolve o jogador para cima, ao lado da escotilha; "Lutar" espera a luta
+(o molde das missões, H-5, e a do Zapdos, H-6).
 
 ---
 
@@ -531,5 +550,10 @@ que aquilo não é coisa da natureza.
     "ninguém vai buscar sentido entre o barco e que é uma equipe que vem de fora").
     As pistas do Surge e do marinheiro são o combate dentro da Usina e as correntes
     lá dentro, e o jogador pode ir verificar: a Usina vira uma marca no mapa da
-    jornada, com uma visita que mostra os sinais mas não deixa passar. O resgate do
-    Zapdos continua no Capítulo 4.
+    jornada.
+14. **A Usina é andável, e a missão do Zapdos começa nela** (pedido do Fellipe):
+    o jogador explora por conta, acha as Poké Balls e a escotilha, e no fundo, no
+    escuro, os olhos (em pixel, num tile, nada de imagem desfocada) e o card de
+    fase "Derrote e liberte o Zapdos", com a foto dele. O card aparece depois da
+    Fase 3, e a luta pede o nível dela (~58, padrão). A visão da Sabrina no
+    Capítulo 4 passa a apontar para os outros dois pássaros.

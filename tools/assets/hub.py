@@ -377,10 +377,22 @@ def build_vermilion(s):
 
 def build_usina(s):
     """
-    A entrada da Usina (0.39): o canto de baixo, à esquerda, com o tapete da porta e o
-    corredor estreito para o norte (onde os Voltorb fecham a passagem na visita).
+    A Usina inteira (0.39, pedido do Fellipe): o jogador anda pelo labirinto do FireRed,
+    só onde o original deixa, acha as Poké Balls e a escotilha para o fundo.
     """
-    s.stamp(0, 0, PP, 0, 20, 26, 20)
+    s.stamp(0, 0, PP, 0, 0, 49, 40)
+
+
+def build_usina_fundo(s):
+    """
+    O fundo da Usina (0.39): uma sala no escuro, com o chão da Usina. Só o círculo de luz em
+    volta do jogador aparece; lá na frente, os olhos do Zapdos.
+    """
+    s.fill(0, 0, 15, 11, PP, 1, 5)
+    s.block(0, 0, 15, 2)
+    s.block(0, 0, 1, 11)
+    s.block(14, 0, 1, 11)
+    s.block(0, 10, 15, 1)
 
 
 def build_cerulean(s):
@@ -407,7 +419,8 @@ MAPS = {
     'cerulean': (22, 15, build_cerulean),
     'ginasio_vermilion': (11, 21, build_ginasio_vermilion),
     'vermilion': (26, 18, build_vermilion),
-    'usina': (26, 20, build_usina),
+    'usina': (49, 40, build_usina),
+    'usina_fundo': (15, 11, build_usina_fundo),
 }
 SOURCES = [P, V, R, F, CE, FU, IP, DS4, DS1, PH1, PH2, LAB, HOUSE1, WARDEN, COPYCAT, GYM1, GYM2, GYM3, VE, PP]
 
@@ -482,6 +495,68 @@ SPRITES = {
     'item_ball':   ('misc/item_ball', 'npc_white', 16, 16),
     'lapras_doll': ('misc/lapras_doll', 'npc_pink', 32, 32),
 }
+
+
+# os desenhos em pixel que o FireRed não tem (0.39): cada letra é uma cor da paleta
+DRAWN = {
+    # os olhos do Zapdos no escuro: dois olhos bravos, inclinados para dentro
+    'olhos_zapdos': (40, 16, {
+        'D': (110, 0, 0, 255), 'R': (220, 24, 24, 255), 'B': (255, 96, 64, 255), 'C': (255, 236, 170, 255),
+    }, None),
+    # a escotilha de metal com a escada de mão, nas cores da Usina
+    'escotilha': (16, 16, {
+        'K': (70, 70, 86, 255), 'L': (190, 190, 204, 255), 'Y': (232, 192, 64, 255),
+        'X': (16, 16, 24, 255), 'R': (150, 150, 168, 255),
+    }, [
+        '................',
+        '.KKKKKKKKKKKKKK.',
+        '.KYYLLLLLLLLYYK.',
+        '.KYXXXXXXXXXXYK.',
+        '.KLXRXXXXXXRXLK.',
+        '.KLXRRRRRRRRXLK.',
+        '.KLXRXXXXXXRXLK.',
+        '.KLXRXXXXXXRXLK.',
+        '.KLXRRRRRRRRXLK.',
+        '.KLXRXXXXXXRXLK.',
+        '.KLXRXXXXXXRXLK.',
+        '.KLXRRRRRRRRXLK.',
+        '.KYXXXXXXXXXXYK.',
+        '.KYYLLLLLLLLYYK.',
+        '.KKKKKKKKKKKKKK.',
+        '................',
+    ]),
+}
+EYE = [
+    'DDD..........',
+    'DRRRDD.......',
+    '.DRRRRRDD....',
+    '..DRBBBRRRD..',
+    '...DRBCCBRRRD',
+    '.....DDDDDDDD',
+]
+
+
+def _eyes_rows():
+    """Os dois olhos na folha de 40x16: o esquerdo e o direito espelhado, com 2 pixels entre eles."""
+    rows = [['.'] * 40 for _ in range(16)]
+    for j, line in enumerate(EYE):
+        for i, ch in enumerate(line):
+            rows[6 + j][6 + i] = ch
+            rows[6 + j][33 - i] = ch
+    return [''.join(r) for r in rows]
+
+
+def export_drawn(catalog):
+    for key, (w, h, pal, rows) in DRAWN.items():
+        rows = rows or _eyes_rows()
+        image = Image.new('RGBA', (w, h), (0, 0, 0, 0))
+        for y, line in enumerate(rows):
+            for x, ch in enumerate(line):
+                if ch in pal:
+                    image.putpixel((x, y), pal[ch])
+        path = ASSETS / 'npc' / f'{key}.png'
+        image.save(path, optimize=True)
+        catalog[f'npc/{key}'] = {'src': path.relative_to(ROOT).as_posix(), 'frameWidth': w, 'frameHeight': h, 'frames': 1}
 
 
 def export_sprites(decomp, catalog):
@@ -565,6 +640,11 @@ def main():
 
     sprites = {}
     export_sprites(decomp, sprites)
+    export_drawn(sprites)
+    # a Ultra Ball do card das missões de lendário (0.39), dos itens do Pokemon All
+    ball = args.fonte / 'assets' / 'items' / 'default' / 'ultra-ball.png'
+    if ball.exists():
+        Image.open(ball).convert('RGBA').save(ROOT / 'assets' / 'items' / 'ultra-ball.png', optimize=True)
     decor = export_decor(sources)
     write_js(maps, sprites, decor)
     print(f'{len(maps)} mapas, {len(sprites)} folhas e {len(decor)} móveis; catálogo em {HUB_MAPS_JS.relative_to(ROOT).as_posix()}')

@@ -34,7 +34,7 @@ export class Cutscene {
    *                nome; quest(id) abre uma quest; emit(on, target) conta um acontecimento da
    *                história (a pista); onEnd() no fim
    */
-  constructor(hub, def, { id = null, fill = (text) => text, value = () => null, give = null, quest = null, emit = null, onEnd = null } = {}) {
+  constructor(hub, def, { id = null, fill = (text) => text, value = () => null, give = null, quest = null, emit = null, card = null, onEnd = null } = {}) {
     this.hub = hub;
     this.id = id;
     this.band = def.band ?? null;
@@ -43,7 +43,7 @@ export class Cutscene {
     this.t = 0;
     this.local = {};           // o estado do passo atual (o roteiro em si nunca muda)
     this.cast = Object.entries(def.actors ?? {}).map(([actorId, a]) => ({
-      id: actorId, sprite: a.sprite, x: a.x, y: a.y, dir: a.dir ?? 'down', hidden: !!a.hidden,
+      id: actorId, sprite: a.sprite, x: a.x, y: a.y, dir: a.dir ?? 'down', hidden: !!a.hidden, glow: !!a.glow,
       moving: false, steps: 0, prog: 0, walkPath: null, from: null, speed: CONFIG.hub.walkTime
     }));
     this.fx = { emote: null, ball: null, flash: 0, bird: null, cutin: null, fade: 0, camera: null, shake: null };
@@ -54,6 +54,7 @@ export class Cutscene {
     this._give = give;
     this._quest = quest;
     this._emit = emit;
+    this._card = card;
     this._onEnd = onEnd;
   }
 
@@ -194,6 +195,15 @@ export class Cutscene {
         break;
       case 'quest': this._quest?.(a.id); done = true; break;
       case 'emit': this._emit?.(a.on, a.target ?? null); done = true; break;
+      case 'card':
+        // o card de uma missão (data/missions.js): a cena espera o Lutar ou o Voltar
+        if (!local.open) {
+          local.open = true;
+          if (!this._card) { done = true; break; }
+          this._card(a.mission, (choice) => { local.choice = choice; });
+        }
+        done = !!local.choice;
+        break;
       case 'flag': hub._flags()[a.name] = a.value ?? true; done = true; break;
       case 'end':
         this.done = true;
