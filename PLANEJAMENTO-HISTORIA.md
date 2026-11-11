@@ -115,7 +115,7 @@ quando o jogador volta, ou o lugar da fase antes dela.
 | **2 — O céu vazio** | Fases 2 e 3 (Misty, Surge) | **A parte da Misty está feita na 0.39** (proposta "Cerulean: o mar bravo", aprovada inteira pelo Fellipe). Depois da Fase 2, duas cenas: no ginásio, a Misty conta que o mar ficou bravo desde que o Articuno deixou de ser visto sobre as Ilhas Seafoam (a primeira prova de que o sábio tem razão) e aponta o Surge e a Usina, onde o Zapdos aparecia; na rua de Cerulean, a casa assaltada do FireRed: o policial culpa a Equipe Rocket (a pista falsa) e o dono estranha que só levaram peças de máquina (as máquinas dos pássaros, no Capítulo 4); o rival passa correndo, a caminho de Vermilion. Na vila, os moradores culpam a Rocket, e só o velho sábio estranha o ladrão. **A parte do Surge também, na 0.39** (proposta "Vermilion: a Usina apagou", versão 2, com as mudanças do Fellipe: nada chega de barco, ninguém viu clarão). No ginásio, o Surge conta que a Usina apagou, que os Voltorb e os Magnemite invadiram Vermilion e que ninguém vê o Zapdos ("com o Articuno, já são dois"); naquela noite, pareceu haver um combate dentro da Usina, como se o Zapdos estivesse brigando. No cais, um marinheiro, preso em terra pelo mar agitado (o mesmo da Misty), conta que trabalhando pela Rota 10 escutou correntes dentro da Usina fechada: abre a quest paralela **"Investigue a Usina"**, e o "Investigar" (pela marca da Usina no mapa) leva o jogador para dentro da **Usina andável**: ele explora o labirinto do FireRed, pega Poké Balls com Reviver e Novo Sorteio e acha a escotilha da sala do gerador; lá embaixo, no escuro, dois olhos vermelhos e o card **"Derrote e liberte o Zapdos"** (seção 5). | **Zapdos** (a missão na Usina, seção 5.1) |
 | **3 — Os rastros** | Fases 4 a 6 (Erika, Koga, Sabrina) | **Feito na 0.39** (a proposta "Celadon: o emblema", com as decisões do Fellipe, decisão 18, aprovada: "ficou excelente"). A Fase 4 só abre com o Zapdos libertado: o Túnel de Pedra, na Rota 10, está no escuro desde o apagão, e acende quando a luz volta à Usina (padrão). A trava não cita o Zapdos: "O Túnel de Pedra está no escuro desde que a Usina apagou. Ninguém passa." A Fase 4 é a batalha da Erika de sempre. Depois dela, no ginásio, **a cena do emblema** (montada como maquete na página da proposta): a Erika conta da tempestade da noite do apagão e, na lembrança, **uma sombra enorme de asas** cruzando o céu carregando algo pesado (o Crobat do Maxie, sem nome); de manhã, o pedaço de metal no jardim. O jogador reconhece: **é o mesmo emblema da máquina que prendia o Zapdos**. A Erika lembra o esconderijo da Rocket embaixo do Cassino (a pista falsa continua), mas a sombra **seguiu para o sul, rumo ao mar**; ela entrega o Pedaço de Metal e aponta o Koga, também ao sul. **Depois disso, a história dos lendários descansa**: o Koga e a Sabrina são ginásios comuns, só com a quest de cada um (padrão). Saem por enquanto a pena dourada, o vulto de capuz vermelho na Rota 10 e a visão da Sabrina. | — |
 | **4 — O trovão preso** | Fase 6 (Sabrina) | **A rever quando chegar a vez** (decisões 14 e 15: a Usina e a missão do Zapdos vieram para depois da Fase 3, e o jogador pode chegar à Sabrina com o Zapdos preso ou livre). A ideia de antes: a Sabrina vê "três jaulas e um homem olhando para o mar"; agora a visão aponta para os outros dois pássaros. | — |
-| **5 — O gelo** | Fase 7 (Blaine) | A Fase 7 passa pelas Ilhas Seafoam. Depois do Blaine, o Carvalho cruza as anotações e aponta o fundo das ilhas. | **Articuno** |
+| **5 — O gelo** | Fase 7 (Blaine) | **Proposta de 2026-11-11, esperando aprovação** (página "Seafoam: as ondas", seção 5.2). Depois do Blaine, no ginásio dele, os instrumentos do Laboratório Pokémon medem ondas estranhas saindo das Ilhas Seafoam rumo ao sul, e o jogador liga às ondas da máquina da Usina; o mar em volta de Seafoam está congelando, e nenhum barco sai de Cinnabar (a trava da Fase 8). O jogador desce a pé até o fundo e acha o Articuno preso numa máquina coberta de gelo. Na proposta, este capítulo passa a ser o **4, "As ondas"** (o antigo 4 virou parte do 3). | **Articuno** |
 | **6 — O fogo e a suspeita** | Fase 8 (Giovanni) | O jogador chega achando que é a Rocket. O Giovanni olha o emblema e ri: não é da Rocket. A pista leva ao Monte Brasa, na Ilha 1. | **Moltres** |
 | **7 — O sonho** | Liga e Campeão | A Victory Road só abre com os três pássaros de volta (padrão; decisão 2). O rival no fim, e o Hall da Fama. Depois, o Carvalho: as rotas estão mais calmas, mas não como antes: "ainda falta alguma coisa". | — |
 | **8 — O que a lagoa guarda** | late game, depois do Campeão | O velho sábio fala do Pokémon criado pelo homem, na Caverna Desconhecida: o ladrão tentou levá-lo e falhou. O pescador fala da lagoa: a descida, o Kyogre e o **Maxie** (a cena que já existe). O emblema do uniforme dele é o mesmo das máquinas. "A caminho do vulcão!" leva a Hoenn. | **Mewtwo**, **Kyogre** |
@@ -151,7 +151,7 @@ passos:
 | Lendário | Onde (mapa do FireRed) | Abre quando | Nível recomendado (padrão) | O desafio próprio (ideia) |
 |---|---|---|---|---|
 | **Zapdos** | o fundo da Usina (`PowerPlant`), pela escotilha da sala do gerador | o card aparece depois da Fase 3 (a Usina andável) | 36 (enfraquecido pela máquina) | Tempestade: raios marcados no chão antes de cair |
-| **Articuno** | Ilhas Seafoam, o fundo (`SeafoamIslands_B4F`) | depois do Blaine | ~62 | Nevasca: neblina que esconde a horda e chão que desacelera |
+| **Articuno** | Ilhas Seafoam, o fundo (`SeafoamIslands_B4F`), a pé pelos cinco andares | depois do Blaine | 57 (enfraquecido; proposta) | A nevasca: a névoa que esconde a horda e o gelo no chão que desacelera; o Frio Absoluto com o olho da nevasca |
 | **Moltres** | o cume do Monte Brasa, na Ilha 1 (`MtEmber_Summit`) | depois do Giovanni | ~66 | Sol forte: Fogo ×1,5 e Água ×0,5, o contrário do Drizzle |
 | **Mewtwo** | a Caverna Desconhecida (`CeruleanCave_B1F`) | depois do Campeão | ~82 | Psíquico: teletransporte e uma barreira que devolve golpes |
 | **Kyogre** | a lagoa da vila (já existe) | depois do Campeão (padrão), com o Dive | 90 | o Drizzle (já existe) |
@@ -237,6 +237,59 @@ decisões abertas ficaram no padrão, para o Fellipe mudar o que quiser.
 - **A captura do Zapdos é outro momento** (padrão, até o Fellipe decidir): liberado, ele
   entra no sorteio da Poké Ball das fases seguintes (da Fase 7 em diante, com a chance
   baixa de hoje), como na decisão 3 ("se escapar na missão, volta pela Poké Ball").
+
+### 5.2 A missão do Articuno (H-7, proposta de 2026-11-11)
+
+Pedido do Fellipe: "podemos planejar a H-7 agora". A proposta, com as três cenas montadas
+em pixel e as mecânicas da luta em movimento, está na página **"Seafoam: as ondas"**
+(https://claude.ai/artifact/YCgPux377xbGTytGRVUtzU). Esperando aprovação; tudo abaixo é o padrão recomendado.
+
+- **As ondas** (`depois_blaine`, no ginásio de Cinnabar do FireRed, depois da Fase 7): o
+  Blaine conta que os instrumentos do Laboratório Pokémon captam ondas estranhas, que
+  saem das Ilhas Seafoam e seguem para o sul, pelo mar. O jogador lembra da máquina da
+  Usina (o "!"). O mar em volta de Seafoam está congelando, e nenhum barco sai de
+  Cinnabar. Abre a quest dourada "Investigue as Ilhas Seafoam" e a marca de Seafoam no
+  mapa da jornada.
+- **A trava da Fase 8** (a Rota 21 é o mar entre Cinnabar e Pallet): "O mar da Rota 21
+  está congelando, fora de época. Nenhum barco sai de Cinnabar." O botão leva a Seafoam.
+  Não cita o Articuno.
+- **Seafoam a pé**: os cinco andares do FireRed, como a Usina, só por onde o original
+  deixa. Sem Surf e sem empurrar pedra, existe caminho: dois buracos no chão (o jogador
+  cai no andar de baixo, como no FireRed) e duas escadas, 79 passos até a margem do fundo
+  (a Usina tinha 170). As cinco Poké Balls do FireRed ficam alcançáveis, e entram mais três
+  nos becos (Reviver e Novo Sorteio). **Achado técnico:** Seafoam tem patamares em duas
+  alturas (3 e 4), ligados por escadinhas (altura 0). O FireRed só deixa passar de uma
+  altura para a outra por elas; o `hub.py` e a vila hoje só olham a colisão e a água. A
+  vila precisa da regra de altura (o `map.bin` já traz a altura de cada tile), senão o
+  jogador sobe pelas paredes de gelo. O caminho foi medido com essa regra.
+- **O fundo** (`seafoam_fundo`, na primeira vez que o jogador chega à margem): a névoa
+  cobre a água, o zumbido da Usina, as ondas subindo; a névoa se abre e, na ilha do canto
+  (onde o Articuno fica no FireRed), a máquina do emblema vermelho coberta de gelo com uma
+  silhueta de asas presa por correntes. "É o Articuno!" fecha "Investigue as Ilhas
+  Seafoam", abre "Derrote e liberte o Articuno" e sobe o card (Voltar ou Lutar).
+- **A luta** (o molde do Zapdos): preso nos primeiros 45 s com a horda de Seafoam (Seel,
+  Dewgong, Shellder, Cloyster, Slowpoke, Slowbro, Psyduck, Golduck, Zubat e Golbat, níveis
+  52 a 56); as correntes arrebentam. **A nevasca, o tempo todo**: a névoa (o alcance da
+  vista cai de 420 px para 340 abaixo de 50% e 280 na fúria; a horda lá fora vira sombra)
+  e o gelo no chão (os golpes deixam gelo por 8 s; em cima, o treinador anda 40% mais
+  devagar). **Os ataques, com aviso**: Raio de Gelo (a mira tracejada por 1,2 s, o raio e
+  o rastro de gelo), Nevasca (o cone acende no chão por 1,1 s e a rajada passa), o anel de
+  gelo e a horda chamada. **Frio Absoluto** (o golpe exclusivo, aos 66% e aos 33%, e a cada
+  24 s na fúria): ele some na névoa, a geada cobre a arena e só o olho da nevasca fica
+  livre, um círculo que anda devagar com o caminho marcado; fora dele, o frio tira vida e
+  deixa lento; 9 s, e ele mergulha num lugar marcado com o anel de gelo. **Sem captura**;
+  nível 57 (a Fase 7 pede 55, a Fase 8, 60), medido com o jogador automático até 11 de 12.
+- **Depois da luta** (`articuno_livre`, na ilha, sem névoa): ele está caído, treme, vê o
+  jogador, grita e foge pela fenda do teto. A máquina quebrada: "A mesma máquina da Usina,
+  coberta de gelo. O mesmo emblema vermelho." e "Duas máquinas, dois pássaros. Alguém está
+  juntando a energia deles. Para quê?". O aviso: "O mar descongelou: os barcos saem de
+  Cinnabar de novo. O caminho para Viridian está aberto." A Fase 8 abre.
+- **Na volta**: o rapaz da vila comenta o mar; o velho sábio, uma vez: "Duas máquinas...
+  alguém está juntando a força dos pássaros. E ainda falta um." O Articuno passa a cair
+  na Poké Ball das fases seguintes. A quest seguinte é "Vença o Giovanni, em Viridian".
+- **As quests**: depois da Sabrina, "Vença o Blaine, em Cinnabar" e "Ouça o que o Blaine
+  descobriu" (Capítulo 4, "As ondas"); depois, "Investigue as Ilhas Seafoam" e "Derrote e
+  liberte o Articuno", todas douradas.
 
 ---
 
@@ -494,7 +547,9 @@ para o objetivo `scene` das quests. O check-data recusa a caixa com retrato
 | 12 | ~~O estrondo na Usina~~ (saiu: a Usina andável e a missão vieram para depois da Fase 3, decisão 14) | — | — | — |
 | 13 | A jaula do Zapdos: a luta e, depois, a sala com a luz de volta, o Zapdos fugindo assustado e a máquina que sugava a energia dele, com o emblema vermelho (`zapdos_livre`) | o fundo da Usina | 2 (missão) | H-6 ✅ |
 | 14 | O Carvalho e o emblema | laboratório | 3 ou 4 | depois |
-| 15 | A jaula do Articuno | Ilhas Seafoam | 5 (missão) | H-7 |
+| 15a | As ondas: o Blaine e os instrumentos (`depois_blaine`) | ginásio de Cinnabar, depois da Fase 7 | 4 (proposta) | H-7 (proposta) |
+| 15 | O fundo de Seafoam: a máquina no gelo e o card (`seafoam_fundo`) | Ilhas Seafoam, o fundo | 4 (proposta) | H-7 (proposta) |
+| 15b | Depois da luta: o Articuno foge e a segunda máquina (`articuno_livre`) | a ilha do fundo | 4 (proposta) | H-7 (proposta) |
 | 16 | O Giovanni e o emblema | ginásio de Viridian, depois da Fase 8 | 6 | H-8 |
 | 17 | A jaula do Moltres | Monte Brasa | 6 (missão) | H-8 |
 | 18 | A Victory Road se abre | mapa da jornada | 7 | H-9 |
@@ -615,7 +670,8 @@ do Zapdos, o tipo, as fraquezas e o nível recomendado (36; sem captura, decisã
 | **H-4** ✅ 0.39 | Os capítulos 1 a 3: as falas de depois da vitória dos líderes, o velho sábio, os moradores e as quests de cada capítulo. O Capítulo 1 (o Brock e o velho sábio), o Capítulo 2 (a Misty, a casa roubada, os moradores; o Surge, o marinheiro e a Usina andável, com a missão do Zapdos, H-5 e H-6) e o Capítulo 3 (decisão 18): a Fase 4 fechada até a Usina, a cena do emblema com a Erika, e o Koga e a Sabrina como ginásios comuns. |
 | **H-5** ✅ 0.39 | A captura sem lendários e o molde da missão de lendário, tirado do salão do Kyogre: `systems/legendaryFight.js` (a captura, os avisos, os anéis, a leva final), o Kyogre por cima dele sem mudar nada (o mesmo rastro, quadro a quadro), o registro das missões na jornada, a volta pela missão e a regra da Poké Ball para quem tem missão. |
 | **H-6** ✅ 0.39 | O Zapdos (seção 5.1): o Lutar com a transição, a luta no fundo da Usina com ele enfraquecido pela máquina, a tempestade, e a cena de depois, em que ele foge assustado (sem captura, decisão 16). |
-| **H-7 e H-8** | O Articuno e o Moltres, cada um com o seu plano e a sua maquete. |
+| **H-7** (proposta) | O Articuno (seção 5.2, página "Seafoam: as ondas"): a cena do Blaine, a trava da Fase 8, Seafoam a pé com a regra de altura, a luta e as duas cenas da missão. |
+| **H-8** | O Moltres, com o seu plano e a sua maquete. |
 | **H-9** | A Liga com os pássaros e o fim do Capítulo 7 (o rival e o "ainda falta alguma coisa"). |
 | **H-10** | O Mewtwo. |
 | **H-11** | O Kyogre como fecho de Kanto (as quests em volta da cena que já existe, a lagoa depois do Campeão) e o Mew. |
