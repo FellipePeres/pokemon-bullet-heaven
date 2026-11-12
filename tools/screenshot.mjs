@@ -538,6 +538,26 @@ const ROTEIROS = {
     { run: "document.querySelectorAll('#modal-quests .ql-group').forEach((g, i) => { g.open = i === 3; }); document.querySelector('#modal-quests .modal-body').scrollTop = 0" },
     { wait: 500 }, { shot: 'mis-07-recolhidos' }
   ],
+  // as recompensas das quests (H-12): a comemoração com o que veio, o toast, e a tela de Missões
+  // com a prometida (no card de agora) e as recebidas (no diário)
+  recompensas: [
+    { open: 'index.html' }, { wait: 500 },
+    { run: "game.newGame(); game.chooseTrainer('leaf'); game.chooseName('Fellipe')" }, { wait: 1800 },
+    { run: "game.storyEvent('talk', 'mae')" }, { wait: 450 }, { shot: 'rec-01-a-comemoracao' },
+    { wait: 2200 }, { run: "game.menus.showModal('modal-quests')" }, { wait: 900 }, { shot: 'rec-02-a-tela' },
+    { run: "game.menus.closeModal(); game.chooseStarter('charmander');" +
+           "game.region.campaign.forEach((e) => { if (e.stage && !game.campaign.clearedStages.includes(e.stage) && e.stage !== 'champion') game.campaign.clearedStages.push(e.stage); });" +
+           "game.campaign.clearedStages.push('zapdos', 'articuno', 'moltres');" +
+           "const done = ['p_mae', 'p_lab', 'p_carvalho', 'p_mapa', 'c1_brock', 'c2_misty', 'c2_surge', 'z_usina', 'z_zapdos', 'c3_erika', 'c3_koga', 'c3_sabrina'," +
+           " 'c4_blaine', 'c4_seafoam', 'c4_articuno', 'c5_giovanni', 'c5_brasa', 'c5_moltres', 'c6_liga', 'c6_e4', 'c7_liga'];" +
+           "const st = game.quests.state; st.done = {}; st.progress = {};" +
+           "done.forEach((id, i) => { st.done[id] = { at: new Date(2026, 10, 1 + Math.floor(i * 0.5), 20, i).toISOString(), paid: true }; });" +
+           "st.active = ['c7_campeao']; st.seen = done.slice(); game.campaign.keyItems = { emblema_vermelho: 1 };" +
+           "document.getElementById('toast-container').style.display = 'none'; game.openCampaign()" },
+    { wait: 1400 }, { run: "game.menus.showModal('modal-quests')" }, { wait: 1000 }, { shot: 'rec-03-o-campeao' },
+    { run: "document.querySelectorAll('#modal-quests .ql-group').forEach((g, i) => { g.open = i >= 5; }); document.querySelector('#modal-quests .modal-body').scrollTop = 330" },
+    { wait: 500 }, { shot: 'rec-04-os-lendarios' }
+  ],
   // a melhoria de UX da 0.31: o card de escolha (o inicial e a Poké Ball) e o painel da fase
   ux: [
     { open: 'index.html' }, { wait: 500 },

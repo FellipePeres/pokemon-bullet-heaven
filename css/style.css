@@ -2381,7 +2381,7 @@ button { font: inherit; color: inherit; }
 .lobby-quest { top: 0; right: 0; width: 200px; padding: 0 6px 2px; filter: drop-shadow(0 3px 5px rgba(0, 0, 0, .25)); }
 .lobby-quest .quest-title { font-size: 11px; }
 .lobby-quest .quest-obj { font-size: 15px; }
-.lobby-quest .quest-done-tag { font-size: 13px; }
+.lobby-quest .quest-done-tag, .lobby-quest .quest-reward { font-size: 13px; }
 .quest-item + .quest-item { margin-top: 6px; padding-top: 6px; border-top: 2px dashed var(--gba-shade); }
 .quest-title {
   display: flex;
@@ -2409,12 +2409,15 @@ button { font: inherit; color: inherit; }
 .quest-obj b { flex: none; font-weight: 700; color: var(--gba-ink-soft); }
 .quest-obj.met, .quest-obj.met b { color: #2f9e4f; }
 .quest-done-tag { margin: 4px 0 0; font-size: 14px; font-weight: 700; color: #2f9e4f; animation: quest-pop .3s steps(3); }
+/* (H-12) o que a quest deu, embaixo do "Missão concluída!" */
+.quest-reward { margin: 1px 0 0; font-size: 14px; font-weight: 700; color: #a8760c; animation: quest-pop .3s steps(3); }
 .quest-item.enter { animation: quest-in .35s steps(5); }
 @keyframes quest-in { from { transform: translateX(26px); opacity: 0; } }
 @keyframes quest-pop { from { transform: scale(.6); opacity: 0; } }
 /* recolhido: só a linha do capítulo da quest de história */
 .quest-tracker.collapsed .quest-obj,
 .quest-tracker.collapsed .quest-done-tag,
+.quest-tracker.collapsed .quest-reward,
 .quest-tracker.collapsed .quest-item.more { display: none; }
 .quest-tracker.collapsed .quest-title::after { content: '+'; margin-left: auto; font-size: 16px; }
 /* ===================== A TELA DE MISSÕES (H-3) ===================== */
@@ -2458,6 +2461,9 @@ button { font: inherit; color: inherit; }
 .ql-objs li { display: flex; justify-content: space-between; gap: 12px; font-size: 17px; font-weight: 600; line-height: 1.35; }
 .ql-objs li b { flex: none; color: var(--gba-ink-soft); }
 .ql-objs li.met, .ql-objs li.met b { color: #2f9e4f; }
+/* (H-12) a recompensa: a prometida no card de agora; a recebida, verde, no que já aconteceu */
+.ql-reward { margin: 6px 0 0; font-size: 15px; font-weight: 700; color: #a8760c; }
+.ql-reward.got { margin-top: 2px; font-size: 14px; color: #2f9e4f; }
 /* o que já aconteceu: um grupo por capítulo, que abre e fecha */
 .ql-group { border-top: 3px dotted var(--gba-shade); }
 .ql-group-title {

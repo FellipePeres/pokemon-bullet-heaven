@@ -25,7 +25,10 @@
  *   openedBy    a cena que abre esta quest (0.39, o passo `quest`): quando a anterior
  *               fecha, ela espera a cena (o Brock pede a ajuda e só então ela aparece).
  *               Na jornada de antes das cenas, que nunca vai ver a cena, ela abre direto
- *   reward      vazio por enquanto (as recompensas vêm no fim, pedido do Fellipe)
+ *   reward      o que a quest dá quando fecha (H-12): { shards?, items?: { id: n } }. Os itens são
+ *               os da mochila do Poké Mart (data/items.js, `kind: 'bag'`): o Novo Sorteio e o
+ *               Reviver. Paga uma vez por jornada, também quando ela fecha em silêncio (o doneIf:
+ *               a jornada fez aquilo, só não viu a comemoração)
  *
  * A primeira quest de uma jornada nova é FIRST_QUEST. O check-data confere que
  * cada `next`, cada fala, cada lugar e cada fase citados existem.
@@ -56,7 +59,7 @@ export const QUESTS = {
     objectives: [{ text: 'Fale com a mãe', on: 'talk', target: 'mae' }],
     doneIf: { starter: true },
     next: ['p_lab'],
-    reward: null
+    reward: { shards: 25 }
   },
   p_lab: {
     kind: 'story', chapter: 'prologo',
@@ -64,7 +67,7 @@ export const QUESTS = {
     objectives: [{ text: 'Vá ao laboratório do Prof. Carvalho', on: 'enter', target: 'lab' }],
     doneIf: { starter: true },
     next: ['p_carvalho'],
-    reward: null
+    reward: { shards: 25 }
   },
   p_carvalho: {
     kind: 'story', chapter: 'prologo',
@@ -73,7 +76,7 @@ export const QUESTS = {
     objectives: [{ text: 'Fale com o Prof. Carvalho', on: 'talk', target: 'carvalho_inicial' }],
     doneIf: { starter: true },
     next: ['p_mapa'],
-    reward: null
+    reward: { items: { reroll: 1 } }
   },
   p_mapa: {
     kind: 'story', chapter: 'prologo',
@@ -81,7 +84,7 @@ export const QUESTS = {
     objectives: [{ text: 'Abra o Mapa da Jornada', on: 'map' }],
     doneIf: { mapSeen: true },
     next: ['c1_brock'],
-    reward: null
+    reward: { shards: 50 }
   },
 
   /* ========================== Capítulo 1: as rotas tomadas ========================== */
@@ -91,7 +94,7 @@ export const QUESTS = {
     objectives: [{ text: 'Vença o Brock, em Pewter', on: 'win', target: 'gym_1_pewter' }],
     doneIf: { cleared: 'gym_1_pewter' },
     next: ['c2_misty'],
-    reward: null
+    reward: { shards: 100 }
   },
 
   /* ========================== Capítulo 2: o céu vazio ========================== */
@@ -110,7 +113,7 @@ export const QUESTS = {
     doneIf: { cleared: 'gym_3_vermilion' },
     openedBy: 'depois_brock',
     next: ['c2_surge'],
-    reward: null
+    reward: { shards: 150 }
   },
   // a Misty aponta o caminho (data/cutscenes.js, depois_misty): o Surge, a Usina e o Zapdos
   c2_surge: {
@@ -125,7 +128,7 @@ export const QUESTS = {
     // a da Erika segue a história; a da Usina, paralela, quem abre é o marinheiro
     // a Fase 4 está fechada (decisão 18): o caminho segue pela Usina, que o marinheiro abre
     next: ['z_usina'],
-    reward: null
+    reward: { shards: 150 }
   },
 
   /* ========================== Capítulo 3: os rastros ========================== */
@@ -139,7 +142,7 @@ export const QUESTS = {
       { text: 'Descubra o que a Erika encontrou no jardim', on: 'clue', target: 'emblema' }
     ],
     next: ['c3_koga'],
-    reward: null
+    reward: { shards: 150 }
   },
   // depois da Erika, a história dos lendários descansa (decisão 18): os ginásios seguem
   c3_koga: {
@@ -147,14 +150,14 @@ export const QUESTS = {
     desc: 'A Erika achou no jardim um pedaço de metal com o mesmo emblema da máquina da Usina. Na noite do apagão, ela viu uma sombra de asas seguir para o sul. O próximo ginásio é o do Koga, em Fuchsia, também ao sul.',
     objectives: [{ text: 'Vença o Koga, em Fuchsia', on: 'win', target: 'gym_5_fuchsia', doneIf: { cleared: 'gym_5_fuchsia' } }],
     next: ['c3_sabrina'],
-    reward: null
+    reward: { shards: 150 }
   },
   c3_sabrina: {
     kind: 'story', chapter: 'cap3',
     desc: 'O Koga caiu. O próximo ginásio é o da Sabrina, em Saffron.',
     objectives: [{ text: 'Vença a Sabrina, em Saffron', on: 'win', target: 'gym_6_saffron', doneIf: { cleared: 'gym_6_saffron' } }],
     next: ['c4_blaine'],
-    reward: null
+    reward: { shards: 150 }
   },
 
   /* ========================== Capítulo 4: as ondas (H-7) ========================== */
@@ -169,7 +172,7 @@ export const QUESTS = {
       { text: 'Ouça o que o Blaine descobriu', on: 'clue', target: 'ondas' }
     ],
     next: ['c4_seafoam'],
-    reward: null
+    reward: { shards: 200 }
   },
   // a visita é pela marca das Ilhas Seafoam no mapa da jornada (data/regionMap.js, STORY_PLACES)
   c4_seafoam: {
@@ -178,7 +181,7 @@ export const QUESTS = {
     // fecha na margem do fundo, quando a névoa se abre (data/cutscenes.js, seafoam_fundo)
     objectives: [{ text: 'Investigue as Ilhas Seafoam', on: 'clue', target: 'articuno_preso' }],
     next: ['c4_articuno'],
-    reward: null
+    reward: { shards: 200 }
   },
   c4_articuno: {
     kind: 'story', chapter: 'cap4',
@@ -186,7 +189,7 @@ export const QUESTS = {
     // fecha com a luta vencida (a fase `articuno`): derrotado, ele foge (sem captura)
     objectives: [{ text: 'Derrote e liberte o Articuno', on: 'win', target: 'articuno' }],
     next: ['c5_giovanni'],
-    reward: null
+    reward: { shards: 300, items: { revive: 1 } }
   },
 
   /* ========================== Capítulo 5: a suspeita ========================== */
@@ -200,7 +203,7 @@ export const QUESTS = {
       { text: 'Mostre o Pedaço de Metal ao Giovanni', on: 'clue', target: 'monte_brasa' }
     ],
     next: ['c5_brasa'],
-    reward: null
+    reward: { shards: 200 }
   },
   // a proposta "Monte Brasa: o fogo" (PLANEJAMENTO-HISTORIA.md seção 5.3): a visita é pela marca da
   // Ilha 1 na borda do mapa da jornada (data/regionMap.js, STORY_PLACES)
@@ -210,7 +213,7 @@ export const QUESTS = {
     // fecha no alto do cume (data/cutscenes.js, brasa_cume)
     objectives: [{ text: 'Investigue o Monte Brasa, na Ilha 1', on: 'clue', target: 'moltres_preso' }],
     next: ['c5_moltres'],
-    reward: null
+    reward: { shards: 200 }
   },
   c5_moltres: {
     kind: 'story', chapter: 'cap5',
@@ -218,7 +221,7 @@ export const QUESTS = {
     // fecha com a luta vencida (a fase `moltres`): derrotado, ele foge (sem captura)
     objectives: [{ text: 'Derrote e liberte o Moltres', on: 'win', target: 'moltres' }],
     next: ['c6_liga'],
-    reward: null
+    reward: { shards: 300, items: { revive: 1 } }
   },
 
   /* ========================== Capítulo 6: a Elite dos Quatro ========================== */
@@ -230,7 +233,7 @@ export const QUESTS = {
     // (H-9) fecha na cena da porta da Victory Road (o Jogar da Lorelei), onde a Liga está vazia
     objectives: [{ text: 'Siga pela Victory Road até a Liga Pokémon', on: 'scene', target: 'victory_road' }],
     next: ['c6_e4'],
-    reward: null
+    reward: { shards: 200 }
   },
   // o bilhete do Lance (H-9): a quest dourada até a cena do subsolo da Mansão (sem citar quem os prendeu)
   c6_e4: {
@@ -238,14 +241,14 @@ export const QUESTS = {
     desc: 'A Elite dos Quatro desceu junta atrás de quem prende Pokémon fortes, e não voltou. O bilhete do Lance fala da velha Mansão de Cinnabar.',
     objectives: [{ text: 'Ajude a Elite dos Quatro', on: 'scene', target: 'mansao_lab' }],
     next: ['c7_liga'],
-    reward: null
+    reward: { shards: 400, items: { reroll: 2 } }
   },
   c7_liga: {
     kind: 'story', chapter: 'cap7',
     desc: 'A Elite dos Quatro voltou para a Liga e espera você, sem pegar leve.',
     objectives: [{ text: 'Vença a Elite dos Quatro', on: 'win', target: 'e4_lance', doneIf: { cleared: 'e4_lance' } }],
     next: ['c7_campeao'],
-    reward: null
+    reward: { shards: 400 }
   },
   // (H-10) o rival chegou antes: a porta do Campeão
   c7_campeao: {
@@ -253,7 +256,7 @@ export const QUESTS = {
     desc: 'O Lance avisou: ainda há uma porta, e alguém chegou lá antes de você.',
     objectives: [{ text: 'Vença o Campeão', on: 'win', target: 'champion', doneIf: { cleared: 'champion' } }],
     next: ['c7_carvalho'],
-    reward: null
+    reward: { shards: 500, items: { revive: 1 } }
   },
   // (H-11) o aviso do Mew: o próximo da lista do Maxie dorme no fundo da lagoa da vila. Fecha com a
   // captura do Kyogre, no salão (a luta que já existia desde a 0.37)
@@ -262,14 +265,14 @@ export const QUESTS = {
     desc: 'O Mew avisou: o próximo da lista do Maxie dorme no fundo da lagoa da vila. Para descer, só com um Pokémon que saiba mergulhar.',
     objectives: [{ text: 'Descubra o que a lagoa guarda', on: 'capture', target: 'kyogre', doneIf: { kyogre: true } }],
     next: [],
-    reward: null
+    reward: { shards: 1000, items: { revive: 1 } }
   },
   c7_carvalho: {
     kind: 'story', chapter: 'cap7',
     desc: 'Você é o Campeão de Kanto. O Prof. Carvalho pediu: "volte e me conte".',
     objectives: [{ text: 'Conte ao Prof. Carvalho', on: 'scene', target: 'carvalho_mew' }],
     next: ['c8_lagoa'],
-    reward: null
+    reward: { shards: 300 }
   },
 
   /* ========================== a Usina (a missão do Zapdos) ========================== */
@@ -283,7 +286,7 @@ export const QUESTS = {
     objectives: [{ text: 'Investigue a Usina, na Rota 10', on: 'clue', target: 'olhos' }],
     openedBy: 'vermilion_correntes',
     next: ['z_zapdos'],
-    reward: null
+    reward: { shards: 150 }
   },
   z_zapdos: {
     kind: 'story', chapter: 'cap2',
@@ -291,7 +294,7 @@ export const QUESTS = {
     // fecha com a luta vencida (a fase `zapdos`, H-6): derrotado, ele foge (sem captura)
     objectives: [{ text: 'Derrote e liberte o Zapdos', on: 'win', target: 'zapdos' }],
     next: ['c3_erika'],
-    reward: null
+    reward: { shards: 300, items: { revive: 1 } }
   }
 };
 

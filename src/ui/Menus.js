@@ -152,7 +152,11 @@ export class Menus {
     if (this.openModal === 'modal-pc' || !el('modal-pc').classList.contains('hidden')) this.pcScreen.close();
     for (const id of MODALS) hide(el(id));
     this.openModal = null;
-    // o que a janela mudou (Shards, PC, conquistas) aparece na barra do lobby e na da vila
+    this.refreshBars();
+  }
+
+  /** O que mudou (Shards, PC, conquistas) aparece na barra do lobby e na da vila. */
+  refreshBars() {
     if (!el('screen-campaign').classList.contains('hidden')) this.lobby.render();
     if (!el('screen-hub').classList.contains('hidden')) this.game.hubHud?.render();
   }

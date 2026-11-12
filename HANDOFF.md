@@ -1134,6 +1134,25 @@ Nunca voltar bônus globais para o pool de level up — foi pedido explícito.
   meio, a derrota, a vitória, a cena de depois, a vila) e o `check-data` (o caminho a pé com os pulos,
   as bolas, os enfeites com `cells`). O roteiro de screenshots é `moltres`.
 
+### As recompensas das quests (H-12, 0.39 na branch)
+- Pedido do Fellipe: "pode fazer tudo o que falta" (as recompensas ficaram para o final, pedido dele
+  desde a H-1). Os valores são o padrão (decisão 26; a tabela está na seção 7.1 do
+  PLANEJAMENTO-HISTORIA): Shards em todas as 24 quests, crescendo por capítulo (25 a 1.000; 5.600 no
+  total), e Revivers e Novos Sorteios nas missões dos lendários, na Mansão, no Campeão e no Kyogre.
+- **Os dados**: `reward: { shards?, items?: { reroll: n, revive: n } }` em `data/quests.js`. Os itens
+  são os da mochila do Poké Mart (`kind: 'bag'`). O `check-data` recusa quest sem recompensa, Shards
+  que não são inteiros positivos e itens que não vão para a mochila.
+- **O pagamento**: o `QuestSystem` chama `onComplete(id, silent)` quando a quest fecha (uma vez:
+  `done[id].paid`), também no silêncio do `doneIf`; o `Game.payQuestReward` põe os Shards no perfil
+  (`addShards`, que conta para a conquista Fortuna) e os itens na mochila (`giveItem`), mostra o
+  toast "Recompensa: ..." e atualiza o contador das barras (`Menus.refreshBars`).
+- **Na tela**: a comemoração do rastreador ganhou a linha "+300 Shards · Reviver"; a tela de Missões
+  mostra "Recompensa: ..." no card de agora e "✓ Recebido: ..." no fim de cada entrada do diário
+  (as quests fechadas antes da H-12 ficam sem, porque fecharam sem pagar).
+- **Os testes**: o `ui-smoke` (a recompensa no card, os 25 Shards da mãe com a comemoração, o
+  "Recebido" no diário; o pagamento em silêncio, uma vez só; o texto da recompensa). O roteiro de
+  screenshots é `recompensas`.
+
 ### O Capítulo 8: a lagoa e o Kyogre (H-11, 0.39 na branch)
 - Pedido do Fellipe: "pode fazer o faltante então" (a descida do Dive, o salão e a luta do Kyogre e
   a cena do Maxie já existiam desde a 0.36 e a 0.37; faltava ligar à história). Sem cena nova.
@@ -1732,6 +1751,7 @@ o Brock como está, todas as outras mais duras, menos níveis.
 | 76 | o refino da história: "essas maquinas que prendem os lendários sugam a energia deles" e mandam em ondas para um lugar misterioso, onde uma máquina central numa base do Maxie desorienta os Pokémon (ideia de End Game); o Zapdos enfraquecido explica a vitória de um jogador de nível baixo; "ao derrotar o Zapdos, rola uma cutscene do Zapdos voando e fugindo, assustado", sem captura por enquanto | 0.39 (na branch): a luta sem captura e de nível 36 (medida: 11 de 12 no 36), a energia escorrendo pelas correntes, a cena com o Zapdos do FireRed caído que foge pelo alto (os passos `cry`, `tremble` e `fly`) e a pista da energia mandada para longe; o card "Sem captura nesta luta" |
 | 77 | "A fase da Erika é barrada, o jogador precisa passar do Zapdos para liberar a Erika, o emblema pode ser visto outra vez e o jogador faz ligação que era o mesmo da máquina"; "não pode ter spoilers no título das fases ou quests"; a cena do emblema "montada já no artifact" e "um bate papo simples dando indícios da continuação"; "ficou excelente" | 0.39 (na branch): a trava da Fase 4 (`lock`, o Túnel de Pedra no escuro, sem o nome do Zapdos), as quests douradas da Usina, a do Koga e a da Sabrina, o palco do ginásio de Celadon com a Erika, a cena `depois_erika` (a lembrança com a sombra de asas, o pedaço de metal, o emblema reconhecido, as pistas: a Rocket no Cassino, a sombra para o sul) e os passos `toast`, `storm` e `item` |
 | 78 | "vamos para o H-3" | 0.39 (na branch): a tela de Missões (seção 7.3 do PLANEJAMENTO-HISTORIA): o Diário nas duas barras com o pontinho de quest nova, o que fazer agora, o diário por capítulo com as datas e os itens importantes; nenhuma quest futura aparece |
+| 87 | "pode fazer tudo o que falta, ai vamos dar um check se acabamos tudo" | 0.39 (na branch): a H-12, as recompensas das quests (decisão 26): Shards por capítulo e Revivers e Novos Sorteios nos lendários e no fim, na comemoração, num toast e na tela de Missões. Fora da branch, na `main` (0.37.10): o card do Kyogre do salão, cujo banner sumia |
 | 86 | "capturas de lendários liberam depois da cena que salva a E4 ... só muda a regra mesmo"; "me mostra a taxa de captura de hoje de um lendário em relação aos demais pokemons nas fases da E4 + Campeão"; "pode fazer todo o resto que falta" | 0.39 (na branch): a captura abre com a cena do subsolo da Mansão (decisão 25); a taxa medida (5% a 12% por Poké Ball na Liga, contra ~2,9% de uma espécie comum em média); a H-11: a quest da lagoa, o pescador, o Maxie no segundo encontro e a vila depois do Kyogre |
 | 85 | "top, tudo aprovado" (a proposta "O sonho da Liga") | 0.39 (na branch): o Capítulo 7: as falas da Elite dos Quatro depois de cada vitória, o rival Campeão (antes e depois da batalha), o Carvalho e o Mew por telepatia no laboratório, as quests do capítulo e a captura dos lendários aberta pelo Campeão |
 | 84 | "bora para o próximo passo que é H-10 e só um detalhe, para não ter como pular uma parte da história, vamos só liberar o TM Dive quando o jogador for campeão da E4"; a nota dele no HANDOFF sobre os lendários nas Poké Balls depois do Campeão | 0.39 (na branch): a TM Dive só aparece no Poké Mart depois do Campeão (`Game.isChampion`, `martTargets`); a proposta da H-10, "O sonho da Liga" (seção 5.5 do PLANEJAMENTO-HISTORIA), com a captura aberta pelo Campeão |
@@ -2063,11 +2083,12 @@ O que está planejado:
   branch** (a tela de Missões, os Capítulos 1 a 3, o molde das missões, a missão do
   Zapdos, o Capítulo 4 com a do Articuno, o 5 com a do Moltres, o 6, a Elite dos
   Quatro e a base na Mansão, o 7, a Liga, o rival Campeão e o Mew, e o 8, a lagoa e o
-  Kyogre). Falta só a H-12: as recompensas das quests.
-  **A captura dos lendários está fechada** (decisão 20, 2026-11-12): nenhum lendário
-  aparece na Poké Ball, nem depois de liberado (`LEGENDARY_CAPTURE.open` em
-  `data/legendaries.js`). A regra da H-5 (o liberado volta à Poké Ball das fases
-  seguintes) fica guardada no `CaptureSystem.rollLegendary` para quando a história abrir.
+  Kyogre) **e a H-12** (as recompensas das quests). **A história de Kanto está completa na
+  branch**; sobe inteira, com o jogo recomeçando do zero (decisão 17).
+  **A captura dos lendários abre com a cena que salva a Elite dos Quatro** (decisão 25): antes
+  dela, nenhum lendário aparece na Poké Ball, nem depois de liberado; depois, a regra da H-5 (o
+  liberado volta à Poké Ball das fases seguintes) vale (`Game.legendsOpen`, a partida recebe
+  `legendsOpen`; `LEGENDARY_CAPTURE.open` em `data/legendaries.js` continua `false`).
   **A história inteira** está no [HISTORIA.md](HISTORIA.md), com a ideia da emboscada do
   Maxie no Mewtwo (seção 8.1).
 - **O Level Cap** (pedido do Fellipe em 2026-11-11, só no planejamento por enquanto:

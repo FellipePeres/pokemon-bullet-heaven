@@ -218,6 +218,8 @@ check('a tela de Missões abre com a quest de agora: o capítulo, o tipo, a desc
       && ['Agora', 'Prólogo', 'História', 'A mãe está lá embaixo', 'Fale com a mãe', '0/1'].every((t) => textIn(questLog()).includes(t)),
       textIn(questLog()));
 check('...com o resumo em cima', registry.get('quests-sub').textContent.startsWith('Uma missão em andamento'), registry.get('quests-sub').textContent);
+check('...e a recompensa no card (H-12): "Recompensa: 25 Shards"', byClass(questLog(), 'ql-reward').length === 1
+      && byClass(questLog(), 'ql-reward')[0]._text === 'Recompensa: 25 Shards', textIn(questLog()));
 check('...e nada do que vem depois: nem o diário, nem os itens, nem a quest seguinte (sem spoiler)',
       !textIn(questLog()).includes('O que já aconteceu') && !textIn(questLog()).includes('Itens importantes')
       && !textIn(questLog()).includes('Prof. Carvalho passou cedinho') && !textIn(questLog()).includes('laboratório'));
@@ -251,7 +253,11 @@ check('a quest só fecha quando a conversa acaba', game.quests.isActive('p_mae')
   const instant = global.setTimeout;
   let later = null;
   global.setTimeout = (fn) => { later = fn; return 1; };
+  const shardsBefore = game.profile.shards ?? 0;
   closeDialog();
+  check('a recompensa da quest (H-12): +25 Shards no perfil, e a comemoração mostra o que veio',
+        game.profile.shards === shardsBefore + 25 && questBox().innerHTML.includes('+25 Shards')
+        && game.quests.state.done.p_mae?.paid === true, `${shardsBefore} → ${game.profile.shards}`);
   check('falou com a mãe: o ✓, o "Missão concluída!" e a próxima é ir ao laboratório',
         game.quests.isDone('p_mae') && game.quests.isActive('p_lab')
         && questBox().innerHTML.includes('Missão concluída!') && questBox().innerHTML.includes('✓ Fale com a mãe')
@@ -270,6 +276,9 @@ check('a quest só fecha quando a conversa acaba', game.quests.isActive('p_mae')
         && byClass(questLog(), 'ql-group').length === 1 && byClass(questLog(), 'ql-group-title')[0]._text === 'Prólogo'
         && byClass(questLog(), 'ql-entry').length === 1 && textIn(byClass(questLog(), 'ql-entry')[0]).includes('Fale com a mãe')
         && byClass(questLog(), 'ql-date').length === 1);
+  check('...com a recompensa recebida no diário e a prometida no card de agora',
+        textIn(byClass(questLog(), 'ql-entry')[0]).includes('✓ Recebido: 25 Shards')
+        && textIn(byClass(questLog(), 'ql-card')[0]).includes('Recompensa: 25 Shards'), textIn(questLog()));
   game.menus.closeModal();
   check('...e o pontinho apaga de novo', !questsDot());
 }
@@ -1789,6 +1798,8 @@ check('depois da escolha, o Continuar segue para a jornada (na vila); sem nome, 
   const journey = game.campaign.journey;
   journey.pc = [...(journey.pc ?? []), { uid: 'mart-eevee', pokemonId: 'eevee', level: 30, xp: 0, hp: 50, abilities: ['quick_attack'], upgrades: {} }];
   game.profile.shards = 0;
+  // (H-12) as recompensas das quests já puseram Revivers e Novos Sorteios na mochila: a conta começa do zero
+  game.profile.bag = {};
   game.menus.showModal('modal-mart');
   check('o Poké Mart abre com os itens', !registry.get('modal-mart').classes.has('hidden') && registry.get('mart-list').children.length === 9);
   check('sem Shards, não compra', game.buyMartItem('revive') === false && (game.profile.bag.revive ?? 0) === 0);
@@ -2379,6 +2390,35 @@ game.quitToMenu();
   qb.sync();
   check('sem o inicial, a jornada fica no começo do prólogo', qb.isActive('p_mae') && qb.tracked()[0]?.objectives[0].text === 'Fale com a mãe');
   check('evento de outro alvo não conta', !qb.notify('talk', 'tv').length && qb.isActive('p_mae'));
+}
+
+// ---- as recompensas das quests (H-12): uma vez por quest e jornada, também em silêncio ----
+{
+  const { QuestSystem } = await import('../src/systems/QuestSystem.js');
+  const { QUESTS } = await import('../src/data/quests.js');
+  const { rewardText } = await import('../src/ui/questLog.js');
+  check('toda quest tem recompensa', Object.values(QUESTS).every((q) => q.reward && (q.reward.shards || Object.keys(q.reward.items ?? {}).length)));
+  check('o texto da recompensa: os Shards e os itens com o nome do Poké Mart',
+        rewardText(QUESTS.c6_e4.reward) === '400 Shards · 2× Novo Sorteio' && rewardText(QUESTS.z_zapdos.reward) === '300 Shards · Reviver'
+        && rewardText(QUESTS.p_carvalho.reward) === 'Novo Sorteio' && rewardText(null) === '');
+  const paid = [];
+  const campaign = { starter: 'squirtle', clearedStages: ['gym_1_pewter'], hub: { flags: { mapa_visto: true } } };
+  const q = new QuestSystem({
+    campaign: () => campaign,
+    context: () => ({ starter: true, mapSeen: true, cleared: campaign.clearedStages }),
+    onComplete: (id, silent) => paid.push([id, silent])
+  });
+  q.sync();
+  check('as que fecham em silêncio (o doneIf) também pagam: a jornada fez aquilo',
+        ['p_mae', 'p_lab', 'p_carvalho', 'p_mapa', 'c1_brock'].every((id) => paid.some(([pid, silent]) => pid === id && silent)) && paid.length === 5,
+        paid.map(([id]) => id).join(', '));
+  q.sync();
+  q.notify('win', 'gym_1_pewter');
+  check('...e uma vez só: sincronizar de novo ou repetir o evento não paga outra vez', paid.length === 5);
+  check('...e o diário sabe que foi pago', q.view('c1_brock').paid && q.view('c1_brock').reward?.shards === 100);
+  const old = { starter: 'squirtle', clearedStages: [], hub: { flags: {} }, quests: { active: ['p_mapa'], progress: {}, done: { p_mae: { at: '2026-01-01T00:00:00Z' } }, seen: [] } };
+  const qo = new QuestSystem({ campaign: () => old, context: () => ({ starter: true }) });
+  check('a quest fechada antes da H-12 não diz "Recebido" (ela fechou sem)', !qo.view('p_mae').paid);
 }
 
 console.log(`\n=== ${failures === 0 ? 'TUDO OK' : failures + ' FALHA(S)'} ===\n`);

@@ -13,8 +13,9 @@
 > ideias"): todo "**padrão**" deste texto virou decisão (seção 12). Ele também
 > acrescentou uma regra para a captura dos lendários (seção 6). **A H-1 está no
 > jogo desde a 0.38**: as quests, o rastreador e o prólogo, do quarto ao Brock. **Da H-2
-> à H-7, prontas na branch (0.39)**, sem push até a H-12; a última foi a missão do
-> Articuno e o Capítulo 4 (seção 5.2), em 2026-11-12.
+> à H-12, prontas na branch (0.39)**: a história de Kanto inteira, do quarto ao Kyogre, com as
+> recompensas das quests (a H-12, a última, em 2026-11-12). Sobe toda de uma vez, com o jogo
+> recomeçando do zero (decisão 17).
 >
 > **A história inteira, em texto corrido** (o que acontece e por quê, capítulo por capítulo, as
 > pistas e as ideias em aberto), está no [HISTORIA.md](HISTORIA.md). Este arquivo é como ela
@@ -524,8 +525,36 @@ As **conquistas continuam**: são do jogador e valem em todas as jornadas. As
 | **Lendário** | azul | a missão de cada lendário. Aparece quando a história chega lá e fica aberta junto da de história. |
 | **Secundária** | branca | pedidos dos moradores, coisas pequenas. Fica para depois da primeira leva. |
 
-**As recompensas ficam para o final** (pedido do Fellipe). O campo `reward` já
-nasce nos dados, vazio.
+**As recompensas (H-12, decisão 26).** Ficaram para o final (pedido do Fellipe). Cada quest dá
+Shards e, nas missões dos lendários e no fim, itens da mochila do Poké Mart (o Reviver, 600, e o
+Novo Sorteio, 300). Os Shards crescem por capítulo, na escala das fases (o ginásio dá 100 na
+primeira vitória; a Liga, 150; o Campeão, 300). A tela de missões mostra a recompensa no card de
+agora e o "✓ Recebido" no diário; a comemoração do rastreador e um toast dizem o que veio.
+
+| Quest | Recompensa |
+|---|---|
+| Prólogo: Fale com a mãe · Vá ao laboratório | 25 Shards cada |
+| Prólogo: Fale com o Prof. Carvalho | 1 Novo Sorteio (a mochila aparece cedo) |
+| Prólogo: Abra o Mapa da Jornada | 50 Shards |
+| Capítulo 1: o Brock | 100 Shards |
+| Capítulo 2: a Misty, o Surge, a Usina | 150 Shards cada |
+| Capítulo 2: liberte o Zapdos | 300 Shards + 1 Reviver |
+| Capítulo 3: a Erika, o Koga, a Sabrina | 150 Shards cada |
+| Capítulo 4: o Blaine, Seafoam | 200 Shards cada |
+| Capítulo 4: liberte o Articuno | 300 Shards + 1 Reviver |
+| Capítulo 5: o Giovanni, o Monte Brasa | 200 Shards cada |
+| Capítulo 5: liberte o Moltres | 300 Shards + 1 Reviver |
+| Capítulo 6: a Victory Road | 200 Shards |
+| Capítulo 6: ajude a Elite dos Quatro | 400 Shards + 2 Novos Sorteios |
+| Capítulo 7: a Elite dos Quatro | 400 Shards |
+| Capítulo 7: o Campeão | 500 Shards + 1 Reviver |
+| Capítulo 7: conte ao Prof. Carvalho | 300 Shards |
+| Capítulo 8: o que a lagoa guarda | 1.000 Shards + 1 Reviver |
+| **Total** | **5.600 Shards, 5 Revivers e 3 Novos Sorteios** (uns 9.500 Shards em valor de Poké Mart) |
+
+Paga uma vez por quest e jornada, também quando ela fecha em silêncio (o `doneIf`: a jornada fez
+aquilo, só não viu a comemoração). As quests fechadas antes da H-12 não pagam de novo (o jogo
+recomeça do zero na subida, decisão 17).
 
 ### 7.2 O rastreador, no canto superior
 
@@ -862,7 +891,7 @@ do Zapdos, o tipo, as fraquezas e o nível recomendado (36; sem captura, decisã
 | **H-9** ✅ 0.39 | A Victory Road e a base do Maxie (decisão 22; seção 5.4, página "A base na Mansão"): a cena da Elite dos Quatro, a quest "Ajude a Elite dos Quatro", a base com o Mewtwo e as jaulas, a emboscada do Maxie e os pássaros. Ganha proposta e maquete. |
 | **H-10** ✅ 0.39 | A Liga e o fim do Capítulo 7 (seção 5.5, página "O sonho da Liga"): a Elite dos Quatro de volta, o rival Campeão e o "ainda falta alguma coisa". |
 | **H-11** ✅ 0.39 | O Kyogre como fecho de Kanto: a quest da lagoa (fecha com a captura), o pescador, o Maxie no segundo encontro ("Você de novo?!") e a vila depois do Kyogre. O Mew veio para a H-10. Junto, a decisão 25 (a captura abre com a cena da Mansão). |
-| **H-12** | As recompensas das quests (no final, pedido do Fellipe). |
+| **H-12** ✅ 0.39 | As recompensas das quests (seção 7.1, decisão 26): Shards por capítulo e Revivers e Novos Sorteios nos lendários e no fim, pagos quando a quest fecha, na comemoração, num toast e na tela de missões. |
 
 ---
 
@@ -976,6 +1005,11 @@ do Zapdos, o tipo, as fraquezas e o nível recomendado (36; sem captura, decisã
     2026-11-12: "capturas de lendários liberam depois da cena que salva a E4, portanto você pode
     capturar lendários após isso, não precisa mexer em cena nenhuma"). Muda a decisão 24: a captura
     abre com a cena do subsolo da Mansão (H-9), não mais com o Campeão. Nenhuma cena mudou.
+26. **As recompensas das quests** (H-12; o Fellipe, 2026-11-12: "pode fazer tudo o que falta", com
+    os valores no padrão): Shards em todas, crescendo por capítulo (25 no prólogo a 1.000 no
+    Kyogre, 5.600 no total), e Revivers e Novos Sorteios nas missões dos lendários, na Mansão, no
+    Campeão e no Kyogre. Pagas uma vez por quest e jornada, também em silêncio. A tabela está na
+    seção 7.1.
 
 ---
 

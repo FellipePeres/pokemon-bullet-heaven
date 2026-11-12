@@ -31,6 +31,7 @@ import { HubHUD } from '../ui/hubHud.js';
 import { QuestSystem } from '../systems/QuestSystem.js';
 import { QuestTracker } from '../ui/questTracker.js';
 import { QUESTS } from '../data/quests.js';
+import { rewardText } from '../ui/questLog.js';
 
 /** X, Y e B põem em campo os da reserva (posições 4, 5 e 6 da equipe). */
 const RESERVE_BUTTONS = { x: 3, y: 4, b: 5 };
@@ -83,7 +84,8 @@ export class Game {
     // as quests da jornada (0.38, PLANEJAMENTO-HISTORIA.md): só existem com uma jornada começada
     this.quests = new QuestSystem({
       campaign: () => (this.profile.trainer ? this.campaign : null),
-      context: () => this.storyContext()
+      context: () => this.storyContext(),
+      onComplete: (id) => this.payQuestReward(id)
     });
 
     // ---- infraestrutura ----
@@ -1394,6 +1396,23 @@ export class Game {
     const items = (this.campaign.keyItems ??= {});
     items[id] = (items[id] ?? 0) + count;
     return key.name;
+  }
+
+  /**
+   * A recompensa de uma quest que fechou (H-12): os Shards vão para o perfil e os itens para a
+   * mochila. O QuestSystem chama uma vez por quest e jornada (o `done[id].paid`). O toast diz o que
+   * veio; a comemoração do rastreador também mostra.
+   */
+  payQuestReward(id) {
+    const reward = QUESTS[id]?.reward;
+    if (!reward) return null;
+    if (reward.shards) this.tracker.addShards(reward.shards);
+    for (const [item, count] of Object.entries(reward.items ?? {})) this.giveItem(item, count);
+    const text = rewardText(reward);
+    if (text) toast(`Recompensa: ${text}`, reward.shards ? 'shards' : '◆');
+    this.menus?.refreshBars();   // o contador de Shards da barra sobe junto com o toast
+    this.tracker.checkAchievements?.();
+    return text;
   }
 
   /** Abre uma quest (o passo `quest` das cenas): ela entra deslizando no rastreador. */

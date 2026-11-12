@@ -29,9 +29,11 @@ export function createQuestState() {
  * `context()` devolve o que o `doneIf` olha: { starter, mapSeen, cleared }.
  */
 export class QuestSystem {
-  constructor({ campaign, context }) {
+  constructor({ campaign, context, onComplete = null }) {
     this._campaign = campaign;   // () => a campanha da jornada ativa (null sem jornada)
     this._context = context;     // () => o contexto do doneIf
+    // (H-12) (id, silent) => a quest fechou: o Game paga a recompensa. Uma vez só: `done[id]` já existe
+    this._onComplete = onComplete;
   }
 
   /** O estado das quests da jornada ativa (criado na primeira vez). */
@@ -144,6 +146,9 @@ export class QuestSystem {
       title: CHAPTERS[quest.chapter] ?? quest.chapter,
       desc: quest.desc ?? '',
       done,
+      // (H-12) a recompensa, e se esta jornada já recebeu (as de antes da H-12 fecharam sem)
+      reward: quest.reward ?? null,
+      paid: !!state?.done[id]?.paid,
       objectives: quest.objectives.map((objective, i) => {
         const count = objective.count ?? 1;
         const n = done ? count : Math.min(count, have[i] ?? 0);
@@ -175,6 +180,10 @@ export class QuestSystem {
     state.active = state.active.filter((qid) => qid !== id);
     state.done[id] = { at: new Date().toISOString(), ...(silent ? { skipped: true } : {}) };
     delete state.progress[id];
+    if (quest.reward) {
+      state.done[id].paid = true;
+      this._onComplete?.(id, silent);
+    }
     const opened = [];
     for (const next of quest.next ?? []) {
       if (state.done[next] || state.active.includes(next) || !QUESTS[next]) continue;

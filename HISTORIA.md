@@ -5,7 +5,7 @@
 > - O [PLANEJAMENTO-HISTORIA.md](PLANEJAMENTO-HISTORIA.md) é como ela é construída (as etapas H-1 a H-12, as decisões técnicas e os números).
 > - As falas exatas estão em `src/data/cutscenes.js` e `src/data/dialogue.js`.
 >
-> **Legenda:** ✅ no jogo (na branch; sobe junto com a H-12) · 📝 proposta esperando aprovação ·
+> **Legenda:** ✅ no jogo (na branch; a H-12, as recompensas das quests, fechou a história de Kanto: sobe inteira) · 📝 proposta esperando aprovação ·
 > 🗺️ planejado, sem proposta ainda · 💡 ideia em aberto.
 >
 > Atualizado em 2026-11-12.

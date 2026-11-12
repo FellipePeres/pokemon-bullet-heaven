@@ -1,6 +1,6 @@
 import { el, clear, create } from './dom.js';
 import { CHAPTERS, QUESTS } from '../data/quests.js';
-import { KEY_ITEMS } from '../data/items.js';
+import { KEY_ITEMS, getMartItem } from '../data/items.js';
 
 const KIND = { story: 'História', legendary: 'Lendário', side: 'Secundária' };
 
@@ -9,6 +9,21 @@ function t(tag, className, text) {
   const node = create(tag, className);
   node.textContent = text;
   return node;
+}
+
+/**
+ * A recompensa de uma quest em texto (H-12): "300 Shards · Reviver", "400 Shards · 2× Novo Sorteio".
+ * Vazio sem recompensa. O rastreador, o toast e a tela de missões usam o mesmo texto.
+ */
+export function rewardText(reward) {
+  if (!reward) return '';
+  const parts = [];
+  if (reward.shards) parts.push(`${reward.shards} Shards`);
+  for (const [id, count] of Object.entries(reward.items ?? {})) {
+    const name = getMartItem(id)?.name ?? id;
+    parts.push(count > 1 ? `${count}× ${name}` : name);
+  }
+  return parts.join(' · ');
 }
 
 /** "11/11" a partir da data ISO do fim da quest (ou nada, nas que fecharam em silêncio). */
@@ -65,6 +80,8 @@ export function buildQuestLog(game) {
     card.appendChild(top);
     if (view.desc) card.appendChild(t('p', 'ql-desc', view.desc));
     card.appendChild(objectives(view));
+    const reward = rewardText(view.reward);
+    if (reward) card.appendChild(t('p', 'ql-reward', `Recompensa: ${reward}`));
     now.appendChild(card);
   }
   body.appendChild(now);
@@ -94,6 +111,9 @@ export function buildQuestLog(game) {
           for (const o of view.objectives.slice(1)) more.appendChild(t('li', 'met', `✓ ${o.text}`));
           entry.appendChild(more);
         }
+        // a recompensa recebida, no fim da entrada (as quests de antes da H-12 fecharam sem)
+        const got = view.paid ? rewardText(view.reward) : '';
+        if (got) entry.appendChild(t('p', 'ql-reward got', `✓ Recebido: ${got}`));
         group.appendChild(entry);
       }
       past.appendChild(group);

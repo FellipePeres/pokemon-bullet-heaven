@@ -1,5 +1,5 @@
 import { el } from './dom.js';
-import { questDot } from './questLog.js';
+import { questDot, rewardText } from './questLog.js';
 
 /** Onde o rastreador completo aparece: a vila e o mapa da jornada. */
 const SPOTS = ['hub-quest', 'lobby-quest'];
@@ -97,7 +97,11 @@ export class QuestTracker {
       const met = o.have >= o.count;
       return `<p class="quest-obj${met ? ' met' : ''}"><span>${met ? '✓ ' : ''}${esc(o.text)}</span><b>${o.have}/${o.count}</b></p>`;
     }).join('');
-    const tag = quest.done ? '<p class="quest-done-tag">Missão concluída!</p>' : '';
+    // (H-12) a comemoração diz o que veio: "+300 Shards · Reviver"
+    const reward = quest.done && quest.paid ? rewardText(quest.reward) : '';
+    const tag = quest.done
+      ? `<p class="quest-done-tag">Missão concluída!</p>${reward ? `<p class="quest-reward">+${esc(reward)}</p>` : ''}`
+      : '';
     return `<div class="${classes.join(' ')}"><p class="quest-title"><i aria-hidden="true">◆</i>${esc(quest.title)}</p>${objectives}${tag}</div>`;
   }
 

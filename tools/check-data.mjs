@@ -114,7 +114,7 @@ const nowhere = Object.keys(LEGENDARY_KITS).filter((id) => !POKEMON[id]?.secret 
 badEncounter.length || inPools.length || nowhere.length
   ? fail(`encontros de lendário: fase inválida ou sem Poké Ball (${badEncounter.join(', ')}), lendário na tabela comum ` +
          `(${inPools.join(', ')}), lendário sem onde aparecer (${nowhere.join(', ')})`)
-  : ok(`o sorteio dos lendários está em ${encounterStages.length} fases (${LEGENDARY_CAPTURE.open ? 'aberto' : 'fechado: a captura dos lendários espera a história, decisão 20'})`);
+  : ok(`o sorteio dos lendários está em ${encounterStages.length} fases (${LEGENDARY_CAPTURE.open ? 'aberto' : 'fechado até a cena que salva a Elite dos Quatro, decisão 25'})`);
 
 const brokenLine = species.filter((p) => (p.moveLine ?? []).some((id) => !ABILITIES[id]));
 brokenLine.length
@@ -409,6 +409,17 @@ const inside = (mapId, x, y) => { const m = HUB_MAPS[mapId]; return !!m && x >= 
     for (const key of Object.keys(quest.doneIf ?? {})) if (!DONE_IF_KEYS.includes(key)) issues.push(`${id}: doneIf desconhecido (${key})`);
     if (quest.doneIf?.cleared && !STAGES[quest.doneIf.cleared]) issues.push(`${id}: doneIf de uma fase que não existe (${quest.doneIf.cleared})`);
     for (const next of quest.next ?? []) if (!QUESTS[next]) issues.push(`${id}: a seguinte não existe (${next})`);
+    // (H-12) toda quest dá alguma coisa: Shards inteiros e itens da mochila do Poké Mart
+    const reward = quest.reward;
+    if (!reward || (!reward.shards && !Object.keys(reward.items ?? {}).length)) issues.push(`${id}: sem recompensa`);
+    else {
+      if (reward.shards != null && !(Number.isInteger(reward.shards) && reward.shards > 0)) issues.push(`${id}: Shards da recompensa inválidos (${reward.shards})`);
+      for (const [item, count] of Object.entries(reward.items ?? {})) {
+        if (getMartItem(item)?.kind !== 'bag') issues.push(`${id}: a recompensa dá um item que não vai para a mochila (${item})`);
+        if (!(Number.isInteger(count) && count > 0)) issues.push(`${id}: quantidade inválida na recompensa (${item}: ${count})`);
+      }
+      for (const key of Object.keys(reward)) if (!['shards', 'items'].includes(key)) issues.push(`${id}: chave desconhecida na recompensa (${key})`);
+    }
   }
   const reached = new Set();
   const queue = [FIRST_QUEST];
@@ -422,7 +433,7 @@ const inside = (mapId, x, y) => { const m = HUB_MAPS[mapId]; return !!m && x >= 
   if (orphans.length) issues.push(`quests que nenhuma outra abre: ${orphans.join(', ')}`);
   issues.length
     ? fail(`quests: ${issues.join(' · ')}`)
-    : ok(`a história: ${Object.keys(QUESTS).length} quests em ${Object.keys(CHAPTERS).length} capítulos, todas encadeadas a partir de "${FIRST_QUEST}"`);
+    : ok(`a história: ${Object.keys(QUESTS).length} quests em ${Object.keys(CHAPTERS).length} capítulos, todas encadeadas a partir de "${FIRST_QUEST}", e todas com recompensa (${Object.values(QUESTS).reduce((sum, q) => sum + (q.reward?.shards ?? 0), 0)} Shards no total)`);
 }
 
 // as Poké Balls do chão (0.39, `loot` em data/hub.js): cada uma no chão, com um item da
