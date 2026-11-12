@@ -1093,6 +1093,13 @@ Nunca voltar bônus globais para o pool de level up — foi pedido explícito.
   `ui/diveHud.js`, `data/dive.js`; a tela é `screen-dive`. Roteiro: `descida`.
 
 ### Captura
+- **Os lendários não aparecem na Poké Ball** (decisão 20 do PLANEJAMENTO-HISTORIA, o
+  Fellipe em 2026-11-12: "ainda não pode aparecer os lendários na captura, mesmo que depois
+  de liberados"). `LEGENDARY_CAPTURE.open` (`data/legendaries.js`) é `false`, e o
+  `CaptureSystem.rollLegendary` não sorteia nada. A tabela `LEGENDARY_ENCOUNTERS` e as regras
+  (um de cada, a missão antes, H-5) continuam no código para quando a história abrir; o
+  `smoke-test` confere as duas coisas (fechada, e o sorteio guardado com a chave aberta). O
+  Kyogre não muda (a luta do salão). Enquanto estiver fechada, a Pokédex chega no máximo a 146.
 - Poké Ball dropa de inimigos derrotados, com **teto por fase** (`maxBalls`: 3 na
   Fase 1, 2 nas outras, 1 em cada sala da Liga e 1 no Campeão, que tinha 0 até a
   0.17). Desde a 0.10 só a
@@ -1540,6 +1547,7 @@ o Brock como está, todas as outras mais duras, menos níveis.
 | 76 | o refino da história: "essas maquinas que prendem os lendários sugam a energia deles" e mandam em ondas para um lugar misterioso, onde uma máquina central numa base do Maxie desorienta os Pokémon (ideia de End Game); o Zapdos enfraquecido explica a vitória de um jogador de nível baixo; "ao derrotar o Zapdos, rola uma cutscene do Zapdos voando e fugindo, assustado", sem captura por enquanto | 0.39 (na branch): a luta sem captura e de nível 36 (medida: 11 de 12 no 36), a energia escorrendo pelas correntes, a cena com o Zapdos do FireRed caído que foge pelo alto (os passos `cry`, `tremble` e `fly`) e a pista da energia mandada para longe; o card "Sem captura nesta luta" |
 | 77 | "A fase da Erika é barrada, o jogador precisa passar do Zapdos para liberar a Erika, o emblema pode ser visto outra vez e o jogador faz ligação que era o mesmo da máquina"; "não pode ter spoilers no título das fases ou quests"; a cena do emblema "montada já no artifact" e "um bate papo simples dando indícios da continuação"; "ficou excelente" | 0.39 (na branch): a trava da Fase 4 (`lock`, o Túnel de Pedra no escuro, sem o nome do Zapdos), as quests douradas da Usina, a do Koga e a da Sabrina, o palco do ginásio de Celadon com a Erika, a cena `depois_erika` (a lembrança com a sombra de asas, o pedaço de metal, o emblema reconhecido, as pistas: a Rocket no Cassino, a sombra para o sul) e os passos `toast`, `storm` e `item` |
 | 78 | "vamos para o H-3" | 0.39 (na branch): a tela de Missões (seção 7.3 do PLANEJAMENTO-HISTORIA): o Diário nas duas barras com o pontinho de quest nova, o que fazer agora, o diário por capítulo com as datas e os itens importantes; nenhuma quest futura aparece |
+| 81 | "ainda não pode aparecer os lendários na captura, mesmo que depois de liberados"; "bola um arquivo md com história e grava toda a história lá"; a ideia da emboscada do Maxie no Mewtwo, com os três pássaros protegendo o jogador, ainda sem momento | 0.39 (na branch): `LEGENDARY_CAPTURE.open = false` (nenhum lendário na Poké Ball; a regra antiga guardada); o `HISTORIA.md` (a verdade por trás de tudo, as regras da escrita, os personagens, os capítulos, as pistas e as ideias em aberto); decisão 20 e seção 13.3 no PLANEJAMENTO-HISTORIA |
 | 80 | "Coloca um atalho para o pós luta, o articuno foi derrotado ele pode aparecer na vila pós cena já"; "lembra de colocar pokeloot nesse caminho de ida ao articuno, pode por até 15" | 0.39 (na branch): a cena `articuno_livre` termina na vila (`then: 'home'`); 15 Poké Balls em Seafoam (as cinco do FireRed, sete à vista da rota de ida, três nos becos), nenhuma escondida pela camada de cima e nenhuma fechando o caminho (o check-data conta as bolas como paredes) |
 | 79 | a proposta da H-7, "Seafoam: as ondas": "pode seguir com o que fez" | 0.39 (na branch): o Capítulo 4, "As ondas" (decisão 19): a cena do Blaine com as ondas, a trava da Fase 8 (o mar congelando), Seafoam a pé com a regra de altura do FireRed (no passo e no desenho), o gatilho `tile` e a névoa, a luta do Articuno (a névoa, o gelo no chão, o Raio de Gelo, a Nevasca, o Frio Absoluto com o olho; nível 57, 11 de 12), a fuga e a segunda máquina; a cena que ficava `started` no Lutar do primeiro card, corrigida |
 | Fase 8 (Giovanni) | 1 → 0,8 | 4,0 | 4,5 | 60 | 84 → 62 |
@@ -1865,10 +1873,12 @@ O que está planejado:
   branch** (a tela de Missões, os Capítulos 1 a 3, o molde das missões, a missão do
   Zapdos e o Capítulo 4 com a do Articuno). Falta, em ordem: as outras missões de
   lendário (H-8, o Moltres, a H-11) e as recompensas (H-12).
-  **Regra do Fellipe para a H-5:** um lendário liberado na missão dele (vencida,
-  capturado ou não) volta a aparecer na Poké Ball das fases seguintes, com a
-  chance baixa de hoje; continua valendo um de cada por jornada. **Não tirar o
-  sorteio de hoje antes das missões existirem**, senão as aves somem do jogo.
+  **A captura dos lendários está fechada** (decisão 20, 2026-11-12): nenhum lendário
+  aparece na Poké Ball, nem depois de liberado (`LEGENDARY_CAPTURE.open` em
+  `data/legendaries.js`). A regra da H-5 (o liberado volta à Poké Ball das fases
+  seguintes) fica guardada no `CaptureSystem.rollLegendary` para quando a história abrir.
+  **A história inteira** está no [HISTORIA.md](HISTORIA.md), com a ideia da emboscada do
+  Maxie no Mewtwo (seção 8.1).
 - **O Level Cap** (pedido do Fellipe em 2026-11-11, só no planejamento por enquanto:
   PLANEJAMENTO-HISTORIA.md, seção 13.1): cada fase tem um teto de nível, e o próximo
   só abre quando a fase é vencida. Para equilibrar. Ganha plano e maquete próprios, e o

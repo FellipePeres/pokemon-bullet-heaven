@@ -16,6 +16,10 @@
 > à H-7, prontas na branch (0.39)**, sem push até a H-12; a última foi a missão do
 > Articuno e o Capítulo 4 (seção 5.2), em 2026-11-12.
 >
+> **A história inteira, em texto corrido** (o que acontece e por quê, capítulo por capítulo, as
+> pistas e as ideias em aberto), está no [HISTORIA.md](HISTORIA.md). Este arquivo é como ela
+> é construída.
+>
 > **Referência:** o Pokémon Tower Defense (Sam e Dan) segue a jornada que todo
 > mundo conhece (Pallet, o Carvalho, os 8 ginásios, a Liga), mas cada fase é
 > também um capítulo de uma história própria, com um vilão que explica por que o
@@ -236,9 +240,9 @@ decisões abertas ficaram no padrão, para o Fellipe mudar o que quiser.
   escotilha passa a levar à sala iluminada, só com os pedaços da máquina. Na vila, o
   rapaz conta que a Usina voltou a funcionar, e o velho sábio, uma vez, fala da máquina
   que sugava a energia e de alguém caçando os pássaros.
-- **A captura do Zapdos é outro momento** (padrão, até o Fellipe decidir): liberado, ele
-  entra no sorteio da Poké Ball das fases seguintes (da Fase 7 em diante, com a chance
-  baixa de hoje), como na decisão 3 ("se escapar na missão, volta pela Poké Ball").
+- **A captura do Zapdos é outro momento**: desde a decisão 20, nenhum lendário aparece na
+  Poké Ball, nem depois de liberado. A forma de ele entrar na equipe fica para a história
+  (HISTORIA.md, seção 8.1).
 
 ### 5.2 A missão do Articuno (H-7, feita na 0.39)
 
@@ -303,8 +307,8 @@ com o que fez", decisão 19) e construída na 0.39 como está abaixo. O que a co
   juntando a energia deles. Para quê?". O aviso: "O mar descongelou: os barcos saem de
   Cinnabar de novo. O caminho para Viridian está aberto." A Fase 8 abre.
 - **Na volta**: o rapaz da vila comenta o mar; o velho sábio, uma vez: "Duas máquinas...
-  alguém está juntando a força dos pássaros. E ainda falta um." O Articuno passa a cair
-  na Poké Ball das fases seguintes. A quest seguinte é "Vença o Giovanni, em Viridian".
+  alguém está juntando a força dos pássaros. E ainda falta um." O Articuno não aparece na
+  Poké Ball (decisão 20). A quest seguinte é "Vença o Giovanni, em Viridian".
 - **As quests**: depois da Sabrina, "Vença o Blaine, em Cinnabar" e "Ouça o que o Blaine
   descobriu" (Capítulo 4, "As ondas"); depois, "Investigue as Ilhas Seafoam" e "Derrote e
   liberte o Articuno", todas douradas.
@@ -369,8 +373,8 @@ da cena final, como ele pediu na H-7.
   Kyogre, o Maxie diz "A caminho do vulcão!"). O aviso: "As rotas se acalmaram: a Liga reabriu a
   Victory Road." E o atalho: o jogador aparece na vila.
 - **Na volta**: o rapaz comenta o Monte Brasa sem fumaça; o sábio, uma vez: "Os três pássaros
-  livres... Mas toda aquela energia foi para algum lugar. Isso ainda não acabou." O Moltres passa
-  a cair na Poké Ball das fases seguintes. A quest seguinte é "Vença a Lorelei, na Liga Pokémon"
+  livres... Mas toda aquela energia foi para algum lugar. Isso ainda não acabou." O Moltres não
+  aparece na Poké Ball (decisão 20). A quest seguinte é "Vença a Lorelei, na Liga Pokémon"
   (Capítulo 6, "O sonho").
 - **As quests**: "Vença o Giovanni, em Viridian" e "Mostre o Pedaço de Metal ao Giovanni"
   (Capítulo 5, "A suspeita"); depois, "Investigue o Monte Brasa, na Ilha 1" e "Derrote e liberte
@@ -379,6 +383,12 @@ da cena final, como ele pediu na H-7.
 ---
 
 ## 6. A captura muda: o lendário só depois da missão dele
+
+> **Mudou em 2026-11-12 (decisão 20):** a captura dos lendários está fechada. Nenhum
+> aparece na Poké Ball das fases, nem depois de liberado ("ainda não pode aparecer os
+> lendários na captura, mesmo que depois de liberados"). O sorteio e a regra abaixo ficam
+> guardados no código (`LEGENDARY_CAPTURE.open`, em `data/legendaries.js`) para quando a
+> história abrir a captura. O texto abaixo é a regra de antes.
 
 - **Regra do Fellipe** (2026-11-10): "sempre que um lendário é liberado, ele entra
   na chance de captura nas seguintes fases, com a % reduzida (como é hoje)".
@@ -770,7 +780,9 @@ do Zapdos, o tipo, as fraquezas e o nível recomendado (36; sem captura, decisã
 1. **O rival entra na história**: no prólogo e em poucas cenas, e é o Campeão.
 2. **A Liga exige os três pássaros**: a Victory Road só abre com eles.
 3. **O lendário recuperado fica com o jogador**: vai para o PC, como o Kyogre. Se
-   escapar na missão, volta pela Poké Ball (seção 6).
+   escapar na missão, volta pela Poké Ball (seção 6). **Mudou com as decisões 16 e 20:** os
+   pássaros fogem na missão e não aparecem na Poké Ball; como eles entram na equipe fica para
+   a história.
 4. **O Moltres fica no Monte Brasa**, na Ilha 1, como no FireRed.
 5. **O Mew é o Pokémon rosa do epílogo**, que aparece de relance em algumas cenas
    antes. A missão dele ganha o seu plano quando chegar a vez.
@@ -820,7 +832,7 @@ do Zapdos, o tipo, as fraquezas e o nível recomendado (36; sem captura, decisã
     captura na missão: derrotado, ele cai; na cena de depois, foge pelo alto. O "outro
     momento" da captura, por enquanto, é a Poké Ball das fases seguintes (padrão, como
     na decisão 3). A mesma lógica deve valer para as outras máquinas (o Articuno e o
-    Moltres), a confirmar quando chegar a vez de cada um.
+    Moltres), a confirmar quando chegar a vez de cada um. (A Poké Ball saiu com a decisão 20.)
 17. **O jogo recomeça do zero quando a história subir** (o Fellipe, 2026-11-11: "o jogo
     vai ser resetado quando tudo for pro ar, então não vai existir jogadores com
     lendários ou coisas do tipo"). As etapas daqui para a frente não precisam tratar
@@ -842,6 +854,12 @@ do Zapdos, o tipo, as fraquezas e o nível recomendado (36; sem captura, decisã
     Seafoam a pé com a regra de altura do FireRed, a luta de nível 57 sem captura (a mesma
     lógica do Zapdos, decisão 16), a fuga pela fenda do teto e o Capítulo 4 renomeado "As
     ondas" (os seguintes descem um número; o do Giovanni fica "A suspeita").
+
+20. **A captura dos lendários fica fechada** (o Fellipe, 2026-11-12: "ainda não pode aparecer
+    os lendários na captura, mesmo que depois de liberados"). Nenhum lendário aparece na Poké
+    Ball das fases: nem os pássaros depois das missões, nem o Mewtwo e o Mew na Liga. O sorteio
+    fica guardado (`LEGENDARY_CAPTURE.open`). O Kyogre não muda: ele vem da luta do salão.
+    Enquanto ela estiver fechada, a Pokédex chega no máximo a 146 de 151.
 
 ---
 
@@ -877,6 +895,13 @@ quando passarem da fase, uma tentativa de equilibrar, mas deixa isso no planejam
   - como o jogo mostra o teto (na barra de XP, no card da fase, no mapa da jornada).
 - **Antes de construir**: ganha um plano e uma maquete próprios, e o `balance.mjs` mede a
   campanha de novo com o teto.
+
+### 13.3 A emboscada do Maxie no Mewtwo
+
+Ideia do Fellipe (2026-11-12), ainda sem momento na história: ao ir libertar o Mewtwo, o Maxie
+aparece e surpreende o jogador, que está vulnerável e prestes a ser capturado; os três pássaros
+lendários aparecem para protegê-lo, e o Maxie foge. Está na história inteira, com o que cada
+momento possível muda: [HISTORIA.md](HISTORIA.md), seção 8.1.
 
 ### 13.2 A máquina central do Maxie
 

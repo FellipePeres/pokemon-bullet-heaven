@@ -161,8 +161,8 @@ não abre até você vencer.
   ele é uma luta para logo depois da Fase 3. A horda elétrica vem, as correntes
   arrebentam e ele luta com uma tempestade de raios marcados no chão, o Zap Cannon,
   investidas e um tabuleiro de raios em que só fica a salvo quem pisa onde o raio acabou
-  de cair. Derrotado, ele foge, assustado: a captura fica para outro momento (só depois
-  de liberado ele aparece nas Poké Balls das fases).
+  de cair. Derrotado, ele foge, assustado: a captura fica para outro momento (por
+  enquanto, nenhum lendário aparece nas Poké Balls das fases).
 - **O emblema de novo**: o caminho para Celadon passa pelo Túnel de Pedra, no escuro
   desde o apagão; ele só acende quando a luz volta à Usina. Depois da Erika, ela conta da
   tempestade daquela noite (a lembrança: uma sombra de asas cruzando o céu) e mostra o
@@ -222,9 +222,8 @@ não abre até você vencer.
   20% sozinho, sem abrir tela.
 - **Lendários**: Articuno, Zapdos, Moltres, Mewtwo e Mew têm um golpe exclusivo
   (Sheer Cold, Zap Cannon, Sacred Fire, Psystrike e Metronome) e já chegam com
-  melhorias e o Golpe Desperto. Raros na Poké Ball: as aves a partir da Fase 7,
-  Mewtwo e Mew na Liga, com a chance crescendo até o Campeão; um de cada por
-  jornada.
+  melhorias e o Golpe Desperto. Por enquanto, nenhum deles aparece na Poké Ball:
+  a captura dos lendários espera a história (os pássaros fogem depois das missões).
 - **Shiny**: raro (1%), na captura e no inicial — o card da Poké Ball brilha, e o
   Pokémon fica com as cores raras no campo, no PC e na Pokédex.
 - **Modo Livre**: ao vencer uma fase, dá para seguir nela sem fim, com XP

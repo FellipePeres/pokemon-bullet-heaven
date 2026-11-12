@@ -130,6 +130,15 @@ export const LEGENDARY_ENCOUNTERS = {
   champion: { chance: 0.12, pool: ALL }
 };
 
+/**
+ * A CAPTURA DOS LENDÁRIOS ESTÁ FECHADA (decisão 20 do PLANEJAMENTO-HISTORIA, o Fellipe em
+ * 2026-11-12: "ainda não pode aparecer os lendários na captura, mesmo que depois de liberados").
+ * Nenhum lendário aparece na Poké Ball das fases: nem os pássaros depois das missões, nem o
+ * Mewtwo e o Mew na Liga. O sorteio desta tabela fica guardado, com as regras de sempre, para
+ * quando a história abrir a captura (`open: true`). O Kyogre não muda: ele vem da luta do salão.
+ */
+export const LEGENDARY_CAPTURE = { open: false };
+
 /** Entre os lendários sorteados: as aves comuns, Mewtwo e Mew raros. */
 export const LEGENDARY_WEIGHT = { articuno: 1, zapdos: 1, moltres: 1, mewtwo: 0.35, mew: 0.15 };
 

@@ -4,7 +4,7 @@ import { CONFIG } from '../core/config.js';
 import { weightedPick, weightedPickMany } from '../core/utils.js';
 import { bus, EVENTS } from '../core/events.js';
 import { TeamSystem } from './TeamSystem.js';
-import { isLegendary, LEGENDARY_ENCOUNTERS, LEGENDARY_WEIGHT } from '../data/legendaries.js';
+import { isLegendary, LEGENDARY_CAPTURE, LEGENDARY_ENCOUNTERS, LEGENDARY_WEIGHT } from '../data/legendaries.js';
 import { MISSION_SPECIES } from '../data/missions.js';
 
 /**
@@ -50,8 +50,13 @@ export class CaptureSystem {
    * A captura muda com as missões (H-5, PLANEJAMENTO-HISTORIA.md seção 6): um lendário
    * que tem missão (data/missions.js) só entra no sorteio depois de liberado, com ou sem
    * a captura (`run.liberated`). Os que ainda não têm missão continuam como antes.
+   *
+   * Desde a decisão 20 (2026-11-12), a captura dos lendários está fechada
+   * (`LEGENDARY_CAPTURE.open`): nenhum aparece, nem depois de liberado. A regra acima vale
+   * quando a história abrir.
    */
   rollLegendary() {
+    if (!LEGENDARY_CAPTURE.open) return null;
     const encounter = LEGENDARY_ENCOUNTERS[this.run.stage.id];
     if (!encounter || Math.random() >= encounter.chance) return null;
     const owned = (id) => this.run.team.has(id) || this.run.pc.some((m) => m.pokemonId === id)

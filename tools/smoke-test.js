@@ -30,7 +30,7 @@ import { BONUS_MOVES, BONUS_BY_TYPE, isBonusMove } from '../src/data/bonusMoves.
 import { RETIRED_ABILITIES } from '../src/data/abilities.js';
 import { abilityFx } from '../src/data/fx.js';
 import { damageEnemy, bonusHeal } from '../src/systems/combat.js';
-import { LEGENDARY_KITS, LEGENDARY_MOVES, LEGENDARY_ENCOUNTERS } from '../src/data/legendaries.js';
+import { LEGENDARY_KITS, LEGENDARY_MOVES, LEGENDARY_ENCOUNTERS, LEGENDARY_CAPTURE } from '../src/data/legendaries.js';
 import { typeMultiplier } from '../src/data/types.js';
 import { leaderTeamTypes, matchupAgainst, moveTypesOf, teamWeaknesses } from '../src/systems/matchup.js';
 
@@ -857,6 +857,20 @@ console.log('\n[encontros de lendário]');
   const legendaryIn = (choices) => choices.filter((p) => LEG.includes(p.id)).map((p) => p.id);
   const keep = JSON.parse(JSON.stringify(LEGENDARY_ENCOUNTERS));
 
+  // a captura dos lendários está fechada (decisão 20): nem com a chance no máximo, nem com todos
+  // os pássaros liberados, nenhum lendário aparece em nenhuma fase
+  for (const enc of Object.values(LEGENDARY_ENCOUNTERS)) enc.chance = 1;
+  let closed = 0;
+  for (const stageId of Object.keys(LEGENDARY_ENCOUNTERS)) {
+    const r = new Run(stageId, { starter: 'charmander', liberated: ['zapdos', 'articuno', 'moltres', 'mewtwo', 'mew'] });
+    for (let i = 0; i < 200; i++) { r.legendariesOffered.clear(); closed += legendaryIn(r.captureSystem.rollChoices()).length; }
+  }
+  check('a captura dos lendários está fechada: nenhum aparece na Poké Ball, nem depois de liberado',
+        !LEGENDARY_CAPTURE.open && closed === 0, `${closed} em ${200 * Object.keys(LEGENDARY_ENCOUNTERS).length} Poké Balls`);
+  for (const [id, enc] of Object.entries(keep)) Object.assign(LEGENDARY_ENCOUNTERS[id], enc);
+  // o sorteio guardado para quando a história abrir a captura: as regras de sempre
+  LEGENDARY_CAPTURE.open = true;
+
   // antes da Fase 7, nunca
   const early = new Run('gym_6_saffron', { starter: 'charmander' });
   let seen = 0;
@@ -897,6 +911,7 @@ console.log('\n[encontros de lendário]');
         !ligaOffers.includes('mewtwo') && ligaOffers.includes('mew'), ligaOffers.join(', '));
   check('o Campeão tem uma Poké Ball (para o lendário)', liga.stage.maxBalls === 1);
   for (const [id, enc] of Object.entries(keep)) Object.assign(LEGENDARY_ENCOUNTERS[id], enc);
+  LEGENDARY_CAPTURE.open = false;
 }
 
 // ---------------------------------------------- 5.13g quem chega tarde vem treinado (0.26)
@@ -1410,7 +1425,9 @@ console.log('\n[a missão do Zapdos — preso, a tempestade, os ataques, a captu
         && isStageUnlocked('gym_4_celadon', ['gym_3_vermilion', 'zapdos']) && !storyLocked('gym_4_celadon', ['gym_3_vermilion', 'zapdos'])
         && !storyLocked('gym_4_celadon', ['gym_2_cerulean']));
 
-  // H-5: a captura sem lendários: quem tem missão só cai na Poké Ball depois dela
+  // H-5: a captura sem lendários: quem tem missão só cai na Poké Ball depois dela (a regra
+  // guardada para quando a história abrir a captura, decisão 20)
+  LEGENDARY_CAPTURE.open = true;
   for (const enc of Object.values(LEGENDARY_ENCOUNTERS)) enc.chance = 1;
   const LEG = Object.keys(LEGENDARY_KITS);
   const offers = (run) => { const seen = new Set(); for (let i = 0; i < 40; i++) { run.legendariesOffered.clear(); for (const c of run.captureSystem.rollChoices()) if (LEG.includes(c.id)) seen.add(c.id); } return seen; };
@@ -1422,6 +1439,9 @@ console.log('\n[a missão do Zapdos — preso, a tempestade, os ataques, a captu
         && offers(new Run('gym_8_viridian', { starter: 'charmander', liberated: ['zapdos', 'articuno'] })).has('articuno'));
   check('...e quem está no PC continua não voltando (um de cada)',
         !offers(new Run('gym_8_viridian', { starter: 'charmander', liberated: ['zapdos'], ownedElsewhere: ['zapdos'] })).has('zapdos'));
+  LEGENDARY_CAPTURE.open = false;
+  check('com a captura fechada (decisão 20), nem o Zapdos liberado aparece',
+        offers(new Run('gym_8_viridian', { starter: 'charmander', liberated: ['zapdos', 'articuno'] })).size === 0);
 }
 
 // ------------------------------------------- a missão do Articuno (H-7)

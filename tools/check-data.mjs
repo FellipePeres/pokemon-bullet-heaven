@@ -8,7 +8,7 @@
 import { POKEMON } from '../src/data/pokemon.js';
 import { ABILITIES } from '../src/data/abilities.js';
 import { BONUS_MOVES } from '../src/data/bonusMoves.js';
-import { LEGENDARY_MOVES, LEGENDARY_KITS, LEGENDARY_ENCOUNTERS } from '../src/data/legendaries.js';
+import { LEGENDARY_MOVES, LEGENDARY_KITS, LEGENDARY_ENCOUNTERS, LEGENDARY_CAPTURE } from '../src/data/legendaries.js';
 import { MART_ITEMS, getMartItem, itemEvolutions, KEY_ITEMS } from '../src/data/items.js';
 import { UPGRADES } from '../src/data/upgrades.js';
 import { AWAKENING_KEYS, awakeningSuffixes } from '../src/data/awakening.js';
@@ -114,7 +114,7 @@ const nowhere = Object.keys(LEGENDARY_KITS).filter((id) => !POKEMON[id]?.secret 
 badEncounter.length || inPools.length || nowhere.length
   ? fail(`encontros de lendário: fase inválida ou sem Poké Ball (${badEncounter.join(', ')}), lendário na tabela comum ` +
          `(${inPools.join(', ')}), lendário sem onde aparecer (${nowhere.join(', ')})`)
-  : ok(`lendários aparecem em ${encounterStages.length} fases, pelo sorteio próprio`);
+  : ok(`o sorteio dos lendários está em ${encounterStages.length} fases (${LEGENDARY_CAPTURE.open ? 'aberto' : 'fechado: a captura dos lendários espera a história, decisão 20'})`);
 
 const brokenLine = species.filter((p) => (p.moveLine ?? []).some((id) => !ABILITIES[id]));
 brokenLine.length
