@@ -1386,7 +1386,7 @@ game.menus.closeModal();
         && QUESTS.c5_brasa.objectives[0].text === 'Investigue o Monte Brasa, na Ilha 1');
   check('nada de spoiler: nem a cena, nem a quest, nem a trava citam o Moltres',
         noMoltres(giovanni) && !QUESTS.c5_brasa.desc.includes('Moltres') && !QUESTS.c5_brasa.objectives[0].text.includes('Moltres')
-        && !STAGES.e4_lorelei.lock.text.includes('Moltres'));
+        && !storyLocked('e4_lorelei', game.campaign.clearedStages).text.includes('Moltres'));
   settle();
   check('...e a volta é para a vila', hub.mapId === 'vila' && !hub.scene);
   // o mapa da jornada: a Liga presa e a marca da Ilha 1
@@ -1544,6 +1544,134 @@ game.menus.closeModal();
   game.openCampaign();
   check('depois da missão, a marca da Ilha 1 sai do mapa, e a Lorelei é a próxima, aberta',
         !brasaNode() && game.menus.lobby.selected === 'e4_lorelei' && !panelJson().includes('Hordas furiosas'));
+  hub.enter('home');
+}
+
+// ---- o Capítulo 6 (H-9, "A base na Mansão"): a porta da Victory Road, a trava da Liga, a Mansão a
+// pé com os interruptores, o laboratório (o Mewtwo, as jaulas, a emboscada do Maxie, os pássaros) ----
+{
+  const { isStageUnlocked, storyLocked, storyProgress } = await import('../src/data/stages.js');
+  const { QUESTS, CHAPTERS } = await import('../src/data/quests.js');
+  const { HUB } = await import('../src/data/hub.js');
+  const panelJson = () => JSON.stringify(registry.get('lobby-panel').children.map((c) => [c.className, c.innerHTML, (c.children ?? []).map((k) => k.innerHTML)]));
+  // a Mansão é grande: o caminho do clique pode levar mais que os 15 s do settle
+  const walkTo = (x, y) => { hub.clickTile(x, y); for (let i = 0; i < 60 * 90 && busy(); i++) hub.update(1 / 60); return hub.player.x === x && hub.player.y === y; };
+  // a estátua: anda até ela, fala, e o "sim" (o padrão da pergunta) vira o interruptor
+  const statue = (x, y) => { hub.clickTile(x, y); for (let i = 0; i < 60 * 60 && (busy() || !hub.dialog); i++) hub.update(1 / 60); for (let i = 0; i < 20 && hub.dialog; i++) { hub.dialog.shown = 999; hub.confirm(); } };
+  const spoiler = (t) => ['Maxie', 'Mewtwo'].some((n) => t.includes(n));
+
+  game.openCampaign();
+  check('com o Moltres livre, a Lorelei aparece no mapa com o Jogar, sem trava',
+        game.menus.lobby.selected === 'e4_lorelei' && !storyLocked('e4_lorelei', storyProgress(game.campaign)) && !panelJson().includes('Hordas furiosas'));
+  // o primeiro Jogar: a cena da porta da Victory Road, no lugar da fase
+  game.startStage('e4_lorelei');
+  check('o Jogar da Lorelei não começa a fase: toca a cena na porta da Victory Road, em tela cheia, com o guarda',
+        !game.run && hub.mapId === 'rota23_portao' && hub.scene?.id === 'victory_road' && registry.get('screen-hub').classes.has('cinema')
+        && hub.npcs.some((n) => n.id === 'guarda' && n.sprite === 'policeman'));
+  let note = false;
+  const vr = runScene((d) => { if (d.text.includes('deixou um bilhete')) note = hub.scene?.fx.item?.sprite === 'npc/bilhete'; });
+  check('o guarda vê as oito insígnias, mas a Liga está vazia; o bilhete do Lance (num quadro) fala da Mansão de Cinnabar',
+        note && said(vr, 'São as oito') && said(vr, 'A Liga está vazia') && said(vr, 'velha Mansão de Cinnabar') && said(vr, 'Lance.'));
+  check('...a cena fecha "Siga pela Victory Road" e abre "Ajude a Elite dos Quatro" (sem spoiler)',
+        game.quests.isDone('c6_liga') && game.quests.isActive('c6_e4') && QUESTS.c6_e4.objectives[0].text === 'Ajude a Elite dos Quatro'
+        && !spoiler(QUESTS.c6_e4.desc) && !vr.some((d) => spoiler(d.text)));
+  settle();
+  const held = storyLocked('e4_lorelei', storyProgress(game.campaign));
+  check('...e a volta é para o mapa da jornada: a Lorelei presa pela trava nova, com o botão para a Mansão',
+        !game.run && held?.scene === 'mansao_lab' && panelJson().includes('A Liga está vazia: a Elite dos Quatro partiu')
+        && panelJson().includes('Vá até a Mansão Pokémon, em Cinnabar'));
+  check('o Jogar de novo não começa nada, e a cena não toca outra vez', (game.startStage('e4_lorelei'), !game.run && !hub.scene));
+  game.openCampaign();
+  const mansionNode = () => mapNodes().find((c) => c.classes.has('place') && String(c.title).includes('Mansão'));
+  check('no mapa aparece a marca da Mansão Pokémon, em Cinnabar', !!mansionNode());
+  nodesOf(registry.get('lobby-panel')).find((n) => n.id === 'panel-lock-go')?.onclick?.();
+  check('o botão da trava leva à marca, com o Investigar', game.menus.lobby.selected === 'place:mansao' && panelJson().includes('Investigar'));
+
+  // a chegada: o Blaine na porta
+  check('o Investigar leva à porta da Mansão, em tela cheia, com a música dela',
+        game.visitPlace('mansao') && hub.mapId === 'mansao_1f' && hub.player.x === 8 && hub.player.y === 32
+        && registry.get('screen-hub').classes.has('explore') && hub.place.music === 'mus_poke_mansion' && hub.scene?.id === 'mansao_entrada');
+  const blaine = runScene();
+  check('o Blaine: os quatro entraram e não saíram, a mansão foi um laboratório, a dica das estátuas e a pergunta bônus',
+        said(blaine, 'porta arrombada') && said(blaine, 'Eu sabia que você vinha') && said(blaine, 'foi um laboratório')
+        && said(blaine, 'as estátuas escondem um interruptor') && said(blaine, 'Pergunta bônus') && !blaine.some((d) => spoiler(d.text)));
+  check('...e ele vai embora', !hub.scene && hub.npcs.find((n) => n.id === 'blaine')?.hidden);
+  const loot = ['mansao_1f', 'mansao_2f', 'mansao_3f', 'mansao_b1f'].flatMap((id) => HUB.maps[id].loot);
+  check('15 Poké Balls pela Mansão: as 11 do FireRed e 4 no caminho de ida',
+        loot.length === 15 && loot.filter((l) => l.id.startsWith('fr')).length === 11 && loot.filter((l) => l.id.startsWith('c')).length === 4);
+  // os diários do FireRed
+  hub.enter({ map: 'mansao_2f', x: 25, y: 5, dir: 'up' });
+  hub.interact();
+  check('os diários do FireRed: "5 de julho. Guiana..."', dialogText().includes('5 de julho') && dialogText().includes('Guiana'));
+  closeDialog();
+
+  // a subida e a descida a pé, por cliques, com as estátuas (o caminho do FireRed)
+  hub.enter({ map: 'mansao_1f', x: 8, y: 32, dir: 'up' });
+  walkTo(10, 13);
+  check('a escada do 1º andar leva ao 2º', hub.mapId === 'mansao_2f' && hub.player.x === 6 && hub.player.y === 14);
+  walkTo(9, 3);
+  check('a escada do alto do 2º leva ao 3º', hub.mapId === 'mansao_3f' && hub.player.x === 8 && hub.player.y === 3);
+  const closedHole = !hub.switchOn;
+  statue(12, 5);
+  check('a estátua do 3º andar: a pergunta e o "sim" viram o interruptor', closedHole && hub.switchOn && !hub.dialog);
+  walkTo(18, 18);
+  check('com o interruptor virado, o buraco do chão: o jogador cai no 1º andar', hub.mapId === 'mansao_1f' && hub.player.x === 19 && hub.player.y === 22 && hub.switchOn);
+  walkTo(25, 27);
+  check('a escada para o subsolo', hub.mapId === 'mansao_b1f' && hub.player.x === 34 && hub.player.y === 29);
+  check('o laboratório tem a máquina roxa com o Mewtwo, as ondas e a Elite dos Quatro nas jaulas',
+        hub.decor.some((d) => d.sprite === 'maquina_mewtwo') && hub.decor.some((d) => d.sprite === 'mewtwo') && hub.pulse?.color === 'psychic'
+        && hub.decor.filter((d) => d.sprite === 'jaula').length === 4 && ['lorelei', 'bruno', 'agatha', 'lance'].every((id) => !hub.npcs.find((n) => n.id === id)?.hidden));
+  statue(24, 29);
+  check('a primeira estátua do subsolo vira o interruptor de volta', !hub.switchOn);
+  statue(27, 5);
+  check('...a segunda vira de novo', hub.switchOn);
+  hub.clickTile(12, 11);
+  for (let i = 0; i < 60 * 90 && busy() && !hub.scene; i++) hub.update(1 / 60);
+  check('pisar na passagem do laboratório começa a cena (o caminho para ali)', hub.scene?.id === 'mansao_lab' && !hub.path);
+  let caged = false, nameless = false, named = false, emblem = false, broke = false, gone = false, opened = false;
+  const lab = runScene((d) => {
+    if (d.text.includes('Presos em jaulas')) caged = hub.player.x === 9 && hub.player.y === 6;
+    if (d.text.includes('Mais um que veio sozinho')) nameless = d.name === '???';
+    if (d.text.includes('Eu sou o Maxie')) named = d.name === 'Maxie';
+    if (d.text.includes('O emblema no uniforme')) emblem = hub.scene?.fx.item?.sprite === 'npc/emblema';
+    if (d.text.includes('a máquina explode')) broke = hub.decor.some((x) => x.sprite === 'maquina_mewtwo_quebrada') && !hub.decor.some((x) => x.sprite === 'maquina_mewtwo');
+    if (d.text.includes('some num clarão')) gone = hub.decor.some((x) => x.sprite === 'mewtwo');   // ainda ali, encarando
+    if (d.text.includes('Você nos salvou')) opened = hub.decor.filter((x) => x.sprite === 'jaula_aberta').length === 4 && hub.npcs.find((n) => n.id === 'lance')?.y === 5
+      && !hub.decor.some((x) => x.sprite === 'mewtwo') && !hub.scene.actor('gelo1').hidden;
+  });
+  check('o laboratório: o jogador vê as jaulas e o Mewtwo dos diários; o Lance grita que é uma armadilha',
+        caged && said(lab, 'É uma armadilha') && said(lab, 'a criatura dos diários: o Mewtwo'));
+  check('a emboscada: o homem de vermelho chega sem nome ("???") e se apresenta: o Maxie', nameless && named);
+  check('...o emblema do uniforme dele (num quadro) é o das máquinas; as Poké Balls não abrem perto da máquina',
+        emblem && said(lab, 'O mesmo das máquinas') && said(lab, 'As Poké Balls não abrem'));
+  check('os três pássaros chegam (o raio, o gelo, o fogo), e o Maxie foge com o Crobat',
+        said(lab, 'Um trovão rasga o teto') && said(lab, 'O gelo prende os capangas') && said(lab, 'Uma parede de fogo') && said(lab, 'vieram por você'));
+  check('...a máquina explode, o Mewtwo encara o jogador e some num clarão (sem luta), e as jaulas abrem, com os capangas ainda no gelo', broke && gone && opened);
+  check('os quatro agradecem e voltam para a Liga', said(lab, 'Você nos salvou') && said(lab, 'Que vergonha') && said(lab, 'Você tem coragem')
+        && said(lab, 'Os pássaros confiam em você') && said(lab, 'não vamos pegar leve'));
+  check('a quest fecha, e a dourada é "Vença a Elite dos Quatro" (Capítulo 7)',
+        game.quests.isDone('c6_e4') && game.quests.isActive('c7_liga') && CHAPTERS[QUESTS.c7_liga.chapter] === 'Capítulo 7 — O sonho'
+        && game.sceneRecord.mansao_lab === 'seen');
+  check('a Liga abre de vez', isStageUnlocked('e4_lorelei', storyProgress(game.campaign)) && !storyLocked('e4_lorelei', storyProgress(game.campaign)));
+  settle();
+  check('...e o atalho: o jogador aparece na vila, na frente de casa', hub.mapId === 'vila' && hub.player.x === 6 && hub.player.y === 17 && !hub.scene);
+  hub.enter({ map: 'mansao_b1f', x: 13, y: 11, dir: 'left' });
+  check('o laboratório depois: a máquina quebrada, as jaulas abertas, sem o Mewtwo e sem os quatro',
+        hub.decor.some((d) => d.sprite === 'maquina_mewtwo_quebrada') && !hub.decor.some((d) => d.sprite === 'mewtwo')
+        && ['lorelei', 'bruno', 'agatha', 'lance'].every((id) => hub.npcs.find((n) => n.id === id)?.hidden) && !hub.pulse);
+  press('left');
+  check('...e a passagem não toca mais nada', !hub.scene);
+  // a vila comenta
+  hub.enter({ map: 'vila', x: 27, y: 22, dir: 'up' });
+  hub.say('sabio');
+  check('o velho sábio, uma vez: o homem do emblema mostrou a cara; os pássaros confiam no jogador', dialogText().includes('Maxie') && dialogText().includes('confiam em você'));
+  closeDialog();
+  hub.say('rapaz');
+  check('o rapaz da vila: a Elite dos Quatro voltou para a Liga', dialogText().includes('voltou para a Liga'));
+  closeDialog();
+  game.openCampaign();
+  check('a marca da Mansão sai do mapa, e a Lorelei é a próxima, aberta',
+        !mansionNode() && game.menus.lobby.selected === 'e4_lorelei' && !panelJson().includes('A Liga está vazia'));
   hub.enter('home');
 }
 

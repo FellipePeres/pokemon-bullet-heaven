@@ -377,6 +377,75 @@ const ROTEIROS = {
     { run: "{ const d = game.hub.dialog; if (d) { d.shown = 999; game.hub.confirm(); } }" }, { wait: 2600 }, { shot: 'mol-53-ainda-nao-acabou' },
     { run: "{ const d = game.hub.dialog; if (d) { d.shown = 999; game.hub.confirm(); } } game.openCampaign()" }, { wait: 1500 }, { shot: 'mol-54-a-liga' }
   ],
+  // o Capítulo 6 (H-9, "A base na Mansão"): a Lorelei aberta, a cena da porta da Victory Road com o
+  // bilhete do Lance, a trava nova e a marca da Mansão, o Blaine na porta, os interruptores e os
+  // diários, o laboratório (o Mewtwo, as jaulas, a emboscada do Maxie, os pássaros, a libertação)
+  mansao: [
+    { open: 'index.html' }, { wait: 500 },
+    { run: "window.skip = (n = 1) => { for (let i = 0; i < n; i++) { const h = game.hub; if (!h.dialog) return; h.dialog.shown = 999; h.confirm(); } };" +
+           "game.newGame(); game.chooseTrainer('leaf'); game.chooseName('Fellipe'); game.chooseStarter('charmander');" +
+           "const mon = (uid, id, abilities) => ({ uid, pokemonId: id, level: 62, xp: 0, hp: 0, abilities, upgrades: {} });" +
+           "game.campaign.journey = { team: { members: [mon('a', 'charizard', ['flamethrower']), mon('b', 'gyarados', ['hydro_pump']), mon('c', 'arcanine', ['flamethrower'])], active: ['a', 'b', 'c'] }, pc: [] };" +
+           "game.campaign.clearedStages.push('gym_1_pewter', 'gym_2_cerulean', 'gym_3_vermilion', 'zapdos', 'gym_4_celadon', 'gym_5_fuchsia', 'gym_6_saffron', 'gym_7_cinnabar', 'articuno', 'gym_8_viridian', 'moltres');" +
+           "game.campaign.badges.push('boulder', 'cascade', 'thunder', 'rainbow', 'soul', 'marsh', 'volcano', 'earth');" +
+           "game.campaign.missions = { zapdos: { won: true, captured: false }, articuno: { won: true, captured: false }, moltres: { won: true, captured: false } };" +
+           "game.quests.state.active = ['c6_liga']; document.getElementById('toast-container').style.display = 'none'; game.openCampaign()" },
+    { wait: 1600 }, { shot: 'mh-01-a-liga-aberta' },
+    { run: "game.startStage('e4_lorelei')" }, { wait: 2600 }, { shot: 'mh-02-as-oito' },
+    { run: 'skip()' }, { wait: 2200 }, { shot: 'mh-03-a-liga-vazia' },
+    { run: 'skip()' }, { wait: 2600 }, { shot: 'mh-04-os-quatro-desceram' },
+    { run: 'skip()' }, { wait: 2400 }, { shot: 'mh-05-o-bilhete' },
+    { run: 'skip()' }, { wait: 2800 }, { shot: 'mh-06-o-bilhete-fala' },
+    { run: 'skip()' }, { wait: 2400 }, { shot: 'mh-07-se-nao-voltarmos' },
+    { run: 'skip()' }, { wait: 2400 }, { shot: 'mh-08-talvez-precisem' },
+    { run: 'skip()' }, { wait: 2400 }, { shot: 'mh-09-a-trava' },
+    { run: "game.menus.lobby.selected = 'place:mansao'; game.menus.lobby.render()" }, { wait: 900 }, { shot: 'mh-10-a-marca' },
+    { run: "game.visitPlace('mansao')" }, { wait: 2400 }, { shot: 'mh-11-a-porta-arrombada' },
+    { run: 'skip()' }, { wait: 2200 }, { shot: 'mh-12-o-blaine' },
+    { run: 'skip()' }, { wait: 2400 }, { shot: 'mh-13-nao-sairam' },
+    { run: 'skip()' }, { wait: 2600 }, { shot: 'mh-14-um-laboratorio' },
+    { run: 'skip()' }, { wait: 2600 }, { shot: 'mh-15-as-estatuas' },
+    { run: 'skip()' }, { wait: 2600 }, { shot: 'mh-16-pergunta-bonus' },
+    { run: 'skip()' }, { wait: 2400 }, { shot: 'mh-17-o-primeiro-andar' },
+    { run: "game.hub.enter({ map: 'mansao_2f', x: 25, y: 5, dir: 'up' }); game.hub.interact()" }, { wait: 1200 },
+    { run: 'skip()' }, { wait: 2200 }, { shot: 'mh-18-o-diario' },
+    { run: 'skip()' }, { wait: 300 },
+    { run: "game.hub.enter({ map: 'mansao_3f', x: 12, y: 6, dir: 'up' }); game.hub.interact()" }, { wait: 1800 }, { shot: 'mh-19-a-estatua' },
+    { run: 'skip()' }, { wait: 1400 }, { shot: 'mh-20-apertar' },
+    { run: 'skip()' }, { wait: 900 }, { shot: 'mh-21-o-interruptor-virado' },
+    { run: "game.hub.enter({ map: 'mansao_3f', x: 19, y: 16, dir: 'down' })" }, { wait: 1000 }, { shot: 'mh-22-os-buracos' },
+    { run: "game.campaign.hub.flags.mansao_interruptor = true; game.hub.enter({ map: 'mansao_b1f', x: 15, y: 11, dir: 'left' })" }, { wait: 1400 }, { shot: 'mh-23-o-laboratorio' },
+    { run: "game.hub.clickTile(12, 11)" }, { wait: 2600 }, { shot: 'mh-24-a-luz-roxa' },
+    { run: 'skip()' }, { wait: 3600 }, { shot: 'mh-25-presos-em-jaulas' },
+    { run: 'skip()' }, { wait: 1800 }, { shot: 'mh-26-uma-armadilha' },
+    { run: 'skip()' }, { wait: 2400 }, { shot: 'mh-27-o-mewtwo' },
+    { run: 'skip()' }, { wait: 2200 }, { shot: 'mh-28-a-agatha' },
+    { run: 'skip()' }, { wait: 2600 }, { shot: 'mh-29-o-homem-de-vermelho' },
+    { run: 'skip()' }, { wait: 2600 }, { shot: 'mh-30-eu-sou-o-maxie' },
+    { run: 'skip()' }, { wait: 2600 }, { shot: 'mh-31-o-emblema' },
+    { run: 'skip()' }, { wait: 2200 }, { shot: 'mh-32-as-bolas-nao-abrem' },
+    { run: 'skip()' }, { wait: 2400 }, { shot: 'mh-33-peguem-a-crianca' },
+    { run: 'skip()' }, { wait: 250 }, { shot: 'mh-34-o-raio', raw: true },
+    { wait: 2000 }, { shot: 'mh-35-o-trovao' },
+    { run: 'skip()' }, { wait: 2200 }, { shot: 'mh-36-o-gelo' },
+    { run: 'skip()' }, { wait: 2200 }, { shot: 'mh-37-a-parede-de-fogo' },
+    { run: 'skip()' }, { wait: 1800 }, { shot: 'mh-38-para-proteger' },
+    { run: 'skip()' }, { wait: 2200 }, { shot: 'mh-39-vieram-por-voce' },
+    { run: 'skip()' }, { wait: 1800 }, { shot: 'mh-40-o-crobat' },
+    { run: 'skip()' }, { wait: 450 }, { shot: 'mh-41-a-fuga', raw: true },
+    { wait: 2400 }, { shot: 'mh-42-a-maquina-explode' },
+    { run: 'skip()' }, { wait: 2200 }, { shot: 'mh-43-o-mewtwo-some' },
+    { run: 'skip()' }, { wait: 3800 }, { shot: 'mh-44-voce-nos-salvou' },
+    { run: 'skip()' }, { wait: 2000 }, { shot: 'mh-45-a-lorelei' },
+    { run: 'skip()' }, { wait: 2000 }, { shot: 'mh-46-o-bruno' },
+    { run: 'skip()' }, { wait: 2000 }, { shot: 'mh-47-a-agatha' },
+    { run: 'skip()' }, { wait: 2200 }, { shot: 'mh-48-o-lance' },
+    { run: "document.getElementById('toast-container').style.display = ''; skip()" }, { wait: 900 }, { shot: 'mh-49-os-passaros-voam', raw: true },
+    { wait: 2400 }, { shot: 'mh-50-na-vila' },
+    { run: "document.getElementById('toast-container').style.display = 'none'; game.hub.enter({ map: 'casa_sabio', x: 3, y: 6, dir: 'up' }); game.hub.interact()" }, { wait: 3200 }, { shot: 'mh-51-o-sabio' },
+    { run: "{ const d = game.hub.dialog; if (d) { d.shown = 999; game.hub.confirm(); } }" }, { wait: 2600 }, { shot: 'mh-52-confiam-em-voce' },
+    { run: "{ const d = game.hub.dialog; if (d) { d.shown = 999; game.hub.confirm(); } } game.openCampaign()" }, { wait: 1500 }, { shot: 'mh-53-a-liga' }
+  ],
   // a tela de Missões (H-3): o pontinho na barra, o começo da jornada e o diário depois do
   // Capítulo 3 (as quests concluídas por capítulo, com as datas, e o Pedaço de Metal)
   missoes: [

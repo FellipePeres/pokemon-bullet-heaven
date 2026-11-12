@@ -95,6 +95,12 @@ const BRASA_SUMMIT = [
   [7, 9], [8, 9], [9, 9], [10, 9], [11, 9]
 ];
 
+/**
+ * A passagem do laboratório no subsolo da Mansão (H-9): só se abre com o interruptor apertado.
+ * Pisar nela começa a cena do Mewtwo e da Elite dos Quatro.
+ */
+const MANSAO_DOOR = [[12, 10], [12, 11], [12, 12]];
+
 const SEAFOAM_SHORE = [
   [11, 7], [12, 7], [13, 7], [14, 7], [15, 7], [11, 8], [12, 8],
   [11, 9], [12, 9], [13, 9], [14, 9], [15, 9], [11, 10], [12, 10], [13, 10], [14, 10], [15, 10],
@@ -898,13 +904,179 @@ export const CUTSCENES = {
       // o atalho (pedido do Fellipe na H-7): de volta para a vila, sem descer a montanha
       { do: 'end', then: 'home' }
     ]
+  },
+
+  /* ========================= Capítulo 6: a Elite dos Quatro (H-9) ========================= */
+  // a proposta "A base na Mansão", aprovada ("pode seguir exatamente com esse roteiro"), com o refino
+  // do Fellipe: a caixa de texto nunca tampa ninguém (a câmera das cenas e o teste do ui-smoke)
+
+  // o primeiro Jogar da Lorelei (o gatilho de antes da fase), com os três pássaros livres: na porta
+  // da Victory Road, o guarda conta que a Liga está vazia e entrega o bilhete do Lance. A fase não
+  // começa: a volta é para o mapa da jornada, com a trava nova (data/stages.js)
+  victory_road: {
+    map: 'rota23_portao', spot: { x: 5, y: 8, dir: 'right' },
+    trigger: [{ on: 'play', target: 'e4_lorelei' }],
+    preload: ['npc/bilhete'],
+    steps: [
+      { do: 'wait', t: 0.5 },
+      { do: 'say', name: 'Guarda', lines: ['A Insígnia da Terra... São as oito! Pode passar: a Victory Road é logo ali.'] },
+      { do: 'emote', who: 'player' },
+      { do: 'say', name: 'Guarda', lines: ['Mas não adianta subir agora. A Liga está vazia.'] },
+      { do: 'face', who: 'guarda', dir: 'up' },
+      { do: 'say', name: 'Guarda', lines: ['Ontem à noite os quatro desceram juntos: a Lorelei, o Bruno, a Agatha e o Lance. Em vinte anos de guarda, nunca vi isso.'] },
+      { do: 'face', who: 'guarda', dir: 'left' },
+      { do: 'item', sprite: 'npc/bilhete', at: [10.5, 1.2] },
+      { do: 'say', name: 'Guarda', lines: ['O Lance deixou um bilhete para o primeiro treinador que chegasse aqui com as oito insígnias.'] },
+      { do: 'say', name: 'Bilhete', lines: [
+        'Os pássaros de Kanto voltaram, mas alguém continua prendendo Pokémon fortes. Os fantasmas da Agatha sentiram um sofrendo na velha Mansão de Cinnabar.',
+        'Nós vamos acabar com isso. Se não voltarmos, a Liga continua fechada. Lance.'
+      ] },
+      { do: 'item', off: true },
+      { do: 'say', name: 'Guarda', lines: ['Se você chegou até aqui, é forte. Talvez eles precisem de ajuda.'] },
+      // fecha "Siga pela Victory Road" e abre "Ajude a Elite dos Quatro" (o objetivo `scene`)
+      { do: 'end', then: 'campaign' }
+    ]
+  },
+
+  // a chegada à Mansão (pela marca de Cinnabar no mapa da jornada), uma vez: o Blaine na porta
+  mansao_entrada: {
+    map: 'mansao_1f', spot: { x: 8, y: 32, dir: 'up' },
+    trigger: [{ on: 'enter', target: 'mansao_1f' }],
+    steps: [
+      { do: 'wait', t: 0.5 },
+      { do: 'say', lines: ['A Mansão Pokémon. Queimada e abandonada há anos... e com a porta arrombada.'] },
+      { do: 'face', who: 'blaine', dir: 'down' },
+      { do: 'emote', who: 'blaine' },
+      { do: 'say', name: 'Blaine', lines: ['Hah! Eu sabia que você vinha.'] },
+      { do: 'say', name: 'Blaine', lines: ['Os quatro entraram ontem à noite e não saíram. Eu vi da janela do ginásio.'] },
+      { do: 'face', who: 'blaine', dir: 'up' },
+      { do: 'say', name: 'Blaine', lines: ['Esta mansão foi um laboratório. Eu trabalhei aqui, há muitos anos. O que fizemos lá embaixo... eu prefiro esquecer.'] },
+      { do: 'face', who: 'blaine', dir: 'down' },
+      { do: 'say', name: 'Blaine', lines: ['Uma dica: as estátuas escondem um interruptor. Ele abre umas passagens e fecha outras. Leia os diários pelo caminho.'] },
+      { do: 'say', name: 'Blaine', lines: ['Pergunta bônus: o que se esconde no porão de uma casa queimada? ...Essa, eu não quero saber a resposta.'] },
+      // ele sai pela porta (pelo lado do jogador)
+      { do: 'walk', who: 'blaine', to: [[9, 33]], speed: 0.14 },
+      { do: 'hide', who: 'blaine' },
+      { do: 'end' }
+    ]
+  },
+
+  // o laboratório do subsolo (pisar na passagem que o interruptor abre): o Mewtwo na máquina, a
+  // Elite dos Quatro nas jaulas, a emboscada do Maxie (a primeira aparição dele), os três pássaros e
+  // a libertação, sem luta (decisão do Fellipe). As jaulas e a máquina mudam pelas flags da cena
+  mansao_lab: {
+    map: 'mansao_b1f', spot: { x: 13, y: 11, dir: 'left' },
+    trigger: [{ on: 'tile', target: 'mansao_b1f', cells: MANSAO_DOOR }],
+    when: { quest: 'c6_e4' },
+    preload: ['npc/emblema', 'dive/maxie', 'dive/crobat'],
+    actors: {
+      maxie: { sprite: 'dive/maxie', x: 13, y: 11, dir: 'left', hidden: true },
+      capanga1: { sprite: 'npc/capanga', x: 14, y: 11, dir: 'left', hidden: true },
+      capanga2: { sprite: 'npc/capanga', x: 13, y: 12, dir: 'left', hidden: true },
+      gelo1: { sprite: 'npc/gelo', x: 11, y: 10, hidden: true },
+      gelo2: { sprite: 'npc/gelo', x: 12, y: 12, hidden: true },
+      fogo: { sprite: 'npc/fogo', x: 10, y: 10.4, hidden: true },
+      raio: { sprite: 'npc/raio', x: 9, y: 8, hidden: true },
+      zapdos: { sprite: 'npc/zapdos', x: 9, y: 8, hidden: true },
+      articuno: { sprite: 'npc/articuno', x: 11, y: 8, hidden: true },
+      moltres: { sprite: 'npc/moltres', x: 7, y: 9, hidden: true },
+      crobat: { sprite: 'dive/crobat', x: 11, y: 11, hidden: true }
+    },
+    steps: [
+      // a câmera mostra a sala inteira acima da caixa de texto: as jaulas, a máquina e a passagem
+      { do: 'camera', x: 8, y: 7.6, t: 0.6 },
+      { do: 'say', lines: ['Um laboratório escondido. As máquinas zumbem, e uma luz roxa pulsa no meio da sala.'] },
+      { do: 'walk', who: 'player', to: [[9, 6, 'up']] },
+      { do: 'emote', who: 'player' },
+      { do: 'say', lines: ['Presos em jaulas: a Lorelei, o Bruno, a Agatha e o Lance!'] },
+      { do: 'face', who: 'lance', dir: 'left' },
+      { do: 'say', name: 'Lance', lines: ['{player}?! Não chegue perto! É uma armadilha!'] },
+      { do: 'face', who: 'player', dir: 'up' },
+      { do: 'say', lines: ['No meio da sala, uma máquina como as dos pássaros. Presa nela, a criatura dos diários: o Mewtwo.'] },
+      { do: 'face', who: 'agatha', dir: 'left' },
+      { do: 'say', name: 'Agatha', lines: ['Hehe... Os meus fantasmas não mentem. Ele sofre há dias aí dentro.'] },
+      // a emboscada: o homem de vermelho e os dois capangas de capuz, pela passagem
+      { do: 'show', who: 'maxie' },
+      { do: 'show', who: 'capanga1' },
+      { do: 'show', who: 'capanga2' },
+      { do: 'face', who: 'player', dir: 'right' },
+      { do: 'emote', who: 'player' },
+      { do: 'say', name: '???', lines: ['Muito bem. Mais um que veio sozinho.'] },
+      { do: 'walk', who: 'maxie', to: [[11, 11]], speed: 0.16 },
+      { do: 'walk', who: 'capanga1', to: [[12, 11]], speed: 0.16 },
+      { do: 'say', name: 'Maxie', lines: ['Eu sou o Maxie. Você soltou os meus pássaros, um por um. Achou mesmo que eu não ia notar?'] },
+      // o emblema do uniforme: o mesmo das máquinas (o pagamento de todos os rastros)
+      { do: 'item', sprite: 'npc/emblema', at: [12.5, 3.2] },
+      { do: 'emote', who: 'player' },
+      { do: 'say', lines: ['O emblema no uniforme dele... O mesmo das máquinas!'] },
+      { do: 'item', off: true },
+      { do: 'say', name: 'Maxie', lines: ['As Poké Balls não abrem perto da minha máquina. Foi assim que eu peguei os quatro.'] },
+      { do: 'walk', who: 'capanga1', to: [[11, 10, 'up']], speed: 0.16 },
+      { do: 'walk', who: 'capanga2', to: [[12, 12, 'up']], speed: 0.16 },
+      { do: 'say', name: 'Maxie', lines: ['Peguem a criança. Ela vai para uma jaula também.'] },
+      // os três pássaros: o raio, o gelo e o fogo
+      { do: 'show', who: 'raio' },
+      { do: 'flash', t: 0.45 },
+      { do: 'cry', dex: 145 },
+      { do: 'shake', t: 0.5, power: 2 },
+      { do: 'hide', who: 'raio' },
+      { do: 'land', who: 'zapdos', t: 0.5, height: 120 },
+      { do: 'say', lines: ['Um trovão rasga o teto!'] },
+      { do: 'land', who: 'articuno', t: 0.6, height: 150 },
+      { do: 'cry', dex: 144 },
+      { do: 'show', who: 'gelo1' },
+      { do: 'show', who: 'gelo2' },
+      { do: 'say', lines: ['O gelo prende os capangas no chão!'] },
+      { do: 'land', who: 'moltres', t: 0.6, height: 150 },
+      { do: 'cry', dex: 146 },
+      { do: 'show', who: 'fogo' },
+      { do: 'say', lines: ['Uma parede de fogo entre o Maxie e {player}!'] },
+      { do: 'say', lines: ['Os três pássaros voltaram. Dessa vez, para proteger {player}.'] },
+      { do: 'emote', who: 'maxie' },
+      { do: 'say', name: 'Maxie', lines: ['Os pássaros... vieram por você?!'] },
+      { do: 'show', who: 'crobat' },
+      { do: 'say', name: 'Maxie', lines: ['Isso não acabou, criança. A energia deles já está onde precisa estar.'] },
+      // o Crobat agarra o Maxie e foge com ele pelo buraco do teto
+      { do: 'hide', who: 'maxie' },
+      { do: 'fly', who: 'crobat', t: 0.9, height: 220 },
+      { do: 'hide', who: 'fogo' },
+      // os pássaros destroem a máquina; o Mewtwo, livre, some num clarão
+      { do: 'flash', t: 0.6 },
+      { do: 'shake', t: 0.6, power: 3 },
+      { do: 'flag', name: 'mansao_maquina' },
+      { do: 'say', lines: ['Raio, gelo e fogo: a máquina explode!'] },
+      // ele encara o jogador durante a fala, e o clarão vem depois dela
+      { do: 'say', lines: ['O Mewtwo encara {player} por um instante... e some num clarão.'] },
+      { do: 'flash', t: 0.5, power: 0.8 },
+      { do: 'flag', name: 'mansao_mewtwo' },
+      // sem a máquina, as jaulas abrem; os quatro saem (os capangas continuam presos no gelo)
+      { do: 'flag', name: 'mansao_jaulas' },
+      { do: 'walk', who: 'lorelei', to: [[2, 5, 'right']], speed: 0.16 },
+      { do: 'walk', who: 'bruno', to: [[3, 5, 'right']], speed: 0.16 },
+      { do: 'walk', who: 'agatha', to: [[10, 5, 'left']], speed: 0.16 },
+      { do: 'walk', who: 'lance', to: [[11, 5, 'left']], speed: 0.16 },
+      { do: 'face', who: 'player', dir: 'up' },
+      { do: 'say', name: 'Lance', lines: ['A máquina caiu, e as jaulas abriram. Você nos salvou, {player}.'] },
+      { do: 'say', name: 'Lorelei', lines: ['Viemos acabar com ele e caímos direto na armadilha. Que vergonha.'] },
+      { do: 'say', name: 'Bruno', lines: ['Hmph! Toda a minha força, e eu não dobrei uma grade. Você tem coragem.'] },
+      { do: 'say', name: 'Agatha', lines: ['Hehe... Os pássaros confiam em você. Isso diz muito, criança.'] },
+      { do: 'say', name: 'Lance', lines: ['Vamos voltar para a Liga. Quando você chegar, estaremos esperando, e não vamos pegar leve.'] },
+      // os três gritam e voam juntos pelo buraco do teto, sem medo
+      { do: 'cry', dex: 145 },
+      { do: 'fly', who: 'zapdos', t: 0.6, height: 220 },
+      { do: 'fly', who: 'articuno', t: 0.6, height: 220 },
+      { do: 'fly', who: 'moltres', t: 0.6, height: 220 },
+      { do: 'toast', text: 'A Elite dos Quatro voltou para a Liga.', icon: 'stages' },
+      // o atalho: de volta para a vila (o padrão das missões a pé)
+      { do: 'end', then: 'home' }
+    ]
   }
 };
 
 /** Os passos que o game/Cutscene.js conhece (o check-data confere). */
 export const CUTSCENE_STEPS = ['wait', 'say', 'talk', 'show', 'hide', 'place', 'walk', 'face', 'emote', 'throw', 'cutin',
   'bird', 'fade', 'camera', 'shake', 'give', 'quest', 'emit', 'card', 'flag', 'cry', 'tremble', 'fly', 'toast', 'storm', 'item',
-  'mist', 'end'];
+  'mist', 'land', 'flash', 'end'];
 
 /** O que pode começar uma cena. */
 export const CUTSCENE_TRIGGERS = ['enter', 'npc', 'starter', 'win', 'play', 'tile'];

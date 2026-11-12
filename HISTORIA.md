@@ -181,8 +181,8 @@ ladrão: o **Maxie**.
   - de perto, o pico escuro do emblema **lembra um vulcão**;
   - a Liga reabre a Victory Road.
 
-### Capítulo 6 — A Elite dos Quatro 📝
-(O ajuste do Fellipe de 2026-11-12, seção 8.1, e a proposta "A base na Mansão".)
+### Capítulo 6 — A Elite dos Quatro ✅
+(O ajuste do Fellipe de 2026-11-12, seção 8.1, e a proposta "A base na Mansão", feita na H-9.)
 - A Victory Road se abre com os três pássaros livres.
 - **Ao começar a Victory Road**, a cena: a Elite dos Quatro se juntou para derrotar uma ameaça
   maior e foi até a base. A quest: "Ajude a Elite dos Quatro". A Liga fica fechada.

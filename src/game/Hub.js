@@ -74,7 +74,10 @@ export class Hub {
     this.mapId = mapId;
     this.place = HUB.maps[mapId];
     this.map = HUB_MAPS[mapId];
-    this.npcs = (this.place.npcs ?? []).map((npc) => ({ ...npc, timer: between(...CONFIG.hub.lookEvery) }));
+    // `hideIf` (H-9): quem já saiu da história não aparece (a Elite dos Quatro, depois da Mansão)
+    let ctx = null;
+    const gone = (cond) => { ctx ??= this._context(); return (Array.isArray(cond) ? cond : [cond]).some((c) => this._matches(c, ctx)); };
+    this.npcs = (this.place.npcs ?? []).map((npc) => ({ ...npc, hidden: !!npc.hideIf && gone(npc.hideIf), timer: between(...CONFIG.hub.lookEvery) }));
     this.banner = { text: this.place.name, t: CONFIG.hub.bannerSeconds };
     // num palco de cena (0.39), a tela fica cheia
     this.game.onPlaceChange?.();
@@ -114,7 +117,13 @@ export class Hub {
   inside(x, y) { return x >= 0 && y >= 0 && x < this.map.width && y < this.map.height; }
 
   /** O tile em si (sem contar quem está em cima). */
-  floor(x, y) { return this.inside(x, y) && this.map.walk[y][x] === '.'; }
+  floor(x, y) { return this.inside(x, y) && (this.switchOn ? this.map.walkOn : this.map.walk)[y][x] === '.'; }
+
+  /**
+   * O interruptor das estátuas (a Mansão Pokémon, H-9): apertado, as barreiras trocam de lugar nos
+   * quatro andares de uma vez, como no FireRed. Fica guardado na jornada (`switch` do lugar).
+   */
+  get switchOn() { return !!this.map?.walkOn && !!this.place?.switch && !!this._flags()[this.place.switch]; }
 
   npcAt(x, y) { return this.npcs.find((npc) => !npc.hidden && npc.x === x && npc.y === y) ?? null; }
 
@@ -612,6 +621,13 @@ export class Hub {
       case 'mart': game.menus.showModal('modal-mart'); break;
       case 'save': game.saveToFile(); break;
       case 'campaign': game.openCampaign(); break;
+      // a estátua da Mansão (H-9): vira o interruptor, e as barreiras trocam de lugar
+      case 'switch': {
+        const flags = this._flags();
+        flags[this.place.switch] = !flags[this.place.switch];
+        game.autosave?.();
+        break;
+      }
       case 'pokedoll': game.menus.showModal('modal-decor'); break;
       case 'badges': game.menus.showModal('modal-badges'); break;
       case 'aquatic': this._fadeOut(() => game.openDive()); break;   // escurece e aparece lá embaixo (0.37.1)
@@ -707,6 +723,7 @@ export class Hub {
         // as cenas (0.39): a cena `value` já foi vista; a flag `value` da vila está marcada
         case 'scene': if (ctx.scenes?.[value] !== 'seen') return false; break;
         case 'flag': if (!this._flags()[value]) return false; break;
+        case 'noflag': if (this._flags()[value]) return false; break;
         // as missões (H-5): o lendário `value` já foi liberado / ainda está preso
         case 'freed': if ((ctx.missions?.[value] ?? 'preso') === 'preso') return false; break;
         case 'mission': if (Object.entries(value).some(([id, state]) => (ctx.missions?.[id] ?? 'preso') !== state)) return false; break;

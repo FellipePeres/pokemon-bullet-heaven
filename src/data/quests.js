@@ -41,6 +41,7 @@ export const CHAPTERS = {
   cap5: 'Capítulo 5 — A suspeita',
   // H-8 e a decisão 22: o Capítulo 6 é o da Elite dos Quatro (a Victory Road e a base do Maxie, H-9)
   cap6: 'Capítulo 6 — A Elite dos Quatro',
+  cap7: 'Capítulo 7 — O sonho',
   // as missões dos lendários (azuis) levam o nome do lugar
   usina: 'A Usina'
 };
@@ -225,7 +226,23 @@ export const QUESTS = {
   c6_liga: {
     kind: 'story', chapter: 'cap6',
     desc: 'Os três pássaros estão livres, e a Liga reabriu a Victory Road. O caminho até a Liga Pokémon está aberto.',
-    objectives: [{ text: 'Siga pela Victory Road até a Liga Pokémon', on: 'win', target: 'e4_lorelei', doneIf: { cleared: 'e4_lorelei' } }],
+    // (H-9) fecha na cena da porta da Victory Road (o Jogar da Lorelei), onde a Liga está vazia
+    objectives: [{ text: 'Siga pela Victory Road até a Liga Pokémon', on: 'scene', target: 'victory_road' }],
+    next: ['c6_e4'],
+    reward: null
+  },
+  // o bilhete do Lance (H-9): a quest dourada até a cena do subsolo da Mansão (sem citar quem os prendeu)
+  c6_e4: {
+    kind: 'story', chapter: 'cap6',
+    desc: 'A Elite dos Quatro desceu junta atrás de quem prende Pokémon fortes, e não voltou. O bilhete do Lance fala da velha Mansão de Cinnabar.',
+    objectives: [{ text: 'Ajude a Elite dos Quatro', on: 'scene', target: 'mansao_lab' }],
+    next: ['c7_liga'],
+    reward: null
+  },
+  c7_liga: {
+    kind: 'story', chapter: 'cap7',
+    desc: 'A Elite dos Quatro voltou para a Liga e espera você, sem pegar leve.',
+    objectives: [{ text: 'Vença a Elite dos Quatro', on: 'win', target: 'e4_lance', doneIf: { cleared: 'e4_lance' } }],
     next: [],
     reward: null
   },

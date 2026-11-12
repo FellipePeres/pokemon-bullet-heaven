@@ -1696,8 +1696,8 @@ console.log('\n[a missão do Moltres — preso, o Sol forte, o chão em brasa, o
   // H-8: a Liga espera a missão do Moltres (as hordas na Victory Road)
   const { storyLocked, isStageUnlocked } = await import('../src/data/stages.js');
   check('a Lorelei fica presa pela trava depois da Fase 8, sem citar o Moltres, e abre com a missão vencida',
-        storyLocked('e4_lorelei', ['gym_8_viridian']) && !STAGES.e4_lorelei.lock.text.includes('Moltres')
-        && !STAGES.e4_lorelei.lock.go.includes('Moltres') && isStageUnlocked('e4_lorelei', ['gym_8_viridian', 'moltres']));
+        storyLocked('e4_lorelei', ['gym_8_viridian'])?.stage === 'moltres' && !storyLocked('e4_lorelei', ['gym_8_viridian']).text.includes('Moltres')
+        && !storyLocked('e4_lorelei', ['gym_8_viridian']).go.includes('Moltres') && isStageUnlocked('e4_lorelei', ['gym_8_viridian', 'moltres']));
 }
 
 // ------------------------------------------- os degraus de pular do Monte Brasa (H-8)
@@ -1720,6 +1720,46 @@ console.log('\n[o Monte Brasa — os degraus de pular do FireRed]');
   check('...pula por cima dele no sentido dele (2 tiles), e não no outro',
         JSON.stringify(hub.jumpFrom(ledge.x, ledge.y - 1, 'down')) === JSON.stringify({ x: ledge.x, y: ledge.y + 1 })
         && hub.jumpFrom(ledge.x, ledge.y + 1, 'up') === null);
+}
+
+// ------------------------------------------- a Elite dos Quatro e a Mansão (H-9)
+console.log('\n[a Liga e a Mansão — a trava por cena, os interruptores das estátuas]');
+{
+  const { storyLocked, isStageUnlocked, storyProgress } = await import('../src/data/stages.js');
+  const { Hub } = await import('../src/game/Hub.js');
+  const { HUB } = await import('../src/data/hub.js');
+  const { HUB_MAPS } = await import('../src/data/hubMaps.js');
+  const base = ['gym_8_viridian', 'moltres'];
+  check('com o Moltres livre, a Lorelei abre (o Jogar toca a cena da Victory Road)',
+        !storyLocked('e4_lorelei', base) && isStageUnlocked('e4_lorelei', base));
+  const held = storyLocked('e4_lorelei', [...base, 'scene:victory_road']);
+  check('depois da cena da Victory Road, a Liga fecha de novo: "A Liga está vazia", com o botão para a Mansão',
+        held?.scene === 'mansao_lab' && held.text.includes('A Liga está vazia') && held.place === 'mansao'
+        && !isStageUnlocked('e4_lorelei', [...base, 'scene:victory_road']));
+  check('...sem citar quem prendeu os quatro (nem o Maxie, nem o Mewtwo)',
+        !['Maxie', 'Mewtwo'].some((n) => held.text.includes(n) || held.go.includes(n)));
+  check('...e abre de vez com a cena do subsolo da Mansão',
+        isStageUnlocked('e4_lorelei', [...base, 'scene:victory_road', 'scene:mansao_lab']) && !storyLocked('e4_lorelei', [...base, 'scene:victory_road', 'scene:mansao_lab']));
+  check('o progresso das travas: as fases vencidas e as cenas vistas (só as vistas)',
+        JSON.stringify(storyProgress({ clearedStages: ['gym_1_pewter'], scenes: { a: 'seen', b: 'started' } })) === JSON.stringify(['gym_1_pewter', 'scene:a']));
+
+  // o interruptor: a colisão e o desenho do andar apertado, nos quatro andares
+  check('os quatro andares da Mansão têm o andar apertado (o desenho e a colisão do script do pret)',
+        ['mansao_1f', 'mansao_2f', 'mansao_3f', 'mansao_b1f'].every((id) => HUB_MAPS[id].walkOn?.length === HUB_MAPS[id].height && HUB_MAPS[id].srcOn && HUB.maps[id].switch === 'mansao_interruptor'));
+  const flags = {};
+  const hub = Object.create(Hub.prototype);
+  Object.assign(hub, { map: HUB_MAPS.mansao_1f, place: HUB.maps.mansao_1f, mapId: 'mansao_1f', game: {} });
+  hub._flags = () => flags;
+  const before = [hub.floor(22, 10), hub.floor(32, 18)];
+  hub._act('switch');
+  const after = [hub.floor(22, 10), hub.floor(32, 18)];
+  check('virar a estátua troca as barreiras: no 1º andar, abre a passagem de 22,10 e fecha a de 32,18 (como no FireRed)',
+        !before[0] && before[1] && after[0] && !after[1] && hub.switchOn && flags.mansao_interruptor === true);
+  hub._act('switch');
+  check('...e virar de novo devolve', !hub.switchOn && !hub.floor(22, 10) && hub.floor(32, 18));
+  hub.map = HUB_MAPS.mansao_b1f; hub.place = HUB.maps.mansao_b1f;
+  check('o laboratório do subsolo só se abre com o interruptor apertado (a passagem 12,10-12)',
+        !hub.floor(12, 11) && (hub._act('switch'), hub.floor(12, 11)));
 }
 
 // ------------------------------------------- a regra dos patamares de Seafoam (H-7)

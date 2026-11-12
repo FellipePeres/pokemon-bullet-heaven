@@ -1,6 +1,6 @@
 import { el, create, clear, show, hide } from './dom.js';
 import { getPokemon } from '../data/pokemon.js';
-import { STAGES, isStageUnlocked, storyLocked } from '../data/stages.js';
+import { STAGES, isStageUnlocked, storyLocked, storyProgress } from '../data/stages.js';
 import { getTrainerLook } from '../data/trainers.js';
 import { REGION_MAP, STAGE_CITY, HOME_CITY, STORY_PLACES, cityName, cityPoint, placePoint } from '../data/regionMap.js';
 import { emptyStageStats } from '../systems/stageStats.js';
@@ -50,7 +50,7 @@ export class Lobby {
 
   /** A próxima fase da jornada (ou a última, se tudo já foi vencido). */
   get nextStage() {
-    const cleared = this.campaign.clearedStages;
+    const cleared = storyProgress(this.campaign);
     // a fase presa pela trava da história (H-4) também é a próxima: o painel diz o que falta
     return this.stages.find((s) => !cleared.includes(s.id) && (isStageUnlocked(s.id, cleared) || storyLocked(s.id, cleared)))
       ?? this.stages.at(-1);
@@ -113,7 +113,7 @@ export class Lobby {
   _map() {
     const map = clear(el('lobby-map'));
     map.style.backgroundImage = `url(${REGION_MAP.src})`;
-    const cleared = this.campaign.clearedStages;
+    const cleared = storyProgress(this.campaign);
 
     // uma marca por cidade: a Liga e o Campeão dividem o Indigo Plateau
     const byCity = new Map();
@@ -211,7 +211,7 @@ export class Lobby {
     if (this.selected?.startsWith('place:')) { this._placePanel(this.selected.slice(6)); return; }
     const panel = clear(el('lobby-panel'));
     const stage = STAGES[this.selected];
-    const cleared = this.campaign.clearedStages;
+    const cleared = storyProgress(this.campaign);
     const unlocked = isStageUnlocked(stage.id, cleared);
     const done = cleared.includes(stage.id);
     const [chapter, title] = stage.name.split(' — ');
@@ -310,15 +310,16 @@ export class Lobby {
     panel.appendChild(create('p', 'panel-trail', `${trail} · ${formatTime(stage.duration)}`));
 
     // a trava da história (H-4): o que fecha o caminho e para onde ir (sem spoiler: a Usina)
-    if (storyLocked(stage.id, cleared)) {
+    const held = storyLocked(stage.id, cleared);
+    if (held) {
       const lock = create('div', 'panel-lock');
-      lock.appendChild(create('p', '', stage.lock.text));
-      const place = stage.lock.place && this.places.some(([id]) => id === stage.lock.place);
-      const go = create('button', 'panel-lock-go', stage.lock.go);
+      lock.appendChild(create('p', '', held.text));
+      const place = held.place && this.places.some(([id]) => id === held.place);
+      const go = create('button', 'panel-lock-go', held.go);
       go.type = 'button';
       go.id = 'panel-lock-go';
       go.disabled = !place;
-      go.onclick = () => { this.selected = `place:${stage.lock.place}`; this.render(); };
+      go.onclick = () => { this.selected = `place:${held.place}`; this.render(); };
       lock.appendChild(go);
       panel.appendChild(lock);
     }

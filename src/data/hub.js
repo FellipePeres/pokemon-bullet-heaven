@@ -27,6 +27,8 @@
  */
 /** As células da máquina no alto do cume do Monte Brasa (H-8): ela não se atravessa. */
 const BRASA_MACHINE = [[8, 5], [9, 5], [10, 5], [11, 5], [8, 6], [9, 6], [10, 6], [11, 6]];
+// a máquina do Mewtwo no laboratório do subsolo da Mansão (H-9): 4 x 3 tiles, encostada na parede
+const MANSAO_MACHINE = [5, 6, 7, 8].flatMap((x) => [[x, 3], [x, 4], [x, 5]]);
 
 export const HUB = {
   spawn: {
@@ -583,6 +585,139 @@ export const HUB = {
       loot: [
         // no caminho de ida, à vista da rota (pedido do Fellipe na H-7)
         { id: 'c1', x: 10, y: 11, item: 'reroll' }
+      ]
+    },
+
+    // ---------------- o Capítulo 6 (H-9): a porta da Victory Road e a Mansão Pokémon ----------------
+    // o recorte da Rota 23: o último guarda das insígnias, na porta da Victory Road (o palco da cena
+    // de antes da fase da Lorelei)
+    rota23_portao: {
+      name: 'Rota 23',
+      scene: true,
+      npcs: [
+        { id: 'guarda', sprite: 'policeman', x: 6, y: 8, dir: 'left', talk: 'guarda_rota23' }
+      ],
+      things: []
+    },
+
+    // a Mansão Pokémon de Cinnabar, a base do Maxie: os quatro andares do FireRed, só por onde o jogo
+    // deixa. As estátuas viram o interruptor (`switch`), que troca as barreiras dos quatro andares
+    // (o desenho e a colisão do andar apertado vêm do hub.py). 15 Poké Balls: as 11 do FireRed (a
+    // Chave Secreta sai) e 4 no caminho de ida
+    mansao_1f: {
+      name: 'Mansão Pokémon',
+      explore: true,
+      music: 'mus_poke_mansion',
+      switch: 'mansao_interruptor',
+      warps: [
+        { x: 7, y: 33, on: 'mat', to: 'vila', tx: 6, ty: 17, dir: 'down' },
+        { x: 8, y: 33, on: 'mat', to: 'vila', tx: 6, ty: 17, dir: 'down' },
+        { x: 9, y: 33, on: 'mat', to: 'vila', tx: 6, ty: 17, dir: 'down' },
+        { x: 34, y: 33, on: 'mat', to: 'vila', tx: 6, ty: 17, dir: 'down' },
+        { x: 10, y: 13, on: 'step', to: 'mansao_2f', tx: 6, ty: 14, dir: 'right' },
+        { x: 25, y: 27, on: 'step', to: 'mansao_b1f', tx: 34, ty: 29, dir: 'left' }
+      ],
+      npcs: [
+        // na porta, só na chegada (a cena `mansao_entrada`): depois, ele vai embora
+        { id: 'blaine', sprite: 'blaine', x: 8, y: 30, dir: 'up', talk: 'blaine_mansao', hideIf: { scene: 'mansao_entrada' } }
+      ],
+      things: [
+        { cells: [[5, 5]], talk: 'estatua_mansao' }
+      ],
+      loot: [
+        { id: 'fr1', x: 29, y: 32, item: 'reroll' }, { id: 'fr2', x: 22, y: 6, item: 'revive' },
+        { id: 'fr3', x: 27, y: 15, item: 'reroll' },
+        // no caminho de ida, à vista da rota (o padrão das missões a pé)
+        { id: 'c1', x: 9, y: 24, item: 'revive' }
+      ]
+    },
+    mansao_2f: {
+      name: 'Mansão Pokémon',
+      explore: true,
+      music: 'mus_poke_mansion',
+      switch: 'mansao_interruptor',
+      warps: [
+        { x: 6, y: 14, on: 'step', to: 'mansao_1f', tx: 10, ty: 13, dir: 'left' },
+        { x: 9, y: 3, on: 'step', to: 'mansao_3f', tx: 8, ty: 3, dir: 'right' },
+        { x: 34, y: 22, on: 'step', to: 'mansao_3f', tx: 34, ty: 18, dir: 'right' },
+        { x: 9, y: 14, on: 'step', to: 'mansao_3f', tx: 11, ty: 11, dir: 'right' }
+      ],
+      npcs: [],
+      things: [
+        { cells: [[2, 16]], talk: 'estatua_mansao' },
+        { cells: [[25, 4]], talk: 'diario_5jul' },
+        { cells: [[6, 31]], talk: 'diario_10jul' }
+      ],
+      loot: [
+        { id: 'fr1', x: 36, y: 8, item: 'revive' }, { id: 'fr2', x: 18, y: 23, item: 'reroll' },
+        { id: 'fr3', x: 35, y: 17, item: 'revive' },
+        { id: 'c1', x: 10, y: 9, item: 'reroll' }
+      ]
+    },
+    mansao_3f: {
+      name: 'Mansão Pokémon',
+      explore: true,
+      music: 'mus_poke_mansion',
+      switch: 'mansao_interruptor',
+      warps: [
+        { x: 8, y: 3, on: 'step', to: 'mansao_2f', tx: 9, ty: 3, dir: 'left' },
+        { x: 34, y: 18, on: 'step', to: 'mansao_2f', tx: 34, ty: 22, dir: 'left' },
+        { x: 11, y: 11, on: 'step', to: 'mansao_2f', tx: 9, ty: 14, dir: 'left' },
+        // os buracos do chão queimado: caem no 1º andar (e os da direita, no 2º), como no FireRed
+        { x: 18, y: 18, on: 'step', to: 'mansao_1f', tx: 19, ty: 22, dir: 'down' },
+        { x: 19, y: 18, on: 'step', to: 'mansao_1f', tx: 20, ty: 22, dir: 'down' },
+        { x: 20, y: 18, on: 'step', to: 'mansao_1f', tx: 20, ty: 22, dir: 'down' },
+        { x: 23, y: 18, on: 'step', to: 'mansao_2f', tx: 27, ty: 17, dir: 'down' },
+        { x: 24, y: 18, on: 'step', to: 'mansao_2f', tx: 27, ty: 17, dir: 'down' }
+      ],
+      npcs: [],
+      things: [
+        { cells: [[12, 5]], talk: 'estatua_mansao' },
+        { cells: [[8, 16]], talk: 'diario_6fev' }
+      ],
+      loot: [
+        { id: 'fr1', x: 9, y: 19, item: 'reroll' }, { id: 'fr2', x: 32, y: 6, item: 'revive' },
+        { id: 'c1', x: 17, y: 8, item: 'reroll' }
+      ]
+    },
+    // o subsolo: o laboratório (a sala da Chave Secreta do FireRed) com o Mewtwo na máquina e a Elite
+    // dos Quatro nas jaulas. A cena `mansao_lab` começa na passagem que o interruptor abre (12, 10-12)
+    mansao_b1f: {
+      name: 'Mansão Pokémon',
+      explore: true,
+      music: 'mus_poke_mansion',
+      switch: 'mansao_interruptor',
+      pulse: { x: 7, y: 4, color: 'psychic', when: { noflag: 'mansao_maquina' } },
+      warps: [
+        { x: 34, y: 29, on: 'step', to: 'mansao_1f', tx: 25, ty: 27, dir: 'right' }
+      ],
+      npcs: [
+        { id: 'lorelei', sprite: 'lorelei', x: 2, y: 4, dir: 'down', talk: 'e4_jaula', hideIf: { scene: 'mansao_lab' } },
+        { id: 'bruno', sprite: 'bruno', x: 3, y: 4, dir: 'down', talk: 'e4_jaula', hideIf: { scene: 'mansao_lab' } },
+        { id: 'agatha', sprite: 'agatha', x: 10, y: 4, dir: 'down', talk: 'e4_jaula', hideIf: { scene: 'mansao_lab' } },
+        { id: 'lance', sprite: 'lance', x: 11, y: 4, dir: 'down', talk: 'e4_jaula', hideIf: { scene: 'mansao_lab' } }
+      ],
+      things: [
+        { cells: [[24, 29]], talk: 'estatua_mansao' },
+        { cells: [[27, 5]], talk: 'estatua_mansao' },
+        { cells: [[21, 27]], talk: 'diario_1set' },
+        { cells: [[19, 2], [20, 2], [21, 2]], talk: 'anotacao_capuz' }
+      ],
+      decor: [
+        // a máquina do Mewtwo (roxa) e ele em cima; na cena, os pássaros a destroem (as flags da cena)
+        { sprite: 'maquina_mewtwo', x: 6.5, y: 5, cells: MANSAO_MACHINE, hideIf: { flag: 'mansao_maquina' } },
+        { sprite: 'maquina_mewtwo_quebrada', x: 6.5, y: 5, cells: MANSAO_MACHINE, hideIf: { noflag: 'mansao_maquina' } },
+        { sprite: 'mewtwo', x: 6.5, y: 5, oy: -30, hideIf: { flag: 'mansao_mewtwo' } },
+        // as jaulas, na frente de cada um; abrem quando a máquina cai
+        ...[2, 3, 10, 11].flatMap((x) => [
+          { sprite: 'jaula', x, y: 4, solid: true, front: true, hideIf: { flag: 'mansao_jaulas' } },
+          { sprite: 'jaula_aberta', x, y: 4, solid: true, front: true, hideIf: { noflag: 'mansao_jaulas' } }
+        ])
+      ],
+      loot: [
+        { id: 'fr1', x: 6, y: 21, item: 'revive' }, { id: 'fr2', x: 23, y: 4, item: 'reroll' },
+        { id: 'fr3', x: 2, y: 29, item: 'revive' },
+        { id: 'c1', x: 14, y: 24, item: 'reroll' }
       ]
     },
 

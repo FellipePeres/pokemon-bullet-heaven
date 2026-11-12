@@ -77,6 +77,16 @@ export const STORY_PLACES = {
     text: 'Os homens do Giovanni viram gente com o emblema vermelho subindo o Monte Brasa, carregando peças de máquina. O barco para a Ilha 1 sai de Cinnabar.',
     seenText: 'O vulcão solta fumaça, e as pedras do caminho foram arrastadas para o lado. Alguém subiu até o cume com uma coisa pesada.',
     go: 'Investigar', goSeen: 'Subir o Monte Brasa'
+  },
+  // o bilhete do Lance (H-9): a Mansão Pokémon, em Cinnabar
+  mansao: {
+    name: 'Mansão Pokémon', area: 'Cinnabar', cell: [5.2, 13.2],
+    map: 'mansao_1f', spot: { x: 8, y: 32, dir: 'up' },
+    quests: ['c6_e4'],
+    scene: 'mansao_entrada',
+    text: 'O bilhete do Lance fala da velha Mansão de Cinnabar: os fantasmas da Agatha sentiram um Pokémon sofrendo lá dentro.',
+    seenText: 'A Mansão queimada de Cinnabar, onde os quatro entraram e não saíram. As estátuas escondem um interruptor.',
+    go: 'Investigar', goSeen: 'Entrar na Mansão'
   }
 };
 

@@ -1,6 +1,6 @@
 import { el, create, clear } from './dom.js';
 import { getPokemon } from '../data/pokemon.js';
-import { STAGES, isStageUnlocked } from '../data/stages.js';
+import { STAGES, isStageUnlocked, storyProgress } from '../data/stages.js';
 import { getRegion } from '../data/regions.js';
 import { getTrainerLook, trainerName } from '../data/trainers.js';
 import { badgeUrl } from '../render/sprites.js';
@@ -80,7 +80,7 @@ export class JourneyScreen {
     card.appendChild(team);
 
     // onde ela está
-    const cleared = progress.clearedStages;
+    const cleared = storyProgress(progress);
     const next = stages.find((s) => !cleared.includes(s.id) && isStageUnlocked(s.id, cleared));
     const champion = cleared.includes(stages.at(-1)?.id);
     card.appendChild(create('p', 'journey-next', champion && !next ? `Campeã de ${region.name}!`

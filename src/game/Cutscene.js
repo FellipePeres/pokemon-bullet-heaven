@@ -223,6 +223,24 @@ export class Cutscene {
         if (done) { m.hidden = true; m.lift = 0; m.jx = 0; }
         break;
       }
+      case 'land': {
+        // o contrário do `fly` (H-9, os pássaros na Mansão): aparece lá no alto e pousa no tile dele
+        const m = this.actor(a.who);
+        m.hidden = false;
+        const k = Math.min(1, this.t / (a.t ?? 0.7));
+        m.lift = (a.height ?? 160) * (1 - k) * (1 - k);
+        done = k >= 1;
+        if (done) m.lift = 0;
+        break;
+      }
+      case 'flash': {
+        // um clarão branco na tela inteira, que some em `t` segundos (o raio, a máquina explodindo)
+        const k = Math.min(1, this.t / (a.t ?? 0.4));
+        this.fx.flash = (a.power ?? 1) * (1 - k);
+        done = k >= 1;
+        if (done) this.fx.flash = 0;
+        break;
+      }
       case 'emit': this._emit?.(a.on, a.target ?? null); done = true; break;
       case 'mist': {
         // a névoa (H-7, o fundo de Seafoam): vai do nível de agora até `to` em `t` segundos; `off`

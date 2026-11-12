@@ -1,6 +1,6 @@
 import { el, create, clear } from './dom.js';
 import { getPokemon } from '../data/pokemon.js';
-import { STAGES, isStageUnlocked } from '../data/stages.js';
+import { STAGES, isStageUnlocked, storyProgress } from '../data/stages.js';
 import { getTrainerLook } from '../data/trainers.js';
 import { emptyStageStats } from '../systems/stageStats.js';
 import { badgeUrl, spriteUrl } from '../render/sprites.js';
@@ -45,7 +45,7 @@ export class BadgeCase {
   }
 
   open({ stageId } = {}) {
-    const cleared = this.campaign.clearedStages;
+    const cleared = storyProgress(this.campaign);
     this.selected = stageId ?? [...this.stages].reverse().find((s) => cleared.includes(s.id))?.id ?? this.stages[0].id;
     this.render();
   }
@@ -53,7 +53,7 @@ export class BadgeCase {
   render() {
     const gyms = this.stages.filter((s) => s.leader?.badgeIndex);
     const league = this.stages.filter((s) => !s.leader?.badgeIndex);
-    const cleared = this.campaign.clearedStages;
+    const cleared = storyProgress(this.campaign);
     el('badges-sub').textContent =
       `${gyms.filter((s) => cleared.includes(s.id)).length} de ${gyms.length} insígnias · Liga: ${league.filter((s) => cleared.includes(s.id)).length} de ${league.length}`;
     this._card(gyms);
@@ -84,7 +84,7 @@ export class BadgeCase {
     portrait.alt = '';
     card.appendChild(portrait);
 
-    const cleared = this.campaign.clearedStages;
+    const cleared = storyProgress(this.campaign);
     gyms.forEach((stage, i) => {
       const slot = place(create('button', `card-slot${stage.id === this.selected ? ' on' : ''}`), slotRect(i));
       slot.type = 'button';
@@ -103,7 +103,7 @@ export class BadgeCase {
   /** A Liga e o Campeão, embaixo do cartão. */
   _league(league) {
     const row = clear(el('league-row'));
-    const cleared = this.campaign.clearedStages;
+    const cleared = storyProgress(this.campaign);
     row.appendChild(create('span', 'league-label', 'Liga'));
     for (const stage of league) {
       const chip = create('button', `league-chip${stage.id === this.selected ? ' on' : ''}${cleared.includes(stage.id) ? ' done' : ''}`);
@@ -123,7 +123,7 @@ export class BadgeCase {
   _stats() {
     const box = clear(el('badge-stats'));
     const stage = STAGES[this.selected];
-    const cleared = this.campaign.clearedStages;
+    const cleared = storyProgress(this.campaign);
     const won = cleared.includes(stage.id);
     const stats = { ...emptyStageStats(), ...this.campaign.stageStats?.[stage.id] };
     const leader = stage.leader;

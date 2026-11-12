@@ -120,7 +120,9 @@ export class HubRenderer {
     ctx.imageSmoothingEnabled = false;
     ctx.fillStyle = '#000';
     ctx.fillRect(0, 0, W, H);
-    const base = getSheet(`hub/${hub.mapId}`);
+    // o andar com o interruptor apertado (a Mansão, H-9) tem o próprio desenho
+    const state = hub.switchOn ? '-on' : '';
+    const base = getSheet(`hub/${hub.mapId}${state}`);
     if (base) ctx.drawImage(base.img, ox, oy, mapW, mapH);
     const decor = hub.decor;
     // os móveis comprados assentam no chão; a camada de cima deles vem depois das pessoas
@@ -130,7 +132,8 @@ export class HubRenderer {
     const actors = [];
     for (const item of decor) {
       if (item.piece) continue;
-      actors.push({ y: item.y, order: 0, draw: () => this._sprite(`npc/${item.sprite}`, 0, false, item.x, item.y, item.oy ?? 0) });
+      // `front` (H-9): na frente de quem está no mesmo tile (as grades das jaulas)
+      actors.push({ y: item.y, order: item.front ? 3 : 0, draw: () => this._sprite(`npc/${item.sprite}`, 0, false, item.x, item.y, item.oy ?? 0) });
     }
     for (const npc of hub.npcs) {
       if (npc.hidden) continue;
@@ -149,7 +152,7 @@ export class HubRenderer {
     actors.sort((a, b) => a.y - b.y || a.order - b.order);
     for (const actor of actors) actor.draw();
 
-    const cover = getSheet(`hub/${hub.mapId}-top`);
+    const cover = getSheet(`hub/${hub.mapId}${state}-top`);
     if (cover) ctx.drawImage(cover.img, ox, oy, mapW, mapH);
     for (const item of decor) if (item.piece) this._piece(item, '-top');
     if (over) this._player(hub);
@@ -371,7 +374,8 @@ export class HubRenderer {
     ctx.lineWidth = S;
     for (let k = 0; k < 3; k++) {
       const p = ((clock + k * 0.62) % 1.86) / 1.86;
-      ctx.strokeStyle = pulse.color === 'fire' ? `rgba(255,170,90,${((1 - p) * 0.9).toFixed(3)})` : `rgba(140,215,255,${((1 - p) * 0.9).toFixed(3)})`;
+      const rgb = pulse.color === 'fire' ? '255,170,90' : pulse.color === 'psychic' ? '196,140,255' : '140,215,255';
+      ctx.strokeStyle = `rgba(${rgb},${((1 - p) * 0.9).toFixed(3)})`;
       ctx.beginPath();
       ctx.ellipse(cx, cy - p * 26 * S, (6 + p * 34) * S, (2 + p * 9) * S, 0, 0, Math.PI * 2);
       ctx.stroke();

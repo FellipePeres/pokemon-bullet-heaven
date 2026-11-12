@@ -204,6 +204,32 @@ export const DIALOGUE = {
       ] }
     ]
   },
+  // o Capítulo 6 (H-9): o guarda da Rota 23, o Blaine na Mansão, as estátuas, os diários do FireRed
+  guarda_rota23: {
+    name: 'Guarda',
+    lines: [{ say: ['Só passa quem tem as oito insígnias. A Victory Road é logo ali.'] }]
+  },
+  blaine_mansao: {
+    name: 'Blaine',
+    lines: [{ say: ['As estátuas escondem um interruptor. Ele abre umas passagens e fecha outras.'] }]
+  },
+  estatua_mansao: {
+    name: null,
+    lines: [{ say: ['Uma estátua de Pokémon. Um dos olhos dela é um interruptor secreto!'],
+      ask: { text: 'Apertar o interruptor?', yes: 'switch', no: ['Melhor não mexer... por enquanto.'] } }]
+  },
+  diario_5jul: { name: null, lines: [{ say: ['Um diário.', '"5 de julho. Guiana, América do Sul. Um Pokémon novo foi descoberto no fundo da selva."'] }] },
+  diario_10jul: { name: null, lines: [{ say: ['Um diário.', '"10 de julho. Batizamos o Pokémon descoberto de Mew."'] }] },
+  diario_6fev: { name: null, lines: [{ say: ['Um diário.', '"6 de fevereiro. O Mew deu à luz. Chamamos o filhote de Mewtwo."'] }] },
+  diario_1set: { name: null, lines: [{ say: ['Um diário.', '"1º de setembro. O Mewtwo é forte demais. Não conseguimos conter a fúria dele."'] }] },
+  anotacao_capuz: {
+    name: null,
+    lines: [{ say: [
+      'Uma folha nova, com o emblema vermelho no canto.',
+      '"A máquina está pronta. A energia das três aves chega toda noite, pelo mar. O Pokémon do laboratório não resiste mais."'
+    ] }]
+  },
+  e4_jaula: { name: null, lines: [{ say: ['Presos atrás das grades...'] }] },
   recruta_brasa: {
     name: 'Recruta da Rocket',
     lines: [{ say: ['O chefe mandou a gente vigiar a montanha.', 'Esses de vermelho não são dos nossos. Subiram pelo caminho do cume.'] }]
@@ -317,6 +343,11 @@ export const DIALOGUE = {
     name: 'Velho sábio',
     lines: [
       { when: { champion: true }, say: ['Você venceu a Liga. Mas me diga: já foi até o fim do mato a oeste? Ninguém nunca foi.'] },
+      // a Mansão (H-9): uma vez, depois da cena do subsolo
+      { when: { scene: 'mansao_lab', once: 'sabio_mansao' }, say: [
+        'A Elite dos Quatro presa numa jaula... E o homem do emblema enfim mostrou a cara. Maxie.',
+        'Os pássaros voltaram por você, {player}. Eles confiam em você agora.'
+      ] },
       // a missão do Moltres (H-8): uma vez, depois da cena da terceira máquina
       { when: { scene: 'moltres_livre', once: 'sabio_moltres' }, say: [
         'Os três pássaros livres... Que alívio, {player}.',
@@ -374,6 +405,7 @@ export const DIALOGUE = {
     name: 'Rapaz',
     lines: [
       { when: { locked: true }, say: ['Ei! Vai sair sem Pokémon? As hordas te pegam na primeira curva.', 'Passa no laboratório do Prof. Carvalho antes!'] },
+      { when: { scene: 'mansao_lab', once: 'rapaz_mansao' }, say: ['Soube? A Elite dos Quatro voltou para a Liga! Dizem que estavam presos na velha Mansão de Cinnabar.'] },
       // depois da casa roubada de Cerulean (0.39): a vila culpa a Equipe Rocket
       // a missão do Moltres (H-8): o vulcão e a Victory Road
       { when: { scene: 'moltres_livre', once: 'rapaz_brasa' }, say: ['Soube? O Monte Brasa parou de soltar fumaça! E dizem que a Liga reabriu a Victory Road.'] },

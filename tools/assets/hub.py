@@ -410,6 +410,26 @@ GYM7 = 'CinnabarIsland_Gym'
 GYM8 = 'ViridianCity_Gym'
 EMBER = ['MtEmber_Exterior', 'MtEmber_SummitPath_1F', 'MtEmber_SummitPath_2F', 'MtEmber_SummitPath_3F', 'MtEmber_Summit']
 SEAFOAM = ['SeafoamIslands_1F', 'SeafoamIslands_B1F', 'SeafoamIslands_B2F', 'SeafoamIslands_B3F', 'SeafoamIslands_B4F']
+MANSION = ['PokemonMansion_1F', 'PokemonMansion_2F', 'PokemonMansion_3F', 'PokemonMansion_B1F']
+ROUTE23 = 'Route23'
+
+# Os interruptores da Mansão Pokémon (H-9): as barreiras que a estátua troca, do script do pret
+# (data/scripts/pokemon_mansion.inc, copiado em tools/assets/pret/; o decomp do Pokemon All não
+# traz os scripts comuns). `setmetatile x, y, METATILE, colisão` de cada andar, no estado apertado.
+MANSION_SCRIPT = Path(__file__).resolve().parent / 'pret' / 'pokemon_mansion.inc'
+
+
+def mansion_switch(decomp):
+    import re
+    labels = {m.group(1): int(m.group(2), 16) for m in re.finditer(
+        r'#define\s+(METATILE_\w+)\s+(0x[0-9A-Fa-f]+)', (decomp / 'include/constants/metatile_labels.h').read_text())}
+    text = MANSION_SCRIPT.read_text()
+    press = {}
+    for blk in re.finditer(r'PokemonMansion_EventScript_PressSwitch_(\w+)::\n(.*?)\treturn', text, re.S):
+        press['PokemonMansion_' + blk.group(1)] = [
+            (int(x), int(y), labels[mt], int(c)) for x, y, mt, c in
+            re.findall(r'setmetatile\s+(\d+),\s*(\d+),\s*(METATILE_\w+),\s*(\d)', blk.group(2))]
+    return press
 
 
 def build_ginasio_celadon(s):
@@ -455,6 +475,25 @@ def seafoam(floor):
     return build
 
 
+def mansion(floor):
+    """
+    Um andar da Mansão Pokémon de Cinnabar, inteiro (H-9, a base do Maxie): o jogador anda a pé,
+    só por onde o FireRed deixa. As estátuas viram o interruptor, que troca as barreiras dos quatro
+    andares de uma vez; cada andar sai nos dois estados (`walkOn`, `srcOn` e `topOn`).
+    """
+    def build(s):
+        s.stamp(0, 0, floor, 0, 0, s.w, s.h)
+    return build
+
+
+def build_rota23(s):
+    """
+    A porta da Victory Road (H-9): o recorte da Rota 23 com o último guarda das insígnias (6,8 no
+    recorte, 6,35 no mapa) e a entrada da caverna (5,1). O palco da cena da Elite dos Quatro.
+    """
+    s.stamp(0, 0, ROUTE23, 0, 27, 15, 10)
+
+
 def build_cerulean(s):
     """
     Um recorte de Cerulean (0.39): a casa assaltada do FireRed (a porta da frente em
@@ -498,15 +537,23 @@ MAPS = {
     'brasa_caminho_2f': (48, 46, ember(EMBER[2])),
     'brasa_caminho_3f': (15, 11, ember(EMBER[3])),
     'brasa_cume': (19, 22, ember(EMBER[4])),
+    # o Capítulo 6 (H-9): a porta da Victory Road e a Mansão Pokémon, a base do Maxie
+    'rota23_portao': (15, 10, build_rota23),
+    'mansao_1f': (38, 35, mansion(MANSION[0])),
+    'mansao_2f': (38, 38, mansion(MANSION[1])),
+    'mansao_3f': (38, 35, mansion(MANSION[2])),
+    'mansao_b1f': (38, 35, mansion(MANSION[3])),
 }
 BRASA = {'brasa_encosta', 'brasa_caminho_1f', 'brasa_caminho_2f', 'brasa_caminho_3f', 'brasa_cume'}
 # os mapas que levam a altura de cada tile (a regra dos patamares, H-7) e os degraus de pular (H-8)
 HEIGHT_MAPS = {'seafoam_1f', 'seafoam_b1f', 'seafoam_b2f', 'seafoam_b3f', 'seafoam_b4f'} | BRASA
 LEDGE_MAPS = BRASA
+# os andares com o interruptor das estátuas: o mapa do lobby e o do FireRed
+SWITCH_MAPS = {'mansao_1f': MANSION[0], 'mansao_2f': MANSION[1], 'mansao_3f': MANSION[2], 'mansao_b1f': MANSION[3]}
 # o comportamento do metatile (MB_JUMP_*) e a letra de cada sentido
 JUMP_BEHAVIOR = {0x38: '>', 0x39: '<', 0x3A: '^', 0x3B: 'v'}
 SOURCES = [P, V, R, F, CE, FU, IP, DS4, DS1, PH1, PH2, LAB, HOUSE1, WARDEN, COPYCAT, GYM1, GYM2, GYM3, VE, PP, GYM4, GYM7, *SEAFOAM,
-           GYM8, *EMBER]
+           GYM8, *EMBER, *MANSION, ROUTE23]
 
 
 # ============================ os móveis do quarto ============================
@@ -585,6 +632,11 @@ SPRITES = {
     'hiker':       ('people/hiker', 'npc_white', 16, 32),
     'rocket':      ('people/rocket_m', 'npc_white', 16, 32),
     'rocha':       ('misc/rock_smash_rock', 'npc_white', 16, 16),
+    # o Capítulo 6 (H-9): a Elite dos Quatro e o Blaine na porta da Mansão
+    'lorelei':     ('people/lorelei', 'npc_white', 16, 32),
+    'bruno':       ('people/bruno', 'npc_white', 16, 32),
+    'agatha':      ('people/agatha', 'npc_pink', 16, 32),
+    'lance':       ('people/lance', 'npc_white', 16, 32),
     'meowth':      ('pokemon/meowth', 'npc_blue', 16, 16),
     'clefairy':    ('pokemon/clefairy', 'npc_pink', 16, 16),
     'pidgey':      ('pokemon/pidgey', 'npc_blue', 16, 16),
@@ -880,6 +932,107 @@ def export_heated(catalog):
         catalog[f'npc/{key}'] = {'src': path.relative_to(ROOT).as_posix(), 'frameWidth': 64, 'frameHeight': 48, 'frames': 1}
 
 
+def _psychic(src):
+    """A máquina do Mewtwo: a do Moltres, com o laranja da brasa virando a luz roxa."""
+    im = Image.open(src).convert('RGBA')
+    px = im.load()
+    for y in range(im.height):
+        for x in range(im.width):
+            r, g, b, a = px[x, y]
+            if a and r > g + 30 and r > b + 30:
+                px[x, y] = (int(r * 0.62), int(g * 0.45), min(255, int(r * 0.95)), a)
+    return im
+
+
+def _cage(open_):
+    from PIL import ImageDraw
+    im = Image.new('RGBA', (20, 34), (0, 0, 0, 0))
+    d = ImageDraw.Draw(im)
+    d.rectangle([0, 0, 19, 2], fill=(58, 60, 72, 255))
+    d.rectangle([0, 31, 19, 33], fill=(58, 60, 72, 255))
+    for x in ((1, 17) if open_ else (1, 5, 9, 13, 17)):
+        d.rectangle([x, 2, x + 1, 31], fill=(70, 74, 88, 255))
+        d.point((x, 3), fill=(168, 176, 196, 255))
+    return im
+
+
+def _ice():
+    from PIL import ImageDraw
+    im = Image.new('RGBA', (20, 30), (0, 0, 0, 0))
+    d = ImageDraw.Draw(im)
+    d.rectangle([0, 0, 19, 29], fill=(190, 235, 255, 150), outline=(240, 252, 255, 230))
+    d.line([(4, 4), (8, 10)], fill=(255, 255, 255, 230))
+    d.line([(13, 18), (16, 23)], fill=(255, 255, 255, 200))
+    return im
+
+
+def _fire_row():
+    from PIL import ImageDraw
+    im = Image.new('RGBA', (48, 18), (0, 0, 0, 0))
+    d = ImageDraw.Draw(im)
+    for i, x in enumerate(range(0, 46, 7)):
+        h = 11 + (i * 5) % 7
+        d.polygon([(x, 17), (x + 3, 17 - h), (x + 7, 17)], fill=(255, 120, 40, 235))
+        d.polygon([(x + 2, 17), (x + 3, 17 - h * 0.55), (x + 5, 17)], fill=(255, 230, 120, 255))
+    return im
+
+
+def _bolt():
+    from PIL import ImageDraw
+    im = Image.new('RGBA', (16, 112), (0, 0, 0, 0))
+    d = ImageDraw.Draw(im)
+    pts, y, x, k = [(8, 0)], 0, 8, 0
+    while y < 111:
+        y += 14
+        x = 4 if k % 2 else 12
+        pts.append((x, min(y, 111)))
+        k += 1
+    d.line(pts, fill=(255, 240, 120, 255), width=4)
+    d.line(pts, fill=(255, 255, 255, 255), width=1)
+    return im
+
+
+def _note():
+    """O bilhete do Lance: uma folha com linhas e o L vermelho no canto."""
+    from PIL import ImageDraw
+    im = Image.new('RGBA', (36, 30), (0, 0, 0, 0))
+    d = ImageDraw.Draw(im)
+    d.rectangle([0, 0, 35, 29], fill=(246, 238, 214, 255), outline=(150, 130, 100, 255))
+    for i in range(5):
+        d.line([(4, 5 + i * 5), (31 - (i == 4) * 14, 5 + i * 5)], fill=(120, 110, 150, 255))
+    d.line([(26, 22), (26, 26), (30, 26)], fill=(190, 40, 40, 255), width=1)
+    return im
+
+
+def export_base(catalog, emerald):
+    """As peças da cena do subsolo da Mansão (H-9)."""
+    out = {
+        'maquina_mewtwo': _psychic(ASSETS / 'npc' / 'maquina_moltres.png'),
+        'maquina_mewtwo_quebrada': _psychic(ASSETS / 'npc' / 'maquina_moltres_quebrada.png'),
+        'jaula': _cage(False), 'jaula_aberta': _cage(True),
+        'gelo': _ice(), 'fogo': _fire_row(), 'raio': _bolt(), 'bilhete': _note(),
+    }
+    icon = ROOT / 'assets' / 'pokemon' / 'gen3' / 'icons' / '150.png'
+    out['mewtwo'] = Image.open(icon).convert('RGBA').crop((0, 0, 32, 32))   # o ícone do Gen 3: 32x32, como os pássaros
+    magma = emerald / 'graphics' / 'object_events' / 'pics' / 'people' / 'team_magma' / 'magma_member_f.png'
+    if magma.exists():
+        # a capanga de capuz vermelho, do Emerald, com a paleta do próprio PNG (o índice 0 é o fundo)
+        src = Image.open(magma)
+        im = src.convert('RGBA')
+        px, ix = im.load(), src.load()
+        for y in range(src.height):
+            for x in range(src.width):
+                if ix[x, y] == 0:
+                    px[x, y] = (0, 0, 0, 0)
+        out['capanga'] = im
+    for key, im in out.items():
+        path = ASSETS / 'npc' / f'{key}.png'
+        im.save(path, optimize=True)
+        fw = {'maquina_mewtwo': 64, 'maquina_mewtwo_quebrada': 64, 'capanga': 16}.get(key, im.width)
+        fh = {'maquina_mewtwo': 48, 'maquina_mewtwo_quebrada': 48, 'capanga': 32}.get(key, im.height)
+        catalog[f'npc/{key}'] = {'src': path.relative_to(ROOT).as_posix(), 'frameWidth': fw, 'frameHeight': fh, 'frames': im.width // fw}
+
+
 def export_emblem(catalog):
     """O emblema vermelho sozinho (H-8): a pista do vulcão, ampliado num quadro da cena de depois do Moltres."""
     pal = {'R': (206, 34, 34, 255), 'D': (112, 10, 14, 255)}
@@ -942,16 +1095,25 @@ def write_js(maps, sprites, decor):
         ' * Cada mapa tem o chão (`src`), o que fica por cima dos personagens (`top`)',
         ' * e a colisão, uma linha por fileira de tiles: "." anda, "#" bloqueia. Nos mapas',
         ' * com patamares (Seafoam), `levels` é a altura de cada tile, em hexadecimal; nos',
-        ' * com degraus de pular (o Monte Brasa), `ledges` é o sentido do pulo de cada degrau.',
+        ' * com degraus de pular (o Monte Brasa), `ledges` é o sentido do pulo de cada degrau; nos',
+        ' * com o interruptor das estátuas (a Mansão), `walkOn`, `srcOn` e `topOn` são o andar apertado.',
         ' */',
         'export const HUB_MAPS = {',
     ]
     for key, m in maps.items():
         lines.append(f"  {key}: {{")
         lines.append(f"    src: '{m['src']}', top: '{m['top']}', width: {m['width']}, height: {m['height']},")
+        if 'srcOn' in m:
+            lines.append(f"    srcOn: '{m['srcOn']}', topOn: '{m['topOn']}',")
         lines.append('    walk: [')
         lines += [f"      '{row}'," for row in m['walk']]
         lines[-1] = lines[-1].rstrip(',')
+        if 'walkOn' in m:
+            # o interruptor apertado (a Mansão, H-9): a mesma colisão com as barreiras trocadas
+            lines.append('    ],')
+            lines.append('    walkOn: [')
+            lines += [f"      '{row}'," for row in m['walkOn']]
+            lines[-1] = lines[-1].rstrip(',')
         if 'ledges' in m:
             # os degraus de pular, um caractere por tile: v ^ < > (o sentido do pulo); '.' nenhum
             lines.append('    ],')
@@ -990,6 +1152,8 @@ def main():
     parser = argparse.ArgumentParser(description='Monta os mapas da vila a partir do Pokemon All.')
     parser.add_argument('--fonte', type=Path, default=ROOT.parent / 'Pokemon All',
                         help='pasta do Pokemon All (padrão: ao lado deste repositório)')
+    parser.add_argument('--emerald', type=Path, default=ROOT.parent / 'pokeemerald',
+                        help='o clone do pokeemerald (a capanga de capuz vermelho da H-9)')
     args = parser.parse_args()
     decomp = args.fonte / 'extracted' / 'pokefirered'
     if not decomp.is_dir():
@@ -997,6 +1161,7 @@ def main():
 
     layouts = {l['name']: l for l in json.loads((decomp / 'data/layouts/layouts.json').read_text())['layouts'] if l}
     sources = {name: Source(decomp, layouts, name) for name in SOURCES}
+    press = mansion_switch(decomp)
     ASSETS.mkdir(parents=True, exist_ok=True)
 
     maps = {}
@@ -1014,6 +1179,21 @@ def main():
             maps[key]['ledges'] = [''.join(JUMP_BEHAVIOR.get(scene.behavior[y][x], '.') for x in range(w)) for y in range(h)]
         if key in HEIGHT_MAPS:
             maps[key]['levels'] = [''.join('%x' % scene.elev[y][x] for x in range(w)) for y in range(h)]
+        if key in SWITCH_MAPS:
+            # o mesmo andar com o interruptor apertado (as barreiras trocadas, a colisão junto)
+            src = sources[SWITCH_MAPS[key]]
+            keep = [row[:] for row in src.cells]
+            for x, y, mt, coll in press[SWITCH_MAPS[key]]:
+                src.cells[y][x] = (src.cells[y][x] & 0xF000) | (0xC00 if coll else 0) | mt
+            on = Scene(sources, w, h)
+            build(on)
+            src.cells = keep
+            base_on, top_on = on.images()
+            base_on.save(ASSETS / f'{key}-on.png', optimize=True)
+            top_on.save(ASSETS / f'{key}-on-top.png', optimize=True)
+            maps[key]['srcOn'] = f'assets/hub/{key}-on.png'
+            maps[key]['topOn'] = f'assets/hub/{key}-on-top.png'
+            maps[key]['walkOn'] = [''.join('.' if on.walk[y][x] else '#' for x in range(w)) for y in range(h)]
         print(f'  {key}: {w}x{h}')
 
     sprites = {}
@@ -1023,6 +1203,7 @@ def main():
     export_readout(sprites)
     export_heated(sprites)
     export_emblem(sprites)
+    export_base(sprites, args.emerald)
     # a Ultra Ball do card das missões de lendário (0.39), dos itens do Pokemon All; na luta do
     # Zapdos (H-6) ela cai no campo e balança na faixa da captura
     ball = args.fonte / 'assets' / 'items' / 'default' / 'ultra-ball.png'

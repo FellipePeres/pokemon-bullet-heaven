@@ -39,7 +39,7 @@ import {
   createProfile, normalizeProfile, ProfileTracker,
   regionProgress, createRegionProgress, countBadges, createJourneySlot
 } from '../save/profile.js';
-import { STAGES, isStageUnlocked } from '../data/stages.js';
+import { STAGES, isStageUnlocked, storyProgress } from '../data/stages.js';
 import { getRegion, DEFAULT_REGION } from '../data/regions.js';
 import { TRAINER_LOOKS, getTrainerLook, trainerName, cleanTrainerName } from '../data/trainers.js';
 import { POKEMON, getPokemon } from '../data/pokemon.js';
@@ -650,7 +650,7 @@ export class Game {
   startStage(stageId, snapshot = null, { story = true } = {}) {
     const stage = STAGES[stageId];
     if (!stage) return;
-    if (!isStageUnlocked(stageId, this.campaign.clearedStages)) {
+    if (!isStageUnlocked(stageId, storyProgress(this.campaign))) {
       toast('Essa fase ainda está bloqueada.', '🔒');
       return;
     }
@@ -1614,7 +1614,7 @@ export class Game {
   }
 
   _nextStage() {
-    const cleared = this.campaign.clearedStages;
+    const cleared = storyProgress(this.campaign);
     for (const entry of this.region.campaign) {
       if (entry.comingSoon) continue;
       const stage = STAGES[entry.stage];

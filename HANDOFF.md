@@ -1132,6 +1132,63 @@ Nunca voltar bônus globais para o pool de level up — foi pedido explícito.
   meio, a derrota, a vitória, a cena de depois, a vila) e o `check-data` (o caminho a pé com os pulos,
   as bolas, os enfeites com `cells`). O roteiro de screenshots é `moltres`.
 
+### O Capítulo 6: a Elite dos Quatro e a base na Mansão (H-9, 0.39 na branch)
+- Pedido do Fellipe: a proposta "A base na Mansão" (PLANEJAMENTO-HISTORIA.md, seção 5.4), aprovada
+  inteira ("pode seguir exatamente com esse roteiro") com um refino: **a caixa de texto nunca tampa
+  ninguém em cena** (ver abaixo, e a regra vale para todas as cenas).
+- **A caixa de texto nunca tampa ninguém** (o motor, para todas as cenas): durante uma cena, a
+  câmera da vila centraliza na área acima da caixa (`hubCamera` e `DIALOG_RESERVE` em
+  `render/HubRenderer.js`; a reserva desliza ao começar e ao acabar a cena). O `ui-smoke` confere, a
+  cada fala de cada cena que ele toca, numa tela de 1280x720, que o jogador, os atores e as pessoas
+  que a cena move ficam acima da caixa (ou fora da tela): 147 falas. As duas cenas do prólogo no
+  laboratório ganharam a câmera que mostra a porta.
+- **A trava por cena** (`data/stages.js`): `lock` pode ser uma lista; cada trava espera uma fase
+  (`stage`) ou uma cena (`scene`) e pode valer só depois de outra cena (`after`). `storyProgress`
+  junta as fases vencidas e as cenas vistas (`scene:<id>`), e é o que o mapa, o estojo de insígnias, as
+  jornadas e o `startStage` passam para `isStageUnlocked`/`storyLocked` (que agora devolve a trava
+  que segura, com o texto). A Lorelei: a trava das hordas (o Moltres) e, depois da cena da Victory
+  Road, "A Liga está vazia: a Elite dos Quatro partiu." até a cena do subsolo da Mansão.
+- **A cena da Victory Road** (`victory_road`, o gatilho de antes da fase da Lorelei, no palco
+  `rota23_portao`, o recorte da Rota 23 com o último guarda das insígnias): a Liga está vazia, os
+  quatro desceram juntos, e o bilhete do Lance (o passo `item` com `npc/bilhete`). Ela não começa a
+  fase: termina com `then: 'campaign'` (o mapa da jornada, com a trava nova). As quests: "Siga pela
+  Victory Road" fecha nela (objetivo `scene`), e abre "Ajude a Elite dos Quatro" (`c6_e4`).
+- **A Mansão Pokémon a pé** (`mansao_1f`, `_2f`, `_3f`, `_b1f`, do `PokemonMansion_*` do FireRed,
+  `explore`, com a música da Mansão): **os interruptores das estátuas**. As barreiras que cada estátua
+  troca vêm do script do pret (`data/scripts/pokemon_mansion.inc`, copiado em `tools/assets/pret/`,
+  porque o decomp do Pokemon All não traz os scripts comuns); o `hub.py` gera cada andar nos dois
+  estados (`walkOn`, `srcOn`, `topOn`). O lugar diz qual flag é o interruptor (`switch:
+  'mansao_interruptor'`); a estátua é uma `thing` com a pergunta ("Apertar o interruptor?") cujo sim
+  é a ação `switch`; `Hub.switchOn` escolhe a colisão e o desenho. O estado vale para os quatro andares,
+  como no FireRed, e fica guardado na jornada. As passagens: as escadas (`step`), os buracos do 3º
+  andar (caem no 1º e no 2º) e as saídas da porta (tapetes para a vila). O check-data mede o caminho a
+  pé com o estado do interruptor e as viradas: 213 passos da porta até o laboratório (três viradas: uma
+  no 3º andar, duas no subsolo) e 125 de volta. 15 Poké Balls: as 11 do FireRed (a Chave Secreta sai) e
+  4 no caminho de ida. Os quatro diários do FireRed, traduzidos, e a anotação nova do capuz vermelho.
+- **A chegada** (`mansao_entrada`, a marca `STORY_PLACES.mansao` em Cinnabar): o Blaine na porta (os
+  quatro entraram e não saíram; a mansão foi um laboratório onde ele trabalhou; a dica das estátuas e
+  a pergunta bônus); ele vai embora (as pessoas do lugar ganharam `hideIf`).
+- **O laboratório** (`mansao_lab`, gatilho `tile` na passagem 12,10-12, que só é chão com o
+  interruptor apertado): a máquina roxa do Mewtwo (`npc/maquina_mewtwo`, a do Moltres em roxo), o
+  Mewtwo (o ícone do Gen 3, 32x32), a Elite dos Quatro do FireRed nas jaulas (`npc/jaula`, enfeites com
+  `front`, na frente de quem está no tile), as ondas roxas (`pulse` com `color: 'psychic'`). A cena:
+  o Lance grita que é uma armadilha; o Maxie chega sem nome ("???") com duas capangas de capuz
+  vermelho (a Equipe Magma do Emerald, `npc/capanga`) e se apresenta; o emblema do uniforme; as Poké
+  Balls não abrem perto da máquina; o raio (`npc/raio`, o passo novo `flash`) e o Zapdos pousando (o
+  passo novo `land`), o gelo nos capangas, a parede de fogo do Moltres; o Crobat leva o Maxie; os
+  pássaros destroem a máquina; o Mewtwo encara o jogador e some num clarão; as jaulas abrem, cada um
+  dos quatro fala, e os pássaros voam juntos. As mudanças do lugar são flags da cena (`flag` e a
+  condição nova `noflag`): `mansao_maquina`, `mansao_mewtwo`, `mansao_jaulas`. O aviso "A Elite dos
+  Quatro voltou para a Liga" e o atalho para a vila. Sem luta (decisão do Fellipe).
+- **Depois**: a quest "Vença a Elite dos Quatro" (Capítulo 7, "O sonho"); a Lorelei abre; o sábio
+  (uma vez: o homem do emblema mostrou a cara; os pássaros confiam no jogador) e o rapaz comentam.
+- **Os testes**: o `smoke-test` (as duas travas da Liga, o progresso das travas, o interruptor que
+  troca as barreiras e abre o laboratório), o `ui-smoke` (a Lorelei aberta, a cena da Victory Road com
+  o bilhete, a trava nova sem spoiler, a marca, o Blaine, os diários, a subida e a descida por cliques
+  com as três estátuas e o buraco, a cena do laboratório inteira, a Liga aberta, a vila; e a caixa de
+  texto em todas as falas) e o `check-data` (as travas por cena, o caminho a pé com o interruptor, as
+  bolas nos dois estados). O roteiro de screenshots é `mansao`.
+
 ### A descida do Dive — o modo aquático (0.36)
 - Pedido do Fellipe, desenhado e medido numa maquete jogável que ele aprovou
   (PLANEJAMENTO-DIVE.md, seções 3 a 7). Na lagoa da vila, com alguém da equipe
@@ -1612,6 +1669,7 @@ o Brock como está, todas as outras mais duras, menos níveis.
 | 76 | o refino da história: "essas maquinas que prendem os lendários sugam a energia deles" e mandam em ondas para um lugar misterioso, onde uma máquina central numa base do Maxie desorienta os Pokémon (ideia de End Game); o Zapdos enfraquecido explica a vitória de um jogador de nível baixo; "ao derrotar o Zapdos, rola uma cutscene do Zapdos voando e fugindo, assustado", sem captura por enquanto | 0.39 (na branch): a luta sem captura e de nível 36 (medida: 11 de 12 no 36), a energia escorrendo pelas correntes, a cena com o Zapdos do FireRed caído que foge pelo alto (os passos `cry`, `tremble` e `fly`) e a pista da energia mandada para longe; o card "Sem captura nesta luta" |
 | 77 | "A fase da Erika é barrada, o jogador precisa passar do Zapdos para liberar a Erika, o emblema pode ser visto outra vez e o jogador faz ligação que era o mesmo da máquina"; "não pode ter spoilers no título das fases ou quests"; a cena do emblema "montada já no artifact" e "um bate papo simples dando indícios da continuação"; "ficou excelente" | 0.39 (na branch): a trava da Fase 4 (`lock`, o Túnel de Pedra no escuro, sem o nome do Zapdos), as quests douradas da Usina, a do Koga e a da Sabrina, o palco do ginásio de Celadon com a Erika, a cena `depois_erika` (a lembrança com a sombra de asas, o pedaço de metal, o emblema reconhecido, as pistas: a Rocket no Cassino, a sombra para o sul) e os passos `toast`, `storm` e `item` |
 | 78 | "vamos para o H-3" | 0.39 (na branch): a tela de Missões (seção 7.3 do PLANEJAMENTO-HISTORIA): o Diário nas duas barras com o pontinho de quest nova, o que fazer agora, o diário por capítulo com as datas e os itens importantes; nenhuma quest futura aparece |
+| 83 | "aprovo tudo com apenas um refino simples, temos que garantir que a legenda não está tampando algo importante na animação, como uma pessoa ou alguma movimentação" (a proposta "A base na Mansão") | 0.39 (na branch): a câmera das cenas centraliza acima da caixa de texto e o ui-smoke confere isso a cada fala; o Capítulo 6: a cena da porta da Victory Road com o bilhete do Lance, a trava por cena da Liga, a Mansão Pokémon a pé com os interruptores do FireRed (o script do pret), os diários, o Blaine na porta e a cena do laboratório (o Mewtwo, as jaulas, a emboscada do Maxie, os pássaros, a libertação sem luta) |
 | 82 | "construa a h-8 então" (a proposta "Monte Brasa: o fogo", depois do ajuste da decisão 22) | 0.39 (na branch): o Capítulo 5 até o fim e o 6 começando: a cena do Giovanni com o Pedaço de Metal, a trava da Liga (as hordas na Victory Road), o Monte Brasa a pé (as pedras do Strength já arrastadas pelos ladrões, os degraus de pular do FireRed, 15 Poké Balls), o cume com o calor, a luta do Moltres (o Sol forte, o chão em brasa, o Lança-chamas, o Redemoinho de Fogo, a Onda de Calor, o Fogo Sagrado com a sombra das rochas; nível 62, 11 de 12), a fuga, o emblema que lembra um vulcão e o atalho para a vila |
 | 81 | "ainda não pode aparecer os lendários na captura, mesmo que depois de liberados"; "bola um arquivo md com história e grava toda a história lá"; a ideia da emboscada do Maxie no Mewtwo, com os três pássaros protegendo o jogador, ainda sem momento | 0.39 (na branch): `LEGENDARY_CAPTURE.open = false` (nenhum lendário na Poké Ball; a regra antiga guardada); o `HISTORIA.md` (a verdade por trás de tudo, as regras da escrita, os personagens, os capítulos, as pistas e as ideias em aberto); decisão 20 e seção 13.3 no PLANEJAMENTO-HISTORIA |
 | 80 | "Coloca um atalho para o pós luta, o articuno foi derrotado ele pode aparecer na vila pós cena já"; "lembra de colocar pokeloot nesse caminho de ida ao articuno, pode por até 15" | 0.39 (na branch): a cena `articuno_livre` termina na vila (`then: 'home'`); 15 Poké Balls em Seafoam (as cinco do FireRed, sete à vista da rota de ida, três nos becos), nenhuma escondida pela camada de cima e nenhuma fechando o caminho (o check-data conta as bolas como paredes) |
@@ -1935,11 +1993,11 @@ O que está planejado:
   Kyogre. **A H-1 está no jogo desde a 0.38** (as quests, o rastreador e o
   prólogo; ver a seção 4), e **a H-2 desde a 0.39** (o motor das cenas, as duas do
   prólogo, a do Brock e as cenas de antes e de depois das fases, em tela cheia nos
-  palcos; **nunca no meio de uma fase**, regra do Fellipe). **A H-3 a H-8 também, na
+  palcos; **nunca no meio de uma fase**, regra do Fellipe). **A H-3 a H-9 também, na
   branch** (a tela de Missões, os Capítulos 1 a 3, o molde das missões, a missão do
-  Zapdos, o Capítulo 4 com a do Articuno e o 5 com a do Moltres). Falta, em ordem: a
-  base do Maxie com o Mewtwo e a Elite dos Quatro presa (H-9, decisão 22), a Liga
-  (H-10), a lagoa e o Mew (H-11) e as recompensas (H-12).
+  Zapdos, o Capítulo 4 com a do Articuno, o 5 com a do Moltres e o 6, a Elite dos
+  Quatro e a base na Mansão). Falta, em ordem: a Liga (H-10), a lagoa e o Mew (H-11)
+  e as recompensas (H-12).
   **A captura dos lendários está fechada** (decisão 20, 2026-11-12): nenhum lendário
   aparece na Poké Ball, nem depois de liberado (`LEGENDARY_CAPTURE.open` em
   `data/legendaries.js`). A regra da H-5 (o liberado volta à Poké Ball das fases

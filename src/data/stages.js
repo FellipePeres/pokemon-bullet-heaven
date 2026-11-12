@@ -577,11 +577,20 @@ export const STAGES = {
     difficulty: 0.8,   // a força da fase (0.17; 0.28: era 1,05, recalibrada com a curva de XP nova)
     // a trava da história (H-8, a decisão 2: a Victory Road só abre com os três pássaros de volta):
     // as hordas tomaram a Victory Road até a missão do Moltres (a fase `moltres`). Sem citar o Moltres
-    lock: {
-      stage: 'moltres',
-      text: 'Hordas furiosas tomaram a Victory Road, e a Liga fechou a passagem até as rotas se acalmarem.',
-      go: 'Investigue o Monte Brasa, na Ilha 1', place: 'monte_brasa'
-    },
+    lock: [
+      {
+        stage: 'moltres',
+        text: 'Hordas furiosas tomaram a Victory Road, e a Liga fechou a passagem até as rotas se acalmarem.',
+        go: 'Investigue o Monte Brasa, na Ilha 1', place: 'monte_brasa'
+      },
+      // (H-9, decisão 22) depois da cena da porta da Victory Road (o primeiro Jogar), a Liga está
+      // vazia até a cena do subsolo da Mansão. Sem citar quem prendeu os quatro
+      {
+        scene: 'mansao_lab', after: 'victory_road',
+        text: 'A Liga está vazia: a Elite dos Quatro partiu.',
+        go: 'Vá até a Mansão Pokémon, em Cinnabar', place: 'mansao'
+      }
+    ],
     unlockedBy: 'gym_8_viridian',
 
     segments: [
@@ -1207,20 +1216,41 @@ export const KANTO_CAMPAIGN = [
 
 export const getStage = (id) => STAGES[id];
 
-/** Uma fase está liberada se não depende de ninguém ou se a dependência foi concluída. */
-export function isStageUnlocked(stageId, clearedStages = []) {
-  const stage = STAGES[stageId];
-  if (!stage) return false;
-  if (stage.unlockedBy && !clearedStages.includes(stage.unlockedBy)) return false;
-  // a trava da história (`lock`, H-4): a fase espera outra (a missão do Zapdos)
-  return !stage.lock || clearedStages.includes(stage.lock.stage);
+/**
+ * O progresso que as travas olham: as fases vencidas e, como `scene:<id>`, as cenas já vistas
+ * (H-9: a Liga espera a cena do subsolo da Mansão, uma missão sem luta).
+ */
+export function storyProgress(campaign) {
+  const scenes = Object.entries(campaign?.scenes ?? {}).filter(([, state]) => state === 'seen').map(([id]) => `scene:${id}`);
+  return [...(campaign?.clearedStages ?? []), ...scenes];
 }
 
-/** A fase já estaria aberta pela anterior, mas espera a trava da história (`lock`)? */
-export function storyLocked(stageId, clearedStages = []) {
+/** As travas da história de uma fase (`lock`: uma ou uma lista, na ordem em que valem). */
+export function locksOf(stage) {
+  return !stage?.lock ? [] : Array.isArray(stage.lock) ? stage.lock : [stage.lock];
+}
+
+/** A trava já vale? (`after`: só depois de uma cena, H-9) E já foi cumprida? */
+const lockActive = (lock, progress) => !lock.after || progress.includes(`scene:${lock.after}`);
+const lockMet = (lock, progress) => progress.includes(lock.scene ? `scene:${lock.scene}` : lock.stage);
+
+/** Uma fase está liberada se não depende de ninguém ou se a dependência foi concluída. */
+export function isStageUnlocked(stageId, progress = []) {
   const stage = STAGES[stageId];
-  if (!stage?.lock || clearedStages.includes(stage.lock.stage)) return false;
-  return !stage.unlockedBy || clearedStages.includes(stage.unlockedBy);
+  if (!stage) return false;
+  if (stage.unlockedBy && !progress.includes(stage.unlockedBy)) return false;
+  // as travas da história (`lock`, H-4): a fase espera outra (a missão do Zapdos) ou uma cena (H-9)
+  return locksOf(stage).every((lock) => !lockActive(lock, progress) || lockMet(lock, progress));
+}
+
+/**
+ * A fase já estaria aberta pela anterior, mas espera uma trava da história? Devolve a trava que
+ * segura (o texto, o botão e o lugar do mapa) ou null.
+ */
+export function storyLocked(stageId, progress = []) {
+  const stage = STAGES[stageId];
+  if (stage?.unlockedBy && !progress.includes(stage.unlockedBy)) return null;
+  return locksOf(stage).find((lock) => lockActive(lock, progress) && !lockMet(lock, progress)) ?? null;
 }
 
 /** Trecho da jornada em um dado momento da fase. */

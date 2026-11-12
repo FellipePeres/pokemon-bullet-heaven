@@ -13,7 +13,7 @@ import { MART_ITEMS, getMartItem, itemEvolutions, KEY_ITEMS } from '../src/data/
 import { UPGRADES } from '../src/data/upgrades.js';
 import { AWAKENING_KEYS, awakeningSuffixes } from '../src/data/awakening.js';
 import { ENEMIES } from '../src/data/enemies.js';
-import { STAGES } from '../src/data/stages.js';
+import { STAGES, locksOf } from '../src/data/stages.js';
 import { nextMoveFor } from '../src/data/tms.js';
 import { CAPTURE_POOLS, poolEntries } from '../src/data/capturePools.js';
 import { ASSET_MANIFEST } from '../src/data/assetManifest.js';
@@ -260,15 +260,23 @@ badSegments.length ? fail(`trechos com cenário inexistente: ${badSegments.join(
 
 // as condições e ações das falas da vila (game/Hub.js), que as cenas também usam
 const KNOWN_WHEN = new Set(['starter', 'starterIs', 'shiny', 'badges', 'champion', 'dex', 'veteran', 'dive', 'diveTm', 'diveRescued', 'kyogre', 'locked', 'once', 'quest', 'questDone', 'scene', 'flag',
-  'freed', 'caged', 'mission']);
-const KNOWN_ACTIONS = new Set(['starter', 'pc', 'mart', 'save', 'campaign', 'pokedoll', 'badges', 'aquatic', 'home', 'stage']);
+  'freed', 'caged', 'mission', 'noflag']);
+const KNOWN_ACTIONS = new Set(['starter', 'pc', 'mart', 'save', 'campaign', 'pokedoll', 'badges', 'aquatic', 'home', 'stage', 'switch']);
 // os degraus de pular (H-8, `ledges` nos mapas gerados): o sentido do pulo [dx, dy], ou null
 const LEDGE = { v: [0, 1], '^': [0, -1], '<': [-1, 0], '>': [1, 0] };
 const ledgeAt = (map, x, y) => LEDGE[map?.ledges?.[y]?.[x]] ?? null;
 // o chão da vila: só onde o mapa do FireRed deixa pisar
-const floor = (mapId, x, y) => {
+// `on` (H-9): o interruptor das estátuas apertado (a Mansão): a colisão do andar apertado
+const floor = (mapId, x, y, on = false) => {
   const map = HUB_MAPS[mapId];
-  return !!map && x >= 0 && y >= 0 && x < map.width && y < map.height && map.walk[y][x] === '.';
+  const rows = on && map?.walkOn ? map.walkOn : map?.walk;
+  return !!map && x >= 0 && y >= 0 && x < map.width && y < map.height && rows[y][x] === '.';
+};
+// as estátuas do interruptor de um lugar (as `things` que viram o `switch`, H-9)
+const statueAt = (mapId, x, y) => {
+  const place = HUB.maps[mapId];
+  if (!place?.switch) return false;
+  return (place.things ?? []).some((t) => DIALOGUE[t.talk]?.lines.some((l) => l.ask?.yes === 'switch') && t.cells.some(([cx, cy]) => cx === x && cy === y));
 };
 const inside = (mapId, x, y) => { const m = HUB_MAPS[mapId]; return !!m && x >= 0 && y >= 0 && x < m.width && y < m.height; };
 
@@ -436,7 +444,7 @@ const inside = (mapId, x, y) => { const m = HUB_MAPS[mapId]; return !!m && x >= 
       count++;
       if (ids.has(l.id)) issues.push(`${mapId}: bola com id repetido (${l.id})`);
       ids.add(l.id);
-      if (!floor(mapId, l.x, l.y)) issues.push(`${mapId}: bola ${l.id} fora do chão (${l.x},${l.y})`);
+      if (!floor(mapId, l.x, l.y) && !floor(mapId, l.x, l.y, true)) issues.push(`${mapId}: bola ${l.id} fora do chão (${l.x},${l.y})`);
       if (getMartItem(l.item)?.kind !== 'bag') issues.push(`${mapId}: bola ${l.id} com um item que não é da mochila (${l.item})`);
       if ((place.npcs ?? []).some((n) => n.x === l.x && n.y === l.y) || (place.warps ?? []).some((w) => w.x === l.x && w.y === l.y)) issues.push(`${mapId}: bola ${l.id} em cima de alguém ou de uma porta`);
     }
@@ -444,13 +452,20 @@ const inside = (mapId, x, y) => { const m = HUB_MAPS[mapId]; return !!m && x >= 
     const starts = [];
     for (const other of Object.values(HUB.maps)) for (const w of other.warps ?? []) if (w.to === mapId) starts.push([w.tx, w.ty]);
     for (const sp of Object.values(STORY_PLACES)) if (sp.map === mapId) starts.push([sp.spot.x, sp.spot.y]);
+    // com o interruptor (a Mansão, H-9), os dois estados contam: as estátuas viram o estado
+    const states = map?.walkOn && place.switch ? [false, true] : [false];
+    const seenOn = new Set(states.flatMap((on) => starts.map(([x, y]) => `${x},${y},${on}`)));
     const seen = new Set(starts.map(([x, y]) => `${x},${y}`));
-    const queue = [...starts];
+    const queue = states.flatMap((on) => starts.map(([x, y]) => [x, y, on]));
     // nos mapas com patamares (Seafoam, H-7), a regra de altura do FireRed vale também aqui; nos
     // degraus de pular (o Monte Brasa, H-8), só o pulo, no sentido do degrau
     while (queue.length) {
-      const [x, y] = queue.shift();
+      const [x, y, on] = queue.shift();
       for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+        if (states.length > 1 && statueAt(mapId, x + dx, y + dy) && !seenOn.has(`${x},${y},${!on}`)) {
+          seenOn.add(`${x},${y},${!on}`);
+          queue.push([x, y, !on]);
+        }
         const jump = ledgeAt(map, x + dx, y + dy);
         let nx = x + dx, ny = y + dy;
         if (jump) {
@@ -458,10 +473,11 @@ const inside = (mapId, x, y) => { const m = HUB_MAPS[mapId]; return !!m && x >= 
           nx += dx; ny += dy;
           if (ledgeAt(map, nx, ny)) continue;
         } else if (!heightOk(map, x, y, nx, ny)) continue;
-        const k = `${nx},${ny}`;
-        if (seen.has(k) || solid.has(k) || !floor(mapId, nx, ny)) continue;
-        seen.add(k);
-        queue.push([nx, ny]);
+        const k = `${nx},${ny},${on}`;
+        if (seenOn.has(k) || solid.has(`${nx},${ny}`) || !floor(mapId, nx, ny, on)) continue;
+        seenOn.add(k);
+        seen.add(`${nx},${ny}`);
+        queue.push([nx, ny, on]);
       }
     }
     for (const l of place.loot) {
@@ -502,7 +518,8 @@ const inside = (mapId, x, y) => { const m = HUB_MAPS[mapId]; return !!m && x >= 
       if (t.on === 'tile') {
         if (t.target !== def.map) issues.push(`${id}: trigger de tile em outro lugar (${t.target})`);
         if (!t.cells?.length) issues.push(`${id}: trigger de tile sem cells`);
-        for (const [x, y] of t.cells ?? []) if (!floor(def.map, x, y)) issues.push(`${id}: tile do trigger fora do chão (${x},${y})`);
+        // (H-9) a passagem do laboratório da Mansão só é chão com o interruptor apertado
+        for (const [x, y] of t.cells ?? []) if (!floor(def.map, x, y) && !floor(def.map, x, y, true)) issues.push(`${id}: tile do trigger fora do chão (${x},${y})`);
         const on = (x, y) => (t.cells ?? []).some(([cx, cy]) => cx === x && cy === y);
         if (def.spot && on(def.spot.x, def.spot.y)) issues.push(`${id}: o spot fica num tile do trigger`);
         const go = def.steps?.at(-1)?.then?.go;
@@ -513,15 +530,20 @@ const inside = (mapId, x, y) => { const m = HUB_MAPS[mapId]; return !!m && x >= 
     const actors = new Set(['player', ...Object.keys(def.actors ?? {}), ...(place.npcs ?? []).map((n) => n.id)]);
     for (const [aid, a] of Object.entries(def.actors ?? {})) {
       if (!SHEETS[a.sprite]) issues.push(`${id}: ${aid} sem folha (${a.sprite})`);
-      if (!floor(def.map, a.x, a.y)) issues.push(`${id}: ${aid} começa fora do chão (${a.x},${a.y})`);
+      // (H-9) os efeitos podem ficar entre dois tiles (a parede de fogo): conta o tile mais perto
+      const ax = Math.round(a.x), ay = Math.round(a.y);
+      if (!floor(def.map, ax, ay) && !floor(def.map, ax, ay, true)) issues.push(`${id}: ${aid} começa fora do chão (${a.x},${a.y})`);
     }
     for (const key of [...(def.preload ?? []), ...(def.band ? [def.band] : [])]) if (!SHEETS[key]) issues.push(`${id}: folha que não existe (${key})`);
     const steps = def.steps ?? [];
     if (steps.at(-1)?.do !== 'end') issues.push(`${id}: o último passo não é o end (a cena nunca contaria como vista)`);
     // a de antes da fase solta a fase no fim; a de um palco volta para a vila (ou solta a fase)
     const then = steps.at(-1)?.then;
-    if (def.trigger?.some((t) => t.on === 'play') && then !== 'stage') issues.push(`${id}: a cena de antes da fase termina sem a fase (then: 'stage')`);
-    else if (place.scene && then !== 'home' && then !== 'stage' && !then?.go) issues.push(`${id}: a cena do palco termina sem voltar (then: 'home', 'stage' ou { go })`);
+    // (H-9) a da porta da Victory Road não solta a fase: ela fecha a Liga (uma trava vale depois
+    // dela, `after`) e volta para o mapa da jornada
+    const closes = Object.values(STAGES).some((st) => locksOf(st).some((l) => l.after === id));
+    if (def.trigger?.some((t) => t.on === 'play') && then !== 'stage' && !(closes && then === 'campaign')) issues.push(`${id}: a cena de antes da fase termina sem a fase (then: 'stage')`);
+    else if (place.scene && then !== 'home' && then !== 'stage' && !then?.go && !(closes && then === 'campaign')) issues.push(`${id}: a cena do palco termina sem voltar (then: 'home', 'stage' ou { go })`);
     steps.forEach((raw, i) => {
       if (raw.pick && !Object.keys(raw.cases ?? {}).length) issues.push(`${id} passo ${i + 1}: pick sem casos`);
       const variants = raw.pick ? Object.values(raw.cases ?? {}).map((c) => ({ ...raw, ...c })) : [raw];
@@ -538,7 +560,7 @@ const inside = (mapId, x, y) => { const m = HUB_MAPS[mapId]; return !!m && x >= 
           const tiles = step.path ?? step.to ?? [];
           if (!tiles.length) issues.push(`${at}: sem path nem to`);
           for (const [x, y, dir] of tiles) {
-            if (!floor(def.map, x, y)) issues.push(`${at}: tile fora do chão (${x},${y})`);
+            if (!floor(def.map, x, y) && !floor(def.map, x, y, true)) issues.push(`${at}: tile fora do chão (${x},${y})`);
             if (dir && !DIRS.includes(dir)) issues.push(`${at}: direção desconhecida (${dir})`);
           }
           // o path anda de tile em tile, como na vila
@@ -628,14 +650,21 @@ const inside = (mapId, x, y) => { const m = HUB_MAPS[mapId]; return !!m && x >= 
   }
   // a trava da história (H-4, `lock` na fase): a fase que destrava existe, e o texto não cita
   // o lendário dela (sem spoiler em título, regra do Fellipe)
+  // (H-9) uma fase pode ter várias travas, e uma trava pode esperar uma cena (`scene`) e só valer
+  // depois de outra (`after`): a Liga espera a cena do subsolo da Mansão, depois da Victory Road
+  const SECRETS = ['Zapdos', 'Articuno', 'Moltres', 'Mewtwo', 'Maxie'];
   for (const [id, stage] of Object.entries(STAGES)) {
-    if (!stage.lock) continue;
-    const by = STAGES[stage.lock.stage];
-    if (!by) { issues.push(`${id}: a trava espera uma fase que não existe (${stage.lock.stage})`); continue; }
-    if (!stage.lock.text || !stage.lock.go) issues.push(`${id}: a trava sem o texto ou sem o "para onde ir"`);
-    const secret = by.legendaryFight?.name;
-    if (secret && [stage.lock.text, stage.lock.go].some((t) => t?.includes(secret))) issues.push(`${id}: a trava cita o ${secret} (spoiler)`);
-    if (stage.lock.place && !STORY_PLACES[stage.lock.place]) issues.push(`${id}: a trava aponta um lugar que não existe (${stage.lock.place})`);
+    for (const lock of locksOf(stage)) {
+      if (lock.scene ? !CUTSCENES[lock.scene] : !STAGES[lock.stage]) {
+        issues.push(`${id}: a trava espera ${lock.scene ? 'uma cena' : 'uma fase'} que não existe (${lock.scene ?? lock.stage})`);
+        continue;
+      }
+      if (lock.after && !CUTSCENES[lock.after]) issues.push(`${id}: a trava vale depois de uma cena que não existe (${lock.after})`);
+      if (!lock.text || !lock.go) issues.push(`${id}: a trava sem o texto ou sem o "para onde ir"`);
+      const secret = SECRETS.find((name) => [lock.text, lock.go].some((t) => t?.includes(name)));
+      if (secret) issues.push(`${id}: a trava cita o ${secret} (spoiler)`);
+      if (lock.place && !STORY_PLACES[lock.place]) issues.push(`${id}: a trava aponta um lugar que não existe (${lock.place})`);
+    }
   }
   // as passagens com `when` (a escotilha da Usina, H-6): cada condição é conhecida
   for (const [mapId, place] of Object.entries(HUB.maps)) {
@@ -664,23 +693,30 @@ const inside = (mapId, x, y) => { const m = HUB_MAPS[mapId]; return !!m && x >= 
     ...(HUB.maps[mapId].loot ?? []).map((l) => `${l.x},${l.y}`)
   ]);
   /** Busca em largura por vários mapas: devolve os passos até o primeiro alvo, ou null. */
+  // (H-9) o interruptor da Mansão vale para os quatro andares: ele faz parte do estado, e virar a
+  // estátua (de frente para ela) conta um passo
   const walk = (start, isGoal) => {
-    const key = (m, x, y) => `${m}:${x},${y}`;
-    const seen = new Map([[key(start.map, start.x, start.y), 0]]);
-    const queue = [[start.map, start.x, start.y]];
+    const key = (m, x, y, on) => `${m}:${x},${y}:${on}`;
+    const seen = new Map([[key(start.map, start.x, start.y, false), 0]]);
+    const queue = [[start.map, start.x, start.y, false]];
     while (queue.length) {
-      const [m, x, y] = queue.shift();
-      const d = seen.get(key(m, x, y));
+      const [m, x, y, on] = queue.shift();
+      const d = seen.get(key(m, x, y, on));
       if (isGoal(m, x, y)) return d;
       const place = HUB.maps[m], map = HUB_MAPS[m], solid = solidAt(m);
       for (const [dir, dx, dy] of [['right', 1, 0], ['left', -1, 0], ['down', 0, 1], ['up', 0, -1]]) {
         let nx = x + dx, ny = y + dy;
         let next = null;
+        if (statueAt(m, nx, ny)) {
+          const k = key(m, x, y, !on);
+          if (!seen.has(k)) { seen.set(k, d + 1); queue.push([m, x, y, !on]); }
+          continue;
+        }
         // a seta de saída (o tapete com o lado dela, H-8) e a porta da caverna (andar contra ela)
         const mat = (place.warps ?? []).find((v) => v.on === 'mat' && v.x === x && v.y === y && (v.face ?? 'down') === dir && v.to !== 'vila');
         const door = (place.warps ?? []).find((v) => v.on === 'push' && v.x === nx && v.y === ny && (!v.face || v.face === dir));
-        if (mat) next = [mat.to, mat.tx, mat.ty];
-        else if (door) next = [door.to, door.tx, door.ty];
+        if (mat) next = [mat.to, mat.tx, mat.ty, on];
+        else if (door) next = [door.to, door.tx, door.ty, on];
         else {
           const jump = ledgeAt(map, nx, ny);
           if (jump) {
@@ -688,9 +724,9 @@ const inside = (mapId, x, y) => { const m = HUB_MAPS[mapId]; return !!m && x >= 
             nx += dx; ny += dy;
             if (ledgeAt(map, nx, ny)) continue;
           } else if (!heightOk(map, x, y, nx, ny)) continue;
-          if (!floor(m, nx, ny) || solid.has(`${nx},${ny}`)) continue;
+          if (!floor(m, nx, ny, on) || solid.has(`${nx},${ny}`)) continue;
           const w = (place.warps ?? []).find((v) => v.on === 'step' && v.x === nx && v.y === ny);
-          next = w ? [w.to, w.tx, w.ty] : [m, nx, ny];
+          next = w ? [w.to, w.tx, w.ty, on] : [m, nx, ny, on];
         }
         const k = key(...next);
         if (seen.has(k)) continue;
@@ -703,7 +739,8 @@ const inside = (mapId, x, y) => { const m = HUB_MAPS[mapId]; return !!m && x >= 
   for (const [id, def] of Object.entries(CUTSCENES)) {
     for (const t of def.trigger ?? []) {
       if (t.on !== 'tile' || !HUB.maps[def.map]?.explore || def.record === false) continue;
-      const story = Object.values(STORY_PLACES).find((sp) => sp.quests.some((q) => QUESTS[q]?.objectives.some((o) => o.on === 'clue' && def.steps.some((st) => st.do === 'emit' && st.target === o.target))));
+      // o lugar da história que leva à cena: a quest dele espera a pista da cena, ou a própria cena (H-9)
+      const story = Object.values(STORY_PLACES).find((sp) => sp.quests.some((q) => QUESTS[q]?.objectives.some((o) => (o.on === 'clue' && def.steps.some((st) => st.do === 'emit' && st.target === o.target)) || (o.on === 'scene' && o.target === id))));
       if (!story) { issues.push(`${id}: nenhum lugar da história leva até esta cena`); continue; }
       const cells = new Set(t.cells.map(([x, y]) => `${def.map}:${x},${y}`));
       const there = walk({ map: story.map, ...story.spot }, (m, x, y) => cells.has(`${m}:${x},${y}`));

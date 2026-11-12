@@ -186,6 +186,14 @@ não abre até você vencer.
   fraca), o chão em brasa, o Lança-chamas que varre, o Redemoinho de Fogo com uma saída
   só e o Fogo Sagrado, em que só a sombra das rochas protege. Derrotado, ele foge, e a
   Liga reabre. Pelo caminho, 15 Poké Balls.
+- **A Elite dos Quatro e a Mansão**: na porta da Victory Road, o guarda conta que a Liga
+  está vazia: os quatro desceram juntos atrás de quem prende Pokémon fortes, e o Lance
+  deixou um bilhete. A Liga fecha de novo. Na velha Mansão de Cinnabar, o Blaine espera na
+  porta, as estátuas escondem os interruptores do FireRed, e os diários contam do Mew e do
+  Mewtwo. No subsolo, o Mewtwo preso numa máquina e os quatro em jaulas; o Maxie aparece
+  pela primeira vez, e os três pássaros chegam para proteger o jogador. Sem luta: a máquina
+  cai, o Mewtwo some, e os quatro voltam para a Liga. Nas cenas, a caixa de texto nunca
+  tampa ninguém.
 - **A tela de Missões**: o Diário na barra, ao lado das Conquistas. Em cima, o que
   fazer agora; embaixo, o que já aconteceu, capítulo por capítulo, com a data de cada
   missão, para reler a história; no fim, os itens importantes que ela deu. Um

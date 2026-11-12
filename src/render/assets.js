@@ -13,6 +13,11 @@ for (const [id, map] of Object.entries(HUB_MAPS)) {
   const size = { frameWidth: map.width * 16, frameHeight: map.height * 16, frames: 1 };
   MANIFEST[`hub/${id}`] = { src: map.src, ...size };
   MANIFEST[`hub/${id}-top`] = { src: map.top, ...size };
+  // o andar com o interruptor apertado (a Mansão, H-9)
+  if (map.srcOn) {
+    MANIFEST[`hub/${id}-on`] = { src: map.srcOn, ...size };
+    MANIFEST[`hub/${id}-on-top`] = { src: map.topOn, ...size };
+  }
 }
 // os móveis do quarto decorável: `hub/decor/<id>` e `hub/decor/<id>-top`
 for (const [id, piece] of Object.entries(HUB_DECOR)) {
