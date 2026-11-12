@@ -382,6 +382,7 @@ export const ASSET_MANIFEST = {
   'scene/fuchsia_gym': { src: 'assets/scenes/fuchsia_gym.png', frameWidth: 16, frameHeight: 16, frames: 32 },
   'scene/lance_room': { src: 'assets/scenes/lance_room.png', frameWidth: 16, frameHeight: 16, frames: 68 },
   'scene/lorelei_room': { src: 'assets/scenes/lorelei_room.png', frameWidth: 16, frameHeight: 16, frames: 57 },
+  'scene/mt_ember': { src: 'assets/scenes/mt_ember.png', frameWidth: 16, frameHeight: 16, frames: 57 },
   'scene/mt_moon': { src: 'assets/scenes/mt_moon.png', frameWidth: 16, frameHeight: 16, frames: 61 },
   'scene/pewter_gym': { src: 'assets/scenes/pewter_gym.png', frameWidth: 16, frameHeight: 16, frames: 61 },
   'scene/power_plant': { src: 'assets/scenes/power_plant.png', frameWidth: 16, frameHeight: 16, frames: 129 },

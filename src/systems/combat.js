@@ -93,8 +93,13 @@ export function bonusHeal(run, companion, amount) {
  * para todos — os golpes da equipe e os dos inimigos.
  */
 export function weatherMultiplier(run, type) {
-  if (run?.stage?.weather !== 'rain' || !type) return 1;
-  return type === 'water' ? 1.5 : type === 'fire' ? 0.5 : 1;
+  const weather = run?.stage?.weather;
+  if (!type || !weather) return 1;
+  // a chuva do Kyogre (0.37): Água ×1,5 e Fogo ×0,5
+  if (weather === 'rain') return type === 'water' ? 1.5 : type === 'fire' ? 0.5 : 1;
+  // o Sol forte do Moltres (H-8): o contrário, Fogo ×1,5 e Água ×0,5
+  if (weather === 'sun') return type === 'fire' ? 1.5 : type === 'water' ? 0.5 : 1;
+  return 1;
 }
 
 /**

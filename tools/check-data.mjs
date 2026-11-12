@@ -262,6 +262,9 @@ badSegments.length ? fail(`trechos com cenário inexistente: ${badSegments.join(
 const KNOWN_WHEN = new Set(['starter', 'starterIs', 'shiny', 'badges', 'champion', 'dex', 'veteran', 'dive', 'diveTm', 'diveRescued', 'kyogre', 'locked', 'once', 'quest', 'questDone', 'scene', 'flag',
   'freed', 'caged', 'mission']);
 const KNOWN_ACTIONS = new Set(['starter', 'pc', 'mart', 'save', 'campaign', 'pokedoll', 'badges', 'aquatic', 'home', 'stage']);
+// os degraus de pular (H-8, `ledges` nos mapas gerados): o sentido do pulo [dx, dy], ou null
+const LEDGE = { v: [0, 1], '^': [0, -1], '<': [-1, 0], '>': [1, 0] };
+const ledgeAt = (map, x, y) => LEDGE[map?.ledges?.[y]?.[x]] ?? null;
 // o chão da vila: só onde o mapa do FireRed deixa pisar
 const floor = (mapId, x, y) => {
   const map = HUB_MAPS[mapId];
@@ -289,6 +292,7 @@ const inside = (mapId, x, y) => { const m = HUB_MAPS[mapId]; return !!m && x >= 
       if (!floor(w.to, w.tx, w.ty)) issues.push(`${at}: chega fora do chão em ${w.to} ${w.tx},${w.ty}`);
       // a porta bloqueia (anda-se contra ela); a escada, a entrada aberta e o tapete são chão
       if (w.on === 'push' ? floor(mapId, w.x, w.y) : !floor(mapId, w.x, w.y)) issues.push(`${at}: '${w.on}' no tile errado`);
+      if (w.face && !['up', 'down', 'left', 'right'].includes(w.face)) issues.push(`${at}: lado desconhecido (${w.face})`);
       if (!['push', 'step', 'mat'].includes(w.on)) issues.push(`${at}: tipo de porta desconhecido (${w.on})`);
     }
     for (const exit of place.exits ?? []) {
@@ -424,6 +428,7 @@ const inside = (mapId, x, y) => { const m = HUB_MAPS[mapId]; return !!m && x >= 
     const solid = new Set([
       ...(place.npcs ?? []).map((n) => `${n.x},${n.y}`),
       ...(place.decor ?? []).filter((d) => d.solid).map((d) => `${d.x},${d.y}`),
+      ...(place.decor ?? []).flatMap((d) => d.cells ?? []).map(([x, y]) => `${x},${y}`),
       ...place.loot.map((l) => `${l.x},${l.y}`)
     ]);
     const ids = new Set();
@@ -441,14 +446,22 @@ const inside = (mapId, x, y) => { const m = HUB_MAPS[mapId]; return !!m && x >= 
     for (const sp of Object.values(STORY_PLACES)) if (sp.map === mapId) starts.push([sp.spot.x, sp.spot.y]);
     const seen = new Set(starts.map(([x, y]) => `${x},${y}`));
     const queue = [...starts];
-    // nos mapas com patamares (Seafoam, H-7), a regra de altura do FireRed vale também aqui
+    // nos mapas com patamares (Seafoam, H-7), a regra de altura do FireRed vale também aqui; nos
+    // degraus de pular (o Monte Brasa, H-8), só o pulo, no sentido do degrau
     while (queue.length) {
       const [x, y] = queue.shift();
       for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
-        const k = `${x + dx},${y + dy}`;
-        if (seen.has(k) || solid.has(k) || !floor(mapId, x + dx, y + dy) || !heightOk(map, x, y, x + dx, y + dy)) continue;
+        const jump = ledgeAt(map, x + dx, y + dy);
+        let nx = x + dx, ny = y + dy;
+        if (jump) {
+          if (jump[0] !== dx || jump[1] !== dy) continue;
+          nx += dx; ny += dy;
+          if (ledgeAt(map, nx, ny)) continue;
+        } else if (!heightOk(map, x, y, nx, ny)) continue;
+        const k = `${nx},${ny}`;
+        if (seen.has(k) || solid.has(k) || !floor(mapId, nx, ny)) continue;
         seen.add(k);
-        queue.push([x + dx, y + dy]);
+        queue.push([nx, ny]);
       }
     }
     for (const l of place.loot) {
@@ -647,6 +660,7 @@ const inside = (mapId, x, y) => { const m = HUB_MAPS[mapId]; return !!m && x >= 
   const solidAt = (mapId) => new Set([
     ...(HUB.maps[mapId].npcs ?? []).map((n) => `${n.x},${n.y}`),
     ...(HUB.maps[mapId].decor ?? []).filter((d) => d.solid).map((d) => `${d.x},${d.y}`),
+    ...(HUB.maps[mapId].decor ?? []).flatMap((d) => d.cells ?? []).map(([x, y]) => `${x},${y}`),
     ...(HUB.maps[mapId].loot ?? []).map((l) => `${l.x},${l.y}`)
   ]);
   /** Busca em largura por vários mapas: devolve os passos até o primeiro alvo, ou null. */
@@ -659,11 +673,25 @@ const inside = (mapId, x, y) => { const m = HUB_MAPS[mapId]; return !!m && x >= 
       const d = seen.get(key(m, x, y));
       if (isGoal(m, x, y)) return d;
       const place = HUB.maps[m], map = HUB_MAPS[m], solid = solidAt(m);
-      for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
-        const nx = x + dx, ny = y + dy;
-        if (!floor(m, nx, ny) || solid.has(`${nx},${ny}`) || !heightOk(map, x, y, nx, ny)) continue;
-        const w = (place.warps ?? []).find((v) => v.on === 'step' && v.x === nx && v.y === ny);
-        const next = w ? [w.to, w.tx, w.ty] : [m, nx, ny];
+      for (const [dir, dx, dy] of [['right', 1, 0], ['left', -1, 0], ['down', 0, 1], ['up', 0, -1]]) {
+        let nx = x + dx, ny = y + dy;
+        let next = null;
+        // a seta de saída (o tapete com o lado dela, H-8) e a porta da caverna (andar contra ela)
+        const mat = (place.warps ?? []).find((v) => v.on === 'mat' && v.x === x && v.y === y && (v.face ?? 'down') === dir && v.to !== 'vila');
+        const door = (place.warps ?? []).find((v) => v.on === 'push' && v.x === nx && v.y === ny && (!v.face || v.face === dir));
+        if (mat) next = [mat.to, mat.tx, mat.ty];
+        else if (door) next = [door.to, door.tx, door.ty];
+        else {
+          const jump = ledgeAt(map, nx, ny);
+          if (jump) {
+            if (jump[0] !== dx || jump[1] !== dy) continue;
+            nx += dx; ny += dy;
+            if (ledgeAt(map, nx, ny)) continue;
+          } else if (!heightOk(map, x, y, nx, ny)) continue;
+          if (!floor(m, nx, ny) || solid.has(`${nx},${ny}`)) continue;
+          const w = (place.warps ?? []).find((v) => v.on === 'step' && v.x === nx && v.y === ny);
+          next = w ? [w.to, w.tx, w.ty] : [m, nx, ny];
+        }
         const k = key(...next);
         if (seen.has(k)) continue;
         seen.set(k, d + 1);

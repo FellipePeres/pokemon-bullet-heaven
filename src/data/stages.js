@@ -575,6 +575,13 @@ export const STAGES = {
     world: { width: 3000, height: 2000, theme: 'cave' },
     scaling: { hp: 4.0, speed: 0.3, damage: 4.6 },
     difficulty: 0.8,   // a força da fase (0.17; 0.28: era 1,05, recalibrada com a curva de XP nova)
+    // a trava da história (H-8, a decisão 2: a Victory Road só abre com os três pássaros de volta):
+    // as hordas tomaram a Victory Road até a missão do Moltres (a fase `moltres`). Sem citar o Moltres
+    lock: {
+      stage: 'moltres',
+      text: 'Hordas furiosas tomaram a Victory Road, e a Liga fechou a passagem até as rotas se acalmarem.',
+      go: 'Investigue o Monte Brasa, na Ilha 1', place: 'monte_brasa'
+    },
     unlockedBy: 'gym_8_viridian',
 
     segments: [
@@ -1087,6 +1094,83 @@ export const STAGES = {
     // a volta é pela margem do fundo (Game.js): vencer leva à cena `articuno_livre`; cair, ao Centro
     returnTo: 'mission',
     capturePool: 'phase7',
+    ballChance: 0,
+    maxBalls: 0,
+    reward: { shards: 300 }
+  },
+
+  /* A MISSÃO DO MOLTRES (H-8, "Derrote e liberte o Moltres", PLANEJAMENTO-HISTORIA.md seção 5.3):
+     o cume do Monte Brasa, pelo card que sobe no alto (data/missions.js). O Moltres acorrentado à
+     máquina do emblema vermelho em brasa, que suga a energia dele: por isso ele está fraco, e uma
+     equipe logo depois da Fase 8 consegue vencê-lo. A horda do Monte Brasa, o Sol forte o tempo
+     todo (Fogo ×1,5 e Água ×0,5, o contrário da chuva do Kyogre) e o chão em brasa, o Lança-chamas
+     que varre, o Redemoinho de Fogo, a Onda de Calor e o Fogo Sagrado com a sombra das rochas
+     (systems/moltresFight.js, no molde das missões). Sem captura: derrotado, ele cai; na cena de
+     depois (`moltres_livre`) ele foge, assustado. Vencer destrava a Liga (o `lock` da Lorelei). */
+  moltres: {
+    id: 'moltres',
+    name: 'Missão — O cume do Monte Brasa',
+    region: 'Kanto',
+    type: 'legendary',
+    icon: 'boss',
+    secret: true,
+    mission: 'moltres',
+    description: 'O Moltres, preso por correntes numa máquina em brasa que suga a energia dele, no cume do Monte Brasa.',
+    music: 'mus_victory_road', leaderMusic: 'mus_vs_legend',
+    duration: 45,
+    xpScale: 1.1,
+    world: { width: 2400, height: 1600, theme: 'cave' },
+    weather: 'sun',
+    scaling: { hp: 0.6, speed: 0.25, damage: 0.3 },
+    difficulty: 1.2,
+    segments: [{ from: 0, name: 'O cume do Monte Brasa', theme: 'cave', scene: 'brasa_arena' }],
+    waves: [
+      // os 45 s com ele preso: a horda do Monte Brasa
+      { from: 0, to: 44, interval: 0.7, batch: 5, maxAlive: 140, level: [58, 62], enemies: [{ id: 'ponyta', weight: 3 }, { id: 'rapidash', weight: 2 }, { id: 'magmar', weight: 2 }, { id: 'geodude_wild', weight: 3 }, { id: 'machop', weight: 2 }, { id: 'machoke', weight: 2 }, { id: 'spearow', weight: 2 }, { id: 'fearow', weight: 1 }] },
+      // com o Moltres solto, a horda continua, mais leve
+      { from: 45, to: 9999, interval: 2, batch: 3, maxAlive: 30, level: [58, 62], enemies: [{ id: 'ponyta', weight: 3 }, { id: 'rapidash', weight: 2 }, { id: 'magmar', weight: 2 }, { id: 'machoke', weight: 1 }] }
+    ],
+    elites: [
+      { at: 14, id: 'rapidash_elite', count: 2, level: 62 },
+      { at: 30, id: 'magmar_elite', count: 1, level: 62 }
+    ],
+    leader: {
+      name: 'MOLTRES',
+      title: 'Pokémon lendário',
+      type: 'fire',
+      dex: 146,
+      portrait: null,
+      quote: 'A máquina sugou a energia dele por muito tempo. Ele está fraco, mas fora de si!'
+    },
+    recommendedLevel: 62,
+    bossTeam: ['moltres_boss'],
+    legendaryFight: {
+      kind: 'moltres', species: 'moltres', name: 'Moltres', dex: 146,
+      // sem captura, como o Zapdos e o Articuno (decisão 16): ele foge na cena de depois
+      balls: 0,
+      machine: [1200, 660],     // a máquina em brasa, logo acima de onde o treinador chega (px do mundo)
+      burnLife: 8,              // o fogo que os golpes deixam no chão dura isso
+      sweepWarn: 1.2,           // o Lança-chamas: o leque aceso antes da chama
+      sweepTime: 1.0,           // ...e o tempo da varredura, de uma ponta à outra
+      sweepArc: 1.1,            // a abertura do leque (radianos)
+      sweepRange: 640,
+      spinRadius: 240,          // o Redemoinho de Fogo: o anel começa com este raio...
+      spinEnd: 70,              // ...e fecha até este
+      spinTime: 3.2,            // em tantos segundos
+      spinGap: 0.8,             // a abertura da saída (radianos)
+      sacredAt: [0.66, 0.33],   // o Fogo Sagrado: aos 66% e aos 33% (e a cada `sacredEvery` s na fúria)
+      sacredEvery: 24,
+      sacredTime: 9,            // o fogo cai por tanto tempo, com as sombras girando
+      rocks: 4,                 // as rochas que sobem do chão
+      shadowLength: 280,        // o comprimento da sombra de cada rocha
+      // o dano de cada golpe (na escala dos golpes dos líderes); o chão em brasa, o anel do
+      // redemoinho e o fogo sagrado contam a cada meio segundo
+      damage: { sweep: 10, spin: 4, ring: 6, burn: 1.6, sacred: 2.2, dive: 8 },
+      summons: [{ id: 'ponyta', weight: 3 }, { id: 'rapidash', weight: 2 }, { id: 'magmar', weight: 2 }, { id: 'machoke', weight: 1 }]
+    },
+    // a volta é pelo cume (Game.js): vencer leva à cena `moltres_livre`; cair, ao Centro
+    returnTo: 'mission',
+    capturePool: 'phase8',
     ballChance: 0,
     maxBalls: 0,
     reward: { shards: 300 }

@@ -392,6 +392,17 @@ export const ENEMIES = {
     hp: 71, speed: 95, damage: 8, xp: 14, dropChance: 0.016,
     behavior: 'chaser', radius: 15, scale: 1.15
   },
+  // a horda do Monte Brasa (H-8, a missão do Moltres): os de fogo do vulcão
+  rapidash: {
+    id: 'rapidash', dex: 78, name: 'Rapidash', types: ['fire'],
+    hp: 82, speed: 108, damage: 9, xp: 15, dropChance: 0.016,
+    behavior: 'chaser', radius: 16, scale: 1.2
+  },
+  magmar: {
+    id: 'magmar', dex: 126, name: 'Magmar', types: ['fire'],
+    hp: 86, speed: 90, damage: 10, xp: 15, dropChance: 0.016,
+    behavior: 'chaser', radius: 16, scale: 1.2
+  },
   // a horda das Ilhas Seafoam (H-7, a missão do Articuno): os evoluídos do fundo
   dewgong: {
     id: 'dewgong', dex: 87, name: 'Dewgong', types: ['water', 'ice'],
@@ -1106,6 +1117,13 @@ export const ENEMIES = {
     hp: 85000, speed: 92, damage: 33, xp: 1600, dropChance: 0,
     behavior: 'boss', radius: 46, scale: 2.6, boss: true, ace: true, legendary: true, enrageAt: 0.2,
     leader: 'Zapdos', abilities: []
+  },
+  // o Moltres da missão (H-8): enfraquecido pela máquina do Monte Brasa, para logo depois da Fase 8
+  moltres_boss: {
+    id: 'moltres_boss', dex: 146, name: 'Moltres', types: ['fire', 'flying'], level: 62,
+    hp: 270000, speed: 86, damage: 40, xp: 2200, dropChance: 0,
+    behavior: 'boss', radius: 46, scale: 2.6, boss: true, ace: true, legendary: true, enrageAt: 0.2,
+    leader: 'Moltres', abilities: []
   },
   // o Articuno da missão (H-7): enfraquecido pela máquina de Seafoam, para logo depois da Fase 7
   articuno_boss: {

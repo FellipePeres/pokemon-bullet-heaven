@@ -1067,6 +1067,71 @@ Nunca voltar bônus globais para o pool de level up — foi pedido explícito.
   vitória, a cena de depois, a vila) e o `check-data` (o caminho a pé, as bolas com a regra de altura,
   os gatilhos de tile). O roteiro de screenshots é `articuno`.
 
+### O Capítulo 5 e a missão do Moltres (H-8, 0.39 na branch)
+- Pedido do Fellipe: a proposta "Monte Brasa: o fogo" (PLANEJAMENTO-HISTORIA.md, seção 5.3), com
+  o ajuste da decisão 22 antes ("construa a h-8 então"). A emboscada do Maxie fica para a H-9.
+- **As quests**: o `c5_giovanni` ganhou o segundo objetivo, "Mostre o Pedaço de Metal ao
+  Giovanni" (a pista `monte_brasa`); depois, `c5_brasa` ("Investigue o Monte Brasa, na Ilha 1", a
+  pista `moltres_preso`), `c5_moltres` (a fase `moltres`) e, no Capítulo 6 ("A Elite dos Quatro"),
+  `c6_liga` (vencer a Lorelei). Nada cita o Moltres antes da cena do cume.
+- **A cena do Pedaço de Metal** (`depois_giovanni`, gatilho `win` da Fase 8) no palco
+  `ginasio_viridian` (o recorte da sala do Giovanni, `npc/giovanni`): o jogador mostra o pedaço (o
+  passo `item`); o Giovanni ri, não é da Rocket, e ele também quer saber quem é; os homens dele
+  viram o emblema subindo o Monte Brasa com peças de máquina. O jogador fica um tile abaixo dele (2,4):
+  colado, a cabeça da personagem cobria o Giovanni. Termina na vila.
+- **A trava da Liga** (`lock` da `e4_lorelei` com a fase `moltres`): "Hordas furiosas tomaram a
+  Victory Road, e a Liga fechou a passagem até as rotas se acalmarem." O botão leva à marca da Ilha 1
+  (`STORY_PLACES.monte_brasa`). Na H-9 a trava passa para a missão da base (decisão 22).
+- **O Monte Brasa a pé** (`brasa_encosta`, `brasa_caminho_1f` a `_3f` e `brasa_cume`, do
+  `MtEmber_*` do FireRed, `explore`, com a música das Ilhas Sevii): no FireRed o caminho do cume pede
+  o Strength. Resolvido na história: os ladrões já arrastaram as cinco pedras para o lado (a cena da
+  chegada mostra o chão marcado), e elas ficam como enfeites sólidos nos lugares novos. As entradas
+  da caverna são `step` (o tile é andável); a saída do cume é um tapete com a seta para cima (`face`).
+- **Os degraus de pular** (o achado técnico da H-8): o `hub.py` grava os `MB_JUMP_*` (0x38 a 0x3B)
+  dos mapas do Monte Brasa em `ledges` (`v`, `^`, `<`, `>`); o degrau não se pisa (`Hub.canStep`), e
+  andar para ele no sentido dele é um pulo de dois tiles (`Hub.jumpFrom`, `p.jump`, o dobro do tempo
+  de um passo, com o arco e a sombra no `HubRenderer`). O clique (`_route`) e o check-data contam os
+  pulos: a subida tem 229 passos; a volta, 56, descendo pelos degraus.
+- **As 15 Poké Balls**: a do FireRed (`fr1`, Novo Sorteio) e catorze no caminho de ida, à vista, sem
+  fechar a rota (o padrão das missões a pé, regra do Fellipe na H-7).
+- **O cume** (`brasa_cume`): enquanto o Moltres está preso, o calor (`heat` do lugar: o laranja e o ar
+  tremendo, `HubRenderer._heat`), as ondas de fogo subindo (`pulse` com `color: 'fire'`) e a máquina
+  em brasa com as correntes e o Moltres por cima (enfeites com `hideIf`). A máquina ocupa 4 x 2 tiles:
+  os enfeites ganharam `cells` (as casas sólidas de um enfeite grande, `Hub._solidCells` e o
+  check-data). Pisar logo abaixo do alto (`BRASA_SUMMIT`) começa `brasa_cume` (o calor, a silhueta, a
+  pista, o card); depois, a versão curta `brasa_cume_card`. O Voltar deixa o jogador em (8,10).
+- **A luta** (`systems/moltresFight.js`, a fase secreta `moltres`, o chefe `moltres_boss`, a arena
+  `brasa_arena` com a areia e as pedras do `MtEmber_Exterior`, a tira `scene/mt_ember`): preso na
+  máquina nos 45 s da horda do Monte Brasa (Rapidash e Magmar novos); o **Sol forte** o tempo todo
+  (`weather: 'sun'`: o `combat.weatherMultiplier` faz Fogo x1,5 e Água x0,5, o contrário da chuva); o
+  **chão em brasa** (`burn`, 8 s; quem da equipe fica em cima perde vida a cada meio segundo); o
+  **Lança-chamas** (o leque de 1,1 rad acende por 1,2 s com a seta da varredura, e a chama varre de
+  uma ponta à outra em 1 s, deixando brasa); o **Redemoinho de Fogo** (o anel fecha em volta do
+  treinador de 240 a 70 px em 3,2 s, com a saída marcada; encostar queima, e quem fica dentro quando
+  fecha queima o triplo); a **Onda de Calor** (dois anéis, `kind: 'heat'`); a horda chamada; o **Fogo
+  Sagrado** (aos 66% e 33% e a cada 24 s na fúria: ele sobe para o sol, intocável, 4 rochas sobem do
+  chão, e o fogo cai na arena inteira menos na sombra delas; ele voa em círculo lá no alto e as
+  sombras giram junto, `sunAt` e `inShadow`; 9 s e o mergulho com a Onda de Calor). Sem captura. O
+  desenho em `render/moltresFight.js` (o sol na borda da tela mostra de onde vem a luz; o aviso do
+  mergulho é laranja: o `warning` do molde lê `type: 'fire'`).
+- **A volta**: `retreat` no cume (8,10), `nurse` `enfermeira_brasa` (um montanhista da Ilha 1 trouxe o
+  jogador); vencer toca `moltres_livre` no cume: o calor baixa, ele cai, se assusta e foge para o céu;
+  a terceira máquina ("Três máquinas, três pássaros") e a pista nova: o emblema de perto lembra um
+  vulcão. O aviso "As rotas se acalmaram: a Liga reabriu a Victory Road", e o atalho para a vila. O
+  sábio (uma vez: "Isso ainda não acabou"), o rapaz e o montanhista comentam.
+- **A medição**: `node tools/kyogre.mjs 62 12 moltres`: 11 de 12, 3 desmaios, 178 s; no 56, 7 de 12
+  (a curva do Zapdos e do Articuno). As alavancas: a vida do `moltres_boss` (270.000), a `difficulty`
+  da fase (1,2) e os danos do `legendaryFight` (o Sol forte já multiplica os golpes dele por 1,5). O
+  bot (`steer`) vai para a sombra de rocha mais perto, sai pela abertura do redemoinho e sai de lado
+  do leque.
+- **Os testes**: o `smoke-test` (a arena, preso, o Sol forte, o leque só depois do aviso, a chama que
+  varre e a brasa, quem sai a tempo, o chão em brasa, o redemoinho com a saída, a Onda de Calor, o
+  Fogo Sagrado com a sombra que gira e o fogo fora dela, o mergulho, a queda; a trava da Liga; os
+  degraus de pular), o `ui-smoke` (a cena do Giovanni, a trava sem spoiler, a marca, a subida por
+  cliques com o pulo, o cume com o card, o Voltar, a versão curta, o Lutar no primeiro card, sair no
+  meio, a derrota, a vitória, a cena de depois, a vila) e o `check-data` (o caminho a pé com os pulos,
+  as bolas, os enfeites com `cells`). O roteiro de screenshots é `moltres`.
+
 ### A descida do Dive — o modo aquático (0.36)
 - Pedido do Fellipe, desenhado e medido numa maquete jogável que ele aprovou
   (PLANEJAMENTO-DIVE.md, seções 3 a 7). Na lagoa da vila, com alguém da equipe
@@ -1098,7 +1163,7 @@ Nunca voltar bônus globais para o pool de level up — foi pedido explícito.
   de liberados"). `LEGENDARY_CAPTURE.open` (`data/legendaries.js`) é `false`, e o
   `CaptureSystem.rollLegendary` não sorteia nada. A tabela `LEGENDARY_ENCOUNTERS` e as regras
   (um de cada, a missão antes, H-5) continuam no código para quando a história abrir; o
-  `smoke-test` confere as duas coisas (fechada, e o sorteio guardado com a chave aberta). O
+  `smoke-test` confere as duas coisas (fechada, e o sorteio guardado com a chave aberta) - Lendários podem aparecer em pokebolas pós derrotar a E4 e o Campeão. O
   Kyogre não muda (a luta do salão). Enquanto estiver fechada, a Pokédex chega no máximo a 146.
 - Poké Ball dropa de inimigos derrotados, com **teto por fase** (`maxBalls`: 3 na
   Fase 1, 2 nas outras, 1 em cada sala da Liga e 1 no Campeão, que tinha 0 até a
@@ -1547,6 +1612,7 @@ o Brock como está, todas as outras mais duras, menos níveis.
 | 76 | o refino da história: "essas maquinas que prendem os lendários sugam a energia deles" e mandam em ondas para um lugar misterioso, onde uma máquina central numa base do Maxie desorienta os Pokémon (ideia de End Game); o Zapdos enfraquecido explica a vitória de um jogador de nível baixo; "ao derrotar o Zapdos, rola uma cutscene do Zapdos voando e fugindo, assustado", sem captura por enquanto | 0.39 (na branch): a luta sem captura e de nível 36 (medida: 11 de 12 no 36), a energia escorrendo pelas correntes, a cena com o Zapdos do FireRed caído que foge pelo alto (os passos `cry`, `tremble` e `fly`) e a pista da energia mandada para longe; o card "Sem captura nesta luta" |
 | 77 | "A fase da Erika é barrada, o jogador precisa passar do Zapdos para liberar a Erika, o emblema pode ser visto outra vez e o jogador faz ligação que era o mesmo da máquina"; "não pode ter spoilers no título das fases ou quests"; a cena do emblema "montada já no artifact" e "um bate papo simples dando indícios da continuação"; "ficou excelente" | 0.39 (na branch): a trava da Fase 4 (`lock`, o Túnel de Pedra no escuro, sem o nome do Zapdos), as quests douradas da Usina, a do Koga e a da Sabrina, o palco do ginásio de Celadon com a Erika, a cena `depois_erika` (a lembrança com a sombra de asas, o pedaço de metal, o emblema reconhecido, as pistas: a Rocket no Cassino, a sombra para o sul) e os passos `toast`, `storm` e `item` |
 | 78 | "vamos para o H-3" | 0.39 (na branch): a tela de Missões (seção 7.3 do PLANEJAMENTO-HISTORIA): o Diário nas duas barras com o pontinho de quest nova, o que fazer agora, o diário por capítulo com as datas e os itens importantes; nenhuma quest futura aparece |
+| 82 | "construa a h-8 então" (a proposta "Monte Brasa: o fogo", depois do ajuste da decisão 22) | 0.39 (na branch): o Capítulo 5 até o fim e o 6 começando: a cena do Giovanni com o Pedaço de Metal, a trava da Liga (as hordas na Victory Road), o Monte Brasa a pé (as pedras do Strength já arrastadas pelos ladrões, os degraus de pular do FireRed, 15 Poké Balls), o cume com o calor, a luta do Moltres (o Sol forte, o chão em brasa, o Lança-chamas, o Redemoinho de Fogo, a Onda de Calor, o Fogo Sagrado com a sombra das rochas; nível 62, 11 de 12), a fuga, o emblema que lembra um vulcão e o atalho para a vila |
 | 81 | "ainda não pode aparecer os lendários na captura, mesmo que depois de liberados"; "bola um arquivo md com história e grava toda a história lá"; a ideia da emboscada do Maxie no Mewtwo, com os três pássaros protegendo o jogador, ainda sem momento | 0.39 (na branch): `LEGENDARY_CAPTURE.open = false` (nenhum lendário na Poké Ball; a regra antiga guardada); o `HISTORIA.md` (a verdade por trás de tudo, as regras da escrita, os personagens, os capítulos, as pistas e as ideias em aberto); decisão 20 e seção 13.3 no PLANEJAMENTO-HISTORIA |
 | 80 | "Coloca um atalho para o pós luta, o articuno foi derrotado ele pode aparecer na vila pós cena já"; "lembra de colocar pokeloot nesse caminho de ida ao articuno, pode por até 15" | 0.39 (na branch): a cena `articuno_livre` termina na vila (`then: 'home'`); 15 Poké Balls em Seafoam (as cinco do FireRed, sete à vista da rota de ida, três nos becos), nenhuma escondida pela camada de cima e nenhuma fechando o caminho (o check-data conta as bolas como paredes) |
 | 79 | a proposta da H-7, "Seafoam: as ondas": "pode seguir com o que fez" | 0.39 (na branch): o Capítulo 4, "As ondas" (decisão 19): a cena do Blaine com as ondas, a trava da Fase 8 (o mar congelando), Seafoam a pé com a regra de altura do FireRed (no passo e no desenho), o gatilho `tile` e a névoa, a luta do Articuno (a névoa, o gelo no chão, o Raio de Gelo, a Nevasca, o Frio Absoluto com o olho; nível 57, 11 de 12), a fuga e a segunda máquina; a cena que ficava `started` no Lutar do primeiro card, corrigida |
@@ -1869,10 +1935,11 @@ O que está planejado:
   Kyogre. **A H-1 está no jogo desde a 0.38** (as quests, o rastreador e o
   prólogo; ver a seção 4), e **a H-2 desde a 0.39** (o motor das cenas, as duas do
   prólogo, a do Brock e as cenas de antes e de depois das fases, em tela cheia nos
-  palcos; **nunca no meio de uma fase**, regra do Fellipe). **A H-3 a H-7 também, na
+  palcos; **nunca no meio de uma fase**, regra do Fellipe). **A H-3 a H-8 também, na
   branch** (a tela de Missões, os Capítulos 1 a 3, o molde das missões, a missão do
-  Zapdos e o Capítulo 4 com a do Articuno). Falta, em ordem: as outras missões de
-  lendário (H-8, o Moltres, a H-11) e as recompensas (H-12).
+  Zapdos, o Capítulo 4 com a do Articuno e o 5 com a do Moltres). Falta, em ordem: a
+  base do Maxie com o Mewtwo e a Elite dos Quatro presa (H-9, decisão 22), a Liga
+  (H-10), a lagoa e o Mew (H-11) e as recompensas (H-12).
   **A captura dos lendários está fechada** (decisão 20, 2026-11-12): nenhum lendário
   aparece na Poké Ball, nem depois de liberado (`LEGENDARY_CAPTURE.open` em
   `data/legendaries.js`). A regra da H-5 (o liberado volta à Poké Ball das fases

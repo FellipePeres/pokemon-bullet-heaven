@@ -877,8 +877,8 @@ console.log('\n[encontros de lendário]');
   for (let i = 0; i < 2000; i++) seen += legendaryIn(early.captureSystem.rollChoices()).length;
   check('antes da Fase 7 nenhum lendário aparece', seen === 0, `${seen} em 2000 Poké Balls`);
 
-  // a chance da fase: ~2% na Fase 7, e só aves
-  const rate = new Run('gym_7_cinnabar', { starter: 'charmander' });
+  // a chance da fase: ~3% na Fase 7, e só aves (os três pássaros têm missão: aqui, já liberados)
+  const rate = new Run('gym_7_cinnabar', { starter: 'charmander', liberated: ['zapdos', 'articuno', 'moltres'] });
   let hits = 0;
   for (let i = 0; i < 4000; i++) {
     rate.legendariesOffered.clear();
@@ -892,8 +892,8 @@ console.log('\n[encontros de lendário]');
 
   // um de cada: na mesma tentativa não repete, mesmo recusado; quem está no PC não volta
   for (const enc of Object.values(LEGENDARY_ENCOUNTERS)) enc.chance = 1;
-  // (os pássaros com missão só caem depois dela, H-5 e H-7: aqui os dois já foram liberados)
-  const run = new Run('gym_8_viridian', { starter: 'charmander', ownedElsewhere: ['zapdos'], liberated: ['zapdos', 'articuno'] });
+  // (os pássaros com missão só caem depois dela, H-5, H-7 e H-8: aqui os três já foram liberados)
+  const run = new Run('gym_8_viridian', { starter: 'charmander', ownedElsewhere: ['zapdos'], liberated: ['zapdos', 'articuno', 'moltres'] });
   const offered = [];
   for (let i = 0; i < 6; i++) {
     const choices = run.captureSystem.rollChoices();
@@ -1433,8 +1433,8 @@ console.log('\n[a missão do Zapdos — preso, a tempestade, os ataques, a captu
   const offers = (run) => { const seen = new Set(); for (let i = 0; i < 40; i++) { run.legendariesOffered.clear(); for (const c of run.captureSystem.rollChoices()) if (LEG.includes(c.id)) seen.add(c.id); } return seen; };
   const before = offers(new Run('gym_8_viridian', { starter: 'charmander' }));
   const after = offers(new Run('gym_8_viridian', { starter: 'charmander', liberated: ['zapdos'] }));
-  check('antes da missão, o Zapdos e o Articuno (H-7) nunca aparecem na Poké Ball (o Moltres, sim, até ter missão)',
-        MISSION_SPECIES.includes('zapdos') && MISSION_SPECIES.includes('articuno') && !before.has('zapdos') && !before.has('articuno') && before.has('moltres'));
+  check('antes da missão, nenhum dos três pássaros aparece na Poké Ball (o Moltres com a H-8)',
+        ['zapdos', 'articuno', 'moltres'].every((id) => MISSION_SPECIES.includes(id) && !before.has(id)));
   check('depois da missão (com ou sem a captura), ele entra no sorteio da fase', after.has('zapdos') && !after.has('articuno')
         && offers(new Run('gym_8_viridian', { starter: 'charmander', liberated: ['zapdos', 'articuno'] })).has('articuno'));
   check('...e quem está no PC continua não voltando (um de cada)',
@@ -1560,6 +1560,166 @@ console.log('\n[a missão do Articuno — preso, a névoa, o gelo no chão, os a
   tick(fight, 0.1);
   check('derrotado, ele cai sem forças (a fuga é a cena de depois), sem captura, e a fase é vencida',
         f.downed && !f.captured && !fight.pendingGift && fight.state === 'victory');
+}
+
+// ------------------------------------------- a missão do Moltres (H-8)
+console.log('\n[a missão do Moltres — preso, o Sol forte, o chão em brasa, os ataques, o Fogo Sagrado e a queda]');
+{
+  const { MISSIONS } = await import('../src/data/missions.js');
+  const { weatherMultiplier } = await import('../src/systems/combat.js');
+  const tick = (run, seconds, move = { x: 0, y: 0 }) => {
+    for (let i = 0; i < 60 * seconds; i++) {
+      run.update(DT, move);
+      if (run.state === 'intro') { run.pendingIntro = null; run.state = 'running'; }
+      if (run.state === 'levelup' || run.state === 'evolution' || run.state === 'unlock') run.state = 'running';
+    }
+  };
+  const fight = new Run('moltres', { starter: 'charmander' });
+  fight.damageCompanion = () => {};
+  const f = fight.fight;
+  check('a fase da missão: o cume do Monte Brasa, no molde, sem captura',
+        MISSIONS.moltres.stage === 'moltres' && fight.world.scene === 'brasa_arena' && f.constructor.name === 'MoltresFight'
+        && f.balls === 0 && MISSIONS.moltres.balls === null);
+  check('enfraquecido pela máquina: a luta é para logo depois da Fase 8 (62, entre a 8 e a Lorelei)',
+        fight.stage.recommendedLevel === 62 && fight.stage.recommendedLevel > STAGES.gym_8_viridian.recommendedLevel
+        && fight.stage.recommendedLevel < STAGES.e4_lorelei.recommendedLevel && MISSIONS.moltres.recommendedLevel === 62);
+  check('o Sol forte o tempo todo: Fogo ×1,5 e Água ×0,5 (o contrário da chuva do Kyogre)',
+        weatherMultiplier(fight, 'fire') === 1.5 && weatherMultiplier(fight, 'water') === 0.5 && weatherMultiplier(fight, 'grass') === 1
+        && weatherMultiplier(new Run('kyogre', { starter: 'charmander' }), 'fire') === 0.5);
+  const { buildSceneGrid } = await import('../src/systems/terrain.js');
+  check('a arena deixa livre o lugar da máquina em brasa, e a base dela bloqueia o caminho',
+        (() => { const g = buildSceneGrid('brasa_arena', fight.terrain.cols, fight.terrain.rows, 'moltres'); const tx = Math.floor(f.machine.x / 32), ty = Math.floor(f.machine.y / 32);
+          for (let y = ty - 4; y <= ty + 3; y++) for (let x = tx - 4; x <= tx + 4; x++) if (g.solid[y * g.cols + x]) return false; return true; })()
+        && fight.terrain.solidAt(Math.floor(f.machine.x / 32), Math.floor((f.machine.y + 20) / 32))
+        && !fight.terrain.solidAt(Math.floor(fight.player.x / 32), Math.floor(fight.player.y / 32)));
+  tick(fight, 4);
+  check('preso na máquina, nos primeiros 45 s: sem o chefe', !fight.boss && !f.snapped && f.state === 'waiting');
+  fight.time = fight.stage.duration;
+  tick(fight, 0.1);
+  check('aos 0:45 ele entra em campo ainda preso, intocável', fight.boss?.data.id === 'moltres_boss' && fight.boss.untouchable && f.state === 'break');
+  tick(fight, 2.4);
+  check('...as correntes arrebentam, a máquina quebra, e a luta começa', f.snapped && f.machine.broken && f.state !== 'break' && !fight.boss.untouchable);
+  const boss = fight.boss;
+  f.rng = () => 0.4;
+  f.attackTimer = 99; f.summonTimer = 99;
+  // conta só os golpes do Moltres que importam (a horda continua batendo de leve)
+  const got = [];
+  const hurt = fight.damageCompanion;
+  fight.damageCompanion = (c, amount) => got.push(amount);
+  const count = (want) => got.filter((a) => Math.abs(a - want) < 1e-6).length;
+  const team = (x, y) => { fight.player.x = x; fight.player.y = y; for (const c of fight.companions) { c.x = x; c.y = y; } };
+  // o Lança-chamas: o leque acende, e a chama varre de uma ponta à outra
+  f._set('fight'); f.burn = [];
+  team(boss.x + 300, boss.y);
+  f._startSweep(boss);
+  const sw = f.sweep;
+  check('o Lança-chamas: o leque acende na frente dele, apontado para o treinador, com aviso de 1,2 s',
+        f.state === 'sweep' && sw.phase === 'aim' && sw.warn === 1.2 && f.inSweep(fight.player.x, fight.player.y) && !f.inSweep(boss.x - 300, boss.y));
+  tick(fight, 1.0);
+  check('...a chama não sai antes do aviso', sw.phase === 'aim' && count(sw.damage) === 0);
+  for (let i = 0; i < 60 * 1.4 && f.sweep; i++) { team(boss.x + 300, boss.y); tick(fight, 1 / 60); }
+  check('...e varre o leque: quem ficou nele leva (uma vez), e a brasa fica pelo caminho (8 s)',
+        count(sw.damage) >= 1 && count(sw.damage) <= fight.companions.length + 1 && f.burn.length >= 6 && f.burn.every((b) => b.life === 8) && f.state === 'fight',
+        `${count(sw.damage)} golpes, ${f.burn.length} brasas`);
+  // quem sai do leque a tempo não leva nada
+  got.length = 0; f.burn = [];
+  team(boss.x + 300, boss.y);
+  f._startSweep(boss);
+  const sw2 = f.sweep;
+  for (let i = 0; i < 60 * 2.6 && f.sweep; i++) { team(boss.x, boss.y - 420); tick(fight, 1 / 60); }
+  check('...quem saiu do leque a tempo não leva nada', count(sw2.damage) === 0 && !f.sweep);
+  // o chão em brasa: em cima, a equipe perde vida a cada meio segundo
+  got.length = 0;
+  const patch = f.burn[0];
+  for (let i = 0; i < 33; i++) { team(patch.x, patch.y); tick(fight, 1 / 60); }
+  check('em cima do chão em brasa, a equipe perde vida', count(f._damage(f.cfg.damage.burn)) >= fight.companions.length);
+  f.burn = [];
+  got.length = 0;
+  tick(fight, 0.6);
+  check('...e fora dele, nada', count(f._damage(f.cfg.damage.burn)) === 0);
+  // o Redemoinho de Fogo: o anel fecha em volta do treinador; a saída marcada salva
+  team(boss.x + 360, boss.y + 60);
+  f._startSpin();
+  const sp = f.spin;
+  check('o Redemoinho de Fogo: o anel começa em volta do treinador, com uma saída marcada',
+        sp.x === fight.player.x && sp.y === fight.player.y && sp.r === f.cfg.spinRadius);
+  got.length = 0;
+  const out = { x: sp.x + Math.cos(sp.gap) * (sp.r + 120), y: sp.y + Math.sin(sp.gap) * (sp.r + 120) };
+  for (let i = 0; i < 60 * 3.4 && f.spin; i++) { team(out.x, out.y); tick(fight, 1 / 60); }
+  const spinHits = count(f._damage(f.cfg.damage.spin)) + count(f._damage(f.cfg.damage.spin * 3));
+  check('...ele fecha, e quem saiu pela abertura não leva nada', !f.spin && spinHits === 0);
+  f.burn = [];
+  const inside = { x: boss.x + 360, y: boss.y + 60 };
+  team(inside.x, inside.y);
+  f._startSpin();
+  got.length = 0;
+  for (let i = 0; i < 60 * 3.4 && f.spin; i++) { team(inside.x, inside.y); tick(fight, 1 / 60); }
+  check('...e quem ficou dentro queima de vez quando ele fecha', !f.spin && count(f._damage(f.cfg.damage.spin * 3)) >= fight.companions.length);
+  f._heatWave(boss);
+  check('a Onda de Calor: dois anéis do tipo Fogo', f.rings.filter((r) => r.kind === 'heat' && r.type === 'fire').length >= 2);
+  // o Fogo Sagrado aos 66%: ele sobe para o sol; as rochas sobem; só a sombra delas protege
+  f.rings = []; f.burn = []; f.hazards = []; f.spin = null;
+  f._set('fight');
+  boss.hp = boss.maxHp * 0.6;
+  tick(fight, 2 / 60);
+  check('aos 66%: o Fogo Sagrado, ele sobe para o sol, intocável, e 4 rochas sobem do chão',
+        f.state === 'sacred' && boss.untouchable && f.sacred?.rocks.length === 4);
+  tick(fight, 1.1);
+  check('...o fogo cai na arena inteira', boss.hidden && f.sacred.phase === 'fire');
+  const rock = f.sacred.rocks[0];
+  const spot0 = f.shadowSpot(rock);
+  got.length = 0;
+  for (let i = 0; i < 60 * 2; i++) { const s = f.shadowSpot(rock); team(s.x, s.y); tick(fight, 1 / 60); }
+  const spot1 = f.shadowSpot(rock);
+  check('...na sombra de uma rocha, nada; e a sombra gira com ele lá no alto',
+        count(f._damage(f.cfg.damage.sacred)) === 0 && Math.hypot(spot1.x - spot0.x, spot1.y - spot0.y) > 40);
+  // longe de todas as rochas: queima
+  const w = fight.world;
+  let far = null;
+  for (const [x, y] of [[200, 260], [w.width - 200, 260], [200, w.height - 200], [w.width - 200, w.height - 200]]) {
+    if (f.sacred.rocks.every((r) => Math.hypot(r.x - x, r.y - y) > f.cfg.shadowLength + 120)) { far = { x, y }; break; }
+  }
+  got.length = 0;
+  for (let i = 0; i < 60; i++) { team(far.x, far.y); tick(fight, 1 / 60); }
+  check('...fora da sombra, o fogo tira vida da equipe', !f.inShadow(far.x, far.y) && count(f._damage(f.cfg.damage.sacred)) >= fight.companions.length);
+  fight.damageCompanion = hurt;
+  for (let i = 0; i < 60 * 15 && f.sacred; i++) tick(fight, 1 / 60);
+  check('no fim, ele mergulha de volta num lugar marcado, com a Onda de Calor, e a luta segue',
+        f.state === 'fight' && !boss.hidden && !boss.untouchable && !f.sacred && f.rings.some((r) => r.kind === 'heat'));
+  const { damageEnemy } = await import('../src/systems/combat.js');
+  check('sem bolas, não há piso de vida (ele pode ser derrotado)', boss.hpFloor == null);
+  damageEnemy(fight, boss, 1e9);
+  tick(fight, 0.1);
+  check('derrotado, ele cai sem forças (a fuga é a cena de depois), sem captura, e a fase é vencida',
+        f.downed && !f.captured && !fight.pendingGift && fight.state === 'victory');
+
+  // H-8: a Liga espera a missão do Moltres (as hordas na Victory Road)
+  const { storyLocked, isStageUnlocked } = await import('../src/data/stages.js');
+  check('a Lorelei fica presa pela trava depois da Fase 8, sem citar o Moltres, e abre com a missão vencida',
+        storyLocked('e4_lorelei', ['gym_8_viridian']) && !STAGES.e4_lorelei.lock.text.includes('Moltres')
+        && !STAGES.e4_lorelei.lock.go.includes('Moltres') && isStageUnlocked('e4_lorelei', ['gym_8_viridian', 'moltres']));
+}
+
+// ------------------------------------------- os degraus de pular do Monte Brasa (H-8)
+console.log('\n[o Monte Brasa — os degraus de pular do FireRed]');
+{
+  const { Hub } = await import('../src/game/Hub.js');
+  const { HUB_MAPS } = await import('../src/data/hubMaps.js');
+  const map = HUB_MAPS.brasa_encosta;
+  const hub = Object.create(Hub.prototype);
+  hub.map = map;
+  hub.walkable = (x, y) => map.walk[y]?.[x] === '.';
+  let ledge = null;
+  for (let y = 1; y < map.height - 2 && !ledge; y++) {
+    for (let x = 0; x < map.width && !ledge; x++) {
+      if (map.ledges[y][x] === 'v' && hub.walkable(x, y - 1) && hub.walkable(x, y + 1) && !hub.ledgeAt(x, y + 1)) ledge = { x, y };
+    }
+  }
+  check('a encosta tem os degraus do FireRed (MB_JUMP_*), e o degrau não se pisa',
+        !!ledge && map.ledges.join('').replace(/[^v^<>]/g, '').length > 10 && !hub.canStep(ledge.x, ledge.y - 1, ledge.x, ledge.y), JSON.stringify(ledge));
+  check('...pula por cima dele no sentido dele (2 tiles), e não no outro',
+        JSON.stringify(hub.jumpFrom(ledge.x, ledge.y - 1, 'down')) === JSON.stringify({ x: ledge.x, y: ledge.y + 1 })
+        && hub.jumpFrom(ledge.x, ledge.y + 1, 'up') === null);
 }
 
 // ------------------------------------------- a regra dos patamares de Seafoam (H-7)

@@ -39,6 +39,8 @@ export const CHAPTERS = {
   // no título: o Moltres só se descobre na cena dele)
   cap4: 'Capítulo 4 — As ondas',
   cap5: 'Capítulo 5 — A suspeita',
+  // H-8 e a decisão 22: o Capítulo 6 é o da Elite dos Quatro (a Victory Road e a base do Maxie, H-9)
+  cap6: 'Capítulo 6 — A Elite dos Quatro',
   // as missões dos lendários (azuis) levam o nome do lugar
   usina: 'A Usina'
 };
@@ -190,7 +192,40 @@ export const QUESTS = {
   c5_giovanni: {
     kind: 'story', chapter: 'cap5',
     desc: 'O mar de Seafoam descongelou, e os barcos saem de Cinnabar de novo. O último ginásio de Kanto é o do Giovanni, em Viridian.',
-    objectives: [{ text: 'Vença o Giovanni, em Viridian', on: 'win', target: 'gym_8_viridian', doneIf: { cleared: 'gym_8_viridian' } }],
+    objectives: [
+      { text: 'Vença o Giovanni, em Viridian', on: 'win', target: 'gym_8_viridian', doneIf: { cleared: 'gym_8_viridian' } },
+      // a pista chega com a cena de depois da Fase 8 (depois_giovanni): o jogador acha que é a Rocket
+      { text: 'Mostre o Pedaço de Metal ao Giovanni', on: 'clue', target: 'monte_brasa' }
+    ],
+    next: ['c5_brasa'],
+    reward: null
+  },
+  // a proposta "Monte Brasa: o fogo" (PLANEJAMENTO-HISTORIA.md seção 5.3): a visita é pela marca da
+  // Ilha 1 na borda do mapa da jornada (data/regionMap.js, STORY_PLACES)
+  c5_brasa: {
+    kind: 'story', chapter: 'cap5',
+    desc: 'O Giovanni riu: o emblema não é da Rocket. Mas os homens dele viram gente com esse emblema subindo o Monte Brasa, na Ilha 1, carregando peças de máquina. O barco para a Ilha 1 sai de Cinnabar.',
+    // fecha no alto do cume (data/cutscenes.js, brasa_cume)
+    objectives: [{ text: 'Investigue o Monte Brasa, na Ilha 1', on: 'clue', target: 'moltres_preso' }],
+    next: ['c5_moltres'],
+    reward: null
+  },
+  c5_moltres: {
+    kind: 'story', chapter: 'cap5',
+    desc: 'No cume do Monte Brasa, numa máquina em brasa, o Moltres está preso por correntes. A terceira máquina, a terceira ave. O card sobe no alto do cume.',
+    // fecha com a luta vencida (a fase `moltres`): derrotado, ele foge (sem captura)
+    objectives: [{ text: 'Derrote e liberte o Moltres', on: 'win', target: 'moltres' }],
+    next: ['c6_liga'],
+    reward: null
+  },
+
+  /* ========================== Capítulo 6: a Elite dos Quatro ========================== */
+  // a Liga reabriu a Victory Road (data/cutscenes.js, moltres_livre). A cena da Elite dos Quatro e a
+  // base do Maxie são a H-9 (decisão 22)
+  c6_liga: {
+    kind: 'story', chapter: 'cap6',
+    desc: 'Os três pássaros estão livres, e a Liga reabriu a Victory Road. O caminho até a Liga Pokémon está aberto.',
+    objectives: [{ text: 'Siga pela Victory Road até a Liga Pokémon', on: 'win', target: 'e4_lorelei', doneIf: { cleared: 'e4_lorelei' } }],
     next: [],
     reward: null
   },

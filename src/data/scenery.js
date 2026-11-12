@@ -159,6 +159,16 @@ export const SCENES = {
     props: [[26, 6, 1, 1], [26, 10, 1, 1], [17, 17, 1, 3], [11, 6, 1, 1], [3, 15, 2, 1]],
     clear: [[30, 14, 16, 11]],
     spacing: 9
+  },
+  // o cume do Monte Brasa (H-8, a missão do Moltres): a areia, o paredão de pedra e as pedras soltas
+  // da encosta do FireRed. `clear` deixa livre o lugar da máquina em brasa
+  brasa_arena: {
+    sheet: 'mt_ember', kind: 'room',
+    floor: [30, 15, 1, 1],
+    top: { rows: [4, 7], repeat: [30, 33] },
+    props: [[27, 9, 1, 1], [31, 8, 1, 1], [34, 15, 2, 1], [36, 16, 1, 1], [33, 17, 1, 1]],
+    clear: [[30, 14, 16, 11]],
+    spacing: 9
   }
 };
 

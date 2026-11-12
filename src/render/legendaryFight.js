@@ -1,6 +1,7 @@
 import { getSheet } from './assets.js';
 import { drawZapdosGround, drawZapdosWorld, drawZapdosScreen, dischargeRing, blastWarning } from './zapdosFight.js';
 import { drawArticunoGround, drawArticunoVeil, drawArticunoWorld, drawArticunoScreen, iceRing } from './articunoFight.js';
+import { drawMoltresGround, drawMoltresVeil, drawMoltresWorld, drawMoltresScreen, heatRing } from './moltresFight.js';
 
 const TAU = Math.PI * 2;
 const PIXEL = '"Pixelify Sans", sans-serif';
@@ -14,7 +15,7 @@ export const hash = (seed, i) => { const x = Math.sin(seed * 12.9898 + i * 78.23
  * O DESENHO DAS LUTAS DE LENDÁRIO (o molde das missões, H-5: systems/legendaryFight.js):
  * os avisos no chão, os raios, a bola caindo, o arremesso e a faixa da captura, os
  * letreiros. O que é só do Zapdos está em render/zapdosFight.js; o do Articuno, em
- * render/articunoFight.js.
+ * render/articunoFight.js; o do Moltres, em render/moltresFight.js.
  *
  * A LUTA DO KYOGRE (systems/kyogreFight.js). Na 0.37.5, os ataques
  * ficaram cinematográficos (o Fellipe: "precisa ter impacto grande na animação"):
@@ -32,6 +33,7 @@ export function drawFightGround(ctx, run) {
   const fight = run.fight;
   if (fight?.kind === 'zapdos') drawZapdosGround(ctx, run, fight);
   else if (fight?.kind === 'articuno') drawArticunoGround(ctx, run, fight);
+  else if (fight?.kind === 'moltres') drawMoltresGround(ctx, run, fight);
 }
 
 export function drawFightWorld(ctx, run) {
@@ -42,6 +44,8 @@ export function drawFightWorld(ctx, run) {
   const kyogre = fight.kind === 'kyogre';
   // a névoa e a geada do Articuno (H-7): por cima dos Pokémon, embaixo dos avisos
   if (fight.kind === 'articuno') drawArticunoVeil(ctx, run, fight);
+  // o Fogo Sagrado do Moltres (H-8): a arena em chamas, as rochas e as sombras
+  if (fight.kind === 'moltres') drawMoltresVeil(ctx, run, fight);
 
   // o lago fervendo antes de ele sair
   if (fight.boiling > 0) bubbles(ctx, fight.lake.x, fight.lake.y, 150, 70, fight.boiling, now);
@@ -62,9 +66,11 @@ export function drawFightWorld(ctx, run) {
   if (fight.kind === 'zapdos') drawZapdosWorld(ctx, run, fight);
   // o Articuno: a mira e o Raio de Gelo, o cone e a rajada da Nevasca, o gelo estilhaçando
   if (fight.kind === 'articuno') drawArticunoWorld(ctx, run, fight);
+  // o Moltres: o Lança-chamas, o Redemoinho de Fogo, as explosões
+  if (fight.kind === 'moltres') drawMoltresWorld(ctx, run, fight);
 
-  // os anéis de onda (no Zapdos, o Discharge; no Articuno, o anel de gelo)
-  for (const ring of fight.rings) if (ring.delay <= 0) (ring.kind === 'discharge' ? dischargeRing : ring.kind === 'ice' ? iceRing : waveRing)(ctx, ring, now);
+  // os anéis de onda (no Zapdos, o Discharge; no Articuno, o anel de gelo; no Moltres, a Onda de Calor)
+  for (const ring of fight.rings) if (ring.delay <= 0) (ring.kind === 'discharge' ? dischargeRing : ring.kind === 'ice' ? iceRing : ring.kind === 'heat' ? heatRing : waveRing)(ctx, ring, now);
 
   // os efeitos do impacto: colunas, raios, estouros
   for (const f of fight.fx) {
@@ -114,6 +120,7 @@ export function drawFightScreen(ctx, run, renderer) {
   if (ts?.phase === 'sweep') { ctx.fillStyle = 'rgba(40,110,220,.16)'; ctx.fillRect(0, 0, W, H); }
   if (fight.kind === 'zapdos') drawZapdosScreen(ctx, run, renderer, fight);
   if (fight.kind === 'articuno') drawArticunoScreen(ctx, run, renderer, fight);
+  if (fight.kind === 'moltres') drawMoltresScreen(ctx, run, renderer, fight);
   if (fight.flash > 0) { ctx.fillStyle = `rgba(${fight.flashColor},${fight.flash})`; ctx.fillRect(0, 0, W, H); }
 
   // o aviso do maremoto: o letreiro e a seta até a bolha de ar
@@ -165,13 +172,14 @@ function warning(ctx, h, next = false) {
   const pulse = 0.5 + 0.5 * Math.sin(h.t * 18);
   if (h.shape === 'square') { stormCell(ctx, h, pulse, next); return; }
   if (h.kind === 'blast') { blastWarning(ctx, h); return; }
-  ctx.fillStyle = thunder ? `rgba(255,230,90,${0.12 + 0.22 * k})` : `rgba(90,170,255,${0.14 + 0.26 * k})`;
-  ctx.strokeStyle = thunder ? `rgba(255,236,120,${0.6 + 0.4 * pulse})` : `rgba(180,225,255,${0.6 + 0.4 * pulse})`;
+  const fire = h.type === 'fire';
+  ctx.fillStyle = thunder ? `rgba(255,230,90,${0.12 + 0.22 * k})` : fire ? `rgba(255,110,40,${0.14 + 0.26 * k})` : `rgba(90,170,255,${0.14 + 0.26 * k})`;
+  ctx.strokeStyle = thunder ? `rgba(255,236,120,${0.6 + 0.4 * pulse})` : fire ? `rgba(255,200,120,${0.6 + 0.4 * pulse})` : `rgba(180,225,255,${0.6 + 0.4 * pulse})`;
   ctx.lineWidth = 3;
   ctx.beginPath(); ctx.ellipse(h.x, h.y, h.r, h.r * 0.55, 0, 0, TAU); ctx.fill(); ctx.stroke();
   ctx.lineWidth = 2;
   ctx.beginPath(); ctx.ellipse(h.x, h.y, h.r * k, h.r * 0.55 * k, 0, 0, TAU); ctx.stroke();
-  if (!thunder) {
+  if (!thunder && !fire) {
     // a água borbulhando no chão antes de estourar
     for (let i = 0; i < 5; i++) {
       const ph = (h.t * 2.2 + i * 0.2) % 1;

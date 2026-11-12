@@ -297,6 +297,86 @@ const ROTEIROS = {
     { run: "{ const d = game.hub.dialog; if (d) { d.shown = 999; game.hub.confirm(); } }" }, { wait: 2600 }, { shot: 'art-54-ainda-falta-um' },
     { run: "{ const d = game.hub.dialog; if (d) { d.shown = 999; game.hub.confirm(); } } game.openCampaign()" }, { wait: 1500 }, { shot: 'art-55-a-fase-8' }
   ],
+  // o Capítulo 5 (H-8, "Monte Brasa: o fogo"): a cena do Giovanni com o Pedaço de Metal, a trava da
+  // Liga e a marca da Ilha 1 no mapa, o Monte Brasa a pé (a chegada, as pedras arrastadas, os
+  // recrutas, o degrau de pular, a caverna, o cume com o calor), a cena do cume com o card, a luta do
+  // Moltres (preso, as correntes, o Lança-chamas, o chão em brasa, o Redemoinho de Fogo, a Onda de
+  // Calor, o Fogo Sagrado com a sombra das rochas, o mergulho) e a fuga
+  moltres: [
+    { open: 'index.html' }, { wait: 500 },
+    { run: "window.skip = (n = 1) => { for (let i = 0; i < n; i++) { const h = game.hub; if (!h.dialog) return; h.dialog.shown = 999; h.confirm(); } };" +
+           "game.newGame(); game.chooseTrainer('leaf'); game.chooseName('Fellipe'); game.chooseStarter('charmander');" +
+           "const mon = (uid, id, abilities) => ({ uid, pokemonId: id, level: 62, xp: 0, hp: 0, abilities, upgrades: {} });" +
+           "game.campaign.journey = { team: { members: [mon('a', 'charizard', ['flamethrower']), mon('b', 'gyarados', ['hydro_pump']), mon('c', 'arcanine', ['flamethrower'])], active: ['a', 'b', 'c'] }, pc: [] };" +
+           "game.campaign.clearedStages.push('gym_1_pewter', 'gym_2_cerulean', 'gym_3_vermilion', 'zapdos', 'gym_4_celadon', 'gym_5_fuchsia', 'gym_6_saffron', 'gym_7_cinnabar', 'articuno');" +
+           "game.campaign.badges.push('boulder', 'cascade', 'thunder', 'rainbow', 'soul', 'marsh', 'volcano');" +
+           "game.campaign.missions = { zapdos: { won: true, captured: false }, articuno: { won: true, captured: false } };" +
+           "game.quests.state.active = ['c5_giovanni']; document.getElementById('toast-container').style.display = 'none';" +
+           "game.startStage('gym_8_viridian'); game.run.state = 'victory'" },
+    { wait: 1500 }, { run: 'game.quitToMenu()' }, { wait: 2600 }, { shot: 'mol-01-giovanni' },
+    { run: 'skip()' }, { wait: 2200 }, { shot: 'mol-02-revirando-kanto' },
+    { run: 'skip()' }, { wait: 1800 }, { shot: 'mol-03-o-metal' },
+    { run: 'skip()' }, { wait: 2400 }, { shot: 'mol-04-nao-e-da-rocket' },
+    { run: 'skip()' }, { wait: 2400 }, { shot: 'mol-05-quer-saber' },
+    { run: 'skip()' }, { wait: 2400 }, { shot: 'mol-06-o-monte-brasa' },
+    { run: 'skip()' }, { wait: 500 }, { shot: 'mol-07-o-susto', raw: true },
+    { wait: 2200 }, { shot: 'mol-08-pecas-de-maquina' },
+    { run: 'skip()' }, { wait: 2400 }, { shot: 'mol-09-o-barco' },
+    { run: 'skip()' }, { wait: 2600 },
+    { run: "game.openCampaign()" }, { wait: 1500 }, { shot: 'mol-10-a-trava' },
+    { run: "game.menus.lobby.selected = 'place:monte_brasa'; game.menus.lobby.render()" }, { wait: 900 }, { shot: 'mol-11-a-marca' },
+    { run: "game.visitPlace('monte_brasa')" }, { wait: 2200 }, { shot: 'mol-12-a-chegada' },
+    { run: 'skip()' }, { wait: 2600 }, { shot: 'mol-13-as-pedras' },
+    { run: 'skip()' }, { wait: 1800 }, { shot: 'mol-14-alguem-subiu' },
+    { run: 'skip()' }, { wait: 1200 },
+    { run: "game.hub.enter({ map: 'brasa_encosta', x: 41, y: 41, dir: 'up' }); game.hub.interact()" }, { wait: 2400 }, { shot: 'mol-15-os-recrutas' },
+    { run: 'skip(2)' }, { wait: 300 },
+    { run: "game.hub.enter({ map: 'brasa_encosta', x: 38, y: 13, dir: 'down' })" }, { wait: 900 },
+    { run: "game.hub._tryMove('down', false)" }, { wait: 170 }, { shot: 'mol-16-o-pulo', raw: true },
+    { wait: 700 },
+    { run: "game.hub.enter({ map: 'brasa_caminho_2f', x: 20, y: 24, dir: 'up' })" }, { wait: 1000 }, { shot: 'mol-17-a-caverna' },
+    { run: "game.hub.enter({ map: 'brasa_cume', x: 9, y: 15, dir: 'up' })" }, { wait: 1400 }, { shot: 'mol-18-o-cume' },
+    { run: "game.hub.clickTile(9, 9)" }, { wait: 2600 }, { shot: 'mol-19-o-calor' },
+    { run: 'skip()' }, { wait: 3400 }, { shot: 'mol-20-a-silhueta' },
+    { run: 'skip()' }, { wait: 2200 }, { shot: 'mol-21-as-ondas' },
+    { run: 'skip()' }, { wait: 2000 }, { shot: 'mol-22-e-o-moltres' },
+    { run: 'skip()' }, { wait: 2400 }, { shot: 'mol-23-o-card' },
+    { run: "game.handleAction('confirm')" }, { wait: 520 }, { shot: 'mol-24-transicao' },
+    { wait: 2400 }, { run: "game.run.time = 18" }, { wait: 2600 }, { shot: 'mol-25-preso', raw: true },
+    { run: "game.run.time = 42" }, { wait: 1800 }, { shot: 'mol-26-sobrecarga', raw: true },
+    { run: "game.run.time = 44.7" }, { wait: 1300 }, { shot: 'mol-27-apresentacao' },
+    { run: "game.closeLeaderIntro()" }, { wait: 420 }, { shot: 'mol-28-correntes', raw: true },
+    { wait: 2000 }, { shot: 'mol-29-livre', raw: true },
+    { run: "{ const r = game.run, f = r.fight; r.damageCompanion = () => {}; r.spawner.update = () => {}; r.enemies.forEach((e) => { if (!e.boss) e.dead = true; });" +
+           " f.attackTimer = 99; f.summonTimer = 99; f.ultimates = []; f.boss.x = r.player.x - 300; f.boss.y = r.player.y - 160; f._startSweep(f.boss); }" },
+    { wait: 650 }, { shot: 'mol-30-lanca-chamas-aviso', raw: true },
+    { wait: 1000 }, { shot: 'mol-31-a-chama', raw: true },
+    { wait: 900 }, { run: "{ const r = game.run, f = r.fight; f.attackTimer = 99; const b = f.burn[Math.floor(f.burn.length / 2)]; if (b) { r.player.x = b.x; r.player.y = b.y + 40; } }" },
+    { wait: 500 }, { shot: 'mol-32-brasa-no-chao', raw: true },
+    { run: "{ const f = game.run.fight; f.attackTimer = 99; f._startSpin(); }" }, { wait: 700 }, { shot: 'mol-33-redemoinho', raw: true },
+    { wait: 1600 }, { shot: 'mol-34-fechando', raw: true },
+    { wait: 1500 }, { run: "{ const f = game.run.fight; f.attackTimer = 99; f._heatWave(f.boss); }" }, { wait: 420 }, { shot: 'mol-35-onda-de-calor', raw: true },
+    { wait: 1600 }, { run: "{ const f = game.run.fight; f.attackTimer = 99; f.burn = []; f._startSacred(f.boss); }" }, { wait: 1800 }, { shot: 'mol-36-fogo-sagrado', raw: true },
+    { run: "{ const r = game.run, f = r.fight; const s = f.shadowSpot(f.sacred.rocks[0]); r.player.x = s.x; r.player.y = s.y; }" }, { wait: 400 }, { shot: 'mol-37-na-sombra', raw: true },
+    { wait: 3000 }, { shot: 'mol-38-a-sombra-gira', raw: true },
+    { wait: 5200 }, { shot: 'mol-39-o-mergulho', raw: true },
+    { wait: 1800 }, { run: "import('./src/systems/combat.js').then(({ damageEnemy }) => damageEnemy(game.run, game.run.boss, 1e9))" },
+    { wait: 900 }, { shot: 'mol-40-vitoria' },
+    { run: "game.quitToMenu()" }, { wait: 2400 }, { shot: 'mol-41-caido' },
+    { run: 'skip()' }, { wait: 2600 }, { shot: 'mol-42-assustado' },
+    { run: 'skip()' }, { wait: 600 }, { shot: 'mol-43-fugindo', raw: true },
+    { wait: 1300 }, { shot: 'mol-44-fugiu' },
+    { run: 'skip()' }, { wait: 2000 }, { shot: 'mol-45-fraco-demais' },
+    { run: 'skip()' }, { wait: 3000 }, { shot: 'mol-46-a-terceira-maquina' },
+    { run: 'skip()' }, { wait: 2200 }, { shot: 'mol-47-tres-passaros' },
+    { run: 'skip()' }, { wait: 2200 }, { shot: 'mol-48-o-emblema' },
+    { run: 'skip()' }, { wait: 2000 }, { shot: 'mol-49-o-vento' },
+    { run: "document.getElementById('toast-container').style.display = ''; skip()" }, { wait: 900 }, { shot: 'mol-50-a-liga-reabriu' },
+    { wait: 1800 }, { shot: 'mol-51-na-vila' },
+    { run: "document.getElementById('toast-container').style.display = 'none'; game.hub.enter({ map: 'casa_sabio', x: 3, y: 6, dir: 'up' }); game.hub.interact()" }, { wait: 3200 }, { shot: 'mol-52-o-sabio' },
+    { run: "{ const d = game.hub.dialog; if (d) { d.shown = 999; game.hub.confirm(); } }" }, { wait: 2600 }, { shot: 'mol-53-ainda-nao-acabou' },
+    { run: "{ const d = game.hub.dialog; if (d) { d.shown = 999; game.hub.confirm(); } } game.openCampaign()" }, { wait: 1500 }, { shot: 'mol-54-a-liga' }
+  ],
   // a tela de Missões (H-3): o pontinho na barra, o começo da jornada e o diário depois do
   // Capítulo 3 (as quests concluídas por capítulo, com as datas, e o Pedaço de Metal)
   missoes: [

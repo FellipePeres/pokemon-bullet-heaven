@@ -17,6 +17,7 @@
  *   node tools/kyogre.mjs 90 1 champion   # a mesma equipe numa fase de comparação
  *   node tools/kyogre.mjs 58 5 zapdos     # a missão do Zapdos com a equipe comum no 58
  *   node tools/kyogre.mjs 57 12 articuno  # a missão do Articuno (H-7) com a equipe comum no 57
+ *   node tools/kyogre.mjs 62 12 moltres   # a missão do Moltres (H-8) com a equipe comum no 62
  */
 import { Run } from '../src/game/Run.js';
 import { DT, resolveLevelUp, steer } from './bot.mjs';
@@ -69,6 +70,8 @@ for (let n = 1; n <= fights; n++) {
     const key = caller.includes('_strike') ? `${name}: avisos (${type})` : caller.includes('_updateRings') ? 'anéis'
       : caller.includes('_updateTsunami') ? 'maremoto' : caller.includes('_updateOrb') ? 'esfera' : caller.includes('_peck') ? 'Investida'
       : caller.includes('_beam') ? 'Raio de Gelo' : caller.includes('_cone') ? 'Nevasca' : caller.includes('_frost') ? 'Frio Absoluto'
+      : caller.includes('_sweep') ? 'Lança-chamas' : caller.includes('_spin') ? 'Redemoinho de Fogo'
+      : caller.includes('_burnGround') ? 'chão em brasa' : caller.includes('_sacredFire') ? 'Fogo Sagrado'
       : caller.includes('_updateZones') ? 'ondas'
       : attacker ? (attacker.boss ? `contato do ${name}` : 'contato da horda') : 'outros';
     taken[key] = (taken[key] ?? 0) + amount;

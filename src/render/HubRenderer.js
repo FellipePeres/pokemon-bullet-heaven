@@ -129,6 +129,9 @@ export class HubRenderer {
     if (pulse) this._pulse(pulse);
     const mist = hub.mist;
     if (mist > 0.005) this._mist(mist);
+    // o calor do cume do Monte Brasa (H-8): a tela quente e o ar tremendo
+    const heat = hub.heat;
+    if (heat > 0.005) this._heat(heat);
 
     // um lugar escuro (0.39, `dark` em data/hub.js): só um círculo fraco de luz em volta do
     // jogador, em degraus de pixel, como sem o Flash; o que brilha (os olhos) vem por cima
@@ -338,7 +341,7 @@ export class HubRenderer {
     ctx.lineWidth = S;
     for (let k = 0; k < 3; k++) {
       const p = ((clock + k * 0.62) % 1.86) / 1.86;
-      ctx.strokeStyle = `rgba(140,215,255,${((1 - p) * 0.9).toFixed(3)})`;
+      ctx.strokeStyle = pulse.color === 'fire' ? `rgba(255,170,90,${((1 - p) * 0.9).toFixed(3)})` : `rgba(140,215,255,${((1 - p) * 0.9).toFixed(3)})`;
       ctx.beginPath();
       ctx.ellipse(cx, cy - p * 26 * S, (6 + p * 34) * S, (2 + p * 9) * S, 0, 0, Math.PI * 2);
       ctx.stroke();
@@ -365,6 +368,22 @@ export class HubRenderer {
       g.addColorStop(1, 'rgba(240,248,255,0)');
       ctx.fillStyle = g;
       ctx.fillRect(x - r, y - r, 2 * r, 2 * r);
+    }
+  }
+
+  /**
+   * O calor (H-8, o cume do Monte Brasa enquanto o Moltres está preso): a tela laranja e faixas de
+   * ar tremendo, como na maquete aprovada. Em pixels do GBA.
+   */
+  _heat(level) {
+    const ctx = this.ctx, S = this.scale, W = this.canvas.width, H = this.canvas.height;
+    const clock = performance.now() / 1000;
+    ctx.fillStyle = `rgba(255,110,30,${(0.24 * level).toFixed(3)})`;
+    ctx.fillRect(0, 0, W, H);
+    for (let y = 0; y < H; y += 6 * S) {
+      const off = Math.sin(clock * 4 + y * 0.35 / S) * 2 * level * S;
+      ctx.fillStyle = `rgba(255,220,180,${(0.1 * level).toFixed(3)})`;
+      ctx.fillRect(Math.round(off), y, W, 2 * S);
     }
   }
 
@@ -395,7 +414,15 @@ export class HubRenderer {
     const speed = p.run ? CONFIG.trainer.animation.stride / CONFIG.hub.runTime : CONFIG.trainer.animation.stride / CONFIG.hub.walkTime;
     const { frame, flip } = trainerFrame({ dir: p.dir, moving: p.moving, stride: p.stride, speed }, look);
     const size = T * this.scale;
-    drawFrame(this.ctx, sheet, frame, this.offset.x + (p.fx + 0.5) * size, this.offset.y + (p.fy + 1) * size,
+    // o pulo do degrau (H-8): um arco de 10 pixels do GBA, com a sombra no chão
+    const lift = p.jump && p.moving ? Math.sin(Math.PI * Math.min(1, p.t)) * 10 * this.scale : 0;
+    if (lift) {
+      this.ctx.fillStyle = 'rgba(0,0,0,.25)';
+      this.ctx.beginPath();
+      this.ctx.ellipse(this.offset.x + (p.fx + 0.5) * size, this.offset.y + (p.fy + 1) * size - 2 * this.scale, 6 * this.scale, 2 * this.scale, 0, 0, Math.PI * 2);
+      this.ctx.fill();
+    }
+    drawFrame(this.ctx, sheet, frame, this.offset.x + (p.fx + 0.5) * size, this.offset.y + (p.fy + 1) * size - lift,
       { scale: this.scale, flipX: flip });
   }
 }

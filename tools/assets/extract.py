@@ -299,6 +299,8 @@ SCENES = {
     'power_plant':     ('PowerPlant', True),
     # a arena da missão do Articuno (H-7): o fundo das Ilhas Seafoam, com o gelo do B1F
     'seafoam':         ('SeafoamIslands_B1F', True),
+    # a arena da missão do Moltres (H-8): o Monte Brasa, a areia e as pedras da encosta
+    'mt_ember':        ('MtEmber_Exterior', True),
 }
 PRIMARY_TILES = 640       # tiles do tileset primário; os do secundário vêm depois
 PRIMARY_METATILES = 640   # idem para as metatiles

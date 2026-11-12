@@ -50,6 +50,9 @@ HALLS = {
     # e a arena da luta dele, o mesmo recorte
     'seafoam': ('SeafoamIslands_B4F', 'ARTICUNO', 0, 0),
     'seafoam_arena': ('SeafoamIslands_B4F', 'ARTICUNO', 0, 0),
+    # o card da missão do Moltres (H-8): o alto do cume do Monte Brasa; e a arena da luta dele
+    'monte_brasa': ('MtEmber_Summit', 'MOLTRES', 0, 0),
+    'brasa_arena': ('MtEmber_Summit', 'MOLTRES', 0, 0),
 }
 
 

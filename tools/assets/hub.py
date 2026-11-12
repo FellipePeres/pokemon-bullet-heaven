@@ -23,7 +23,9 @@ A colisão também vem dos mapas de origem: o bit de colisão do map.bin
 (paredes, árvores, cercas, portas) e a elevação 1 (água, só com Surf). Nos
 mapas com patamares (as Ilhas Seafoam, H-7), sai também a altura de cada tile
 (`levels`): o FireRed só deixa passar de uma altura para outra por um tile de
-altura 0 (as escadinhas), e a vila faz igual (data/hub.js, `heightOk`).
+altura 0 (as escadinhas), e a vila faz igual (data/hub.js, `heightOk`). Nos mapas
+com degraus de pular (o Monte Brasa, H-8), sai `ledges`: a direção do pulo de cada
+degrau (o comportamento MB_JUMP_* do metatile), que só se atravessa naquele sentido.
 Portas, saídas, pessoas e falas ficam em src/data/hub.js (feito à mão).
 
 Uso (Python 3 + Pillow):
@@ -122,6 +124,7 @@ class Scene:
         self.top = [[None] * w for _ in range(h)]
         self.walk = [[False] * w for _ in range(h)]
         self.elev = [[0] * w for _ in range(h)]   # a altura de cada tile (os patamares de Seafoam)
+        self.behavior = [[0] * w for _ in range(h)]   # o comportamento do metatile (os degraus de pular)
 
     def _put(self, dx, dy, cell):
         if 0 <= dx < self.w and 0 <= dy < self.h:
@@ -135,6 +138,7 @@ class Scene:
                 self._put(dx + i, dy + j, src.cell(sx + i, sy + j))
                 if 0 <= dx + i < self.w and 0 <= dy + j < self.h:
                     self.elev[dy + j][dx + i] = src.cells[sy + j][sx + i] >> 12
+                    self.behavior[dy + j][dx + i] = src.layers.attrs[src.cells[sy + j][sx + i] & 0x3FF] & 0x1FF
 
     def stamp_keyed(self, dx, dy, m, sx, sy, w, h, kx, ky):
         """
@@ -403,6 +407,8 @@ def build_usina_fundo(s):
 
 GYM4 = 'CeladonCity_Gym'
 GYM7 = 'CinnabarIsland_Gym'
+GYM8 = 'ViridianCity_Gym'
+EMBER = ['MtEmber_Exterior', 'MtEmber_SummitPath_1F', 'MtEmber_SummitPath_2F', 'MtEmber_SummitPath_3F', 'MtEmber_Summit']
 SEAFOAM = ['SeafoamIslands_1F', 'SeafoamIslands_B1F', 'SeafoamIslands_B2F', 'SeafoamIslands_B3F', 'SeafoamIslands_B4F']
 
 
@@ -417,6 +423,25 @@ def build_ginasio_cinnabar(s):
     das ondas, depois da Fase 7. O Blaine fica em 5,4, como no FireRed.
     """
     s.stamp(0, 0, GYM7, 0, 0, 15, 10)
+
+
+def build_ginasio_viridian(s):
+    """
+    A sala do Giovanni no ginásio de Viridian (H-8, o recorte da maquete): o palco da cena do
+    emblema, depois da Fase 8. O Giovanni fica em 2,2, como no FireRed.
+    """
+    s.stamp(0, 0, GYM8, 0, 0, 15, 10)
+
+
+def ember(name):
+    """
+    Um mapa do Monte Brasa, inteiro (H-8): a encosta, o caminho do cume (três andares) e o cume. O
+    jogador sobe a pé, só por onde o FireRed deixa; as pedras do Strength do caminho já foram
+    empurradas para o lado (os enfeites de data/hub.js), e os degraus de pular só descem.
+    """
+    def build(s):
+        s.stamp(0, 0, name, 0, 0, s.w, s.h)
+    return build
 
 
 def seafoam(floor):
@@ -466,10 +491,22 @@ MAPS = {
     'seafoam_b2f': (38, 24, seafoam(SEAFOAM[2])),
     'seafoam_b3f': (38, 24, seafoam(SEAFOAM[3])),
     'seafoam_b4f': (38, 24, seafoam(SEAFOAM[4])),
+    # o Capítulo 5 (H-8): a sala do Giovanni e o Monte Brasa
+    'ginasio_viridian': (15, 10, build_ginasio_viridian),
+    'brasa_encosta': (57, 54, ember(EMBER[0])),
+    'brasa_caminho_1f': (15, 18, ember(EMBER[1])),
+    'brasa_caminho_2f': (48, 46, ember(EMBER[2])),
+    'brasa_caminho_3f': (15, 11, ember(EMBER[3])),
+    'brasa_cume': (19, 22, ember(EMBER[4])),
 }
-# os mapas que levam a altura de cada tile (a regra dos patamares, H-7)
-HEIGHT_MAPS = {'seafoam_1f', 'seafoam_b1f', 'seafoam_b2f', 'seafoam_b3f', 'seafoam_b4f'}
-SOURCES = [P, V, R, F, CE, FU, IP, DS4, DS1, PH1, PH2, LAB, HOUSE1, WARDEN, COPYCAT, GYM1, GYM2, GYM3, VE, PP, GYM4, GYM7, *SEAFOAM]
+BRASA = {'brasa_encosta', 'brasa_caminho_1f', 'brasa_caminho_2f', 'brasa_caminho_3f', 'brasa_cume'}
+# os mapas que levam a altura de cada tile (a regra dos patamares, H-7) e os degraus de pular (H-8)
+HEIGHT_MAPS = {'seafoam_1f', 'seafoam_b1f', 'seafoam_b2f', 'seafoam_b3f', 'seafoam_b4f'} | BRASA
+LEDGE_MAPS = BRASA
+# o comportamento do metatile (MB_JUMP_*) e a letra de cada sentido
+JUMP_BEHAVIOR = {0x38: '>', 0x39: '<', 0x3A: '^', 0x3B: 'v'}
+SOURCES = [P, V, R, F, CE, FU, IP, DS4, DS1, PH1, PH2, LAB, HOUSE1, WARDEN, COPYCAT, GYM1, GYM2, GYM3, VE, PP, GYM4, GYM7, *SEAFOAM,
+           GYM8, *EMBER]
 
 
 # ============================ os móveis do quarto ============================
@@ -541,6 +578,13 @@ SPRITES = {
     'blaine':      ('people/blaine', 'npc_pink', 16, 32),
     'articuno':    ('pokemon/articuno', 'npc_pink', 32, 32),
     'pedra':       ('misc/strength_boulder', 'npc_white', 16, 16),
+    # o Capítulo 5 (H-8): o Giovanni, o Moltres do FireRed, o Hiker, os recrutas da Rocket e as
+    # pedras de quebrar (Rock Smash) do Monte Brasa
+    'giovanni':    ('people/giovanni', 'npc_white', 16, 32),
+    'moltres':     ('pokemon/moltres', 'npc_blue', 32, 32),
+    'hiker':       ('people/hiker', 'npc_white', 16, 32),
+    'rocket':      ('people/rocket_m', 'npc_white', 16, 32),
+    'rocha':       ('misc/rock_smash_rock', 'npc_white', 16, 16),
     'meowth':      ('pokemon/meowth', 'npc_blue', 16, 16),
     'clefairy':    ('pokemon/clefairy', 'npc_pink', 16, 16),
     'pidgey':      ('pokemon/pidgey', 'npc_blue', 16, 16),
@@ -788,6 +832,67 @@ def export_frosted(catalog):
         catalog[f'npc/{key}'] = {'src': path.relative_to(ROOT).as_posix(), 'frameWidth': 64, 'frameHeight': 48, 'frames': 1}
 
 
+# a máquina do emblema vermelho em brasa (H-8, a do Monte Brasa): a mesma da Usina, com o metal
+# esquentado (os claros puxam para o laranja), as fendas que brilham e a fuligem embaixo; a da vila
+# leva as correntes até o Moltres, a da luta não (render/moltresFight.js desenha as correntes)
+def _heated(src, broken, chains):
+    import random
+    from PIL import ImageDraw
+    rng = random.Random(11)
+    im = Image.open(src).convert('RGBA')
+    w, h = im.size
+    px = im.load()
+    hot = im.copy()
+    hp = hot.load()
+    k = 0.35 if broken else 0.55
+    for y in range(h):
+        for x in range(w):
+            r, g, b, a = px[x, y]
+            if not a:
+                continue
+            lum = (r + g + b) / 3
+            hp[x, y] = (min(255, int(r + (255 - r) * k * lum / 255 + 30 * k)), int(g * (1 - 0.25 * k)), int(b * (1 - 0.6 * k)), a)
+            if y > h - 10 and rng.random() < 0.25:
+                hp[x, y] = (40, 30, 28, a)
+    d = ImageDraw.Draw(hot)
+    for _ in range(5 if broken else 14):
+        x, y = rng.randrange(4, w - 4), rng.randrange(6, h - 8)
+        if not px[x, y][3]:
+            continue
+        pts = [(x, y)]
+        for _ in range(rng.randint(2, 4)):
+            x += rng.choice((-1, 0, 1))
+            y += 1
+            pts.append((x, y))
+        d.line(pts, fill=(200, 90, 40, 255) if broken else (255, 196, 60, 255), width=1)
+    if chains:
+        for sx, sy in ((10, 6), (54, 6), (26, 30), (38, 30)):
+            d.line([(sx, sy), (32, 14)], fill=CHAIN, width=1)
+    return hot
+
+
+def export_heated(catalog):
+    for key, (base, broken, chains) in {'maquina_moltres': ('maquina_zapdos', False, False),
+                                        'maquina_moltres_correntes': ('maquina_zapdos', False, True),
+                                        'maquina_moltres_quebrada': ('maquina_zapdos_quebrada', True, False)}.items():
+        path = ASSETS / 'npc' / f'{key}.png'
+        _heated(ASSETS / 'npc' / f'{base}.png', broken, chains).save(path, optimize=True)
+        catalog[f'npc/{key}'] = {'src': path.relative_to(ROOT).as_posix(), 'frameWidth': 64, 'frameHeight': 48, 'frames': 1}
+
+
+def export_emblem(catalog):
+    """O emblema vermelho sozinho (H-8): a pista do vulcão, ampliado num quadro da cena de depois do Moltres."""
+    pal = {'R': (206, 34, 34, 255), 'D': (112, 10, 14, 255)}
+    im = Image.new('RGBA', (len(EMBLEM[0]), len(EMBLEM)), (0, 0, 0, 0))
+    for y, row in enumerate(EMBLEM):
+        for x, ch in enumerate(row):
+            if ch in pal:
+                im.putpixel((x, y), pal[ch])
+    path = ASSETS / 'npc' / 'emblema.png'
+    im.save(path, optimize=True)
+    catalog['npc/emblema'] = {'src': path.relative_to(ROOT).as_posix(), 'frameWidth': im.width, 'frameHeight': im.height, 'frames': 1}
+
+
 def export_readout(catalog):
     """
     A leitura dos instrumentos do Blaine (H-7, a cena das ondas): o monitor escuro com a grade e a
@@ -836,7 +941,8 @@ def write_js(maps, sprites, decor):
         ' *',
         ' * Cada mapa tem o chão (`src`), o que fica por cima dos personagens (`top`)',
         ' * e a colisão, uma linha por fileira de tiles: "." anda, "#" bloqueia. Nos mapas',
-        ' * com patamares (Seafoam), `levels` é a altura de cada tile, em hexadecimal.',
+        ' * com patamares (Seafoam), `levels` é a altura de cada tile, em hexadecimal; nos',
+        ' * com degraus de pular (o Monte Brasa), `ledges` é o sentido do pulo de cada degrau.',
         ' */',
         'export const HUB_MAPS = {',
     ]
@@ -846,6 +952,12 @@ def write_js(maps, sprites, decor):
         lines.append('    walk: [')
         lines += [f"      '{row}'," for row in m['walk']]
         lines[-1] = lines[-1].rstrip(',')
+        if 'ledges' in m:
+            # os degraus de pular, um caractere por tile: v ^ < > (o sentido do pulo); '.' nenhum
+            lines.append('    ],')
+            lines.append('    ledges: [')
+            lines += [f"      '{row}'," for row in m['ledges']]
+            lines[-1] = lines[-1].rstrip(',')
         if 'levels' in m:
             # a altura de cada tile, em hexadecimal (os patamares de Seafoam: 3 e 4; as escadinhas, 0)
             lines.append('    ],')
@@ -898,6 +1010,8 @@ def main():
             'src': f'assets/hub/{key}.png', 'top': f'assets/hub/{key}-top.png', 'width': w, 'height': h,
             'walk': [''.join('.' if scene.walk[y][x] else '#' for x in range(w)) for y in range(h)],
         }
+        if key in LEDGE_MAPS:
+            maps[key]['ledges'] = [''.join(JUMP_BEHAVIOR.get(scene.behavior[y][x], '.') for x in range(w)) for y in range(h)]
         if key in HEIGHT_MAPS:
             maps[key]['levels'] = [''.join('%x' % scene.elev[y][x] for x in range(w)) for y in range(h)]
         print(f'  {key}: {w}x{h}')
@@ -907,6 +1021,8 @@ def main():
     export_drawn(sprites)
     export_frosted(sprites)
     export_readout(sprites)
+    export_heated(sprites)
+    export_emblem(sprites)
     # a Ultra Ball do card das missões de lendário (0.39), dos itens do Pokemon All; na luta do
     # Zapdos (H-6) ela cai no campo e balança na faixa da captura
     ball = args.fonte / 'assets' / 'items' / 'default' / 'ultra-ball.png'
@@ -914,8 +1030,8 @@ def main():
         Image.open(ball).convert('RGBA').save(ROOT / 'assets' / 'items' / 'ultra-ball.png', optimize=True)
     with Image.open(ROOT / 'assets' / 'items' / 'ultra-ball.png') as im:
         sprites['item/ultra-ball'] = {'src': 'assets/items/ultra-ball.png', 'frameWidth': im.width, 'frameHeight': im.height, 'frames': 1}
-    # os gritos do Zapdos (H-6) e do Articuno (H-7), do Pokemon All, como o do Kyogre
-    for dex in (145, 144):
+    # os gritos do Zapdos (H-6), do Articuno (H-7) e do Moltres (H-8), do Pokemon All, como o do Kyogre
+    for dex in (145, 144, 146):
         cry = args.fonte / 'assets' / 'sound' / 'cries' / f'{dex}.ogg'
         if cry.exists():
             (ROOT / 'assets' / 'sound' / 'cries').mkdir(parents=True, exist_ok=True)

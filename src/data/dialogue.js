@@ -188,6 +188,26 @@ export const DIALOGUE = {
     name: 'Erika',
     lines: [{ say: ['O seu próximo desafio é o Koga, em Fuchsia. Fique de olhos abertos pelo caminho.'] }]
   },
+  // o palco da volta da Fase 8 (H-8, data/cutscenes.js)
+  giovanni: {
+    name: 'Giovanni',
+    lines: [{ say: ['O barco para a Ilha 1 sai de Cinnabar. Se descobrir quem são... volte e me conte.'] }]
+  },
+  // o Monte Brasa (H-8): o Hiker da chegada e os recrutas da Rocket, os homens do Giovanni
+  hiker_brasa: {
+    name: 'Montanhista',
+    lines: [
+      { when: { freed: 'moltres' }, say: ['O vulcão parou de rugir. Faz tempo que eu não via o céu tão limpo aqui em cima.'] },
+      { say: [
+        'Uns sujeitos de capuz vermelho subiram por aqui, empurrando as pedras e arrastando uma caixa enorme.',
+        'Fiquei com medo de perguntar o que era.'
+      ] }
+    ]
+  },
+  recruta_brasa: {
+    name: 'Recruta da Rocket',
+    lines: [{ say: ['O chefe mandou a gente vigiar a montanha.', 'Esses de vermelho não são dos nossos. Subiram pelo caminho do cume.'] }]
+  },
   // o palco da volta da Fase 7 (H-7, data/cutscenes.js)
   blaine: {
     name: 'Blaine',
@@ -297,6 +317,11 @@ export const DIALOGUE = {
     name: 'Velho sábio',
     lines: [
       { when: { champion: true }, say: ['Você venceu a Liga. Mas me diga: já foi até o fim do mato a oeste? Ninguém nunca foi.'] },
+      // a missão do Moltres (H-8): uma vez, depois da cena da terceira máquina
+      { when: { scene: 'moltres_livre', once: 'sabio_moltres' }, say: [
+        'Os três pássaros livres... Que alívio, {player}.',
+        'Mas toda aquela energia foi para algum lugar. Isso ainda não acabou.'
+      ] },
       // a missão do Articuno (H-7): uma vez, depois da cena da segunda máquina
       { when: { scene: 'articuno_livre', once: 'sabio_articuno' }, say: [
         'O Articuno também? Preso numa máquina igual, com o mesmo emblema vermelho...',
@@ -350,6 +375,8 @@ export const DIALOGUE = {
     lines: [
       { when: { locked: true }, say: ['Ei! Vai sair sem Pokémon? As hordas te pegam na primeira curva.', 'Passa no laboratório do Prof. Carvalho antes!'] },
       // depois da casa roubada de Cerulean (0.39): a vila culpa a Equipe Rocket
+      // a missão do Moltres (H-8): o vulcão e a Victory Road
+      { when: { scene: 'moltres_livre', once: 'rapaz_brasa' }, say: ['Soube? O Monte Brasa parou de soltar fumaça! E dizem que a Liga reabriu a Victory Road.'] },
       // a missão do Articuno (H-7): o mar de Seafoam
       { when: { scene: 'articuno_livre', once: 'rapaz_seafoam' }, say: ['Soube? O mar em volta das Ilhas Seafoam descongelou de uma hora para outra! Os barcos já saem de Cinnabar de novo.'] },
       { when: { scene: 'zapdos_livre', once: 'rapaz_usina' }, say: ['Ouviu? A Usina voltou a funcionar! Vermilion acendeu inteira ontem à noite. Até o Túnel de Pedra acendeu de novo!'] },
@@ -398,6 +425,14 @@ export const DIALOGUE = {
     lines: [{ say: [
       'Ah, você acordou! Um marinheiro de Vermilion trouxe você da Usina.',
       'Disse que achou você desmaiado perto de uma escotilha... Seus Pokémon já estão bem. Descanse antes de voltar lá.'
+    ] }]
+  },
+  // a missão do Moltres (H-8): caiu na luta e acorda no Centro
+  enfermeira_brasa: {
+    name: 'Enfermeira',
+    lines: [{ say: [
+      'Ah, você acordou! Um montanhista da Ilha 1 trouxe você do Monte Brasa.',
+      'Disse que achou você desmaiado lá no cume, no meio da fumaça... Seus Pokémon já estão bem. Descanse antes de voltar lá.'
     ] }]
   },
   // a missão do Articuno (H-7): caiu na luta e acorda no Centro

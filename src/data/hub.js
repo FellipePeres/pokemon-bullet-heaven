@@ -25,6 +25,9 @@
  *            `hideIf` esconde quando a condição bate (a bola do inicial escolhido some).
  *            No quarto (`room`) entra também o que o jogador comprou (data/decor.js)
  */
+/** As células da máquina no alto do cume do Monte Brasa (H-8): ela não se atravessa. */
+const BRASA_MACHINE = [[8, 5], [9, 5], [10, 5], [11, 5], [8, 6], [9, 6], [10, 6], [11, 6]];
+
 export const HUB = {
   spawn: {
     bedroom: { map: 'casa_2f', x: 5, y: 5, dir: 'down' },
@@ -434,6 +437,152 @@ export const HUB = {
         { id: 'fr1', x: 22, y: 19, item: 'revive' },
         { id: 'c1', x: 24, y: 3, item: 'reroll' },
         { id: 'c2', x: 18, y: 9, item: 'revive' }
+      ]
+    },
+
+    // a sala do Giovanni no ginásio de Viridian (H-8, o recorte da maquete aprovada): o palco da
+    // cena do emblema, depois da Fase 8
+    ginasio_viridian: {
+      name: 'Ginásio de Viridian',
+      scene: true,
+      npcs: [
+        { id: 'giovanni', sprite: 'giovanni', x: 2, y: 2, dir: 'down', talk: 'giovanni' }
+      ],
+      things: []
+    },
+
+    /* O MONTE BRASA (H-8, a missão do Moltres, PLANEJAMENTO-HISTORIA.md seção 5.3): os mapas do
+       FireRed, inteiros, para subir a pé como a Usina e Seafoam: a encosta, o caminho do cume por
+       dentro (três andares) e o cume. No FireRed a subida pede o Strength: as cinco pedras que
+       fecham o caminho já foram empurradas um tile para o lado por quem subiu antes, carregando a
+       máquina (é a pista da chegada). As pedras de quebrar ficam (o caminho não passa por elas).
+       As passagens: as portas de caverna (pisar), as setas de saída (o tapete, com o lado da seta:
+       a do cume é para cima) e os degraus de pular, só de descida (`ledges`, Hub.ledgeAt). */
+    brasa_encosta: {
+      name: 'Monte Brasa',
+      explore: true,
+      music: 'mus_sevii_123',
+      warps: [
+        // a trilha da Kindle Road (as setas para baixo): de volta para a vila
+        { x: 28, y: 48, on: 'mat', to: 'vila', tx: 6, ty: 17, dir: 'down' },
+        { x: 29, y: 48, on: 'mat', to: 'vila', tx: 6, ty: 17, dir: 'down' },
+        // as portas de caverna: a de baixo leva ao caminho do cume; a de cima, ao 3F
+        { x: 14, y: 24, on: 'step', to: 'brasa_caminho_1f', tx: 2, ty: 15, dir: 'up' },
+        { x: 39, y: 19, on: 'step', to: 'brasa_caminho_3f', tx: 11, ty: 8, dir: 'up' },
+        // a seta do alto, para cima: o cume
+        { x: 29, y: 7, on: 'mat', face: 'up', to: 'brasa_cume', tx: 9, ty: 15, dir: 'up' }
+      ],
+      npcs: [
+        { id: 'hiker', sprite: 'hiker', x: 29, y: 45, dir: 'down', talk: 'hiker_brasa' },
+        // os homens do Giovanni, na entrada do Ruby Path (fora do caminho)
+        { id: 'recruta1', sprite: 'rocket', x: 41, y: 40, dir: 'down', talk: 'recruta_brasa' },
+        { id: 'recruta2', sprite: 'rocket', x: 42, y: 40, dir: 'down', talk: 'recruta_brasa' }
+      ],
+      things: [],
+      decor: [
+        // as duas pedras do caminho, arrastadas um tile para o lado (de 22,45 e de 17,46)
+        { sprite: 'pedra', x: 22, y: 46, solid: true }, { sprite: 'pedra', x: 17, y: 45, solid: true },
+        // as que ficaram onde estão no FireRed, e as de quebrar
+        { sprite: 'pedra', x: 36, y: 14, solid: true }, { sprite: 'pedra', x: 35, y: 14, solid: true },
+        { sprite: 'pedra', x: 35, y: 17, solid: true },
+        { sprite: 'rocha', x: 29, y: 41, solid: true }, { sprite: 'rocha', x: 30, y: 42, solid: true },
+        { sprite: 'rocha', x: 34, y: 14, solid: true }, { sprite: 'rocha', x: 36, y: 15, solid: true },
+        { sprite: 'rocha', x: 18, y: 39, solid: true }, { sprite: 'rocha', x: 19, y: 40, solid: true }
+      ],
+      loot: [
+        // a Dire Hit do FireRed, a única das três da encosta que dá para alcançar a pé (aqui, um Novo Sorteio)
+        { id: 'fr1', x: 48, y: 20, item: 'reroll' },
+        // no caminho de ida, à vista da rota (pedido do Fellipe na H-7)
+        { id: 'c1', x: 22, y: 43, item: 'revive' },
+        { id: 'c2', x: 10, y: 41, item: 'reroll' },
+        { id: 'c3', x: 12, y: 37, item: 'revive' },
+        { id: 'c4', x: 26, y: 41, item: 'reroll' },
+        { id: 'c5', x: 20, y: 35, item: 'revive' },
+        { id: 'c6', x: 13, y: 25, item: 'reroll' },
+        { id: 'c7', x: 28, y: 14, item: 'revive' }
+      ]
+    },
+    brasa_caminho_1f: {
+      name: 'Monte Brasa',
+      explore: true,
+      music: 'mus_sevii_123',
+      warps: [
+        { x: 2, y: 15, on: 'mat', to: 'brasa_encosta', tx: 14, ty: 25, dir: 'down' },
+        { x: 11, y: 1, on: 'step', to: 'brasa_caminho_2f', tx: 8, ty: 39, dir: 'up' }
+      ],
+      npcs: [],
+      things: [],
+      loot: [
+        // no caminho de ida, à vista da rota (pedido do Fellipe na H-7)
+        { id: 'c1', x: 10, y: 3, item: 'reroll' }
+      ]
+    },
+    brasa_caminho_2f: {
+      name: 'Monte Brasa',
+      explore: true,
+      music: 'mus_sevii_123',
+      warps: [
+        { x: 8, y: 39, on: 'mat', to: 'brasa_caminho_1f', tx: 11, ty: 2, dir: 'down' },
+        { x: 39, y: 6, on: 'step', to: 'brasa_caminho_3f', tx: 2, ty: 4, dir: 'up' }
+      ],
+      npcs: [],
+      things: [],
+      // as pedras de quebrar do FireRed (o caminho passa ao lado delas)
+      decor: [
+        { sprite: 'rocha', x: 40, y: 7, solid: true }, { sprite: 'rocha', x: 33, y: 5, solid: true },
+        { sprite: 'rocha', x: 15, y: 19, solid: true }, { sprite: 'rocha', x: 13, y: 23, solid: true },
+        { sprite: 'rocha', x: 13, y: 21, solid: true }, { sprite: 'rocha', x: 7, y: 38, solid: true },
+        { sprite: 'rocha', x: 9, y: 35, solid: true }, { sprite: 'rocha', x: 7, y: 34, solid: true },
+        { sprite: 'rocha', x: 15, y: 26, solid: true }
+      ],
+      loot: [
+        // no caminho de ida, à vista da rota (pedido do Fellipe na H-7)
+        { id: 'c1', x: 10, y: 32, item: 'revive' },
+        { id: 'c2', x: 14, y: 21, item: 'reroll' },
+        { id: 'c3', x: 23, y: 10, item: 'revive' },
+        { id: 'c4', x: 32, y: 5, item: 'reroll' }
+      ]
+    },
+    brasa_caminho_3f: {
+      name: 'Monte Brasa',
+      explore: true,
+      music: 'mus_sevii_123',
+      warps: [
+        { x: 2, y: 4, on: 'mat', to: 'brasa_caminho_2f', tx: 39, ty: 7, dir: 'down' },
+        { x: 11, y: 8, on: 'mat', to: 'brasa_encosta', tx: 39, ty: 20, dir: 'down' }
+      ],
+      npcs: [],
+      things: [],
+      loot: [
+        // no caminho de ida, à vista da rota (pedido do Fellipe na H-7)
+        { id: 'c1', x: 10, y: 5, item: 'revive' }
+      ]
+    },
+    // o cume: no alto (onde o Moltres fica no FireRed), a máquina do emblema vermelho em brasa,
+    // com o Moltres acorrentado por cima. Enquanto ele está preso, o calor (`heat`) e as ondas
+    // subindo (`pulse`). Pisar logo abaixo do alto começa a cena do cume (o gatilho 'tile')
+    brasa_cume: {
+      name: 'Monte Brasa',
+      explore: true,
+      music: 'mus_sevii_123',
+      heat: { alpha: 0.85, when: { caged: 'moltres' } },
+      pulse: { x: 9.5, y: 4.2, color: 'fire', when: { caged: 'moltres' } },
+      warps: [
+        { x: 9, y: 15, on: 'mat', to: 'brasa_encosta', tx: 29, ty: 8, dir: 'down' }
+      ],
+      npcs: [],
+      things: [],
+      decor: [
+        { sprite: 'maquina_moltres_correntes', x: 9, y: 6, hideIf: { freed: 'moltres' }, cells: BRASA_MACHINE },
+        { sprite: 'moltres', x: 9, y: 6, oy: -20, hideIf: { freed: 'moltres' } },
+        { sprite: 'maquina_moltres_quebrada', x: 9, y: 6, hideIf: { caged: 'moltres' }, cells: BRASA_MACHINE },
+        // as três pedras do cume, arrastadas (de 9,12, 8,11 e 8,10), e a que ficou
+        { sprite: 'pedra', x: 8, y: 12, solid: true }, { sprite: 'pedra', x: 7, y: 11, solid: true },
+        { sprite: 'pedra', x: 7, y: 10, solid: true }, { sprite: 'pedra', x: 10, y: 12, solid: true }
+      ],
+      loot: [
+        // no caminho de ida, à vista da rota (pedido do Fellipe na H-7)
+        { id: 'c1', x: 10, y: 11, item: 'reroll' }
       ]
     },
 

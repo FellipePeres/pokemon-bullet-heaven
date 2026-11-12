@@ -1312,6 +1312,212 @@ game.menus.closeModal();
   hub.enter('home');
 }
 
+// ---- o Capítulo 5 (H-8, "Monte Brasa: o fogo"): o Giovanni, a trava da Liga, o Monte Brasa a pé
+// (com os degraus de pular), o card, a luta do Moltres e a fuga dele ----
+{
+  const { isStageUnlocked, storyLocked } = await import('../src/data/stages.js');
+  const { QUESTS, CHAPTERS } = await import('../src/data/quests.js');
+  const { BATTLE_INTRO } = await import('../src/game/Hub.js');
+  const { HUB } = await import('../src/data/hub.js');
+  const panelJson = () => JSON.stringify(registry.get('lobby-panel').children.map((c) => [c.className, c.innerHTML, (c.children ?? []).map((k) => k.innerHTML)]));
+  const untilCard = (watch = null) => {
+    const seen = [];
+    let last = null;
+    for (let i = 0; i < 60 * 120 && hub.scene && !game.missionCard; i++) {
+      if (hub.dialog && hub.dialog !== last) { last = hub.dialog; seen.push({ name: hub.dialog.name, text: hub.dialog.pages.join(' ') }); watch?.(seen.at(-1)); }
+      if (hub.dialog) { hub.dialog.shown = 999; hub.confirm(); }
+      hub.update(1 / 60);
+    }
+    return seen;
+  };
+  // a encosta é grande: o caminho do clique pode levar mais que os 15 s do settle
+  const walkTo = (x, y) => { hub.clickTile(x, y); for (let i = 0; i < 60 * 90 && busy(); i++) hub.update(1 / 60); return hub.player.x === x && hub.player.y === y; };
+  const noMoltres = (seen) => !seen.some((d) => d.text.includes('Moltres'));
+
+  game.openHub('home');
+  game.startStage('gym_8_viridian');
+  game.run.state = 'victory';
+  game._handleRunState();
+  check('vencer o Giovanni deixa a cena do Pedaço de Metal devida, e a Liga fica presa pela trava da história',
+        game.sceneRecord.depois_giovanni === 'due' && storyLocked('e4_lorelei', game.campaign.clearedStages)
+        && !isStageUnlocked('e4_lorelei', game.campaign.clearedStages) && game.quests.isActive('c5_giovanni'));
+  registry.get('btn-result-menu').click();
+  check('Continuar Jornada: a sala do Giovanni em tela cheia, com o Giovanni em pixel',
+        hub.mapId === 'ginasio_viridian' && hub.scene?.id === 'depois_giovanni' && registry.get('screen-hub').classes.has('cinema')
+        && hub.npcs.some((n) => n.id === 'giovanni' && n.sprite === 'giovanni'));
+  let metal = false, openedMid = false;
+  const giovanni = runScene((d) => {
+    if (d.text.includes('mostra o Pedaço de Metal')) metal = hub.scene?.fx.item?.sprite === 'npc/pedaco_metal';
+    if (d.text.includes('O barco para a Ilha 1')) openedMid = game.quests.isActive('c5_brasa');
+  });
+  check('o Giovanni ri do Pedaço de Metal (no quadro, o pedaço com o emblema): não é da Rocket',
+        metal && said(giovanni, 'Isso não é da Rocket') && said(giovanni, 'subindo o Monte Brasa'));
+  check('...a pista fecha a do Giovanni e abre "Investigue o Monte Brasa, na Ilha 1"',
+        openedMid && game.quests.isDone('c5_giovanni') && game.sceneRecord.depois_giovanni === 'seen'
+        && QUESTS.c5_brasa.objectives[0].text === 'Investigue o Monte Brasa, na Ilha 1');
+  check('nada de spoiler: nem a cena, nem a quest, nem a trava citam o Moltres',
+        noMoltres(giovanni) && !QUESTS.c5_brasa.desc.includes('Moltres') && !QUESTS.c5_brasa.objectives[0].text.includes('Moltres')
+        && !STAGES.e4_lorelei.lock.text.includes('Moltres'));
+  settle();
+  check('...e a volta é para a vila', hub.mapId === 'vila' && !hub.scene);
+  // o mapa da jornada: a Liga presa e a marca da Ilha 1
+  check('a Liga está fechada até o Monte Brasa: jogar não começa nada', (game.startStage('e4_lorelei'), !game.run));
+  game.openCampaign();
+  check('o mapa mostra a Lorelei como a próxima, com a trava: as hordas na Victory Road e "Investigue o Monte Brasa"',
+        game.menus.lobby.selected === 'e4_lorelei' && panelJson().includes('Hordas furiosas tomaram a Victory Road')
+        && panelJson().includes('Investigue o Monte Brasa, na Ilha 1'));
+  const brasaNode = () => mapNodes().find((c) => c.classes.has('place') && String(c.title).includes('Ilha 1'));
+  check('no mapa aparece a marca do Monte Brasa, na Ilha 1', !!brasaNode());
+  nodesOf(registry.get('lobby-panel')).find((n) => n.id === 'panel-lock-go')?.onclick?.();
+  check('o botão da trava leva à marca da ilha, com o Investigar',
+        game.menus.lobby.selected === 'place:monte_brasa' && panelJson().includes('peças de máquina') && panelJson().includes('Investigar'));
+
+  // o Monte Brasa a pé (só por onde o FireRed deixa, com os degraus de pular)
+  check('o Investigar leva ao pé do Monte Brasa, em tela cheia, com a música da Ilha 1',
+        game.visitPlace('monte_brasa') && hub.mapId === 'brasa_encosta' && hub.player.x === 28 && hub.player.y === 47
+        && registry.get('screen-hub').classes.has('explore') && hub.place.music === 'mus_sevii_123');
+  check('...e a chegada toca uma vez: a fumaça e as pedras do caminho arrastadas', hub.scene?.id === 'brasa_entrada');
+  const chegada = runScene();
+  check('...e depois o jogador anda à vontade', said(chegada, 'arrastadas para o lado') && said(chegada, 'até o cume') && !hub.scene && noMoltres(chegada));
+  const brasaLoot = ['brasa_encosta', 'brasa_caminho_1f', 'brasa_caminho_2f', 'brasa_caminho_3f', 'brasa_cume'].flatMap((id) => HUB.maps[id].loot);
+  check('15 Poké Balls pelo Monte Brasa: a do FireRed e catorze no caminho de ida',
+        brasaLoot.length === 15 && brasaLoot.filter((l) => l.id.startsWith('c')).length === 14);
+  // os homens do Giovanni no caminho
+  hub.say('recruta_brasa');
+  check('os recrutas da Rocket vigiam a montanha: "Esses de vermelho não são dos nossos"', dialogText().includes('não são dos nossos'));
+  closeDialog();
+  // o degrau de pular: no sentido dele, o pulo de dois tiles; no outro, parede
+  hub.enter({ map: 'brasa_encosta', x: 38, y: 13, dir: 'down' });
+  press('down');
+  check('o degrau do FireRed: para baixo, o jogador pula dois tiles', hub.mapId === 'brasa_encosta' && hub.player.x === 38 && hub.player.y === 15);
+  press('up');
+  check('...e de baixo, o degrau não sobe', hub.player.x === 38 && hub.player.y === 15);
+  // a subida inteira, por cliques: a encosta, a caverna (três andares) e a saída no alto da encosta
+  hub.enter({ map: 'brasa_encosta', x: 28, y: 47, dir: 'up' });
+  walkTo(14, 24);
+  check('a entrada da caverna leva ao 1º andar do caminho', hub.mapId === 'brasa_caminho_1f' && hub.player.x === 2 && hub.player.y === 15);
+  walkTo(11, 1);
+  check('a escada do 1º leva ao 2º andar', hub.mapId === 'brasa_caminho_2f' && hub.player.x === 8 && hub.player.y === 39);
+  walkTo(39, 6);
+  check('a escada do 2º leva ao 3º andar', hub.mapId === 'brasa_caminho_3f' && hub.player.x === 2 && hub.player.y === 4);
+  walkTo(11, 8);
+  press('down');
+  check('o tapete do 3º leva de volta à encosta, lá no alto', hub.mapId === 'brasa_encosta' && hub.player.x === 39 && hub.player.y === 20);
+  walkTo(29, 7);
+  press('up');
+  check('o tapete do alto (a seta para cima) leva ao cume, com o calor e a máquina com o Moltres acorrentado',
+        hub.mapId === 'brasa_cume' && hub.player.x === 9 && hub.player.y === 15 && hub.heat > 0.5 && !!hub.pulse
+        && hub.decor.some((d) => d.sprite === 'maquina_moltres_correntes') && hub.decor.some((d) => d.sprite === 'moltres')
+        && !hub.decor.some((d) => d.sprite === 'maquina_moltres_quebrada'));
+  // logo abaixo do alto: pisar ali começa a cena do cume
+  walkTo(9, 9);
+  check('pisar logo abaixo do alto começa a cena do cume (o caminho para ali)', hub.scene?.id === 'brasa_cume' && !hub.path);
+  let cleared = false, faced = false;
+  const cume = untilCard((d) => {
+    if (d.text.includes('uma máquina em brasa')) faced = hub.player.x === 9 && hub.player.y === 8 && hub.player.dir === 'up';
+    if (d.text.includes('É o Moltres')) cleared = game.quests.isActive('c5_brasa');
+  });
+  check('o calor, a máquina em brasa e as ondas subindo pela boca do vulcão, de frente para o alto',
+        faced && said(cume, 'Um calor que sufoca') && said(cume, 'Como na Usina e em Seafoam'));
+  check('"É o Moltres!": a pista fecha "Investigue o Monte Brasa" e abre "Derrote e liberte o Moltres"',
+        cleared && game.quests.isDone('c5_brasa') && game.quests.isActive('c5_moltres'));
+  const card = registry.get('mission-card');
+  const cardHtml = () => JSON.stringify(card.children.map((c) => [c.className, c.innerHTML, c.children.map((k) => [k.className, k.innerHTML, k.src])]));
+  check('o card sobe: "Derrote e liberte o Moltres", a foto, sem captura, nível 62',
+        game.missionCard?.id === 'moltres' && !card.classes.has('hidden') && cardHtml().includes('Derrote e liberte o Moltres')
+        && cardHtml().includes('146.png') && cardHtml().includes('62'));
+  game.handleAction('cancel');
+  for (let i = 0; i < 4; i++) hub.update(1 / 60);
+  settle();
+  check('o Voltar fecha o card e deixa o jogador um passo atrás, fora do alto', !game.missionCard && !hub.scene && hub.mapId === 'brasa_cume' && hub.player.x === 8 && hub.player.y === 10);
+  // de volta ao alto: a versão curta, com o card de novo
+  press('up');
+  press('up');
+  check('pisar de novo logo abaixo do alto: a máquina e o card outra vez (a versão curta)', hub.scene?.id === 'brasa_cume_card');
+  untilCard();
+  game.handleAction('cancel');
+  for (let i = 0; i < 4; i++) hub.update(1 / 60);
+  settle();
+  // o Lutar logo no primeiro card: a cena do cume conta como vista ali mesmo
+  delete game.campaign.scenes.brasa_cume;
+  press('up');
+  press('up');
+  untilCard();
+  game.handleAction('confirm');
+  for (let i = 0; i < 60 * BATTLE_INTRO + 2; i++) hub.update(1 / 60);
+  check('o Lutar no primeiro card: a cena do cume conta como vista (não volta na volta da luta)',
+        game.sceneRecord.brasa_cume === 'seen' && game.pendingScene !== 'brasa_cume');
+  check('o Lutar: a luta do Moltres, no cume, preso na máquina, sem captura, com o Sol forte',
+        game.run?.stage.id === 'moltres' && game.run.fight?.kind === 'moltres' && game.run.fight.balls === 0
+        && game.run.world.scene === 'brasa_arena' && game.run.stage.weather === 'sun' && !hub.battle && !hub.scene);
+  game.quitToMenu();
+  check('sair no meio da luta volta para o cume, um passo atrás do alto', !game.run && hubVisible() && hub.mapId === 'brasa_cume' && hub.player.x === 8 && hub.player.y === 10);
+  // a derrota: o Centro, com a enfermeira da Ilha 1
+  press('up');
+  press('up');
+  untilCard();
+  game.handleAction('confirm');
+  for (let i = 0; i < 60 * BATTLE_INTRO + 2; i++) hub.update(1 / 60);
+  game.run.team.members.forEach((m) => { m.fainted = true; m.hp = 0; });
+  game.run.update(1 / 60, { x: 0, y: 0 });
+  game._handleRunState();
+  registry.get('btn-result-village').click();
+  check('caiu na luta: acorda no Centro, e a enfermeira conta do montanhista da Ilha 1',
+        !game.run && hub.mapId === 'centro' && hub.dialog?.name === 'Enfermeira' && dialogText().includes('Monte Brasa'));
+  closeDialog();
+  check('perder não libera o Moltres, e a Liga continua presa',
+        game.missionState('moltres') === 'preso' && game.quests.isActive('c5_moltres') && storyLocked('e4_lorelei', game.campaign.clearedStages));
+  // a vitória: ele cai sem forças
+  game.startMission('moltres');
+  for (let i = 0; i < 60 * BATTLE_INTRO + 2; i++) hub.update(1 / 60);
+  game.run.state = 'victory';
+  game._handleRunState();
+  check('venceu: o Moltres livre (sem captura), a quest fecha, e a dourada é a Victory Road (Capítulo 6)',
+        game.missionState('moltres') === 'livre' && game.quests.isDone('c5_moltres') && game.quests.isActive('c6_liga')
+        && CHAPTERS[QUESTS.c6_liga.chapter] === 'Capítulo 6 — A Elite dos Quatro' && game.sceneRecord.moltres_livre === 'due');
+  check('a Liga abre, e a captura dos lendários continua fechada (decisão 20)',
+        isStageUnlocked('e4_lorelei', game.campaign.clearedStages) && game.liberatedSpecies().includes('moltres'));
+  registry.get('btn-result-menu').click();
+  check('Continuar Jornada: o cume sem o calor, a máquina quebrada e o Moltres caído',
+        hub.mapId === 'brasa_cume' && hub.scene?.id === 'moltres_livre' && hub.heat === 0 && !hub.pulse
+        && hub.decor.some((d) => d.sprite === 'maquina_moltres_quebrada') && !hub.decor.some((d) => d.sprite === 'moltres')
+        && hub.scene.actor('moltres')?.sprite === 'npc/moltres' && hub.player.x === 10 && hub.player.y === 8);
+  let fled = false, emblem = false;
+  const livre = runScene((d) => {
+    if (d.text.includes('fugiu para o céu')) fled = !!hub.scene?.actor('moltres')?.hidden;
+    if (d.text.includes('lembra... um vulcão')) emblem = hub.scene?.fx.item?.sprite === 'npc/emblema';
+  });
+  check('a cena: o Moltres se assusta e foge para o céu', fled && said(livre, 'grita, assustado') && game.sceneRecord.moltres_livre === 'seen');
+  check('...a terceira máquina e a pista nova: o emblema de perto lembra um vulcão',
+        said(livre, 'Três máquinas, três pássaros') && emblem);
+  settle();
+  check('...e o atalho: no fim da cena, o jogador aparece na vila, na frente de casa',
+        hub.mapId === 'vila' && hub.player.x === 6 && hub.player.y === 17 && !hub.scene && !registry.get('screen-hub').classes.has('cinema'));
+  hub.enter({ map: 'brasa_cume', x: 8, y: 10, dir: 'up' });
+  press('up');
+  check('com o Moltres livre, o alto não toca mais nada', !hub.scene && hub.heat === 0);
+  check('o Lutar de uma missão vencida não começa nada', !game.startMission('moltres') && !hub.battle);
+  hub.enter({ map: 'brasa_encosta', x: 29, y: 46, dir: 'up' });
+  hub.say('hiker_brasa');
+  check('o montanhista: o vulcão parou de rugir', dialogText().includes('parou de rugir'));
+  closeDialog();
+  // a vila comenta
+  hub.enter({ map: 'vila', x: 27, y: 22, dir: 'up' });
+  hub.say('sabio');
+  check('o velho sábio, uma vez: os três pássaros livres, "Isso ainda não acabou"', dialogText().includes('Isso ainda não acabou'));
+  closeDialog();
+  hub.say('sabio');
+  check('...só uma vez', !dialogText().includes('Isso ainda não acabou'));
+  closeDialog();
+  hub.say('rapaz');
+  check('o rapaz da vila: o Monte Brasa parou de soltar fumaça', dialogText().includes('parou de soltar fumaça'));
+  closeDialog();
+  game.openCampaign();
+  check('depois da missão, a marca da Ilha 1 sai do mapa, e a Lorelei é a próxima, aberta',
+        !brasaNode() && game.menus.lobby.selected === 'e4_lorelei' && !panelJson().includes('Hordas furiosas'));
+  hub.enter('home');
+}
+
 // ---- Campeão e Hall da Fama ----
 game.region.campaign.slice(0, -1).forEach((e) => {
   if (!game.campaign.clearedStages.includes(e.stage)) game.campaign.clearedStages.push(e.stage);

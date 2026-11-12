@@ -9,6 +9,8 @@ import { bus, EVENTS } from '../core/events.js';
 import { MISSIONS } from '../data/missions.js';
 
 const DIRS = { up: [0, -1], down: [0, 1], left: [-1, 0], right: [1, 0] };
+/** As letras dos degraus de pular em `ledges` (data/hubMaps.js, H-8). */
+const LEDGE_DIRS = { v: 'down', '^': 'up', '<': 'left', '>': 'right' };
 const OPPOSITE = { up: 'down', down: 'up', left: 'right', right: 'left' };
 const LOOK_DIRS = ['down', 'left', 'right', 'down', 'up'];
 
@@ -170,6 +172,8 @@ export class Hub {
   /** As células que um enfeite bloqueia (o boneco no tile dele; o móvel, as do mapa de origem). */
   _solidCells(d) {
     if (d.piece) return HUB_DECOR[d.piece].solid.map(([sx, sy]) => [d.x + sx, d.y + sy]);
+    // as células que ele ocupa, uma a uma (a máquina do cume do Monte Brasa, H-8)
+    if (Array.isArray(d.cells)) return d.cells;
     return d.solid ? [[d.x, d.y]] : [];
   }
 
@@ -183,7 +187,26 @@ export class Hub {
    * Seafoam, H-7), a regra de altura do FireRed: de um patamar para outro, só pelas escadinhas.
    */
   canStep(x, y, nx, ny) {
-    return this.walkable(nx, ny) && heightOk(this.map, x, y, nx, ny);
+    // um degrau de pular não se pisa: só se pula por cima dele, no sentido dele (_tryMove)
+    return this.walkable(nx, ny) && !this.ledgeAt(nx, ny) && heightOk(this.map, x, y, nx, ny);
+  }
+
+  /**
+   * O degrau de pular do tile (H-8, o Monte Brasa): 'up', 'down', 'left' ou 'right' (o sentido do
+   * pulo, do MB_JUMP_* do FireRed), ou null. Andando contra ele nesse sentido, o jogador pula por
+   * cima e cai dois tiles adiante; nos outros sentidos, ele bloqueia.
+   */
+  ledgeAt(x, y) {
+    const ch = this.map?.ledges?.[y]?.[x];
+    return LEDGE_DIRS[ch] ?? null;
+  }
+
+  /** Dá para pular o degrau de (x, y) para a direção `dir`? Devolve o tile onde cai, ou null. */
+  jumpFrom(x, y, dir) {
+    const [dx, dy] = DIRS[dir];
+    if (this.ledgeAt(x + dx, y + dy) !== dir) return null;
+    const lx = x + 2 * dx, ly = y + 2 * dy;
+    return this.walkable(lx, ly) && !this.ledgeAt(lx, ly) ? { x: lx, y: ly } : null;
   }
 
   /**
@@ -195,6 +218,12 @@ export class Hub {
     if (scene != null) return scene;
     const mist = this.place?.mist;
     return mist && this._matches(mist.when, this._context()) ? mist.alpha : 0;
+  }
+
+  /** O calor do lugar (H-8, `heat` em data/hub.js: o cume do Monte Brasa com o Moltres preso), 0 a 1. */
+  get heat() {
+    const heat = this.place?.heat;
+    return heat && this._matches(heat.when, this._context()) ? heat.alpha : 0;
   }
 
   /** As ondas que sobem da máquina (`pulse` em data/hub.js), enquanto a condição dela vale; ou null. */
@@ -267,7 +296,8 @@ export class Hub {
 
     const p = this.player;
     if (p.moving) {
-      const duration = p.run ? CONFIG.hub.runTime : CONFIG.hub.walkTime;
+      // o pulo do degrau leva o tempo de dois passos
+      const duration = p.jump ? CONFIG.hub.walkTime * 2 : p.run ? CONFIG.hub.runTime : CONFIG.hub.walkTime;
       const step = dt / duration;
       p.t += step;
       p.stride += step * CONFIG.trainer.animation.stride;
@@ -278,7 +308,7 @@ export class Hub {
       }
       p.x += p.dx;
       p.y += p.dy;
-      Object.assign(p, { fx: p.x, fy: p.y, moving: false, t: 0 });
+      Object.assign(p, { fx: p.x, fy: p.y, moving: false, t: 0, jump: false });
       this.trackLevel();
       if (this._arrive()) return;
     }
@@ -329,9 +359,10 @@ export class Hub {
     p.walking = true;
     const [dx, dy] = DIRS[dir];
 
-    // o tapete da saída: para baixo em cima dele
+    // o tapete da saída: para baixo em cima dele (ou para o lado da seta, `face`: a do cume do
+    // Monte Brasa é para cima, H-8)
     const here = this._warp(p.x, p.y);
-    if (here?.on === 'mat' && dir === 'down') { this._warpTo(here); return true; }
+    if (here?.on === 'mat' && dir === (here.face ?? 'down')) { this._warpTo(here); return true; }
 
     const nx = p.x + dx;
     const ny = p.y + dy;
@@ -342,6 +373,13 @@ export class Hub {
     }
     const door = this._warp(nx, ny);
     if (door?.on === 'push' && (!door.face || door.face === dir)) { this._warpTo(door); return true; }
+    // o degrau de pular (H-8): no sentido dele, um pulo de dois tiles; nos outros, parede
+    if (this.ledgeAt(nx, ny)) {
+      const land = this.jumpFrom(p.x, p.y, dir);
+      if (!land) return false;
+      Object.assign(p, { moving: true, t: 0, dx: 2 * dx, dy: 2 * dy, run: false, jump: true });
+      return true;
+    }
     if (!this.canStep(p.x, p.y, nx, ny)) return false;
 
     Object.assign(p, { moving: true, t: 0, dx, dy, run: running });
@@ -758,10 +796,12 @@ export class Hub {
         return { goal, steps };
       }
       for (const [dir, [dx, dy]] of Object.entries(DIRS)) {
-        const nx = x + dx;
-        const ny = y + dy;
+        // o degrau de pular (H-8): um passo do caminho que cai dois tiles adiante
+        const land = this.jumpFrom(x, y, dir);
+        const nx = land ? land.x : x + dx;
+        const ny = land ? land.y : y + dy;
         const k = key(nx, ny);
-        if (from.has(k) || !this.canStep(x, y, nx, ny)) continue;
+        if (from.has(k) || (!land && !this.canStep(x, y, nx, ny))) continue;
         from.set(k, [dir, key(x, y)]);
         queue.push([nx, ny]);
       }

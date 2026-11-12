@@ -160,8 +160,8 @@ ladrão: o **Maxie**.
   - o mar descongela, e o jogador volta direto para a vila;
   - o sábio: "E ainda falta um."
 
-### Capítulo 5 — A suspeita 📝
-(Proposta "Monte Brasa: o fogo".)
+### Capítulo 5 — A suspeita ✅
+(A proposta "Monte Brasa: o fogo", feita na H-8.)
 - **Depois do Giovanni:**
   - o jogador mostra o Pedaço de Metal, achando que achou o culpado;
   - o Giovanni ri: "Isso não é da Rocket. O nosso emblema é um R." Ele também quer saber quem é;
@@ -174,7 +174,8 @@ ladrão: o **Maxie**.
   - os recrutas da Rocket confirmam: "esses de vermelho não são dos nossos";
   - no cume, a terceira máquina, em brasa: **o Moltres**.
 - **A luta e a fuga:**
-  - o Sol forte e o Fogo Sagrado, em que só a sombra das rochas protege;
+  - o Sol forte, o chão em brasa, o Lança-chamas, o Redemoinho de Fogo e o Fogo Sagrado, em que
+    só a sombra das rochas protege;
   - derrotado, o Moltres foge para o céu;
   - "Três máquinas, três pássaros. Para onde foi toda essa energia?";
   - de perto, o pico escuro do emblema **lembra um vulcão**;
@@ -192,11 +193,13 @@ ladrão: o **Maxie**.
   - o jogador, vulnerável, vai ser capturado;
   - os três pássaros chegam para protegê-lo, e o Maxie foge.
 - A Elite dos Quatro é libertada, e as fases da Liga abrem.
-
+(aqui não tem combate para liberar o mewtwo, ele é liberto em uma cena, e nessa mesma cena ao liberar os treinadores da E4 eles agradecem e falam que vão para a E4 para o jogador poder desafiar)
 ### Capítulo 7 — O sonho 🗺️
 - A Liga: Lorelei, Bruno, Agatha e Lance, agora conhecidos.
 - O rival como Campeão, no fim, e o Hall da Fama.
 - Depois, o Carvalho: as rotas estão mais calmas, mas não como antes. "Ainda falta alguma coisa."
+
+-Mew aparece quando o jogador é campeão volta para vila e fala com o carvalho, Mew faz telepatia com o jogador, por isso  o jogador entende, Ele explica que conseguiu fugir do Maxie, e que as hordas ainda estão estranhas pois ele anda roubando energia de lendários em outras regiões também
 
 ### Capítulo 8 — O que a lagoa guarda 🗺️
 - O pescador fala da lagoa da vila. O jogador desce com o Dive e captura **o Kyogre** no fundo
@@ -205,11 +208,6 @@ ladrão: o **Maxie**.
   - "Não acredito que cheguei tarde! Você capturou o lendário Kyogre!";
   - o Crobat, e "A caminho do vulcão! O próximo lendário será meu!".
 - É a ponte para Hoenn (o Monte Chimney).
-
-### Epílogo — O Pokémon rosa 💡
-- O Mew, que escapou do ladrão, aparece na vila.
-
----
 
 ## 6. As pistas e onde elas se pagam
 
@@ -234,7 +232,7 @@ ladrão: o **Maxie**.
 |---|---|---|---|
 | **Zapdos** ✅ | o fundo da Usina (Cap. 2), nível 36 | a tempestade marcada no chão e o tabuleiro de raios | foge assustado pelo alto; a luz da Usina volta |
 | **Articuno** ✅ | o fundo das Ilhas Seafoam (Cap. 4), nível 57 | a névoa, o gelo no chão e o Frio Absoluto com o olho da nevasca | foge pela fenda do teto; o mar descongela |
-| **Moltres** 📝 | o cume do Monte Brasa (Cap. 5), nível 62 | o Sol forte, o chão em brasa e o Fogo Sagrado com a sombra das rochas | foge para o céu; a Victory Road abre |
+| **Moltres** ✅ | o cume do Monte Brasa (Cap. 5), nível 62 | o Sol forte, o chão em brasa e o Fogo Sagrado com a sombra das rochas | foge para o céu; a Victory Road abre |
 
 - **Eles não ficam com o jogador.** Derrotados nas missões, fogem com medo.
 - **A captura deles está fechada** (decisão 20, o Fellipe em 2026-11-12: "ainda não pode aparecer

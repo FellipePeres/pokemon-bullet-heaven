@@ -86,6 +86,15 @@ const OAK = 'Prof. Carvalho';
  * margem de frente para a ilha (x até 15, linhas 7 a 11); quem chega pela escada do B4F (15,9)
  * aparece aqui dentro sem pisar, e a cena começa no primeiro passo.
  */
+/**
+ * Logo abaixo do alto do cume do Monte Brasa (H-8): pisar num destes tiles começa a cena do cume.
+ * São a frente da plataforma (linha 7), o degrau (9,8 e 10,8) e a linha de baixo (9).
+ */
+const BRASA_SUMMIT = [
+  [7, 7], [8, 7], [9, 7], [10, 7], [11, 7], [9, 8], [10, 8],
+  [7, 9], [8, 9], [9, 9], [10, 9], [11, 9]
+];
+
 const SEAFOAM_SHORE = [
   [11, 7], [12, 7], [13, 7], [14, 7], [15, 7], [11, 8], [12, 8],
   [11, 9], [12, 9], [13, 9], [14, 9], [15, 9], [11, 10], [12, 10], [13, 10], [14, 10], [15, 10],
@@ -741,6 +750,148 @@ export const CUTSCENES = {
       { do: 'say', lines: ['A correnteza voltou a correr.'] },
       // o mar descongela, e com ele a Rota 21: a Fase 8 abre
       { do: 'toast', text: 'O mar descongelou: os barcos saem de Cinnabar de novo. O caminho para Viridian está aberto.', icon: 'stages' },
+      { do: 'end', then: 'home' }
+    ]
+  },
+
+  /* ========================= Capítulo 5: a suspeita (H-8) ========================= */
+  // depois da Fase 8 (a proposta "Monte Brasa: o fogo"): o jogador chega achando que é a Rocket e
+  // mostra o Pedaço de Metal. O Giovanni ri: não é da Rocket, e ele também quer saber quem é. Os
+  // homens dele viram o emblema subindo o Monte Brasa, com peças de máquina (as de Cerulean)
+  depois_giovanni: {
+    map: 'ginasio_viridian', spot: { x: 2, y: 4, dir: 'up' },
+    trigger: [{ on: 'win', target: 'gym_8_viridian' }],
+    preload: ['npc/pedaco_metal'],
+    steps: [
+      { do: 'face', who: 'giovanni', dir: 'down' },
+      { do: 'wait', t: 0.6 },
+      { do: 'say', name: 'Giovanni', lines: [
+        'Fwahaha! Faz tempo que ninguém me derrota no meu próprio ginásio, {player}.',
+        'Então é você o treinador que anda revirando Kanto atrás da Equipe Rocket.'
+      ] },
+      { do: 'item', sprite: 'npc/pedaco_metal', at: [9.2, 0.7] },
+      { do: 'say', lines: ['{player} mostra o Pedaço de Metal, com o emblema vermelho.'] },
+      { do: 'face', who: 'giovanni', dir: 'left' },
+      { do: 'wait', t: 0.4 },
+      { do: 'say', name: 'Giovanni', lines: ['Hm... Fwahaha! Isso não é da Rocket. O nosso emblema é um R, e a Rocket não deixa rastro para trás.'] },
+      { do: 'item', off: true },
+      { do: 'face', who: 'giovanni', dir: 'down' },
+      { do: 'say', name: 'Giovanni', lines: ['Mas eu também quero saber quem é. Alguém anda agindo no meu território e deixando a Rocket levar a culpa.'] },
+      { do: 'face', who: 'giovanni', dir: 'up' },
+      { do: 'wait', t: 0.4 },
+      { do: 'say', name: 'Giovanni', lines: ['Meus homens nas Ilhas Sevii viram gente com esse emblema subindo o Monte Brasa, na Ilha 1. Carregavam peças de máquina.'] },
+      { do: 'emote', who: 'player' },
+      { do: 'say', lines: ['Peças de máquina... {player} lembra da casa assaltada de Cerulean!'] },
+      // a pista: fecha "Mostre o Pedaço de Metal ao Giovanni" e abre "Investigue o Monte Brasa"
+      { do: 'emit', on: 'clue', target: 'monte_brasa' },
+      { do: 'face', who: 'giovanni', dir: 'down' },
+      { do: 'say', name: 'Giovanni', lines: ['O barco para a Ilha 1 sai de Cinnabar. Se descobrir quem são... volte e me conte. Fwahaha!'] },
+      { do: 'wait', t: 0.5 },
+      { do: 'end', then: 'home' }
+    ]
+  },
+
+  // a chegada ao Monte Brasa (pela marca da Ilha 1 no mapa da jornada), uma vez: a fumaça e as
+  // pedras do caminho arrastadas para o lado. Depois, o jogador sobe a pé
+  brasa_entrada: {
+    map: 'brasa_encosta', spot: { x: 28, y: 47, dir: 'up' },
+    trigger: [{ on: 'enter', target: 'brasa_encosta' }],
+    steps: [
+      { do: 'wait', t: 0.5 },
+      { do: 'say', lines: ['O barco deixou {player} na Ilha 1. A trilha sobe até o pé do Monte Brasa, que solta fumaça.'] },
+      // as duas pedras arrastadas, ali do lado
+      { do: 'camera', x: 20, y: 45, t: 1.0 },
+      { do: 'say', lines: [
+        'As pedras grandes do caminho foram arrastadas para o lado. O chão está marcado, como se alguém tivesse puxado uma coisa pesada.',
+        'Alguém subiu por aqui, até o cume.'
+      ] },
+      { do: 'camera', to: 'player', t: 0.8 },
+      { do: 'end' }
+    ]
+  },
+
+  // o cume (pisou logo abaixo do alto pela primeira vez): o calor, a máquina em brasa com o Moltres
+  // preso por correntes e as ondas subindo pela boca do vulcão. O card sobe
+  brasa_cume: {
+    map: 'brasa_cume', spot: { x: 8, y: 10, dir: 'up' },
+    trigger: [{ on: 'tile', target: 'brasa_cume', cells: BRASA_SUMMIT }],
+    when: { caged: 'moltres' },
+    steps: [
+      { do: 'say', lines: ['Um calor que sufoca. O ar treme em cima das pedras.'] },
+      { do: 'walk', who: 'player', to: [[9, 8, 'up']] },
+      { do: 'camera', x: 9.5, y: 6, t: 0.8 },
+      { do: 'emote', who: 'player' },
+      { do: 'say', lines: [
+        'No alto, uma máquina em brasa. Presa a ela por correntes, uma silhueta de asas em chamas.',
+        'As ondas saem da máquina e somem no céu, pela boca do vulcão. Como na Usina e em Seafoam.'
+      ] },
+      { do: 'cry', dex: 146 },
+      { do: 'shake', t: 0.6, power: 1.5 },
+      { do: 'say', lines: ['É o Moltres! A terceira máquina. A terceira ave.'] },
+      // a pista: fecha "Investigue o Monte Brasa" e abre "Derrote e liberte o Moltres"
+      { do: 'emit', on: 'clue', target: 'moltres_preso' },
+      { do: 'wait', t: 1.2 },
+      { do: 'card', mission: 'moltres' },
+      // Voltar: um passo atrás, fora do alto (o Lutar acaba a cena ali e começa a luta)
+      { do: 'end', then: { go: { map: 'brasa_cume', x: 8, y: 10, dir: 'down' } } }
+    ]
+  },
+
+  // de volta ao alto com o Moltres ainda preso, toda vez: a máquina e o card
+  brasa_cume_card: {
+    map: 'brasa_cume', spot: { x: 8, y: 10, dir: 'up' }, record: false,
+    trigger: [{ on: 'tile', target: 'brasa_cume', cells: BRASA_SUMMIT }],
+    when: { caged: 'moltres', scene: 'brasa_cume' },
+    steps: [
+      { do: 'walk', who: 'player', to: [[9, 8, 'up']] },
+      { do: 'camera', x: 9.5, y: 6, t: 0.8 },
+      { do: 'say', lines: ['A máquina em brasa continua sugando a energia do Moltres.'] },
+      { do: 'card', mission: 'moltres' },
+      { do: 'end', then: { go: { map: 'brasa_cume', x: 8, y: 10, dir: 'down' } } }
+    ]
+  },
+
+  // depois da missão do Moltres (o gatilho 'win' da fase `moltres`), no cume, com o calor baixando:
+  // ele está caído, treme, grita e foge para o céu. A terceira máquina, e a pista nova: o pico escuro
+  // do emblema lembra um vulcão. A Liga reabre a Victory Road, e o atalho leva para a vila
+  moltres_livre: {
+    map: 'brasa_cume', spot: { x: 10, y: 8, dir: 'left' },
+    trigger: [{ on: 'win', target: 'moltres' }],
+    actors: { moltres: { sprite: 'npc/moltres', x: 9, y: 7, dir: 'down' } },
+    preload: ['npc/emblema'],
+    steps: [
+      { do: 'fade', to: 1, t: 0 },
+      { do: 'wait', t: 0.4 },
+      { do: 'fade', to: 0, t: 0.8 },
+      { do: 'wait', t: 0.3 },
+      { do: 'say', lines: ['O calor baixou. O Moltres está caído ao pé da máquina, sem forças.'] },
+      { do: 'tremble', who: 'moltres', t: 0.5, power: 1 },
+      { do: 'wait', t: 0.3 },
+      { do: 'emote', who: 'moltres' },
+      { do: 'cry', dex: 146 },
+      { do: 'tremble', who: 'moltres', t: 0.6, power: 3 },
+      { do: 'shake', t: 0.5, power: 1.5, wait: false },
+      { do: 'say', lines: ['O Moltres treme, vê {player} e grita, assustado!'] },
+      { do: 'fly', who: 'moltres', t: 1.0, height: 230 },
+      { do: 'wait', t: 0.4 },
+      { do: 'say', lines: [
+        'O Moltres fugiu para o céu, por cima da boca do vulcão.',
+        'Ele ainda está fraco demais para confiar em alguém.'
+      ] },
+      { do: 'face', who: 'player', dir: 'up' },
+      { do: 'emote', who: 'player' },
+      { do: 'say', lines: [
+        'A mesma máquina, em brasa. O mesmo emblema vermelho.',
+        'Três máquinas, três pássaros. Toda essa energia, mandada para longe. Para onde?'
+      ] },
+      // a pista nova: o emblema de perto (na cena do Kyogre, o Maxie diz "A caminho do vulcão!")
+      { do: 'item', sprite: 'npc/emblema', at: [12, 3.5] },
+      { do: 'say', lines: ['De perto, o pico escuro do emblema lembra... um vulcão.'] },
+      { do: 'item', off: true },
+      { do: 'say', lines: ['O vento muda, e a fumaça do vulcão se abre.'] },
+      // os três pássaros livres: a Liga reabre a Victory Road (decisão 2)
+      { do: 'toast', text: 'As rotas se acalmaram: a Liga reabriu a Victory Road.', icon: 'stages' },
+      // o atalho (pedido do Fellipe na H-7): de volta para a vila, sem descer a montanha
       { do: 'end', then: 'home' }
     ]
   }

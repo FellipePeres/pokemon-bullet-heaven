@@ -122,7 +122,7 @@ quando o jogador volta, ou o lugar da fase antes dela.
 | **3 — Os rastros** | Fases 4 a 6 (Erika, Koga, Sabrina) | **Feito na 0.39** (a proposta "Celadon: o emblema", com as decisões do Fellipe, decisão 18, aprovada: "ficou excelente"). A Fase 4 só abre com o Zapdos libertado: o Túnel de Pedra, na Rota 10, está no escuro desde o apagão, e acende quando a luz volta à Usina (padrão). A trava não cita o Zapdos: "O Túnel de Pedra está no escuro desde que a Usina apagou. Ninguém passa." A Fase 4 é a batalha da Erika de sempre. Depois dela, no ginásio, **a cena do emblema** (montada como maquete na página da proposta): a Erika conta da tempestade da noite do apagão e, na lembrança, **uma sombra enorme de asas** cruzando o céu carregando algo pesado (o Crobat do Maxie, sem nome); de manhã, o pedaço de metal no jardim. O jogador reconhece: **é o mesmo emblema da máquina que prendia o Zapdos**. A Erika lembra o esconderijo da Rocket embaixo do Cassino (a pista falsa continua), mas a sombra **seguiu para o sul, rumo ao mar**; ela entrega o Pedaço de Metal e aponta o Koga, também ao sul. **Depois disso, a história dos lendários descansa**: o Koga e a Sabrina são ginásios comuns, só com a quest de cada um (padrão). Saem por enquanto a pena dourada, o vulto de capuz vermelho na Rota 10 e a visão da Sabrina. | — |
 | ~~O trovão preso~~ | — | **Saiu** (decisão 19): a Sabrina ficou no Capítulo 3, como ginásio comum (decisão 18), e os capítulos seguintes desceram um número. A ideia de antes (a visão da Sabrina) fica guardada. | — |
 | **4 — As ondas** | Fase 7 (Blaine) | **Feito na 0.39 (H-7)**, a proposta "Seafoam: as ondas", aprovada ("pode seguir com o que fez"; seção 5.2). Depois do Blaine, no ginásio dele, os instrumentos do Laboratório Pokémon medem ondas estranhas saindo das Ilhas Seafoam rumo ao sul, e o jogador liga às ondas da máquina da Usina; o mar em volta de Seafoam está congelando, e nenhum barco sai de Cinnabar (a trava da Fase 8). O jogador desce a pé os cinco andares do FireRed até o fundo e acha o Articuno preso numa máquina coberta de gelo; vence a luta, ele foge pela fenda do teto, e na máquina quebrada: "Duas máquinas, dois pássaros". O mar descongela, e a Fase 8 abre. | **Articuno** |
-| **5 — A suspeita** | Fase 8 (Giovanni) | **Proposta de 2026-11-12, esperando aprovação** (página "Monte Brasa: o fogo", seção 5.3). O jogador chega achando que é a Rocket. O Giovanni olha o Pedaço de Metal e ri: não é da Rocket, e ele também quer saber quem é. Os homens dele viram gente com o emblema subindo o Monte Brasa, na Ilha 1, com peças de máquina (as da casa de Cerulean). A Liga fica fechada até o Moltres (decisão 2). O jogador sobe a pé até o cume e acha o Moltres preso na terceira máquina, em brasa. (No jogo, o título é só "A suspeita": "o fogo" adiantaria o Moltres, sem spoiler em título.) | **Moltres** |
+| **5 — A suspeita** | Fase 8 (Giovanni) | **Feito na 0.39 (H-8)**, a proposta "Monte Brasa: o fogo", aprovada ("construa a h-8 então"; seção 5.3). O jogador chega achando que é a Rocket. O Giovanni olha o Pedaço de Metal e ri: não é da Rocket, e ele também quer saber quem é. Os homens dele viram gente com o emblema subindo o Monte Brasa, na Ilha 1, com peças de máquina (as da casa de Cerulean). A Liga fica fechada até o Moltres (decisão 2). O jogador sobe a pé até o cume e acha o Moltres preso na terceira máquina, em brasa. (No jogo, o título é só "A suspeita": "o fogo" adiantaria o Moltres, sem spoiler em título.) | **Moltres** |
 | **6 — A Elite dos Quatro** | o começo da Victory Road | **Ajuste de 2026-11-12** (decisão 22; HISTORIA.md, seção 8.1). A Victory Road só abre com os três pássaros de volta (decisão 2). Ao começar por ela, uma cena: a Elite dos Quatro se juntou para derrotar uma ameaça maior e foi até a base do Maxie (o lugar a pensar). A quest "Ajude a Elite dos Quatro". Na base, o Mewtwo preso numa máquina e os quatro em jaulas; a emboscada: o Maxie aparece pela primeira vez, o jogador vai ser capturado, os três pássaros chegam e o Maxie foge. Só então a Liga abre. | **Mewtwo** |
 | **7 — O sonho** | Liga e Campeão | A Elite dos Quatro, libertada, de volta à Liga. O rival no fim, e o Hall da Fama. Depois, o Carvalho: as rotas estão mais calmas, mas não como antes: "ainda falta alguma coisa". | — |
 | **8 — O que a lagoa guarda** | late game, depois do Campeão | O pescador fala da lagoa: a descida, o Kyogre e o **Maxie** (a cena que já existe), agora o segundo encontro. "A caminho do vulcão!" leva a Hoenn. | **Kyogre** |
@@ -314,12 +314,13 @@ com o que fez", decisão 19) e construída na 0.39 como está abaixo. O que a co
   descobriu" (Capítulo 4, "As ondas"); depois, "Investigue as Ilhas Seafoam" e "Derrote e
   liberte o Articuno", todas douradas.
 
-### 5.3 A missão do Moltres (H-8, proposta de 2026-11-12)
+### 5.3 A missão do Moltres (H-8 ✅, feita na 0.39)
 
 Pedido do Fellipe: "bora para o planejamento então". A proposta, com as três cenas montadas
 em pixel, os mapas da subida com o caminho e as mecânicas da luta em movimento, está na página
-**"Monte Brasa: o fogo"** (https://claude.ai/artifact/6ppShMZkPmWuGzW2MoHySx). Esperando aprovação; tudo abaixo é o
-padrão recomendado. Já entram as Poké Balls no caminho de ida e o atalho para a vila depois
+**"Monte Brasa: o fogo"** (https://claude.ai/artifact/6ppShMZkPmWuGzW2MoHySx). Aprovada ("construa a h-8 então", 2026-11-12, depois do ajuste
+da decisão 22) e feita na 0.39: tudo abaixo entrou como está. A luta foi medida no nível 62: 11 de
+12 (no 56, 7 de 12). Já entram as Poké Balls no caminho de ida e o atalho para a vila depois
 da cena final, como ele pediu na H-7.
 
 - **O emblema** (`depois_giovanni`, na sala do Giovanni no ginásio de Viridian do FireRed, com
@@ -646,9 +647,9 @@ para o objetivo `scene` das quests. O check-data recusa a caixa com retrato
 | 15a | As ondas: o Blaine e os instrumentos (`depois_blaine`) | ginásio de Cinnabar, depois da Fase 7 | 4 | H-7 ✅ |
 | 15 | O fundo de Seafoam: a máquina no gelo e o card (`seafoam_fundo`, e a versão curta `seafoam_fundo_card`) | Ilhas Seafoam, o fundo | 4 | H-7 ✅ |
 | 15b | Depois da luta: o Articuno foge e a segunda máquina (`articuno_livre`) | a ilha do fundo | 4 | H-7 ✅ |
-| 16 | O Giovanni e o emblema (`depois_giovanni`) | ginásio de Viridian, depois da Fase 8 | 5 (proposta) | H-8 (proposta) |
-| 17 | O cume: a terceira máquina e o card (`brasa_cume`) | o cume do Monte Brasa | 5 (proposta) | H-8 (proposta) |
-| 17b | Depois da luta: o Moltres foge e o emblema que lembra um vulcão (`moltres_livre`) | o cume do Monte Brasa | 5 (proposta) | H-8 (proposta) |
+| 16 | O Giovanni e o emblema (`depois_giovanni`) | ginásio de Viridian, depois da Fase 8 | 5 | H-8 ✅ |
+| 17 | O cume: a terceira máquina e o card (`brasa_cume`, e a versão curta `brasa_cume_card`) | o cume do Monte Brasa | 5 | H-8 ✅ |
+| 17b | Depois da luta: o Moltres foge e o emblema que lembra um vulcão (`moltres_livre`) | o cume do Monte Brasa | 5 | H-8 ✅ |
 | 18 | A Victory Road: a Elite dos Quatro partiu atrás de uma ameaça maior | o começo da Victory Road | 6 | H-9 |
 | 18b | A base do Maxie: o Mewtwo na máquina, os quatro em jaulas, a emboscada e os pássaros | a base do Maxie (a pensar) | 6 (missão) | H-9 |
 | 19 | O rival Campeão | sala do Campeão | 7 | H-10 |
@@ -768,7 +769,7 @@ do Zapdos, o tipo, as fraquezas e o nível recomendado (36; sem captura, decisã
 | **H-5** ✅ 0.39 | A captura sem lendários e o molde da missão de lendário, tirado do salão do Kyogre: `systems/legendaryFight.js` (a captura, os avisos, os anéis, a leva final), o Kyogre por cima dele sem mudar nada (o mesmo rastro, quadro a quadro), o registro das missões na jornada, a volta pela missão e a regra da Poké Ball para quem tem missão. |
 | **H-6** ✅ 0.39 | O Zapdos (seção 5.1): o Lutar com a transição, a luta no fundo da Usina com ele enfraquecido pela máquina, a tempestade, e a cena de depois, em que ele foge assustado (sem captura, decisão 16). |
 | **H-7** ✅ 0.39 | O Articuno e o Capítulo 4 (seção 5.2, página "Seafoam: as ondas"): a cena do Blaine, a trava da Fase 8, Seafoam a pé com a regra de altura, a luta e as duas cenas da missão. |
-| **H-8** (proposta) | O Moltres e o Capítulo 5 (seção 5.3, página "Monte Brasa: o fogo"): a cena do Giovanni, a trava da Liga, o Monte Brasa a pé com as pedras arrastadas, os degraus de pular e as 15 Poké Balls, a luta sob o Sol forte e as duas cenas da missão. |
+| **H-8** ✅ 0.39 | O Moltres e o Capítulo 5 (seção 5.3, página "Monte Brasa: o fogo"): a cena do Giovanni, a trava da Liga, o Monte Brasa a pé com as pedras arrastadas, os degraus de pular e as 15 Poké Balls, a luta sob o Sol forte e as duas cenas da missão. |
 | **H-9** | A Victory Road e a base do Maxie (decisão 22): a cena da Elite dos Quatro, a quest "Ajude a Elite dos Quatro", a base com o Mewtwo e as jaulas, a emboscada do Maxie e os pássaros. Ganha proposta e maquete. |
 | **H-10** | A Liga e o fim do Capítulo 7: a Elite dos Quatro de volta, o rival Campeão e o "ainda falta alguma coisa". |
 | **H-11** | O Kyogre como fecho de Kanto (as quests em volta da cena que já existe, a lagoa depois do Campeão, o Maxie como segundo encontro) e o Mew. |

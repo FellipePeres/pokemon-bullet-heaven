@@ -177,6 +177,15 @@ não abre até você vencer.
   horda, o gelo no chão que deixa o treinador lento, o Raio de Gelo, a Nevasca e o Frio
   Absoluto, em que só o olho da nevasca fica livre. Derrotado, ele foge, o mar
   descongela, e o jogador volta direto para a vila. Pelo caminho, 15 Poké Balls.
+- **O Giovanni e o Moltres**: depois da Fase 8, o jogador mostra o Pedaço de Metal ao
+  Giovanni, que ri: não é da Rocket, e ele também quer saber quem é. Os homens dele viram
+  o emblema subindo o Monte Brasa, na Ilha 1. A Liga fecha a Victory Road, tomada por
+  hordas furiosas. O jogador sobe a montanha a pé, como no FireRed, pulando os degraus do
+  caminho (as pedras grandes já foram arrastadas pelos ladrões), até o cume, onde uma
+  máquina em brasa prende o Moltres. A luta tem o Sol forte (Fogo mais forte, Água mais
+  fraca), o chão em brasa, o Lança-chamas que varre, o Redemoinho de Fogo com uma saída
+  só e o Fogo Sagrado, em que só a sombra das rochas protege. Derrotado, ele foge, e a
+  Liga reabre. Pelo caminho, 15 Poké Balls.
 - **A tela de Missões**: o Diário na barra, ao lado das Conquistas. Em cima, o que
   fazer agora; embaixo, o que já aconteceu, capítulo por capítulo, com a data de cada
   missão, para reler a história; no fim, os itens importantes que ela deu. Um

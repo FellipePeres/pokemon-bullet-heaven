@@ -90,6 +90,35 @@ export function steer(run) {
     if (d < cold.eye.r * 0.35) return { x: 0, y: 0 };
     return { x: dx / d, y: dy / d };
   }
+  // o Fogo Sagrado do Moltres (H-8): vai para a sombra de rocha mais perto e anda junto com ela
+  const sacred = run.fight?.sacred;
+  if (sacred?.rocks && sacred.phase !== 'down') {
+    let best = null, bd = Infinity;
+    for (const r of sacred.rocks) {
+      const s = run.fight.shadowSpot(r);
+      const d = Math.hypot(s.x - player.x, s.y - player.y);
+      if (d < bd) { bd = d; best = s; }
+    }
+    if (bd < 18) return { x: 0, y: 0 };
+    return { x: (best.x - player.x) / bd, y: (best.y - player.y) / bd };
+  }
+  // o Redemoinho de Fogo: sai pela abertura
+  const spin = run.fight?.spin;
+  if (spin) {
+    const d0 = Math.hypot(player.x - spin.x, player.y - spin.y);
+    if (d0 < spin.r + 60) {
+      const tx = spin.x + Math.cos(spin.gap) * (spin.r + 90), ty = spin.y + Math.sin(spin.gap) * (spin.r + 90);
+      const dx = tx - player.x, dy = ty - player.y, d = Math.hypot(dx, dy) || 1;
+      return { x: dx / d, y: dy / d };
+    }
+  }
+  // o Lança-chamas: sai do leque aceso pelo lado mais perto
+  const sweep = run.fight?.sweep;
+  if (sweep?.phase === 'aim' && run.fight.inSweep(player.x, player.y)) {
+    const mid = (sweep.from + sweep.to) / 2;
+    const side = Math.sin(Math.atan2(player.y - sweep.y, player.x - sweep.x) - mid) >= 0 ? 1 : -1;
+    mx += -Math.sin(mid) * side * 5; my += Math.cos(mid) * side * 5;
+  }
   // a Nevasca do Articuno: sai do cone aceso pelo lado mais perto
   const cone = run.fight?.cone;
   if (cone?.phase === 'aim' && run.fight.inCone(player.x, player.y)) {

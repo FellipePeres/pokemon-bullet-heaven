@@ -66,6 +66,17 @@ export const STORY_PLACES = {
     text: 'Os instrumentos do Blaine captam ondas estranhas saindo daqui, rumo ao sul. O mar em volta das ilhas está congelando.',
     seenText: 'Um frio que corta, e o chão coberto de gelo. Lá embaixo, as ondas batem forte; em algum lugar, um caminho desce até o fundo.',
     go: 'Investigar', goSeen: 'Entrar nas ilhas'
+  },
+  // H-8: o Monte Brasa fica na Ilha 1, nas Ilhas Sevii, fora do Town Map de Kanto: a marca fica na
+  // borda do mapa, a oeste de Cinnabar (de onde sai o barco)
+  monte_brasa: {
+    name: 'Monte Brasa', area: 'Ilha 1', cell: [1.5, 14],
+    map: 'brasa_encosta', spot: { x: 28, y: 47, dir: 'up' },
+    quests: ['c5_brasa', 'c5_moltres'],
+    scene: 'brasa_entrada',
+    text: 'Os homens do Giovanni viram gente com o emblema vermelho subindo o Monte Brasa, carregando peças de máquina. O barco para a Ilha 1 sai de Cinnabar.',
+    seenText: 'O vulcão solta fumaça, e as pedras do caminho foram arrastadas para o lado. Alguém subiu até o cume com uma coisa pesada.',
+    go: 'Investigar', goSeen: 'Subir o Monte Brasa'
   }
 };
 

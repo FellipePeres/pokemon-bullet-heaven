@@ -61,6 +61,26 @@ export const MISSIONS = {
     retreat: { map: 'seafoam_b4f', x: 17, y: 7, dir: 'right' },
     retreatToast: 'Você recua para a margem.',
     nurse: 'enfermeira_seafoam'
+  },
+  // H-8: o cume do Monte Brasa (PLANEJAMENTO-HISTORIA.md seção 5.3); o card sobe no alto do cume
+  moltres: {
+    name: 'MOLTRES',
+    title: 'Derrote e liberte o Moltres',
+    place: 'O cume do Monte Brasa',
+    about: 'Pokémon lendário de Kanto',
+    dex: 146,
+    type: 'fire',
+    weak: ['rock', 'water', 'electric'],
+    banner: 'assets/ui/gym-banners/monte_brasa.png',
+    balls: null,
+    trail: 'O cume do Monte Brasa · preso por correntes · enfraquecido e fora de si',
+    recommendedLevel: 62,
+    note: 'Volte quando estiver pronto: o cume continua no mesmo lugar.',
+    stage: 'moltres',
+    species: 'moltres',
+    retreat: { map: 'brasa_cume', x: 8, y: 10, dir: 'down' },
+    retreatToast: 'Você recua do alto do cume.',
+    nurse: 'enfermeira_brasa'
   }
 };
 
