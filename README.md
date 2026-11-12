@@ -75,6 +75,9 @@ campo** e **quais melhorias escolher**.
 > O progresso fica salvo no navegador e também pode ser exportado como arquivo
 > `.json` pelo botão **Salvar** (na vila e no mapa da jornada) ou dormindo na cama do
 > quarto — dá para levar sua jornada para outra máquina.
+>
+> Com a história (0.39), o jogo recomeçou do zero: os saves de antes dela (até a 0.37)
+> não carregam mais.
 
 ## Os sistemas
 
@@ -142,8 +145,12 @@ não abre até você vencer.
 - **A história e as quests** (0.38): o rastreador no canto de cima da vila e do mapa da
   jornada (e uma linha na partida) guia o prólogo, do quarto ao laboratório do
   Carvalho e daí ao Brock. Ao fechar uma quest, o ✓ e o "Missão concluída!", e a
-  próxima entra deslizando. A história completa está em
-  [PLANEJAMENTO-HISTORIA.md](PLANEJAMENTO-HISTORIA.md) e chega por capítulos.
+  próxima entra deslizando. A história de Kanto está inteira no jogo (0.39), do quarto
+  ao Kyogre, em 8 capítulos: [HISTORIA.md](HISTORIA.md) conta, e
+  [PLANEJAMENTO-HISTORIA.md](PLANEJAMENTO-HISTORIA.md) mostra como foi construída.
+- **As recompensas das quests** (0.39): cada quest dá Shards, mais a cada capítulo, e as
+  missões dos lendários e o fim dão também Revivers e Novos Sorteios. A comemoração do
+  rastreador diz o que veio, e a tela de Missões mostra a recompensa de cada uma.
 - **As cenas** (0.39): o Carvalho encena o discurso do prólogo, e o rival chega
   atrasado ao laboratório para pegar o inicial com vantagem sobre o seu. As cenas
   são roteiros em dados, com câmera, gente andando, itens e quests. A história
@@ -250,8 +257,9 @@ não abre até você vencer.
   20% sozinho, sem abrir tela.
 - **Lendários**: Articuno, Zapdos, Moltres, Mewtwo e Mew têm um golpe exclusivo
   (Sheer Cold, Zap Cannon, Sacred Fire, Psystrike e Metronome) e já chegam com
-  melhorias e o Golpe Desperto. Por enquanto, nenhum deles aparece na Poké Ball:
-  a captura dos lendários espera a história (os pássaros fogem depois das missões).
+  melhorias e o Golpe Desperto. Nas missões, os pássaros fogem depois da luta (sem
+  captura); eles e o Mewtwo e o Mew só aparecem na Poké Ball depois da cena que salva a
+  Elite dos Quatro.
 - **Shiny**: raro (1%), na captura e no inicial — o card da Poké Ball brilha, e o
   Pokémon fica com as cores raras no campo, no PC e na Pokédex.
 - **Modo Livre**: ao vencer uma fase, dá para seguir nela sem fim, com XP
