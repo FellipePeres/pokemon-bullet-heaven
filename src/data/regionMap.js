@@ -56,6 +56,16 @@ export const STORY_PLACES = {
     text: 'Um marinheiro de Vermilion escutou correntes pesadas se arrastando aqui dentro. A Usina está fechada desde o apagão.',
     seenText: 'As paredes estão marcadas por raios, e um barulho de correntes vem lá do fundo. Em algum lugar do labirinto, um caminho leva para baixo.',
     go: 'Investigar', goSeen: 'Entrar na Usina'
+  },
+  // H-7: as duas ilhas do Town Map, na Rota 20, entre Fuchsia e Cinnabar (a marca fica entre elas)
+  seafoam: {
+    name: 'Ilhas Seafoam', area: 'Rota 20', cell: [7.5, 14],
+    map: 'seafoam_1f', spot: { x: 6, y: 20, dir: 'up' },
+    quests: ['c4_seafoam', 'c4_articuno'],
+    scene: 'seafoam_entrada',
+    text: 'Os instrumentos do Blaine captam ondas estranhas saindo daqui, rumo ao sul. O mar em volta das ilhas está congelando.',
+    seenText: 'Um frio que corta, e o chão coberto de gelo. Lá embaixo, as ondas batem forte; em algum lugar, um caminho desce até o fundo.',
+    go: 'Investigar', goSeen: 'Entrar nas ilhas'
   }
 };
 

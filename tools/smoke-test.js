@@ -878,7 +878,8 @@ console.log('\n[encontros de lendário]');
 
   // um de cada: na mesma tentativa não repete, mesmo recusado; quem está no PC não volta
   for (const enc of Object.values(LEGENDARY_ENCOUNTERS)) enc.chance = 1;
-  const run = new Run('gym_8_viridian', { starter: 'charmander', ownedElsewhere: ['zapdos'] });
+  // (os pássaros com missão só caem depois dela, H-5 e H-7: aqui os dois já foram liberados)
+  const run = new Run('gym_8_viridian', { starter: 'charmander', ownedElsewhere: ['zapdos'], liberated: ['zapdos', 'articuno'] });
   const offered = [];
   for (let i = 0; i < 6; i++) {
     const choices = run.captureSystem.rollChoices();
@@ -1397,6 +1398,11 @@ console.log('\n[a missão do Zapdos — preso, a tempestade, os ataques, a captu
   check('derrotado, ele cai sem forças (a fuga é a cena de depois), sem captura, e a fase é vencida',
         f.downed && !f.captured && !f.ball && !fight.pendingGift && fight.state === 'victory');
 
+  // H-7: a Fase 8 espera a missão do Articuno (o mar da Rota 21 congelando)
+  check('a Fase 8 fica presa pela trava depois da Fase 7, sem citar o Articuno, e abre com a missão vencida',
+        (await import('../src/data/stages.js')).storyLocked('gym_8_viridian', ['gym_7_cinnabar'])
+        && !STAGES.gym_8_viridian.lock.text.includes('Articuno')
+        && (await import('../src/data/stages.js')).isStageUnlocked('gym_8_viridian', ['gym_7_cinnabar', 'articuno']));
   // H-4 (decisão 18): a Fase 4 espera a missão do Zapdos (a trava da história)
   const { isStageUnlocked, storyLocked } = await import('../src/data/stages.js');
   check('a Fase 4 fica presa pela trava da história depois da Fase 3, e abre com a missão vencida',
@@ -1410,11 +1416,155 @@ console.log('\n[a missão do Zapdos — preso, a tempestade, os ataques, a captu
   const offers = (run) => { const seen = new Set(); for (let i = 0; i < 40; i++) { run.legendariesOffered.clear(); for (const c of run.captureSystem.rollChoices()) if (LEG.includes(c.id)) seen.add(c.id); } return seen; };
   const before = offers(new Run('gym_8_viridian', { starter: 'charmander' }));
   const after = offers(new Run('gym_8_viridian', { starter: 'charmander', liberated: ['zapdos'] }));
-  check('antes da missão, o Zapdos nunca aparece na Poké Ball (os outros pássaros, sim, até terem missão)',
-        MISSION_SPECIES.includes('zapdos') && !before.has('zapdos') && before.has('articuno') && before.has('moltres'));
-  check('depois da missão (com ou sem a captura), ele entra no sorteio da fase', after.has('zapdos'));
+  check('antes da missão, o Zapdos e o Articuno (H-7) nunca aparecem na Poké Ball (o Moltres, sim, até ter missão)',
+        MISSION_SPECIES.includes('zapdos') && MISSION_SPECIES.includes('articuno') && !before.has('zapdos') && !before.has('articuno') && before.has('moltres'));
+  check('depois da missão (com ou sem a captura), ele entra no sorteio da fase', after.has('zapdos') && !after.has('articuno')
+        && offers(new Run('gym_8_viridian', { starter: 'charmander', liberated: ['zapdos', 'articuno'] })).has('articuno'));
   check('...e quem está no PC continua não voltando (um de cada)',
         !offers(new Run('gym_8_viridian', { starter: 'charmander', liberated: ['zapdos'], ownedElsewhere: ['zapdos'] })).has('zapdos'));
+}
+
+// ------------------------------------------- a missão do Articuno (H-7)
+console.log('\n[a missão do Articuno — preso, a névoa, o gelo no chão, os ataques, o Frio Absoluto e a queda]');
+{
+  const { MISSIONS } = await import('../src/data/missions.js');
+  const start = () => {
+    const run = new Run('articuno', { starter: 'charmander' });
+    run.damageCompanion = () => {};
+    return run;
+  };
+  const tick = (run, seconds, move = { x: 0, y: 0 }) => {
+    for (let i = 0; i < 60 * seconds; i++) {
+      run.update(DT, move);
+      if (run.state === 'intro') { run.pendingIntro = null; run.state = 'running'; }
+      if (run.state === 'levelup' || run.state === 'evolution' || run.state === 'unlock') run.state = 'running';
+    }
+  };
+  const fight = start();
+  const f = fight.fight;
+  check('a fase da missão: o fundo das Ilhas Seafoam (o gelo do B1F), no molde, sem captura',
+        MISSIONS.articuno.stage === 'articuno' && fight.world.scene === 'seafoam_arena' && f.constructor.name === 'ArticunoFight'
+        && f.balls === 0 && MISSIONS.articuno.balls === null);
+  check('enfraquecido pela máquina: a luta é para logo depois da Fase 7 (57, entre a 7 e a 8)',
+        fight.stage.recommendedLevel === 57 && fight.stage.recommendedLevel > STAGES.gym_7_cinnabar.recommendedLevel
+        && fight.stage.recommendedLevel < STAGES.gym_8_viridian.recommendedLevel && MISSIONS.articuno.recommendedLevel === 57);
+  const { buildSceneGrid } = await import('../src/systems/terrain.js');
+  check('a arena deixa livre o lugar da máquina coberta de gelo, e a base dela bloqueia o caminho',
+        (() => { const g = buildSceneGrid('seafoam_arena', fight.terrain.cols, fight.terrain.rows, 'articuno'); const tx = Math.floor(f.machine.x / 32), ty = Math.floor(f.machine.y / 32);
+          for (let y = ty - 4; y <= ty + 3; y++) for (let x = tx - 4; x <= tx + 4; x++) if (g.solid[y * g.cols + x]) return false; return true; })()
+        && fight.terrain.solidAt(Math.floor(f.machine.x / 32), Math.floor((f.machine.y + 20) / 32))
+        && !fight.terrain.solidAt(Math.floor(fight.player.x / 32), Math.floor(fight.player.y / 32)));
+  tick(fight, 4);
+  check('preso na máquina, nos primeiros 45 s: sem o chefe; a névoa com a vista inteira (420 px)', !fight.boss && !f.snapped && f.state === 'waiting' && f.sight === 420);
+  fight.time = fight.stage.duration;
+  tick(fight, 0.1);
+  check('aos 0:45 ele entra em campo ainda preso, intocável', fight.boss?.data.id === 'articuno_boss' && fight.boss.untouchable && f.state === 'break');
+  tick(fight, 2.4);
+  check('...as correntes arrebentam, a máquina quebra, e a luta começa', f.snapped && f.machine.broken && f.state !== 'break' && !fight.boss.untouchable);
+  const boss = fight.boss;
+  f.rng = () => 0.4;
+  f.attackTimer = 99; f.summonTimer = 99;
+  // o Raio de Gelo: a mira, o raio e o rastro de gelo
+  f._set('fight');
+  const before = f.ice.length;
+  f._startBeam(boss, 1, f.cfg.beamWarn);
+  const bm = f.beam;
+  check('o Raio de Gelo: a faixa acende dele até depois do treinador, com aviso de 1,2 s', bm.phase === 'aim' && bm.warn === 1.2 && Math.hypot(bm.x1 - bm.x0, bm.y1 - bm.y0) >= 800 - 1);
+  // conta só os golpes do Articuno (o dano dele; a horda continua batendo de leve)
+  let hits = 0;
+  let want = bm.damage;
+  const hurt = fight.damageCompanion;
+  const counter = (c, amount) => { if (Math.abs(amount - want) < 1e-6) hits++; };
+  fight.damageCompanion = counter;
+  tick(fight, 1.0);
+  check('...o raio não cai antes do aviso', bm.phase === 'aim' && hits === 0);
+  tick(fight, 0.3);
+  check('...e passa, deixando o rastro de gelo no chão (8 s)', bm.phase === 'fire' && f.ice.length === before + 1 && f.ice.at(-1).life === 8 && f.ice.at(-1).x0 != null);
+  // o gelo no chão: em cima, o treinador anda 40% mais devagar
+  const lane = f.ice.at(-1);
+  fight.player.x = (lane.x0 + lane.x1) / 2; fight.player.y = (lane.y0 + lane.y1) / 2;
+  check('em cima do gelo, o treinador anda 40% mais devagar', Math.abs(f.trainerSpeed() - 0.6) < 1e-9);
+  const x0 = fight.player.x;
+  tick(fight, 0.25, { x: 1, y: 0 });
+  const slowStep = fight.player.x - x0;
+  f.ice = [];
+  const x1 = fight.player.x;
+  tick(fight, 0.25, { x: 1, y: 0 });
+  check('...e a partida usa isso (o mesmo tempo anda menos no gelo)', slowStep > 0 && slowStep < (fight.player.x - x1) * 0.8, `${slowStep.toFixed(1)} contra ${(fight.player.x - x1).toFixed(1)}`);
+  tick(fight, 0.5);
+  // a Nevasca: o cone acende, e quem sai dele a tempo não leva nada
+  f.beam = null; f._set('fight');
+  fight.player.x = boss.x + 300; fight.player.y = boss.y;
+  f._startCone(boss);
+  want = f.cone.damage;
+  check('a Nevasca: o cone acende na frente dele, apontado para o treinador, com aviso de 1,1 s',
+        f.state === 'cone' && f.cone.warn === 1.1 && f.inCone(fight.player.x, fight.player.y) && !f.inCone(boss.x - 300, boss.y));
+  hits = 0;
+  fight.player.x = boss.x; fight.player.y = boss.y - 400;   // saiu do cone a tempo
+  for (const c of fight.companions) { c.x = fight.player.x; c.y = fight.player.y; }
+  tick(fight, 1.2);
+  check('...quem saiu do cone a tempo não leva nada, e a rajada deixa gelo pelo caminho', hits === 0 && f.cone?.phase === 'gust' && f.ice.length === 3);
+  tick(fight, 0.8);
+  f._iceRing(boss);
+  check('o anel de gelo: dois anéis do tipo Gelo', f.rings.filter((r) => r.kind === 'ice' && r.type === 'ice').length >= 2);
+  fight.damageCompanion = hurt;
+  // o Frio Absoluto aos 66%: ele some na névoa, a geada cobre tudo menos o olho
+  f.rings = []; f.ice = []; f.cone = null; f.hazards = [];
+  f._set('fight');
+  boss.hp = boss.maxHp * 0.6;
+  tick(fight, 2 / 60);
+  check('aos 66%: o Frio Absoluto, e ele some na névoa, intocável', f.state === 'cold' && boss.untouchable && !!f.cold);
+  tick(fight, 0.8);
+  check('...a geada cobre a arena, e o olho da nevasca começa em volta do treinador', boss.hidden && f.cold.phase === 'frost' && f.inEye(fight.player.x, fight.player.y));
+  const eye0 = { ...f.cold.eye };
+  hits = 0;
+  want = f._damage(f.cfg.damage.cold);
+  fight.damageCompanion = counter;
+  tick(fight, 3);
+  check('...o olho anda devagar pelo caminho marcado', Math.hypot(f.cold.eye.x - eye0.x, f.cold.eye.y - eye0.y) > 100 && Math.hypot(f.cold.eye.x - eye0.x, f.cold.eye.y - eye0.y) < 3 * 160);
+  const outside = hits;
+  fight.player.x = f.cold.eye.x; fight.player.y = f.cold.eye.y;
+  for (const c of fight.companions) { c.x = f.cold.eye.x; c.y = f.cold.eye.y; }
+  check('...fora do olho, o frio tira vida e deixa o treinador lento; dentro, nada', outside > 0 && f.trainerSpeed() === 1);
+  fight.player.x = f.cold.eye.x + 400;
+  check('...(fora do olho, o treinador anda 40% mais devagar)', Math.abs(f.trainerSpeed() - 0.6) < 1e-9);
+  fight.damageCompanion = hurt;
+  for (let i = 0; i < 60 * 15 && f.cold; i++) tick(fight, 1 / 60);
+  check('no fim, ele mergulha de volta num lugar marcado, com o anel de gelo, e a luta segue',
+        f.state === 'fight' && !boss.hidden && !boss.untouchable && !f.cold && f.rings.some((r) => r.kind === 'ice'));
+  check('a névoa fecha quando ele perde vida (340 abaixo de 50%, 280 na fúria)',
+        (boss.hp = boss.maxHp * 0.45, f.sight === 340) && (f.fury = true, f.sight === 280));
+  const { damageEnemy } = await import('../src/systems/combat.js');
+  check('sem bolas, não há piso de vida (ele pode ser derrotado)', boss.hpFloor == null);
+  damageEnemy(fight, boss, 1e9);
+  tick(fight, 0.1);
+  check('derrotado, ele cai sem forças (a fuga é a cena de depois), sem captura, e a fase é vencida',
+        f.downed && !f.captured && !fight.pendingGift && fight.state === 'victory');
+}
+
+// ------------------------------------------- a regra dos patamares de Seafoam (H-7)
+console.log('\n[as Ilhas Seafoam — a regra de altura do FireRed]');
+{
+  const { heightOk } = await import('../src/data/hub.js');
+  const { HUB_MAPS } = await import('../src/data/hubMaps.js');
+  const b1 = HUB_MAPS.seafoam_b1f;
+  // a beirada de um patamar: dois tiles andáveis vizinhos, de alturas 3 e 4 (no B2F, 4,9 e 4,10)
+  const b2 = HUB_MAPS.seafoam_b2f;
+  const lv = (m, x, y) => (m.walk[y][x] === '.' ? parseInt(m.levels[y][x], 16) : -1);
+  check('de um patamar para o outro, direto, não passa (altura 3 para 4)',
+        lv(b2, 4, 9) === 3 && lv(b2, 4, 10) === 4 && !heightOk(b2, 4, 9, 4, 10) && !heightOk(b2, 4, 10, 4, 9));
+  // e uma escadinha (altura 0) ao lado de um patamar
+  let stair = null;
+  for (let y = 1; y < b1.height - 1 && !stair; y++) {
+    for (let x = 1; x < b1.width - 1 && !stair; x++) {
+      if (lv(b1, x, y) !== 0) continue;
+      for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) if (lv(b1, x + dx, y + dy) >= 3) { stair = [x, y, x + dx, y + dy]; break; }
+    }
+  }
+  check('pela escadinha (altura 0), passa nos dois sentidos', !!stair && heightOk(b1, ...stair) && heightOk(b1, stair[2], stair[3], stair[0], stair[1]), String(stair));
+  check('no mesmo patamar, passa; e nos mapas sem patamares, vale tudo',
+        heightOk(b1, 10, 13, 11, 13) === (b1.levels[13][10] === b1.levels[13][11] || b1.levels[13][10] === '0' || b1.levels[13][11] === '0')
+        && heightOk(HUB_MAPS.vila, 5, 5, 6, 5));
 }
 
 console.log(`\n=== ${failures === 0 ? 'TUDO OK' : failures + ' FALHA(S)'} ===\n`);

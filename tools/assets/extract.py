@@ -297,6 +297,8 @@ SCENES = {
     'champion_room':   ('PokemonLeague_ChampionsRoom', True),
     # a arena da missão do Zapdos (H-6): o fundo da Usina, com as peças da Power Plant
     'power_plant':     ('PowerPlant', True),
+    # a arena da missão do Articuno (H-7): o fundo das Ilhas Seafoam, com o gelo do B1F
+    'seafoam':         ('SeafoamIslands_B1F', True),
 }
 PRIMARY_TILES = 640       # tiles do tileset primário; os do secundário vêm depois
 PRIMARY_METATILES = 640   # idem para as metatiles

@@ -1,4 +1,5 @@
 import { CONFIG } from '../core/config.js';
+import { heightOk } from '../data/hub.js';
 
 const DIRS = { up: [0, -1], down: [0, 1], left: [-1, 0], right: [1, 0] };
 
@@ -47,7 +48,7 @@ export class Cutscene {
       id: actorId, sprite: a.sprite, x: a.x, y: a.y, dir: a.dir ?? 'down', hidden: !!a.hidden, glow: !!a.glow,
       moving: false, steps: 0, prog: 0, walkPath: null, from: null, speed: CONFIG.hub.walkTime
     }));
-    this.fx = { emote: null, ball: null, flash: 0, bird: null, cutin: null, fade: 0, camera: null, shake: null, storm: null, item: null };
+    this.fx = { emote: null, ball: null, flash: 0, bird: null, cutin: null, fade: 0, camera: null, shake: null, storm: null, item: null, mist: null };
     this.then = null;
     this.done = false;
     this._fill = fill;
@@ -223,15 +224,30 @@ export class Cutscene {
         break;
       }
       case 'emit': this._emit?.(a.on, a.target ?? null); done = true; break;
+      case 'mist': {
+        // a névoa (H-7, o fundo de Seafoam): vai do nível de agora até `to` em `t` segundos; `off`
+        // devolve a névoa ao lugar (data/hub.js, `mist`)
+        if (a.off) { this.fx.mist = null; done = true; break; }
+        if (local.from == null) local.from = this.fx.mist ?? hub.mist;
+        const k = a.t ? Math.min(1, this.t / a.t) : 1;
+        this.fx.mist = local.from + ((a.to ?? 0) - local.from) * k;
+        done = k >= 1;
+        break;
+      }
       case 'card':
         // o card de uma missão (data/missions.js): a cena espera o Lutar ou o Voltar. No
         // Lutar, a cena acaba ali (sem o `then` do fim): a luta começa (Game.startMission)
+        // (H-7) o fim no Lutar acontece na hora da escolha: a vila para durante a transição de
+        // batalha e não roda mais a cena, que antes ficava 'started' para sempre (e voltava a tocar
+        // na volta da luta, na frente da cena de depois)
         if (!local.open) {
           local.open = true;
           if (!this._card) { done = true; break; }
-          this._card(a.mission, (choice) => { local.choice = choice; });
+          this._card(a.mission, (choice) => {
+            local.choice = choice;
+            if (choice === 'play' && !this.done) { this.done = true; this._onEnd?.(); }
+          });
         }
-        if (local.choice === 'play') { this.done = true; this._onEnd?.(); }
         done = !!local.choice;
         break;
       case 'flag': hub._flags()[a.name] = a.value ?? true; done = true; break;
@@ -287,6 +303,7 @@ export class Cutscene {
       m.x = next.x; m.y = next.y;
       if (player) { m.fx = next.x; m.fy = next.y; }
       m.walkPath.shift(); m.from = null; m.prog = 0; m.steps = (m.steps ?? 0) + 1;
+      if (player) this.hub.trackLevel?.();
       if (!m.walkPath.length) {
         m.walkPath = null; m.moving = false;
         if (player) { m.walking = false; m.run = false; }
@@ -305,10 +322,14 @@ export class Cutscene {
     return { x: Math.round(m.x), y: Math.round(m.y) };
   }
 
-  /** O tile está livre para `self` passar? (o chão da vila, as pessoas, o jogador e os atores da cena) */
-  _free(x, y, self) {
+  /**
+   * O tile está livre para `self` passar? (o chão da vila, as pessoas, o jogador e os atores da cena).
+   * Vindo de (fx, fy), vale também a regra dos patamares (as Ilhas Seafoam, H-7).
+   */
+  _free(x, y, self, fx = null, fy = null) {
     const hub = this.hub;
     if (!hub.walkable(x, y)) return false;
+    if (fx != null && !heightOk(hub.map, fx, fy, x, y)) return false;
     const p = hub.player;
     if (self !== p && p.x === x && p.y === y) return false;
     return !this.cast.some((a) => a !== self && !a.hidden && Math.round(a.x) === x && Math.round(a.y) === y);
@@ -339,7 +360,7 @@ export class Cutscene {
         for (const [dx, dy] of Object.values(DIRS)) {
           const nx = x + dx, ny = y + dy;
           const k = key(nx, ny);
-          if (from.has(k) || !this._free(nx, ny, m)) continue;
+          if (from.has(k) || !this._free(nx, ny, m, x, y)) continue;
           from.set(k, key(x, y));
           queue.push([nx, ny]);
         }

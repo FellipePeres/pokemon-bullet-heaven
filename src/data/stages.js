@@ -498,6 +498,14 @@ export const STAGES = {
     type: 'gym',
     icon: 'tm-ground',
     description: 'A Rota 21, o Esconderijo Rocket e a Rota 22 — até o Ginásio do Giovanni.',
+    // a trava da história (H-7, a proposta "Seafoam: as ondas"): o mar da Rota 21, entre Cinnabar e
+    // Pallet, está congelando, e nenhum barco sai de Cinnabar até a máquina de Seafoam parar (a
+    // missão do Articuno, a fase `articuno`). O texto não cita o Articuno (sem spoiler em título)
+    lock: {
+      stage: 'articuno',
+      text: 'O mar da Rota 21 está congelando, fora de época. Nenhum barco sai de Cinnabar.',
+      go: 'Investigue as Ilhas Seafoam', place: 'seafoam'
+    },
     music: 'mus_rocket_hideout', leaderMusic: 'mus_vs_gym_leader',
     duration: 165,
     xpScale: 1.59,   // 2:45 até o líder (0.15; era 3:30, e antes da 0.11, mais): cada inimigo vale mais XP
@@ -1006,6 +1014,79 @@ export const STAGES = {
     // a volta é pela Usina (Game.js): vencer leva à cena `zapdos_livre`; cair, ao Centro
     returnTo: 'mission',
     capturePool: 'phase6',
+    ballChance: 0,
+    maxBalls: 0,
+    reward: { shards: 300 }
+  },
+
+  /* A MISSÃO DO ARTICUNO (H-7, "Derrote e liberte o Articuno", PLANEJAMENTO-HISTORIA.md seção 5.2):
+     o fundo das Ilhas Seafoam, pelo card que sobe da margem (data/missions.js). O Articuno
+     acorrentado à máquina do emblema vermelho coberta de gelo, que suga a energia dele: por isso
+     ele está fraco, e uma equipe logo depois da Fase 7 consegue vencê-lo. A horda de Seafoam, a
+     nevasca o tempo todo (a névoa que esconde a horda e o gelo no chão que deixa o treinador lento)
+     e o Frio Absoluto com o olho da nevasca (systems/articunoFight.js, no molde das missões).
+     Sem captura: derrotado, ele cai; na cena de depois (`articuno_livre`) ele foge, assustado.
+     Fora da campanha: vencer não abre fase sozinho, destrava a Fase 8 (o `lock` dela). */
+  articuno: {
+    id: 'articuno',
+    name: 'Missão — O fundo das Ilhas Seafoam',
+    region: 'Kanto',
+    type: 'legendary',
+    icon: 'boss',
+    secret: true,
+    mission: 'articuno',
+    description: 'O Articuno, preso por correntes numa máquina coberta de gelo que suga a energia dele, no fundo das Ilhas Seafoam.',
+    music: 'mus_sevii_dungeon', leaderMusic: 'mus_vs_legend',
+    duration: 45,
+    xpScale: 1.1,
+    world: { width: 2400, height: 1600, theme: 'cave' },
+    scaling: { hp: 0.6, speed: 0.25, damage: 0.3 },
+    difficulty: 1.2,
+    segments: [{ from: 0, name: 'O fundo das Ilhas Seafoam', theme: 'cave', scene: 'seafoam_arena' }],
+    waves: [
+      // os 45 s com ele preso: a horda de Seafoam
+      { from: 0, to: 44, interval: 0.7, batch: 5, maxAlive: 140, level: [52, 56], enemies: [{ id: 'seel', weight: 3 }, { id: 'shellder', weight: 3 }, { id: 'dewgong', weight: 2 }, { id: 'cloyster', weight: 2 }, { id: 'slowpoke', weight: 2 }, { id: 'slowbro', weight: 1 }, { id: 'psyduck', weight: 2 }, { id: 'golduck', weight: 2 }, { id: 'zubat', weight: 2 }, { id: 'golbat', weight: 1 }] },
+      // com o Articuno solto, a horda continua, mais leve
+      { from: 45, to: 9999, interval: 2, batch: 3, maxAlive: 30, level: [52, 56], enemies: [{ id: 'seel', weight: 3 }, { id: 'shellder', weight: 3 }, { id: 'dewgong', weight: 2 }, { id: 'golbat', weight: 1 }] }
+    ],
+    elites: [
+      { at: 14, id: 'dewgong_elite', count: 2, level: 56 },
+      { at: 30, id: 'cloyster_elite', count: 1, level: 56 }
+    ],
+    leader: {
+      name: 'ARTICUNO',
+      title: 'Pokémon lendário',
+      type: 'ice',
+      dex: 144,
+      portrait: null,
+      quote: 'A máquina sugou a energia dele por muito tempo. Ele está fraco, mas fora de si!'
+    },
+    recommendedLevel: 57,
+    bossTeam: ['articuno_boss'],
+    legendaryFight: {
+      kind: 'articuno', species: 'articuno', name: 'Articuno', dex: 144,
+      // sem captura, como o Zapdos (decisão 16): fraco e assustado, ele foge na cena de depois
+      balls: 0,
+      machine: [1200, 660],     // a máquina coberta de gelo, logo acima de onde o treinador chega (px do mundo)
+      sight: [420, 340, 280],   // a névoa: o alcance da vista (cheio, abaixo de 50%, na fúria)
+      iceLife: 8,               // o gelo que os golpes deixam no chão dura isso
+      iceSlow: 0.4,             // em cima do gelo, o treinador anda 40% mais devagar
+      beamWarn: 1.2,            // o Raio de Gelo: a mira acesa antes do raio
+      coneWarn: 1.1,            // a Nevasca: o cone aceso antes da rajada
+      coneSpread: 0.42,         // a metade da abertura do cone (radianos)
+      coneLength: 620,
+      coldAt: [0.66, 0.33],     // o Frio Absoluto: aos 66% e aos 33% (e a cada `coldEvery` s na fúria)
+      coldEvery: 24,
+      coldTime: 9,              // a geada dura isso, com o olho andando
+      coldSlow: 0.4,            // fora do olho, o treinador anda 40% mais devagar
+      eyeRadius: 190,           // o olho da nevasca
+      // o dano de cada golpe (na escala dos golpes dos líderes); o frio é a cada meio segundo fora do olho
+      damage: { beam: 12, cone: 11, ring: 7, cold: 2.5, dive: 9 },
+      summons: [{ id: 'seel', weight: 3 }, { id: 'dewgong', weight: 2 }, { id: 'cloyster', weight: 2 }, { id: 'golbat', weight: 1 }]
+    },
+    // a volta é pela margem do fundo (Game.js): vencer leva à cena `articuno_livre`; cair, ao Centro
+    returnTo: 'mission',
+    capturePool: 'phase7',
     ballChance: 0,
     maxBalls: 0,
     reward: { shards: 300 }

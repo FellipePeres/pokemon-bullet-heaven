@@ -387,6 +387,7 @@ export const ASSET_MANIFEST = {
   'scene/power_plant': { src: 'assets/scenes/power_plant.png', frameWidth: 16, frameHeight: 16, frames: 129 },
   'scene/route1': { src: 'assets/scenes/route1.png', frameWidth: 16, frameHeight: 16, frames: 50 },
   'scene/saffron_gym': { src: 'assets/scenes/saffron_gym.png', frameWidth: 16, frameHeight: 16, frames: 41 },
+  'scene/seafoam': { src: 'assets/scenes/seafoam.png', frameWidth: 16, frameHeight: 16, frames: 45 },
   'scene/vermilion_gym': { src: 'assets/scenes/vermilion_gym.png', frameWidth: 16, frameHeight: 16, frames: 57 },
   'scene/viridian_forest': { src: 'assets/scenes/viridian_forest.png', frameWidth: 16, frameHeight: 16, frames: 93 },
   'scene/viridian_gym': { src: 'assets/scenes/viridian_gym.png', frameWidth: 16, frameHeight: 16, frames: 69 },

@@ -20,7 +20,10 @@ de cima ficam atrás (COVERED) ou na frente dos personagens (NORMAL e SPLIT).
 árvores.
 
 A colisão também vem dos mapas de origem: o bit de colisão do map.bin
-(paredes, árvores, cercas, portas) e a elevação 1 (água, só com Surf).
+(paredes, árvores, cercas, portas) e a elevação 1 (água, só com Surf). Nos
+mapas com patamares (as Ilhas Seafoam, H-7), sai também a altura de cada tile
+(`levels`): o FireRed só deixa passar de uma altura para outra por um tile de
+altura 0 (as escadinhas), e a vila faz igual (data/hub.js, `heightOk`).
 Portas, saídas, pessoas e falas ficam em src/data/hub.js (feito à mão).
 
 Uso (Python 3 + Pillow):
@@ -118,6 +121,7 @@ class Scene:
         self.base = [[None] * w for _ in range(h)]
         self.top = [[None] * w for _ in range(h)]
         self.walk = [[False] * w for _ in range(h)]
+        self.elev = [[0] * w for _ in range(h)]   # a altura de cada tile (os patamares de Seafoam)
 
     def _put(self, dx, dy, cell):
         if 0 <= dx < self.w and 0 <= dy < self.h:
@@ -129,6 +133,8 @@ class Scene:
         for j in range(h):
             for i in range(w):
                 self._put(dx + i, dy + j, src.cell(sx + i, sy + j))
+                if 0 <= dx + i < self.w and 0 <= dy + j < self.h:
+                    self.elev[dy + j][dx + i] = src.cells[sy + j][sx + i] >> 12
 
     def stamp_keyed(self, dx, dy, m, sx, sy, w, h, kx, ky):
         """
@@ -396,11 +402,32 @@ def build_usina_fundo(s):
 
 
 GYM4 = 'CeladonCity_Gym'
+GYM7 = 'CinnabarIsland_Gym'
+SEAFOAM = ['SeafoamIslands_1F', 'SeafoamIslands_B1F', 'SeafoamIslands_B2F', 'SeafoamIslands_B3F', 'SeafoamIslands_B4F']
 
 
 def build_ginasio_celadon(s):
     """O ginásio da Erika, inteiro: o palco da cena do emblema, depois da Fase 4 (H-4)."""
     s.stamp(0, 0, GYM4, 0, 0, 13, 20)
+
+
+def build_ginasio_cinnabar(s):
+    """
+    A sala do Blaine no ginásio de Cinnabar (H-7, o recorte da maquete aprovada): o palco da cena
+    das ondas, depois da Fase 7. O Blaine fica em 5,4, como no FireRed.
+    """
+    s.stamp(0, 0, GYM7, 0, 0, 15, 10)
+
+
+def seafoam(floor):
+    """
+    Um andar das Ilhas Seafoam, inteiro (H-7, como a Usina): o jogador desce a pé, só por onde o
+    FireRed deixa, com a regra de altura dos patamares (o `levels` do mapa). Sem Surf e sem
+    empurrar pedra, há caminho: dois buracos no chão e duas escadas até a margem do fundo.
+    """
+    def build(s):
+        s.stamp(0, 0, floor, 0, 0, s.w, s.h)
+    return build
 
 
 def build_cerulean(s):
@@ -432,8 +459,17 @@ MAPS = {
     'usina_fundo': (15, 11, build_usina_fundo),
     # a mesma sala com a luz de volta, depois da missão do Zapdos (H-6)
     'usina_luz': (15, 11, build_usina_fundo),
+    # o Capítulo 4, as ondas (H-7): a sala do Blaine e os cinco andares das Ilhas Seafoam
+    'ginasio_cinnabar': (15, 10, build_ginasio_cinnabar),
+    'seafoam_1f': (38, 24, seafoam(SEAFOAM[0])),
+    'seafoam_b1f': (38, 23, seafoam(SEAFOAM[1])),
+    'seafoam_b2f': (38, 24, seafoam(SEAFOAM[2])),
+    'seafoam_b3f': (38, 24, seafoam(SEAFOAM[3])),
+    'seafoam_b4f': (38, 24, seafoam(SEAFOAM[4])),
 }
-SOURCES = [P, V, R, F, CE, FU, IP, DS4, DS1, PH1, PH2, LAB, HOUSE1, WARDEN, COPYCAT, GYM1, GYM2, GYM3, VE, PP, GYM4]
+# os mapas que levam a altura de cada tile (a regra dos patamares, H-7)
+HEIGHT_MAPS = {'seafoam_1f', 'seafoam_b1f', 'seafoam_b2f', 'seafoam_b3f', 'seafoam_b4f'}
+SOURCES = [P, V, R, F, CE, FU, IP, DS4, DS1, PH1, PH2, LAB, HOUSE1, WARDEN, COPYCAT, GYM1, GYM2, GYM3, VE, PP, GYM4, GYM7, *SEAFOAM]
 
 
 # ============================ os móveis do quarto ============================
@@ -501,6 +537,10 @@ SPRITES = {
     'voltorb':     ('pokemon/voltorb', 'npc_white', 16, 16),
     # o Zapdos do FireRed (o da Power Plant), na cena de depois da missão (H-6)
     'zapdos':      ('pokemon/zapdos', 'npc_blue', 32, 32),
+    # o Capítulo 4 (H-7): o Blaine, o Articuno do FireRed (o de Seafoam) e as pedras do Strength
+    'blaine':      ('people/blaine', 'npc_pink', 16, 32),
+    'articuno':    ('pokemon/articuno', 'npc_pink', 32, 32),
+    'pedra':       ('misc/strength_boulder', 'npc_white', 16, 16),
     'meowth':      ('pokemon/meowth', 'npc_blue', 16, 16),
     'clefairy':    ('pokemon/clefairy', 'npc_pink', 16, 16),
     'pidgey':      ('pokemon/pidgey', 'npc_blue', 16, 16),
@@ -695,6 +735,85 @@ def export_drawn(catalog):
         catalog[f'npc/{key}'] = {'src': path.relative_to(ROOT).as_posix(), 'frameWidth': w, 'frameHeight': h, 'frames': 1}
 
 
+# a máquina do emblema vermelho coberta de gelo (H-7, a de Seafoam): a mesma da Usina, com geada no
+# alto de cada peça e pingentes embaixo (o desenho da maquete aprovada). A da vila leva as correntes
+# que prendem o Articuno (ele fica por cima, em data/hub.js); a quebrada, só os pedaços
+FROST = [(236, 246, 255, 255), (196, 226, 250, 255), (150, 200, 240, 255)]
+CHAIN = (60, 65, 82, 255)
+
+
+def _frosted(src, chains):
+    import random
+    rng = random.Random(7)
+    im = Image.open(src).convert('RGBA')
+    w, h = im.size
+    px = im.load()
+
+    def solid(x, y):
+        return 0 <= x < w and 0 <= y < h and px[x, y][3] > 0
+    ice = im.copy()
+    ip = ice.load()
+    for y in range(h):
+        for x in range(w):
+            if not solid(x, y):
+                continue
+            # a borda de cima de cada peça vira geada
+            if not solid(x, y - 1) or (not solid(x, y - 2) and rng.random() < 0.55):
+                ip[x, y] = FROST[0] if rng.random() < 0.6 else FROST[1]
+            elif rng.random() < 0.06:
+                ip[x, y] = FROST[1]
+    # os pingentes: embaixo das beiradas, de 1 a 4 px
+    for x in range(w):
+        for y in range(h - 1):
+            if solid(x, y) and not solid(x, y + 1) and rng.random() < 0.28:
+                for k in range(1, rng.randint(2, 5)):
+                    if y + k < h and not solid(x, y + k):
+                        ip[x, y + k] = FROST[2] if k > 1 else FROST[1]
+    if chains:
+        # as quatro correntes, das bobinas e do console até o Articuno (no meio de cima da máquina)
+        from PIL import ImageDraw
+        d = ImageDraw.Draw(ice)
+        for sx, sy in ((10, 6), (54, 6), (26, 30), (38, 30)):
+            d.line([(sx, sy), (32, 14)], fill=CHAIN, width=1)
+    return ice
+
+
+def export_frosted(catalog):
+    # a inteira sem as correntes vai para a luta (render/articunoFight.js desenha as correntes até ele)
+    for key, (base, chains) in {'maquina_articuno': ('maquina_zapdos', False),
+                                'maquina_articuno_correntes': ('maquina_zapdos', True),
+                                'maquina_articuno_quebrada': ('maquina_zapdos_quebrada', False)}.items():
+        path = ASSETS / 'npc' / f'{key}.png'
+        _frosted(ASSETS / 'npc' / f'{base}.png', chains).save(path, optimize=True)
+        catalog[f'npc/{key}'] = {'src': path.relative_to(ROOT).as_posix(), 'frameWidth': 64, 'frameHeight': 48, 'frames': 1}
+
+
+def export_readout(catalog):
+    """
+    A leitura dos instrumentos do Blaine (H-7, a cena das ondas): o monitor escuro com a grade e a
+    linha verde com os pulsos que se repetem (o quadro da maquete aprovada), para o passo `item`.
+    """
+    from PIL import ImageDraw
+    w, h = 48, 40
+    im = Image.new('RGBA', (w, h), (13, 27, 38, 255))
+    d = ImageDraw.Draw(im)
+    for x in range(3, w - 2, 6):
+        d.line([(x, 2), (x, h - 3)], fill=(34, 64, 58, 255))
+    for y in range(4, h - 2, 6):
+        d.line([(2, y), (w - 3, y)], fill=(34, 64, 58, 255))
+    d.rectangle([0, 0, w - 1, h - 1], outline=(6, 12, 18, 255))
+    base = 25
+    pts = []
+    for x in range(2, w - 2):
+        phase = (x + 6) % 16
+        spike = -round(14 * (1 - abs(phase - 7) / 3)) if 4 <= phase <= 10 else (1 if x % 3 == 0 else 0)
+        pts.append((x, base + spike))
+    d.line(pts, fill=(126, 240, 180, 255), width=1)
+    path = ASSETS / 'npc' / 'leitura.png'
+    im.save(path, optimize=True)
+    catalog['npc/leitura'] = {'src': path.relative_to(ROOT).as_posix(), 'frameWidth': w, 'frameHeight': h, 'frames': 1}
+
+
 def export_sprites(decomp, catalog):
     pics = decomp / 'graphics' / 'object_events' / 'pics'
     palettes = decomp / 'graphics' / 'object_events' / 'palettes'
@@ -716,7 +835,8 @@ def write_js(maps, sprites, decor):
         ' * gerador de novo. Portas, pessoas e falas ficam em src/data/hub.js.',
         ' *',
         ' * Cada mapa tem o chão (`src`), o que fica por cima dos personagens (`top`)',
-        ' * e a colisão, uma linha por fileira de tiles: "." anda, "#" bloqueia.',
+        ' * e a colisão, uma linha por fileira de tiles: "." anda, "#" bloqueia. Nos mapas',
+        ' * com patamares (Seafoam), `levels` é a altura de cada tile, em hexadecimal.',
         ' */',
         'export const HUB_MAPS = {',
     ]
@@ -726,6 +846,12 @@ def write_js(maps, sprites, decor):
         lines.append('    walk: [')
         lines += [f"      '{row}'," for row in m['walk']]
         lines[-1] = lines[-1].rstrip(',')
+        if 'levels' in m:
+            # a altura de cada tile, em hexadecimal (os patamares de Seafoam: 3 e 4; as escadinhas, 0)
+            lines.append('    ],')
+            lines.append('    levels: [')
+            lines += [f"      '{row}'," for row in m['levels']]
+            lines[-1] = lines[-1].rstrip(',')
         lines.append('    ]')
         lines.append('  },')
     lines[-1] = '  }'
@@ -772,11 +898,15 @@ def main():
             'src': f'assets/hub/{key}.png', 'top': f'assets/hub/{key}-top.png', 'width': w, 'height': h,
             'walk': [''.join('.' if scene.walk[y][x] else '#' for x in range(w)) for y in range(h)],
         }
+        if key in HEIGHT_MAPS:
+            maps[key]['levels'] = [''.join('%x' % scene.elev[y][x] for x in range(w)) for y in range(h)]
         print(f'  {key}: {w}x{h}')
 
     sprites = {}
     export_sprites(decomp, sprites)
     export_drawn(sprites)
+    export_frosted(sprites)
+    export_readout(sprites)
     # a Ultra Ball do card das missões de lendário (0.39), dos itens do Pokemon All; na luta do
     # Zapdos (H-6) ela cai no campo e balança na faixa da captura
     ball = args.fonte / 'assets' / 'items' / 'default' / 'ultra-ball.png'
@@ -784,11 +914,12 @@ def main():
         Image.open(ball).convert('RGBA').save(ROOT / 'assets' / 'items' / 'ultra-ball.png', optimize=True)
     with Image.open(ROOT / 'assets' / 'items' / 'ultra-ball.png') as im:
         sprites['item/ultra-ball'] = {'src': 'assets/items/ultra-ball.png', 'frameWidth': im.width, 'frameHeight': im.height, 'frames': 1}
-    # o grito do Zapdos (H-6), do Pokemon All, como o do Kyogre
-    cry = args.fonte / 'assets' / 'sound' / 'cries' / '145.ogg'
-    if cry.exists():
-        (ROOT / 'assets' / 'sound' / 'cries').mkdir(parents=True, exist_ok=True)
-        (ROOT / 'assets' / 'sound' / 'cries' / '145.ogg').write_bytes(cry.read_bytes())
+    # os gritos do Zapdos (H-6) e do Articuno (H-7), do Pokemon All, como o do Kyogre
+    for dex in (145, 144):
+        cry = args.fonte / 'assets' / 'sound' / 'cries' / f'{dex}.ogg'
+        if cry.exists():
+            (ROOT / 'assets' / 'sound' / 'cries').mkdir(parents=True, exist_ok=True)
+            (ROOT / 'assets' / 'sound' / 'cries' / f'{dex}.ogg').write_bytes(cry.read_bytes())
     decor = export_decor(sources)
     write_js(maps, sprites, decor)
     print(f'{len(maps)} mapas, {len(sprites)} folhas e {len(decor)} móveis; catálogo em {HUB_MAPS_JS.relative_to(ROOT).as_posix()}')

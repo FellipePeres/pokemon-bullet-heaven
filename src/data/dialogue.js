@@ -188,6 +188,11 @@ export const DIALOGUE = {
     name: 'Erika',
     lines: [{ say: ['O seu próximo desafio é o Koga, em Fuchsia. Fique de olhos abertos pelo caminho.'] }]
   },
+  // o palco da volta da Fase 7 (H-7, data/cutscenes.js)
+  blaine: {
+    name: 'Blaine',
+    lines: [{ say: ['Se quer respostas, desça até o fundo das Ilhas Seafoam. E leve um casaco! Hah!'] }]
+  },
   marinheiro: {
     name: 'Marinheiro',
     lines: [{ say: ['Correntes, na Usina fechada... Até hoje eu me arrepio.'] }]
@@ -292,6 +297,11 @@ export const DIALOGUE = {
     name: 'Velho sábio',
     lines: [
       { when: { champion: true }, say: ['Você venceu a Liga. Mas me diga: já foi até o fim do mato a oeste? Ninguém nunca foi.'] },
+      // a missão do Articuno (H-7): uma vez, depois da cena da segunda máquina
+      { when: { scene: 'articuno_livre', once: 'sabio_articuno' }, say: [
+        'O Articuno também? Preso numa máquina igual, com o mesmo emblema vermelho...',
+        'Duas máquinas... alguém está juntando a força dos pássaros, {player}. E ainda falta um.'
+      ] },
       // a missão do Zapdos (H-6): uma vez, depois da cena da máquina destruída
       { when: { scene: 'zapdos_livre', once: 'sabio_zapdos' }, say: [
         'O Zapdos preso numa máquina que sugava a energia dele? E com um emblema vermelho? Então eu tinha razão, {player}.',
@@ -340,6 +350,8 @@ export const DIALOGUE = {
     lines: [
       { when: { locked: true }, say: ['Ei! Vai sair sem Pokémon? As hordas te pegam na primeira curva.', 'Passa no laboratório do Prof. Carvalho antes!'] },
       // depois da casa roubada de Cerulean (0.39): a vila culpa a Equipe Rocket
+      // a missão do Articuno (H-7): o mar de Seafoam
+      { when: { scene: 'articuno_livre', once: 'rapaz_seafoam' }, say: ['Soube? O mar em volta das Ilhas Seafoam descongelou de uma hora para outra! Os barcos já saem de Cinnabar de novo.'] },
       { when: { scene: 'zapdos_livre', once: 'rapaz_usina' }, say: ['Ouviu? A Usina voltou a funcionar! Vermilion acendeu inteira ontem à noite. Até o Túnel de Pedra acendeu de novo!'] },
       { when: { scene: 'vermilion_correntes', quest: 'z_usina' }, say: ['Dizem que Vermilion ficou dias sem luz! E a Equipe Rocket levando a culpa de novo.'] },
       { when: { scene: 'cerulean_roubo', quest: 'c2_surge' }, say: ['Viu o jornal? A Equipe Rocket assaltou uma casa em Cerulean!'] },
@@ -386,6 +398,14 @@ export const DIALOGUE = {
     lines: [{ say: [
       'Ah, você acordou! Um marinheiro de Vermilion trouxe você da Usina.',
       'Disse que achou você desmaiado perto de uma escotilha... Seus Pokémon já estão bem. Descanse antes de voltar lá.'
+    ] }]
+  },
+  // a missão do Articuno (H-7): caiu na luta e acorda no Centro
+  enfermeira_seafoam: {
+    name: 'Enfermeira',
+    lines: [{ say: [
+      'Ah, você acordou! Um pescador de Cinnabar trouxe você das Ilhas Seafoam.',
+      'Disse que achou você desmaiado na margem, no meio da névoa... Seus Pokémon já estão bem. Descanse antes de voltar lá.'
     ] }]
   },
   enfermeira_resgate: {

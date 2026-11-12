@@ -24,7 +24,7 @@ import { SCENES, stageScenes } from '../src/data/scenery.js';
 import { ALL_SCENE_TILES as SCENE_TILES } from '../src/data/sceneTiles.js';
 import { DIVE_WORLD } from '../src/data/diveWorld.js';
 import { buildSceneGrid, TILE } from '../src/systems/terrain.js';
-import { HUB } from '../src/data/hub.js';
+import { HUB, heightOk } from '../src/data/hub.js';
 import { HUB_MAPS, HUB_SPRITES, HUB_DECOR } from '../src/data/hubMaps.js';
 import { DIALOGUE } from '../src/data/dialogue.js';
 import { DECOR, decorMax } from '../src/data/decor.js';
@@ -441,17 +441,19 @@ const inside = (mapId, x, y) => { const m = HUB_MAPS[mapId]; return !!m && x >= 
     for (const sp of Object.values(STORY_PLACES)) if (sp.map === mapId) starts.push([sp.spot.x, sp.spot.y]);
     const seen = new Set(starts.map(([x, y]) => `${x},${y}`));
     const queue = [...starts];
+    // nos mapas com patamares (Seafoam, H-7), a regra de altura do FireRed vale também aqui
     while (queue.length) {
       const [x, y] = queue.shift();
       for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
         const k = `${x + dx},${y + dy}`;
-        if (seen.has(k) || solid.has(k) || !floor(mapId, x + dx, y + dy)) continue;
+        if (seen.has(k) || solid.has(k) || !floor(mapId, x + dx, y + dy) || !heightOk(map, x, y, x + dx, y + dy)) continue;
         seen.add(k);
         queue.push([x + dx, y + dy]);
       }
     }
     for (const l of place.loot) {
-      if (![[1, 0], [-1, 0], [0, 1], [0, -1]].some(([dx, dy]) => seen.has(`${l.x + dx},${l.y + dy}`))) issues.push(`${mapId}: a bola ${l.id} não tem como ser alcançada`);
+      // a bola se pega de frente para ela, do mesmo patamar (ou de uma escadinha)
+      if (![[1, 0], [-1, 0], [0, 1], [0, -1]].some(([dx, dy]) => seen.has(`${l.x + dx},${l.y + dy}`) && heightOk(map, l.x + dx, l.y + dy, l.x, l.y))) issues.push(`${mapId}: a bola ${l.id} não tem como ser alcançada`);
     }
     for (const w of place.warps ?? []) {
       if (w.on === 'step' && !seen.has(`${w.x},${w.y}`)) issues.push(`${mapId}: com as bolas no lugar, a escada ${w.x},${w.y} fica sem caminho`);
@@ -483,6 +485,16 @@ const inside = (mapId, x, y) => { const m = HUB_MAPS[mapId]; return !!m && x >= 
       if (t.on === 'npc' && !(place.npcs ?? []).some((n) => n.id === t.target)) issues.push(`${id}: trigger de alguém que não está no lugar (${t.target})`);
       if ((t.on === 'win' || t.on === 'play') && !STAGES[t.target]) issues.push(`${id}: trigger de uma fase que não existe (${t.target})`);
       if (t.on === 'visit' && STORY_PLACES[t.target]?.scene !== id) issues.push(`${id}: visita a um lugar que não leva a esta cena (${t.target})`);
+      // pisar num tile (H-7): os tiles no chão do lugar, e o spot e o go fora deles (senão a cena voltaria sozinha)
+      if (t.on === 'tile') {
+        if (t.target !== def.map) issues.push(`${id}: trigger de tile em outro lugar (${t.target})`);
+        if (!t.cells?.length) issues.push(`${id}: trigger de tile sem cells`);
+        for (const [x, y] of t.cells ?? []) if (!floor(def.map, x, y)) issues.push(`${id}: tile do trigger fora do chão (${x},${y})`);
+        const on = (x, y) => (t.cells ?? []).some(([cx, cy]) => cx === x && cy === y);
+        if (def.spot && on(def.spot.x, def.spot.y)) issues.push(`${id}: o spot fica num tile do trigger`);
+        const go = def.steps?.at(-1)?.then?.go;
+        if (go?.map === def.map && on(go.x, go.y)) issues.push(`${id}: o go do fim leva para um tile do trigger`);
+      }
     }
     for (const cond of Object.keys(def.when ?? {})) if (!KNOWN_WHEN.has(cond)) issues.push(`${id}: condição desconhecida (${cond})`);
     const actors = new Set(['player', ...Object.keys(def.actors ?? {}), ...(place.npcs ?? []).map((n) => n.id)]);
@@ -623,6 +635,57 @@ const inside = (mapId, x, y) => { const m = HUB_MAPS[mapId]; return !!m && x >= 
     ? fail(`cenas: ${issues.join(' · ')}`)
     : ok(`as cenas: ${Object.keys(CUTSCENES).length} roteiros com ${stepCount} passos, caminhos só no chão; ${stages.length} palco(s) em tela cheia (${stages.join(', ')}); ${Object.keys(STORY_PLACES).length} lugar(es) da história no mapa; nada no meio das fases`);
   if (waiting.length) console.log(`  …    | pistas que as quests esperam e ainda não têm cena: ${waiting.join(', ')}`);
+}
+
+// os lugares para explorar com andares (as Ilhas Seafoam, H-7): a pé, do lugar da história no
+// mapa da jornada até a margem (os tiles da cena de tile), só por onde o FireRed deixa (o chão, as
+// pedras, a regra de altura e as passagens 'step'); e, de lá, de volta a uma saída para a vila
+{
+  const issues = [];
+  const notes = [];
+  const solidAt = (mapId) => new Set([
+    ...(HUB.maps[mapId].npcs ?? []).map((n) => `${n.x},${n.y}`),
+    ...(HUB.maps[mapId].decor ?? []).filter((d) => d.solid).map((d) => `${d.x},${d.y}`)
+  ]);
+  /** Busca em largura por vários mapas: devolve os passos até o primeiro alvo, ou null. */
+  const walk = (start, isGoal) => {
+    const key = (m, x, y) => `${m}:${x},${y}`;
+    const seen = new Map([[key(start.map, start.x, start.y), 0]]);
+    const queue = [[start.map, start.x, start.y]];
+    while (queue.length) {
+      const [m, x, y] = queue.shift();
+      const d = seen.get(key(m, x, y));
+      if (isGoal(m, x, y)) return d;
+      const place = HUB.maps[m], map = HUB_MAPS[m], solid = solidAt(m);
+      for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+        const nx = x + dx, ny = y + dy;
+        if (!floor(m, nx, ny) || solid.has(`${nx},${ny}`) || !heightOk(map, x, y, nx, ny)) continue;
+        const w = (place.warps ?? []).find((v) => v.on === 'step' && v.x === nx && v.y === ny);
+        const next = w ? [w.to, w.tx, w.ty] : [m, nx, ny];
+        const k = key(...next);
+        if (seen.has(k)) continue;
+        seen.set(k, d + 1);
+        queue.push(next);
+      }
+    }
+    return null;
+  };
+  for (const [id, def] of Object.entries(CUTSCENES)) {
+    for (const t of def.trigger ?? []) {
+      if (t.on !== 'tile' || !HUB.maps[def.map]?.explore || def.record === false) continue;
+      const story = Object.values(STORY_PLACES).find((sp) => sp.quests.some((q) => QUESTS[q]?.objectives.some((o) => o.on === 'clue' && def.steps.some((st) => st.do === 'emit' && st.target === o.target))));
+      if (!story) { issues.push(`${id}: nenhum lugar da história leva até esta cena`); continue; }
+      const cells = new Set(t.cells.map(([x, y]) => `${def.map}:${x},${y}`));
+      const there = walk({ map: story.map, ...story.spot }, (m, x, y) => cells.has(`${m}:${x},${y}`));
+      if (there == null) { issues.push(`${id}: não há caminho a pé de ${story.map} até os tiles da cena`); continue; }
+      // de volta: do lugar onde o Voltar deixa o jogador até um tapete de saída para a vila
+      const go = def.steps.at(-1)?.then?.go ?? { map: def.map, x: t.cells[0][0], y: t.cells[0][1] };
+      const back = walk(go, (m, x, y) => (HUB.maps[m].warps ?? []).some((w) => w.on === 'mat' && w.to === 'vila' && w.x === x && w.y === y));
+      if (back == null) issues.push(`${id}: da margem não há caminho a pé de volta até a saída`);
+      else notes.push(`${id}: ${there} passos da entrada até a margem, ${back} de volta até a saída`);
+    }
+  }
+  issues.length ? fail(`lugares com andares: ${issues.join(' · ')}`) : ok(`a pé pelos andares: ${notes.join('; ') || 'nenhuma cena de tile'}`);
 }
 
 // pools de captura: mostra quanto de cada fase já está implementado

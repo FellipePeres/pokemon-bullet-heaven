@@ -168,6 +168,15 @@ não abre até você vencer.
   tempestade daquela noite (a lembrança: uma sombra de asas cruzando o céu) e mostra o
   pedaço de metal que achou no jardim, com o mesmo emblema da máquina da Usina. Depois,
   a jornada segue pelo Koga e pela Sabrina.
+- **As ondas e o Articuno**: depois da Fase 7, o Blaine conta que os instrumentos dele
+  captam ondas estranhas saindo das Ilhas Seafoam, e que o mar em volta está
+  congelando: nenhum barco sai de Cinnabar, e a Fase 8 espera. O jogador desce a pé os
+  cinco andares das ilhas, como no FireRed (os patamares só se ligam pelas escadinhas,
+  e os buracos levam para baixo), até a margem do fundo, onde a névoa se abre sobre uma
+  máquina coberta de gelo com o Articuno acorrentado. A luta tem a névoa que esconde a
+  horda, o gelo no chão que deixa o treinador lento, o Raio de Gelo, a Nevasca e o Frio
+  Absoluto, em que só o olho da nevasca fica livre. Derrotado, ele foge, e o mar
+  descongela.
 - **A tela de Missões**: o Diário na barra, ao lado das Conquistas. Em cima, o que
   fazer agora; embaixo, o que já aconteceu, capítulo por capítulo, com a data de cada
   missão, para reler a história; no fim, os itens importantes que ela deu. Um

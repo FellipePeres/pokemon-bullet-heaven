@@ -35,6 +35,10 @@ export const CHAPTERS = {
   cap1: 'Capítulo 1 — As rotas tomadas',
   cap2: 'Capítulo 2 — O céu vazio',
   cap3: 'Capítulo 3 — Os rastros',
+  // H-7: o antigo Capítulo 4 virou parte do 3; o do gelo é o 4. O 5 é o do Giovanni (sem o "fogo"
+  // no título: o Moltres só se descobre na cena dele)
+  cap4: 'Capítulo 4 — As ondas',
+  cap5: 'Capítulo 5 — A suspeita',
   // as missões dos lendários (azuis) levam o nome do lugar
   usina: 'A Usina'
 };
@@ -145,6 +149,48 @@ export const QUESTS = {
     kind: 'story', chapter: 'cap3',
     desc: 'O Koga caiu. O próximo ginásio é o da Sabrina, em Saffron.',
     objectives: [{ text: 'Vença a Sabrina, em Saffron', on: 'win', target: 'gym_6_saffron', doneIf: { cleared: 'gym_6_saffron' } }],
+    next: ['c4_blaine'],
+    reward: null
+  },
+
+  /* ========================== Capítulo 4: as ondas (H-7) ========================== */
+  // a proposta "Seafoam: as ondas" (PLANEJAMENTO-HISTORIA.md seção 5.2): depois do Blaine, as ondas
+  // que os instrumentos dele captam, o mar congelando e a descida a pé até o fundo de Seafoam
+  c4_blaine: {
+    kind: 'story', chapter: 'cap4',
+    desc: 'A Sabrina caiu. O último ginásio antes de Viridian é o do Blaine, na ilha vulcânica de Cinnabar.',
+    objectives: [
+      { text: 'Vença o Blaine, em Cinnabar', on: 'win', target: 'gym_7_cinnabar', doneIf: { cleared: 'gym_7_cinnabar' } },
+      // a pista chega com a cena de depois da Fase 7 (depois_blaine): as ondas
+      { text: 'Ouça o que o Blaine descobriu', on: 'clue', target: 'ondas' }
+    ],
+    next: ['c4_seafoam'],
+    reward: null
+  },
+  // a visita é pela marca das Ilhas Seafoam no mapa da jornada (data/regionMap.js, STORY_PLACES)
+  c4_seafoam: {
+    kind: 'story', chapter: 'cap4',
+    desc: 'Os instrumentos do Blaine captam ondas estranhas saindo das Ilhas Seafoam, rumo ao sul. Ondas, como as da máquina da Usina. E o mar em volta das ilhas está congelando: nenhum barco sai de Cinnabar.',
+    // fecha na margem do fundo, quando a névoa se abre (data/cutscenes.js, seafoam_fundo)
+    objectives: [{ text: 'Investigue as Ilhas Seafoam', on: 'clue', target: 'articuno_preso' }],
+    next: ['c4_articuno'],
+    reward: null
+  },
+  c4_articuno: {
+    kind: 'story', chapter: 'cap4',
+    desc: 'No fundo das Ilhas Seafoam, numa máquina coberta de gelo, o Articuno está preso por correntes. A máquina suga a energia dele, como a da Usina sugava a do Zapdos. O card sobe na margem.',
+    // fecha com a luta vencida (a fase `articuno`): derrotado, ele foge (sem captura)
+    objectives: [{ text: 'Derrote e liberte o Articuno', on: 'win', target: 'articuno' }],
+    next: ['c5_giovanni'],
+    reward: null
+  },
+
+  /* ========================== Capítulo 5: a suspeita ========================== */
+  // o mar descongelou (data/cutscenes.js, articuno_livre): a Fase 8 abre. A cena do Giovanni é a H-8
+  c5_giovanni: {
+    kind: 'story', chapter: 'cap5',
+    desc: 'O mar de Seafoam descongelou, e os barcos saem de Cinnabar de novo. O último ginásio de Kanto é o do Giovanni, em Viridian.',
+    objectives: [{ text: 'Vença o Giovanni, em Viridian', on: 'win', target: 'gym_8_viridian', doneIf: { cleared: 'gym_8_viridian' } }],
     next: [],
     reward: null
   },

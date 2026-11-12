@@ -1,5 +1,6 @@
 import { getSheet } from './assets.js';
 import { drawZapdosGround, drawZapdosWorld, drawZapdosScreen, dischargeRing, blastWarning } from './zapdosFight.js';
+import { drawArticunoGround, drawArticunoVeil, drawArticunoWorld, drawArticunoScreen, iceRing } from './articunoFight.js';
 
 const TAU = Math.PI * 2;
 const PIXEL = '"Pixelify Sans", sans-serif';
@@ -12,7 +13,8 @@ export const hash = (seed, i) => { const x = Math.sin(seed * 12.9898 + i * 78.23
 /**
  * O DESENHO DAS LUTAS DE LENDÁRIO (o molde das missões, H-5: systems/legendaryFight.js):
  * os avisos no chão, os raios, a bola caindo, o arremesso e a faixa da captura, os
- * letreiros. O que é só do Zapdos está em render/zapdosFight.js.
+ * letreiros. O que é só do Zapdos está em render/zapdosFight.js; o do Articuno, em
+ * render/articunoFight.js.
  *
  * A LUTA DO KYOGRE (systems/kyogreFight.js). Na 0.37.5, os ataques
  * ficaram cinematográficos (o Fellipe: "precisa ter impacto grande na animação"):
@@ -25,10 +27,11 @@ export const hash = (seed, i) => { const x = Math.sin(seed * 12.9898 + i * 78.23
  * - a faixa da captura, como a do Voar, com a bola balançando.
  * Só lê o estado.
  */
-/** Embaixo de todos (antes dos Pokémon): a máquina e as correntes do Zapdos. */
+/** Embaixo de todos (antes dos Pokémon): a máquina e as correntes do Zapdos e do Articuno, e o gelo no chão. */
 export function drawFightGround(ctx, run) {
   const fight = run.fight;
   if (fight?.kind === 'zapdos') drawZapdosGround(ctx, run, fight);
+  else if (fight?.kind === 'articuno') drawArticunoGround(ctx, run, fight);
 }
 
 export function drawFightWorld(ctx, run) {
@@ -37,6 +40,8 @@ export function drawFightWorld(ctx, run) {
   const now = run.time;
   const boss = fight.boss;
   const kyogre = fight.kind === 'kyogre';
+  // a névoa e a geada do Articuno (H-7): por cima dos Pokémon, embaixo dos avisos
+  if (fight.kind === 'articuno') drawArticunoVeil(ctx, run, fight);
 
   // o lago fervendo antes de ele sair
   if (fight.boiling > 0) bubbles(ctx, fight.lake.x, fight.lake.y, 150, 70, fight.boiling, now);
@@ -55,9 +60,11 @@ export function drawFightWorld(ctx, run) {
   if (kyogre && fight.state === 'charge' && boss) charge(ctx, boss, clamp01(fight.t / fight.cfg.pulseCharge), now);
   // o Zapdos: a faixa da Investida, a carga e a esfera do Zap Cannon
   if (fight.kind === 'zapdos') drawZapdosWorld(ctx, run, fight);
+  // o Articuno: a mira e o Raio de Gelo, o cone e a rajada da Nevasca, o gelo estilhaçando
+  if (fight.kind === 'articuno') drawArticunoWorld(ctx, run, fight);
 
-  // os anéis de onda (no Zapdos, o Discharge)
-  for (const ring of fight.rings) if (ring.delay <= 0) (ring.kind === 'discharge' ? dischargeRing : waveRing)(ctx, ring, now);
+  // os anéis de onda (no Zapdos, o Discharge; no Articuno, o anel de gelo)
+  for (const ring of fight.rings) if (ring.delay <= 0) (ring.kind === 'discharge' ? dischargeRing : ring.kind === 'ice' ? iceRing : waveRing)(ctx, ring, now);
 
   // os efeitos do impacto: colunas, raios, estouros
   for (const f of fight.fx) {
@@ -106,6 +113,7 @@ export function drawFightScreen(ctx, run, renderer) {
   const ts = fight.tsunami;
   if (ts?.phase === 'sweep') { ctx.fillStyle = 'rgba(40,110,220,.16)'; ctx.fillRect(0, 0, W, H); }
   if (fight.kind === 'zapdos') drawZapdosScreen(ctx, run, renderer, fight);
+  if (fight.kind === 'articuno') drawArticunoScreen(ctx, run, renderer, fight);
   if (fight.flash > 0) { ctx.fillStyle = `rgba(${fight.flashColor},${fight.flash})`; ctx.fillRect(0, 0, W, H); }
 
   // o aviso do maremoto: o letreiro e a seta até a bolha de ar

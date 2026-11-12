@@ -5,7 +5,7 @@
 > decisão foi tomada e o que falta fazer. O `README.md` é o manual de uso;
 > este aqui é o contexto de desenvolvimento.
 
-**Versão atual:** `0.39.0` · **Última atualização:** 2026-11-10
+**Versão atual:** `0.39.0` · **Última atualização:** 2026-11-12
 **Stack:** HTML + CSS + JavaScript puro (ES Modules). Sem backend, sem build, sem dependências.
 **Repositório:** https://github.com/FellipePeres/pokemon-bullet-heaven (público)
 **Jogo no ar:** https://fellipeperes.github.io/pokemon-bullet-heaven/
@@ -991,6 +991,78 @@ Nunca voltar bônus globais para o pool de level up — foi pedido explícito.
   bolas e o nível do card batem com os da fase, as passagens com `when`). O roteiro de
   screenshots é `zapdos`.
 
+### O Capítulo 4 e a missão do Articuno (H-7, 0.39 na branch)
+- Pedido do Fellipe: a proposta "Seafoam: as ondas" (PLANEJAMENTO-HISTORIA.md, seção 5.2,
+  decisão 19), aprovada inteira com os padrões ("pode seguir com o que fez").
+- **As quests**: depois da Sabrina, o Capítulo 4, "As ondas": `c4_blaine` (a vitória e a pista
+  `ondas`), `c4_seafoam` ("Investigue as Ilhas Seafoam", a pista `articuno_preso`), `c4_articuno`
+  (a fase `articuno`) e, no Capítulo 5 ("A suspeita", sem o "fogo" no título), `c5_giovanni`.
+  Nada cita o Articuno antes da cena do fundo.
+- **A cena das ondas** (`depois_blaine`, gatilho `win` da Fase 7) no palco `ginasio_cinnabar` (o
+  recorte da sala do Blaine, `npc/blaine`): o quiz, os instrumentos com a leitura num quadro (o
+  passo `item` com `npc/leitura`, desenhada pelo `tools/assets/hub.py`), o jogador lembrando da
+  máquina da Usina e o mar congelando.
+- **A trava da Fase 8** (`lock` com a fase `articuno`): "O mar da Rota 21 está congelando, fora de
+  época. Nenhum barco sai de Cinnabar." O botão leva à marca das ilhas (`STORY_PLACES.seafoam`,
+  entre as duas ilhas do Town Map, na Rota 20).
+- **Seafoam a pé** (`seafoam_1f` a `seafoam_b4f`, os cinco andares inteiros, `explore`, com a música
+  da caverna): as passagens são as do FireRed que funcionam a pé, as escadas (`MB_LADDER`) e os
+  buracos (`MB_FALL_WARP`, só de descida); os tiles onde se cai (`MB_CAVE`) não levam a nada, e a
+  saída é a seta da Rota 20 (o tapete). As pedras do Strength à vista ficam como enfeites sólidos
+  (`npc/pedra`). As Poké Balls: as cinco do FireRed (o item vira Reviver ou Novo Sorteio) e três a
+  mais nos becos.
+- **A regra de altura** (o achado técnico da proposta): o `hub.py` grava a altura de cada tile dos
+  mapas com patamares (`levels` em `data/hubMaps.js`, em hexadecimal), e `heightOk` (`data/hub.js`)
+  é a regra do FireRed: de uma altura para outra, só por um tile de altura 0 (as escadinhas). Vale no
+  `Hub.canStep` (o passo, o clique, o empurrão), no caminho das cenas e no check-data. **O desenho
+  também**: o jogador guarda a altura do último tile que não é escadinha (`player.level`, o
+  `previousElevation` do jogo), e no patamar alto (altura 4) ele vem depois da camada de cima do mapa,
+  como a prioridade do sprite no GBA (`ELEVATION_PRIORITY` em `render/HubRenderer.js`); sem isso, a
+  beirada cobria a personagem na margem do fundo.
+- **O fundo** (`seafoam_b4f`): enquanto o Articuno está preso, a névoa (`mist` do lugar, desenhada pelo
+  `HubRenderer._mist`), as ondas subindo da máquina (`pulse`, `_pulse`) e a máquina coberta de gelo
+  com as correntes (`npc/maquina_articuno_correntes`) e o Articuno por cima (enfeites com `hideIf`;
+  livre, a quebrada). O `hideIf` dos enfeites passou a ver as missões e as cenas (o contexto leve do
+  `Hub.decor`).
+- **O gatilho `tile`** (as cenas): pisar num dos `cells` do lugar (`Hub._arrive` chama
+  `Game.sceneTrigger('tile', mapa, { x, y })`). A margem (`SEAFOAM_SHORE` em `data/cutscenes.js`)
+  começa `seafoam_fundo` (a névoa se abre, a pista, o card); depois de vista, a versão curta
+  `seafoam_fundo_card` (`record: false`). O Voltar deixa o jogador fora da margem (17,7). O check-data
+  recusa spot ou go dentro dos tiles do gatilho e mede, por andares, o caminho a pé até a margem (75
+  passos) e o de volta até a saída (86).
+- **O passo `mist`** (as cenas): a névoa vai do nível de agora até `to` em `t` segundos.
+- **O Lutar no primeiro card** (correção no motor): a cena só contava como vista no quadro seguinte,
+  que nunca vinha (a vila para durante a transição de batalha); uma cena com registro ficava
+  `started` e voltava a tocar na volta da luta, na frente da de depois. Agora o fim vem na hora da
+  escolha. Na Usina não aparecia porque o `usina_fundo` não se registra.
+- **A luta** (`systems/articunoFight.js`, a fase secreta `articuno`, o chefe `articuno_boss`, a arena
+  `seafoam_arena` com o gelo do B1F, a tira `scene/seafoam` do `extract.py`): preso na máquina nos 45 s
+  da horda de Seafoam (com Dewgong, Cloyster e Slowbro novos); a névoa (`sight`: 420, 340 abaixo de
+  50%, 280 na fúria; desenhada por cima dos Pokémon e embaixo dos avisos, com a horda lá fora como
+  sombra); o gelo no chão (`ice`, 8 s; o treinador 40% mais lento em cima: `trainerSpeed`, que o
+  `Run.update` pergunta); o Raio de Gelo (a mira de 1,2 s, o raio, o rastro), a Nevasca (o cone de 1,1
+  s), o anel de gelo, a horda chamada; o Frio Absoluto (aos 66% e 33% e a cada 24 s na fúria: ele some,
+  a geada cobre tudo menos o olho da nevasca, que anda pelo caminho marcado; fora dele, o frio tira
+  vida e deixa lento; a geada é mais rala em volta do treinador, para ele se ver; 9 s e o mergulho).
+  Sem captura. O desenho em `render/articunoFight.js` (as correntes e a explosão das correntes vêm do
+  `render/zapdosFight.js`).
+- **A volta**: a missão diz onde o jogador fica ao sair no meio (`retreat`, a margem) e qual
+  enfermeira fala na derrota (`nurse`, `enfermeira_seafoam`); vencer toca `articuno_livre` na ilha:
+  ele cai, se assusta, foge pela fenda do teto, e a máquina quebrada ("Duas máquinas, dois
+  pássaros"); o aviso do mar descongelado, e a Fase 8 abre. O sábio (uma vez: "E ainda falta um") e o
+  rapaz comentam.
+- **A medição**: `node tools/kyogre.mjs 57 12 articuno`: 11 de 12, 2,3 desmaios, 153 s; no 51, 8 de 12
+  (a curva do Zapdos: no 30, 7 de 12). As alavancas: a vida do `articuno_boss` (270.000), a
+  `difficulty` da fase (1,2) e os danos do `legendaryFight`. O bot (`steer`) vai para o olho, sai do
+  cone e sai de lado da faixa do raio.
+- **Os testes**: o `smoke-test` (a arena, preso, o raio só depois do aviso, o rastro e o treinador mais
+  lento de verdade, o cone, os anéis, o Frio Absoluto com o olho andando e o frio só fora dele, a
+  névoa fechando, a queda; a regra de altura; a trava da Fase 8), o `ui-smoke` (a cena do Blaine, a
+  trava sem spoiler, a marca, a descida por cliques andar por andar, a beirada que não passa, a cena da
+  margem com o card, o Voltar, a versão curta, o Lutar no primeiro card, sair no meio, a derrota, a
+  vitória, a cena de depois, a vila) e o `check-data` (o caminho a pé, as bolas com a regra de altura,
+  os gatilhos de tile). O roteiro de screenshots é `articuno`.
+
 ### A descida do Dive — o modo aquático (0.36)
 - Pedido do Fellipe, desenhado e medido numa maquete jogável que ele aprovou
   (PLANEJAMENTO-DIVE.md, seções 3 a 7). Na lagoa da vila, com alguém da equipe
@@ -1464,6 +1536,7 @@ o Brock como está, todas as outras mais duras, menos níveis.
 | 76 | o refino da história: "essas maquinas que prendem os lendários sugam a energia deles" e mandam em ondas para um lugar misterioso, onde uma máquina central numa base do Maxie desorienta os Pokémon (ideia de End Game); o Zapdos enfraquecido explica a vitória de um jogador de nível baixo; "ao derrotar o Zapdos, rola uma cutscene do Zapdos voando e fugindo, assustado", sem captura por enquanto | 0.39 (na branch): a luta sem captura e de nível 36 (medida: 11 de 12 no 36), a energia escorrendo pelas correntes, a cena com o Zapdos do FireRed caído que foge pelo alto (os passos `cry`, `tremble` e `fly`) e a pista da energia mandada para longe; o card "Sem captura nesta luta" |
 | 77 | "A fase da Erika é barrada, o jogador precisa passar do Zapdos para liberar a Erika, o emblema pode ser visto outra vez e o jogador faz ligação que era o mesmo da máquina"; "não pode ter spoilers no título das fases ou quests"; a cena do emblema "montada já no artifact" e "um bate papo simples dando indícios da continuação"; "ficou excelente" | 0.39 (na branch): a trava da Fase 4 (`lock`, o Túnel de Pedra no escuro, sem o nome do Zapdos), as quests douradas da Usina, a do Koga e a da Sabrina, o palco do ginásio de Celadon com a Erika, a cena `depois_erika` (a lembrança com a sombra de asas, o pedaço de metal, o emblema reconhecido, as pistas: a Rocket no Cassino, a sombra para o sul) e os passos `toast`, `storm` e `item` |
 | 78 | "vamos para o H-3" | 0.39 (na branch): a tela de Missões (seção 7.3 do PLANEJAMENTO-HISTORIA): o Diário nas duas barras com o pontinho de quest nova, o que fazer agora, o diário por capítulo com as datas e os itens importantes; nenhuma quest futura aparece |
+| 79 | a proposta da H-7, "Seafoam: as ondas": "pode seguir com o que fez" | 0.39 (na branch): o Capítulo 4, "As ondas" (decisão 19): a cena do Blaine com as ondas, a trava da Fase 8 (o mar congelando), Seafoam a pé com a regra de altura do FireRed (no passo e no desenho), o gatilho `tile` e a névoa, a luta do Articuno (a névoa, o gelo no chão, o Raio de Gelo, a Nevasca, o Frio Absoluto com o olho; nível 57, 11 de 12), a fuga e a segunda máquina; a cena que ficava `started` no Lutar do primeiro card, corrigida |
 | Fase 8 (Giovanni) | 1 → 0,8 | 4,0 | 4,5 | 60 | 84 → 62 |
 | Lorelei | 1,05 → 0,8 | 3,5 | 3,1–4,7 | 64 | 92 → 66 |
 | Bruno | 1,12 → 0,97 | 3,7 | 3,5–6,3 ² | 66 | 99 → 68 |
@@ -1783,10 +1856,10 @@ O que está planejado:
   Kyogre. **A H-1 está no jogo desde a 0.38** (as quests, o rastreador e o
   prólogo; ver a seção 4), e **a H-2 desde a 0.39** (o motor das cenas, as duas do
   prólogo, a do Brock e as cenas de antes e de depois das fases, em tela cheia nos
-  palcos; **nunca no meio de uma fase**, regra do Fellipe). **A H-3, a H-4, a H-5 e a
-  H-6 também, na branch** (a tela de Missões, os Capítulos 1 a 3, o molde das missões
-  e a missão do Zapdos). Falta, em ordem: as outras missões de lendário (H-7 a H-11) e
-  as recompensas (H-12).
+  palcos; **nunca no meio de uma fase**, regra do Fellipe). **A H-3 a H-7 também, na
+  branch** (a tela de Missões, os Capítulos 1 a 3, o molde das missões, a missão do
+  Zapdos e o Capítulo 4 com a do Articuno). Falta, em ordem: as outras missões de
+  lendário (H-8, o Moltres, a H-11) e as recompensas (H-12).
   **Regra do Fellipe para a H-5:** um lendário liberado na missão dele (vencida,
   capturado ou não) volta a aparecer na Poké Ball das fases seguintes, com a
   chance baixa de hoje; continua valendo um de cada por jornada. **Não tirar o

@@ -24,7 +24,7 @@ const easeOut = (t) => 1 - Math.pow(1 - clamp01(t), 3);
  */
 
 /** Onde as correntes se prendem: os anéis das bobinas e os lados do console (px do mundo). */
-function anchors(m) {
+export function anchors(m) {
   return [
     { x: m.x - 64 + 8 * SCALE, y: m.y - 48 + 2 * SCALE, to: [-26, 4] },
     { x: m.x - 64 + 55 * SCALE, y: m.y - 48 + 2 * SCALE, to: [26, 4] },
@@ -34,7 +34,7 @@ function anchors(m) {
 }
 
 /** Uma corrente de elos de (ax, ay) a (bx, by), caindo um pouco no meio; `heat` acende os elos. */
-function chain(ctx, ax, ay, bx, by, heat, now) {
+export function chain(ctx, ax, ay, bx, by, heat, now) {
   const len = Math.hypot(bx - ax, by - ay);
   const n = Math.max(3, Math.round(len / 11));
   const sag = Math.min(26, len * 0.12);
@@ -274,7 +274,7 @@ function blast(ctx, f) {
 }
 
 /** As correntes arrebentando: os elos voando para os lados e caindo. */
-function chainSnap(ctx, f) {
+export function chainSnap(ctx, f) {
   const k = f.t / f.life;
   for (let i = 0; i < 12; i++) {
     const a = (i / 12) * TAU + hash(f.seed, i);

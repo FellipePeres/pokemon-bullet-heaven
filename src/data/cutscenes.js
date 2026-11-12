@@ -12,8 +12,9 @@
  *             { on: 'npc', target: id } (falou com alguém do lugar), { on: 'starter' }
  *             (acabou de escolher o inicial), { on: 'win', target: fase } (venceu a fase:
  *             a cena fica devida e toca na volta, no `spot`) ou { on: 'play', target: fase }
- *             (apertou Jogar: a cena toca antes, e a fase começa no fim, com `then: 'stage'`).
- *             Sem trigger, só o código a começa (a do Maxie).
+ *             (apertou Jogar: a cena toca antes, e a fase começa no fim, com `then: 'stage'`)
+ *             ou { on: 'tile', target: lugar, cells: [[x, y]...] } (pisou num desses tiles do lugar,
+ *             H-7: a margem do fundo de Seafoam). Sem trigger, só o código a começa (a do Maxie).
  *
  * As cenas são ANTES e DEPOIS das fases, nunca no meio, e sempre em tela cheia, num
  * cenário do FireRed, com os personagens em pixel (regra do Fellipe). Fora da vila, o
@@ -59,6 +60,8 @@
  *     storm  { sprite } / { off }      a lembrança de uma tempestade: a tela azul-escura, os
  *                                      clarões e uma sombra de asas cruzando o alto
  *     item   { sprite, at } / { off }  um item num quadro ao lado da conversa (`at`: o tile)
+ *     mist   { to, t } / { off }       a névoa (H-7, o fundo de Seafoam): do nível de agora até `to`
+ *                                      em `t` segundos; `off` devolve a do lugar (`mist` em data/hub.js)
  *     flag   { name, value }           marca uma flag da vila (as falas `once`, os enfeites `hideIf`)
  *     end    { then }                  o fim: só aqui a cena conta como vista; `then` é uma
  *                                      ação das falas (data/dialogue.js), como 'starter', ou
@@ -77,6 +80,17 @@ const MAXIE_END = 'A caminho do vulcão! O próximo lendário será meu!';
 const MAXIE_SHEETS = ['dive/maxie', 'dive/exclam', 'dive/bird', 'dive/crobat', 'dive/band_out', 'dive/band_in'];
 
 const OAK = 'Prof. Carvalho';
+
+/**
+ * A margem do fundo de Seafoam (H-7): pisar num destes tiles começa a cena do fundo. São os da
+ * margem de frente para a ilha (x até 15, linhas 7 a 11); quem chega pela escada do B4F (15,9)
+ * aparece aqui dentro sem pisar, e a cena começa no primeiro passo.
+ */
+const SEAFOAM_SHORE = [
+  [11, 7], [12, 7], [13, 7], [14, 7], [15, 7], [11, 8], [12, 8],
+  [11, 9], [12, 9], [13, 9], [14, 9], [15, 9], [11, 10], [12, 10], [13, 10], [14, 10], [15, 10],
+  [11, 11], [12, 11], [13, 11], [14, 11], [15, 11]
+];
 
 export const CUTSCENES = {
   /* ============================ o Maxie (0.37) ============================ */
@@ -587,12 +601,154 @@ export const CUTSCENES = {
       { do: 'say', lines: ['A sala do fundo está quieta. Só sobraram os pedaços da máquina do emblema vermelho.'] },
       { do: 'end', then: { go: { map: 'usina', x: 5, y: 12, dir: 'left' } } }
     ]
+  },
+
+  /* ========================= Capítulo 4: as ondas (H-7) ========================= */
+  // depois da Fase 7 (a proposta "Seafoam: as ondas", aprovada pelo Fellipe: "pode seguir com o que
+  // fez"): na sala do Blaine, a pergunta bônus do quiz dele, os instrumentos do Laboratório Pokémon
+  // captando ondas que saem das Ilhas Seafoam e seguem para o sul, e o mar congelando em volta
+  // delas. O jogador liga às ondas da máquina da Usina. Sem citar o Articuno (sem spoiler)
+  depois_blaine: {
+    map: 'ginasio_cinnabar', spot: { x: 5, y: 5, dir: 'up' },
+    trigger: [{ on: 'win', target: 'gym_7_cinnabar' }],
+    preload: ['npc/leitura'],
+    steps: [
+      { do: 'face', who: 'blaine', dir: 'down' },
+      { do: 'wait', t: 0.6 },
+      { do: 'say', name: 'Blaine', lines: [
+        'Hah! Você apagou o meu fogo, {player}! Faz tempo que ninguém me vence assim.',
+        'Pergunta bônus do meu quiz: o que faz o mar congelar do lado de um vulcão?'
+      ] },
+      { do: 'face', who: 'blaine', dir: 'left' },
+      { do: 'wait', t: 0.4 },
+      { do: 'say', name: 'Blaine', lines: ['...Também não sei a resposta. E é isso que me tira o sono.'] },
+      // a leitura dos instrumentos, num quadro: pulsos que se repetem
+      { do: 'item', sprite: 'npc/leitura', at: [9.2, 0.7] },
+      { do: 'say', name: 'Blaine', lines: [
+        'No Laboratório Pokémon, os meus instrumentos captam umas ondas estranhas. Faz semanas.',
+        'Pulsam de tempos em tempos, sempre vindas das Ilhas Seafoam. E seguem para o sul, pelo mar, até sumir.'
+      ] },
+      { do: 'item', off: true },
+      { do: 'face', who: 'blaine', dir: 'down' },
+      { do: 'emote', who: 'player' },
+      { do: 'say', lines: ['Ondas... {player} lembra da máquina da Usina, que mandava a energia do Zapdos para longe!'] },
+      // a pista: fecha "Ouça o que o Blaine descobriu" e abre "Investigue as Ilhas Seafoam"
+      { do: 'emit', on: 'clue', target: 'ondas' },
+      { do: 'say', name: 'Blaine', lines: [
+        'Ondas de máquina? Hah! Então tem alguém mexendo onde não devia.',
+        'E tem mais: o mar em volta de Seafoam está congelando, fora de época. Nenhum barco consegue sair de Cinnabar.',
+        'Se quer respostas, desça até o fundo das Ilhas Seafoam. E leve um casaco! Hah!'
+      ] },
+      { do: 'wait', t: 0.5 },
+      { do: 'end', then: 'home' }
+    ]
+  },
+
+  // a chegada às Ilhas Seafoam (pela marca delas no mapa da jornada), uma vez: o frio, o gelo e um
+  // zumbido lá do fundo. Depois, o jogador desce a pé (os cinco andares do FireRed)
+  seafoam_entrada: {
+    map: 'seafoam_1f', spot: { x: 6, y: 20, dir: 'up' },
+    trigger: [{ on: 'enter', target: 'seafoam_1f' }],
+    steps: [
+      { do: 'wait', t: 0.5 },
+      { do: 'say', lines: ['Um frio que corta. O chão das Ilhas Seafoam está coberto de gelo.'] },
+      { do: 'shake', t: 0.5, power: 1 },
+      { do: 'say', lines: ['Lá embaixo, as ondas batem forte. E, no meio delas, um zumbido baixo, que vem lá do fundo.'] },
+      { do: 'end' }
+    ]
+  },
+
+  // o fundo (pisou na margem pela primeira vez): a névoa cobre a água, o zumbido da Usina e as
+  // ondas subindo; a névoa se abre e, na ilha do canto (onde o Articuno fica no FireRed), a máquina
+  // do emblema vermelho coberta de gelo com o Articuno preso por correntes. O card sobe
+  seafoam_fundo: {
+    map: 'seafoam_b4f', spot: { x: 17, y: 7, dir: 'left' },
+    trigger: [{ on: 'tile', target: 'seafoam_b4f', cells: SEAFOAM_SHORE }],
+    when: { caged: 'articuno' },
+    steps: [
+      { do: 'mist', to: 0.62, t: 0.6 },
+      { do: 'say', lines: ['Um frio que corta. A névoa cobre toda a água.'] },
+      { do: 'walk', who: 'player', to: [[12, 7, 'left']] },
+      { do: 'say', lines: ['Do outro lado da água, um zumbido. O mesmo da Usina.'] },
+      { do: 'camera', x: 11.5, y: 4, t: 1.0 },
+      { do: 'face', who: 'player', dir: 'up' },
+      { do: 'mist', to: 0.24, t: 1.4 },
+      { do: 'emote', who: 'player' },
+      { do: 'say', lines: [
+        'Numa máquina coberta de gelo, uma silhueta enorme de asas, presa por correntes.',
+        'As ondas saem da máquina e somem pelo teto da caverna. Como na Usina.'
+      ] },
+      { do: 'cry', dex: 144 },
+      { do: 'shake', t: 0.6, power: 1.5 },
+      { do: 'say', lines: ['É o Articuno! A máquina está sugando a energia dele.'] },
+      // a pista: fecha "Investigue as Ilhas Seafoam" e abre "Derrote e liberte o Articuno"
+      { do: 'emit', on: 'clue', target: 'articuno_preso' },
+      { do: 'wait', t: 1.2 },
+      { do: 'card', mission: 'articuno' },
+      // Voltar: um passo para trás na margem (o Lutar acaba a cena ali e começa a luta)
+      { do: 'end', then: { go: { map: 'seafoam_b4f', x: 17, y: 7, dir: 'right' } } }
+    ]
+  },
+
+  // de volta à margem com o Articuno ainda preso, toda vez: a névoa se abre, a máquina e o card
+  seafoam_fundo_card: {
+    map: 'seafoam_b4f', spot: { x: 17, y: 7, dir: 'left' }, record: false,
+    trigger: [{ on: 'tile', target: 'seafoam_b4f', cells: SEAFOAM_SHORE }],
+    when: { caged: 'articuno', scene: 'seafoam_fundo' },
+    steps: [
+      { do: 'walk', who: 'player', to: [[12, 7, 'up']] },
+      { do: 'camera', x: 11.5, y: 4, t: 0.8 },
+      { do: 'mist', to: 0.24, t: 1.0 },
+      { do: 'say', lines: ['A máquina coberta de gelo continua sugando a energia do Articuno.'] },
+      { do: 'card', mission: 'articuno' },
+      { do: 'end', then: { go: { map: 'seafoam_b4f', x: 17, y: 7, dir: 'right' } } }
+    ]
+  },
+
+  // depois da missão do Articuno (o gatilho 'win' da fase `articuno`), na ilha, sem névoa: ele está
+  // caído, treme, vê o jogador, grita e foge pela fenda do teto. Na máquina quebrada, o mesmo
+  // emblema: duas máquinas, dois pássaros. O mar descongela, e a Fase 8 abre
+  articuno_livre: {
+    map: 'seafoam_b4f', spot: { x: 13, y: 2, dir: 'left' },
+    trigger: [{ on: 'win', target: 'articuno' }],
+    actors: { articuno: { sprite: 'npc/articuno', x: 11, y: 3, dir: 'down' } },
+    steps: [
+      { do: 'fade', to: 1, t: 0 },
+      { do: 'wait', t: 0.4 },
+      { do: 'fade', to: 0, t: 0.8 },
+      { do: 'wait', t: 0.3 },
+      { do: 'say', lines: ['A névoa se desfez. O Articuno está caído no gelo, sem forças.'] },
+      { do: 'tremble', who: 'articuno', t: 0.5, power: 1 },
+      { do: 'wait', t: 0.3 },
+      // ele vê o jogador, se assusta e foge pelo alto
+      { do: 'emote', who: 'articuno' },
+      { do: 'cry', dex: 144 },
+      { do: 'tremble', who: 'articuno', t: 0.6, power: 3 },
+      { do: 'shake', t: 0.5, power: 1.5, wait: false },
+      { do: 'say', lines: ['O Articuno treme, vê {player} e grita, assustado!'] },
+      { do: 'fly', who: 'articuno', t: 1.0, height: 230 },
+      { do: 'wait', t: 0.4 },
+      { do: 'say', lines: [
+        'O Articuno fugiu pela fenda do teto, por onde caem as pedras.',
+        'Ele ainda está fraco demais para confiar em alguém.'
+      ] },
+      { do: 'emote', who: 'player' },
+      { do: 'say', lines: [
+        'A mesma máquina da Usina, coberta de gelo. O mesmo emblema vermelho.',
+        'Duas máquinas, dois pássaros. Alguém está juntando a energia deles. Para quê?'
+      ] },
+      { do: 'say', lines: ['A correnteza voltou a correr.'] },
+      // o mar descongela, e com ele a Rota 21: a Fase 8 abre
+      { do: 'toast', text: 'O mar descongelou: os barcos saem de Cinnabar de novo. O caminho para Viridian está aberto.', icon: 'stages' },
+      { do: 'end', then: { go: { map: 'seafoam_b4f', x: 12, y: 7, dir: 'up' } } }
+    ]
   }
 };
 
 /** Os passos que o game/Cutscene.js conhece (o check-data confere). */
 export const CUTSCENE_STEPS = ['wait', 'say', 'talk', 'show', 'hide', 'place', 'walk', 'face', 'emote', 'throw', 'cutin',
-  'bird', 'fade', 'camera', 'shake', 'give', 'quest', 'emit', 'card', 'flag', 'cry', 'tremble', 'fly', 'toast', 'storm', 'item', 'end'];
+  'bird', 'fade', 'camera', 'shake', 'give', 'quest', 'emit', 'card', 'flag', 'cry', 'tremble', 'fly', 'toast', 'storm', 'item',
+  'mist', 'end'];
 
 /** O que pode começar uma cena. */
-export const CUTSCENE_TRIGGERS = ['enter', 'npc', 'starter', 'win', 'play'];
+export const CUTSCENE_TRIGGERS = ['enter', 'npc', 'starter', 'win', 'play', 'tile'];

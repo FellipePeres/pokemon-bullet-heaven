@@ -1,5 +1,5 @@
 import { CONFIG } from '../core/config.js';
-import { HUB } from '../data/hub.js';
+import { HUB, heightOk } from '../data/hub.js';
 import { HUB_MAPS, HUB_DECOR } from '../data/hubMaps.js';
 import { DECOR, decorMax } from '../data/decor.js';
 import { DIALOGUE } from '../data/dialogue.js';
@@ -81,9 +81,27 @@ export class Hub {
   }
 
   _place(x, y, dir) {
-    Object.assign(this.player, { x, y, fx: x, fy: y, dir, moving: false, t: 0, turn: 0, walking: false });
+    Object.assign(this.player, { x, y, fx: x, fy: y, dir, moving: false, t: 0, turn: 0, walking: false, level: 0 });
+    this.trackLevel();
     this.path = null;
     this.pending = null;
+  }
+
+  /** A altura do tile (x, y) nos mapas com patamares (as Ilhas Seafoam, H-7); 0 nos outros. */
+  levelAt(x, y) {
+    const levels = this.map?.levels;
+    return levels ? parseInt(levels[y]?.[x] ?? '0', 16) : 0;
+  }
+
+  /**
+   * A altura de onde o jogador está, para o desenho (H-7): a do último tile que não é escadinha
+   * (como o `previousElevation` do FireRed). No patamar alto (altura 4), ele aparece por cima da
+   * camada de cima do mapa, como no jogo; no de baixo, a beirada do patamar o cobre.
+   */
+  trackLevel() {
+    const p = this.player;
+    const level = this.levelAt(p.x, p.y);
+    if (level && level !== 15) p.level = level;
   }
 
   /* ============================== consultas ============================== */
@@ -104,7 +122,14 @@ export class Hub {
    * Pokédolls (data/decor.js). Cada uma é um sprite (`sprite`) ou um móvel (`piece`).
    */
   get decor() {
-    const ctx = { starterId: this.campaign.starter };
+    // o contexto leve (o desenho pergunta a cada quadro): o inicial, as missões dos lendários (a
+    // máquina de Seafoam inteira enquanto o Articuno está preso, quebrada depois, H-7) e as cenas
+    const game = this.game;
+    const ctx = {
+      starterId: this.campaign.starter,
+      missions: Object.fromEntries(Object.keys(MISSIONS).map((id) => [id, game.missionState?.(id) ?? 'preso'])),
+      scenes: this.campaign.scenes ?? {}
+    };
     const loot = this.loot.map((l) => ({ sprite: 'item_ball', x: l.x, y: l.y, solid: true, loot: l }));
     // `hideIf` é uma condição ou uma lista delas (some se qualquer uma bater: a bola do
     // inicial do jogador e, depois da cena do rival, a dele, 0.39)
@@ -151,6 +176,31 @@ export class Hub {
   walkable(x, y) {
     if (!this.floor(x, y) || this.npcAt(x, y)) return false;
     return !this.decor.some((d) => this._solidCells(d).some(([cx, cy]) => cx === x && cy === y));
+  }
+
+  /**
+   * Dá para ir de (x, y) para o vizinho (nx, ny)? O tile livre e, nos mapas com patamares (as Ilhas
+   * Seafoam, H-7), a regra de altura do FireRed: de um patamar para outro, só pelas escadinhas.
+   */
+  canStep(x, y, nx, ny) {
+    return this.walkable(nx, ny) && heightOk(this.map, x, y, nx, ny);
+  }
+
+  /**
+   * O nível da névoa agora (0 a 1): a do lugar (`mist` em data/hub.js, com a condição dele; o fundo
+   * de Seafoam enquanto o Articuno está preso) ou a da cena (o passo `mist`).
+   */
+  get mist() {
+    const scene = this.scene?.fx.mist;
+    if (scene != null) return scene;
+    const mist = this.place?.mist;
+    return mist && this._matches(mist.when, this._context()) ? mist.alpha : 0;
+  }
+
+  /** As ondas que sobem da máquina (`pulse` em data/hub.js), enquanto a condição dela vale; ou null. */
+  get pulse() {
+    const pulse = this.place?.pulse;
+    return pulse && this._matches(pulse.when, this._context()) ? pulse : null;
   }
 
   /** A passagem do tile (x, y); `when` escolhe entre duas no mesmo tile (a escotilha da Usina, H-6). */
@@ -229,6 +279,7 @@ export class Hub {
       p.x += p.dx;
       p.y += p.dy;
       Object.assign(p, { fx: p.x, fy: p.y, moving: false, t: 0 });
+      this.trackLevel();
       if (this._arrive()) return;
     }
 
@@ -291,7 +342,7 @@ export class Hub {
     }
     const door = this._warp(nx, ny);
     if (door?.on === 'push' && (!door.face || door.face === dir)) { this._warpTo(door); return true; }
-    if (!this.walkable(nx, ny)) return false;
+    if (!this.canStep(p.x, p.y, nx, ny)) return false;
 
     Object.assign(p, { moving: true, t: 0, dx, dy, run: running });
     return true;
@@ -299,8 +350,16 @@ export class Hub {
 
   /** Chegou num tile: a escada e a entrada aberta da loja levam na hora. */
   _arrive() {
-    const warp = this._warp(this.player.x, this.player.y);
+    const p = this.player;
+    const warp = this._warp(p.x, p.y);
     if (warp?.on === 'step') { this._warpTo(warp); return true; }
+    // pisar num lugar pode começar uma cena (o gatilho 'tile', H-7: a margem do fundo de Seafoam)
+    if (this.game.sceneTrigger?.('tile', this.mapId, { x: p.x, y: p.y })) {
+      this.path = null;
+      this.pending = null;
+      p.walking = false;
+      return true;
+    }
     return false;
   }
 
@@ -502,7 +561,7 @@ export class Hub {
   _stepBack(dir) {
     const p = this.player;
     const [dx, dy] = DIRS[OPPOSITE[dir]];
-    if (!this.walkable(p.x + dx, p.y + dy)) return;
+    if (!this.canStep(p.x, p.y, p.x + dx, p.y + dy)) return;
     Object.assign(p, { moving: true, t: 0, dx, dy, run: false, walking: false });
   }
 
@@ -702,7 +761,7 @@ export class Hub {
         const nx = x + dx;
         const ny = y + dy;
         const k = key(nx, ny);
-        if (from.has(k) || !this.walkable(nx, ny)) continue;
+        if (from.has(k) || !this.canStep(x, y, nx, ny)) continue;
         from.set(k, [dir, key(x, y)]);
         queue.push([nx, ny]);
       }

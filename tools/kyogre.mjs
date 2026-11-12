@@ -1,6 +1,6 @@
 /**
  * A MEDIÇÃO DAS LUTAS DE LENDÁRIO: a do Kyogre (0.37, PLANEJAMENTO-DIVE.md seção 9) e as
- * das missões (H-5 em diante; a do Zapdos é a H-6).
+ * das missões (H-5 em diante; a do Zapdos é a H-6; a do Articuno, a H-7).
  *
  * Roda a fase com o jogador automático do bot.mjs (foge dos avisos no chão, lê o
  * tabuleiro da tempestade e vai até a bola) e uma equipe pronta:
@@ -16,6 +16,7 @@
  *   node tools/kyogre.mjs 80 5            # nível 80, 5 lutas
  *   node tools/kyogre.mjs 90 1 champion   # a mesma equipe numa fase de comparação
  *   node tools/kyogre.mjs 58 5 zapdos     # a missão do Zapdos com a equipe comum no 58
+ *   node tools/kyogre.mjs 57 12 articuno  # a missão do Articuno (H-7) com a equipe comum no 57
  */
 import { Run } from '../src/game/Run.js';
 import { DT, resolveLevelUp, steer } from './bot.mjs';
@@ -67,6 +68,7 @@ for (let n = 1; n <= fights; n++) {
     const caller = new Error().stack.split('\n')[2] ?? '';
     const key = caller.includes('_strike') ? `${name}: avisos (${type})` : caller.includes('_updateRings') ? 'anéis'
       : caller.includes('_updateTsunami') ? 'maremoto' : caller.includes('_updateOrb') ? 'esfera' : caller.includes('_peck') ? 'Investida'
+      : caller.includes('_beam') ? 'Raio de Gelo' : caller.includes('_cone') ? 'Nevasca' : caller.includes('_frost') ? 'Frio Absoluto'
       : caller.includes('_updateZones') ? 'ondas'
       : attacker ? (attacker.boss ? `contato do ${name}` : 'contato da horda') : 'outros';
     taken[key] = (taken[key] ?? 0) + amount;

@@ -10,6 +10,12 @@ const STAND = { down: 0, up: 1, left: 2, right: 2 };
 const WALK = { down: 3, up: 5, left: 7, right: 7 };
 const actorFrame = (a) => (a.moving && a.prog < 0.5 ? WALK[a.dir] + ((a.steps ?? 0) % 2) : STAND[a.dir]);
 const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
+/**
+ * A prioridade do sprite pela altura (sElevationToPriority do FireRed/Emerald): 1 ou 0 fica por
+ * cima da camada de cima do mapa (a BG1, prioridade 1); 2, embaixo dela. É o que faz o jogador
+ * aparecer por cima das beiradas no patamar alto das Ilhas Seafoam (H-7).
+ */
+const ELEVATION_PRIORITY = [2, 2, 2, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 0, 0, 2];
 
 /**
  * DESENHO DA VILA — o chão, as pessoas e o jogador, e por cima a camada que
@@ -101,7 +107,9 @@ export class HubRenderer {
       // numa cena, as pessoas do lugar também andam (game/Cutscene.js)
       actors.push({ y: npc.y, order: 1, draw: () => this._sprite(`npc/${npc.sprite}`, actorFrame(npc), npc.dir === 'right', npc.x, npc.y, 0) });
     }
-    actors.push({ y: p.fy, order: 2, draw: () => this._player(hub) });
+    // no patamar alto (H-7), o jogador vem depois da camada de cima, como no FireRed
+    const over = !!hub.map.levels && ELEVATION_PRIORITY[p.level ?? 0] <= 1;
+    if (!over) actors.push({ y: p.fy, order: 2, draw: () => this._player(hub) });
     // os atores da cena (o Maxie, o rival...) andam pela vila como as pessoas dela
     for (const a of scene?.cast ?? []) {
       if (a.hidden || a.glow) continue;
@@ -114,6 +122,13 @@ export class HubRenderer {
     const cover = getSheet(`hub/${hub.mapId}-top`);
     if (cover) ctx.drawImage(cover.img, ox, oy, mapW, mapH);
     for (const item of decor) if (item.piece) this._piece(item, '-top');
+    if (over) this._player(hub);
+
+    // as ondas que sobem da máquina coberta de gelo (H-7, `pulse`) e a névoa do fundo de Seafoam
+    const pulse = hub.pulse;
+    if (pulse) this._pulse(pulse);
+    const mist = hub.mist;
+    if (mist > 0.005) this._mist(mist);
 
     // um lugar escuro (0.39, `dark` em data/hub.js): só um círculo fraco de luz em volta do
     // jogador, em degraus de pixel, como sem o Flash; o que brilha (os olhos) vem por cima
@@ -310,6 +325,47 @@ export class HubRenderer {
     }
     this.ctx.imageSmoothingEnabled = false;
     this.ctx.drawImage(this._darkCanvas, 0, 0, w * S, h * S);
+  }
+
+  /**
+   * As ondas que a máquina manda para o alto (H-7, a maquete aprovada): três anéis de luz azul que
+   * saem do alto dela, crescem e somem subindo. Em pixels do GBA, como o resto da vila.
+   */
+  _pulse(pulse) {
+    const ctx = this.ctx, S = this.scale, size = T * S;
+    const clock = performance.now() / 1000;
+    const cx = this.offset.x + pulse.x * size, cy = this.offset.y + pulse.y * size;
+    ctx.lineWidth = S;
+    for (let k = 0; k < 3; k++) {
+      const p = ((clock + k * 0.62) % 1.86) / 1.86;
+      ctx.strokeStyle = `rgba(140,215,255,${((1 - p) * 0.9).toFixed(3)})`;
+      ctx.beginPath();
+      ctx.ellipse(cx, cy - p * 26 * S, (6 + p * 34) * S, (2 + p * 9) * S, 0, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+  }
+
+  /**
+   * A névoa (H-7, o fundo de Seafoam): um véu branco-azulado do nível pedido e sete nuvens mais
+   * densas que correm devagar, umas para cada lado (o desenho da maquete aprovada).
+   */
+  _mist(level) {
+    const ctx = this.ctx, S = this.scale, W = this.canvas.width, H = this.canvas.height;
+    const clock = performance.now() / 1000;
+    ctx.fillStyle = `rgba(214,230,244,${level.toFixed(3)})`;
+    ctx.fillRect(0, 0, W, H);
+    const gw = W / S + 80;
+    for (let i = 0; i < 7; i++) {
+      const speed = (i % 2 ? 1 : -1) * (5 + i);
+      const x = ((((i * 61 + clock * speed) % gw) + gw) % gw - 40) * S;
+      const y = (10 + i * 21) * S * (H / S / 160);
+      const r = 46 * S;
+      const g = ctx.createRadialGradient(x, y, 0, x, y, r);
+      g.addColorStop(0, `rgba(240,248,255,${(level * 0.85).toFixed(3)})`);
+      g.addColorStop(1, 'rgba(240,248,255,0)');
+      ctx.fillStyle = g;
+      ctx.fillRect(x - r, y - r, 2 * r, 2 * r);
+    }
   }
 
   /** Um móvel do quarto (o chão dele, ou a camada de cima com `layer` = '-top'). */

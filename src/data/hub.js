@@ -286,6 +286,138 @@ export const HUB = {
       things: [],
       decor: [{ sprite: 'maquina_zapdos_quebrada', x: 7, y: 4, solid: true }]
     },
+    // a sala do Blaine no ginásio de Cinnabar (H-7, o recorte da maquete aprovada): o palco da cena
+    // das ondas, depois da Fase 7
+    ginasio_cinnabar: {
+      name: 'Ginásio de Cinnabar',
+      scene: true,
+      npcs: [
+        { id: 'blaine', sprite: 'blaine', x: 5, y: 4, dir: 'down', talk: 'blaine' }
+      ],
+      things: []
+    },
+
+    /* AS ILHAS SEAFOAM (H-7, a missão do Articuno, PLANEJAMENTO-HISTORIA.md seção 5.2): os cinco
+       andares do FireRed, inteiros, para explorar como a Usina, só por onde o original deixa. Os
+       patamares têm duas alturas, e de uma para a outra só se passa pelas escadinhas (`heightOk`,
+       a altura de cada tile vem do map.bin). As passagens são as do FireRed que funcionam a pé: as
+       escadas (MB_LADDER) e os buracos do chão (MB_FALL_WARP, só de descida; os tiles onde se cai
+       não levam de volta). Sem Surf e sem empurrar pedra, há caminho: 79 passos da entrada até a
+       margem do fundo, pelos buracos do 1F e do B1F e pelas escadas do B2F e do B3F; e 87 de volta
+       até a saída. As pedras do Strength ficam onde estão no FireRed (as que estão à vista). */
+    seafoam_1f: {
+      name: 'Ilhas Seafoam',
+      explore: true,
+      music: 'mus_mt_moon',
+      warps: [
+        // a saída para a Rota 20 (a seta do FireRed): para baixo em cima dela, de volta para a vila
+        { x: 6, y: 21, on: 'mat', to: 'vila', tx: 6, ty: 17, dir: 'down' },
+        { x: 10, y: 6, on: 'step', to: 'seafoam_b1f', tx: 10, ty: 6, dir: 'down' },
+        { x: 31, y: 4, on: 'step', to: 'seafoam_b1f', tx: 31, ty: 4, dir: 'down' },
+        { x: 28, y: 19, on: 'step', to: 'seafoam_b1f', tx: 28, ty: 19, dir: 'down' },
+        // os buracos: cai no andar de baixo
+        { x: 21, y: 8, on: 'step', to: 'seafoam_b1f', tx: 21, ty: 8, dir: 'down' },
+        { x: 30, y: 8, on: 'step', to: 'seafoam_b1f', tx: 29, ty: 8, dir: 'down' }
+      ],
+      npcs: [],
+      things: [],
+      decor: [{ sprite: 'pedra', x: 22, y: 12, solid: true }, { sprite: 'pedra', x: 32, y: 9, solid: true }],
+      // as Poké Balls: as do FireRed (o Ice Heal do 1F vira um Novo Sorteio) e três a mais nos becos
+      loot: [{ id: 'fr1', x: 11, y: 8, item: 'reroll' }]
+    },
+    seafoam_b1f: {
+      name: 'Ilhas Seafoam',
+      explore: true,
+      music: 'mus_mt_moon',
+      warps: [
+        { x: 10, y: 6, on: 'step', to: 'seafoam_1f', tx: 10, ty: 6, dir: 'down' },
+        { x: 31, y: 4, on: 'step', to: 'seafoam_1f', tx: 31, ty: 4, dir: 'down' },
+        { x: 28, y: 19, on: 'step', to: 'seafoam_1f', tx: 28, ty: 19, dir: 'down' },
+        { x: 7, y: 3, on: 'step', to: 'seafoam_b2f', tx: 7, ty: 4, dir: 'down' },
+        { x: 17, y: 9, on: 'step', to: 'seafoam_b2f', tx: 17, ty: 9, dir: 'down' },
+        { x: 25, y: 19, on: 'step', to: 'seafoam_b2f', tx: 25, ty: 19, dir: 'down' },
+        { x: 32, y: 14, on: 'step', to: 'seafoam_b2f', tx: 32, ty: 14, dir: 'down' },
+        { x: 23, y: 8, on: 'step', to: 'seafoam_b2f', tx: 22, ty: 7, dir: 'down' },
+        { x: 28, y: 8, on: 'step', to: 'seafoam_b2f', tx: 29, ty: 8, dir: 'down' }
+      ],
+      npcs: [],
+      things: [],
+      decor: [{ sprite: 'pedra', x: 22, y: 8, solid: true }, { sprite: 'pedra', x: 30, y: 8, solid: true }],
+      // a Water Stone e o Revive do FireRed; e uma a mais, no canto de baixo à esquerda
+      loot: [
+        { id: 'fr1', x: 19, y: 18, item: 'reroll' },
+        { id: 'fr2', x: 24, y: 14, item: 'revive' },
+        { id: 'b1', x: 3, y: 13, item: 'revive' }
+      ]
+    },
+    seafoam_b2f: {
+      name: 'Ilhas Seafoam',
+      explore: true,
+      music: 'mus_mt_moon',
+      warps: [
+        { x: 7, y: 17, on: 'step', to: 'seafoam_b3f', tx: 8, ty: 14, dir: 'down' },
+        { x: 32, y: 4, on: 'step', to: 'seafoam_b3f', tx: 31, ty: 4, dir: 'down' },
+        { x: 31, y: 17, on: 'step', to: 'seafoam_b3f', tx: 31, ty: 16, dir: 'down' },
+        { x: 7, y: 4, on: 'step', to: 'seafoam_b1f', tx: 7, ty: 3, dir: 'down' },
+        { x: 17, y: 9, on: 'step', to: 'seafoam_b1f', tx: 17, ty: 9, dir: 'down' },
+        { x: 25, y: 19, on: 'step', to: 'seafoam_b1f', tx: 25, ty: 19, dir: 'down' },
+        { x: 32, y: 14, on: 'step', to: 'seafoam_b1f', tx: 32, ty: 14, dir: 'down' }
+      ],
+      npcs: [],
+      things: [],
+      decor: [{ sprite: 'pedra', x: 22, y: 8, solid: true }, { sprite: 'pedra', x: 30, y: 8, solid: true }],
+      // a Big Pearl do FireRed; e uma a mais, na ponta do patamar de cima
+      loot: [
+        { id: 'fr1', x: 18, y: 15, item: 'reroll' },
+        { id: 'b1', x: 4, y: 13, item: 'reroll' }
+      ]
+    },
+    seafoam_b3f: {
+      name: 'Ilhas Seafoam',
+      explore: true,
+      music: 'mus_mt_moon',
+      warps: [
+        { x: 8, y: 14, on: 'step', to: 'seafoam_b2f', tx: 7, ty: 17, dir: 'down' },
+        { x: 31, y: 4, on: 'step', to: 'seafoam_b2f', tx: 32, ty: 4, dir: 'down' },
+        { x: 31, y: 16, on: 'step', to: 'seafoam_b2f', tx: 31, ty: 17, dir: 'down' },
+        { x: 12, y: 9, on: 'step', to: 'seafoam_b4f', tx: 15, ty: 9, dir: 'down' },
+        { x: 29, y: 5, on: 'step', to: 'seafoam_b4f', tx: 32, ty: 5, dir: 'down' }
+      ],
+      npcs: [],
+      things: [],
+      decor: [
+        { sprite: 'pedra', x: 12, y: 16, solid: true }, { sprite: 'pedra', x: 13, y: 16, solid: true },
+        { sprite: 'pedra', x: 9, y: 16, solid: true }, { sprite: 'pedra', x: 6, y: 17, solid: true }
+      ],
+      // uma a mais, no beco entre as pedras
+      loot: [{ id: 'b1', x: 10, y: 16, item: 'revive' }]
+    },
+    // o fundo (B4F): a margem de frente para a ilha onde o Articuno fica no FireRed. Enquanto ele
+    // está preso, a névoa cobre a água (`mist`), e a máquina do emblema vermelho coberta de gelo
+    // manda as ondas para o alto (`pulse`), com o Articuno acorrentado por cima dela. Pisar na
+    // margem começa a cena do fundo (o gatilho 'tile' de data/cutscenes.js, `seafoam_fundo`)
+    seafoam_b4f: {
+      name: 'Ilhas Seafoam',
+      explore: true,
+      music: 'mus_mt_moon',
+      mist: { alpha: 0.5, when: { caged: 'articuno' } },
+      pulse: { x: 11, y: 1.2, when: { caged: 'articuno' } },
+      warps: [
+        { x: 15, y: 9, on: 'step', to: 'seafoam_b3f', tx: 12, ty: 9, dir: 'down' },
+        { x: 32, y: 5, on: 'step', to: 'seafoam_b3f', tx: 29, ty: 5, dir: 'down' }
+      ],
+      npcs: [],
+      things: [],
+      // a máquina fica em cima das escadinhas da ilha (10,3 e 11,3), no meio delas
+      decor: [
+        { sprite: 'maquina_articuno_correntes', x: 10.5, y: 2.75, hideIf: { freed: 'articuno' } },
+        { sprite: 'articuno', x: 10.5, y: 2.75, oy: -20, hideIf: { freed: 'articuno' } },
+        { sprite: 'maquina_articuno_quebrada', x: 10.5, y: 2.75, hideIf: { caged: 'articuno' } }
+      ],
+      // a Ultra Ball do FireRed (aqui, um Reviver)
+      loot: [{ id: 'fr1', x: 22, y: 19, item: 'revive' }]
+    },
+
     // um recorte de Cerulean: a casa assaltada do FireRed, com o policial na porta
     cerulean: {
       name: 'Cidade de Cerulean',
@@ -311,6 +443,20 @@ export const HUB = {
     }
   }
 };
+
+/**
+ * A regra dos patamares do FireRed (H-7, as Ilhas Seafoam): o jogador só passa de uma altura para
+ * outra por um tile de altura 0 (as escadinhas) ou 15. É a do jogo (IsElevationMismatchAt, com a
+ * altura de quem anda sendo a do tile em que está: os mapas de Seafoam não têm tile de altura 15
+ * no chão). Num mapa sem `levels` (data/hubMaps.js), vale tudo.
+ */
+export function heightOk(map, x, y, nx, ny) {
+  const levels = map?.levels;
+  if (!levels) return true;
+  const a = parseInt(levels[y]?.[x] ?? '0', 16);
+  const b = parseInt(levels[ny]?.[nx] ?? '0', 16);
+  return a === b || a === 0 || b === 0 || a === 15 || b === 15;
+}
 
 /** As células de um retângulo, para `things`. */
 function rect(x, y, w, h) {

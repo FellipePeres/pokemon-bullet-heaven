@@ -46,6 +46,10 @@ HALLS = {
     'usina': ('PowerPlant', 'ZAPDOS', 0, 0),
     # a arena da luta do Zapdos (H-6), o fundo da Usina: o mesmo recorte
     'usina_arena': ('PowerPlant', 'ZAPDOS', 0, 0),
+    # o card da missão do Articuno (H-7): a ilha do fundo das Ilhas Seafoam, onde ele fica no FireRed;
+    # e a arena da luta dele, o mesmo recorte
+    'seafoam': ('SeafoamIslands_B4F', 'ARTICUNO', 0, 0),
+    'seafoam_arena': ('SeafoamIslands_B4F', 'ARTICUNO', 0, 0),
 }
 
 

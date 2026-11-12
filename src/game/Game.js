@@ -752,11 +752,13 @@ export class Game {
       this._maybeMaxieScene('lagoa');
       return;
     }
-    // de uma missão (H-6): vencida, a cena de depois (no palco dela); senão, de volta à Usina
+    // de uma missão (H-6): vencida, a cena de depois (no palco dela); senão, de volta para onde
+    // o card subiu (a escotilha da Usina, a margem do fundo de Seafoam: `retreat` da missão, H-7)
     if (run?.stage.returnTo === 'mission') {
       if (this._playPendingScene()) return;
-      this.openHub(HATCH_SPOT);
-      toast('Você recua pela escotilha.', '⚡');
+      const mission = getMission(run.stage.mission);
+      this.openHub(mission?.retreat ?? HATCH_SPOT);
+      toast(mission?.retreatToast ?? 'Você recua pela escotilha.', '⚡');
       return;
     }
     if (!this.profile.trainer) { this.menus.show('screen-title'); return; }
@@ -1259,8 +1261,9 @@ export class Game {
     if (!mission) this.diveRecord.rescues = (this.diveRecord.rescues ?? 0) + 1;
     this.autosave();
     this.openHub(HUB_RESCUE_SPOT);
-    // da missão (H-6): um marinheiro de Vermilion achou o jogador desmaiado na Usina
-    if (mission) this.hub.say('enfermeira_usina');
+    // da missão (H-6): alguém achou o jogador desmaiado (na Usina, o marinheiro; em Seafoam, um
+    // pescador de Cinnabar: a fala `nurse` da missão, H-7)
+    if (mission) this.hub.say(getMission(mission)?.nurse ?? 'enfermeira_usina');
     else if (!this._maybeMaxieScene('centro')) this.hub.say('enfermeira_resgate');
   }
 
@@ -1320,15 +1323,17 @@ export class Game {
 
   /**
    * Algo que pode começar uma cena aconteceu na vila: entrou num lugar ('enter'),
-   * falou com alguém ('npc') ou escolheu o inicial ('starter'). Toca a primeira
-   * cena daquele lugar com esse trigger, ainda não vista, cujas condições batem.
+   * falou com alguém ('npc'), escolheu o inicial ('starter') ou pisou num tile ('tile',
+   * H-7: `cell` é o tile, e o gatilho lista as `cells`). Toca a primeira cena daquele
+   * lugar com esse trigger, ainda não vista, cujas condições batem.
    */
-  sceneTrigger(on, target = null) {
+  sceneTrigger(on, target = null, cell = null) {
     if (!this.profile.trainer || this.hub.scene || !this.hub.map) return false;
     const ctx = this.hub._context();
     if (on === 'win' || on === 'play') return false;   // os de depois e de antes da fase têm caminho próprio
+    const onCell = (t) => !t.cells || (!!cell && t.cells.some(([x, y]) => x === cell.x && y === cell.y));
     for (const [id, def] of Object.entries(CUTSCENES)) {
-      if (!def.trigger?.some((t) => t.on === on && (t.target == null || t.target === target))) continue;
+      if (!def.trigger?.some((t) => t.on === on && (t.target == null || t.target === target) && onCell(t))) continue;
       if (def.map && def.map !== this.hub.mapId) continue;
       if (this.sceneRecord[id] === 'seen' || !this.hub._matches(def.when, ctx)) continue;
       return this.playScene(id);

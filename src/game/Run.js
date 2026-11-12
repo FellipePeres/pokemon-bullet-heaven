@@ -262,7 +262,10 @@ export class Run {
     if (this.shakeTime > 0) this.shakeTime = Math.max(0, this.shakeTime - dt);
     this.grid.rebuild(this.enemies);
 
-    const stats = this.buffs.tailwind > 0 ? { ...this.playerStats, speed: this.playerStats.speed * 1.25 } : this.playerStats;
+    let stats = this.buffs.tailwind > 0 ? { ...this.playerStats, speed: this.playerStats.speed * 1.25 } : this.playerStats;
+    // o gelo no chão da luta do Articuno (H-7): em cima dele, o treinador anda mais devagar
+    const slow = this.fight?.trainerSpeed?.() ?? 1;
+    if (slow !== 1) stats = { ...stats, speed: stats.speed * slow };
     this.player.update(dt, move, stats, this.world);
     this.team.update(dt);
 

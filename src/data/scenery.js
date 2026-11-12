@@ -149,6 +149,16 @@ export const SCENES = {
     props: [[27, 22, 4, 2], [27, 25, 4, 1], [3, 3, 3, 1], [7, 4, 2, 1], [7, 10, 3, 3], [36, 25, 5, 1]],
     clear: [[30, 14, 16, 11]],
     spacing: 10
+  },
+  // o fundo das Ilhas Seafoam (H-7, a missão do Articuno): o chão de gelo, a parede de pedras de gelo
+  // e as pedras soltas do B1F do FireRed. `clear` deixa livre o lugar da máquina coberta de gelo
+  seafoam_arena: {
+    sheet: 'seafoam', kind: 'room',
+    floor: [6, 13, 1, 1],
+    top: { rows: [1, 3], repeat: [9, 14] },
+    props: [[26, 6, 1, 1], [26, 10, 1, 1], [17, 17, 1, 3], [11, 6, 1, 1], [3, 15, 2, 1]],
+    clear: [[30, 14, 16, 11]],
+    spacing: 9
   }
 };
 

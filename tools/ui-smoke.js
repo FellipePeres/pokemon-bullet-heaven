@@ -1117,6 +1117,195 @@ game.menus.closeModal();
         !registry.get('bar-quests').classes.has('alert') && !registry.get('hub-quests').classes.has('alert'));
 }
 
+// ---- o Capítulo 4 (H-7, "Seafoam: as ondas"): o Blaine, a trava da Fase 8, Seafoam a pé, o card,
+// a luta do Articuno e a fuga dele ----
+{
+  const { isStageUnlocked, storyLocked } = await import('../src/data/stages.js');
+  const { QUESTS, CHAPTERS } = await import('../src/data/quests.js');
+  const { BATTLE_INTRO } = await import('../src/game/Hub.js');
+  const panelJson = () => JSON.stringify(registry.get('lobby-panel').children.map((c) => [c.className, c.innerHTML, (c.children ?? []).map((k) => k.innerHTML)]));
+  // toca a cena até o card subir, passando as páginas
+  const untilCard = (watch = null) => {
+    const seen = [];
+    let last = null;
+    for (let i = 0; i < 60 * 120 && hub.scene && !game.missionCard; i++) {
+      if (hub.dialog && hub.dialog !== last) { last = hub.dialog; seen.push({ name: hub.dialog.name, text: hub.dialog.pages.join(' ') }); watch?.(seen.at(-1)); }
+      if (hub.dialog) { hub.dialog.shown = 999; hub.confirm(); }
+      hub.update(1 / 60);
+    }
+    return seen;
+  };
+  game.openHub('home');
+  game.startStage('gym_6_saffron');
+  game.run.state = 'victory';
+  game._handleRunState();
+  check('vencer a Sabrina abre o Capítulo 4, "As ondas": "Vença o Blaine, em Cinnabar"',
+        game.quests.isActive('c4_blaine') && CHAPTERS[QUESTS.c4_blaine.chapter] === 'Capítulo 4 — As ondas');
+  registry.get('btn-result-menu').click();
+  settle();
+  game.startStage('gym_7_cinnabar');
+  game.run.state = 'victory';
+  game._handleRunState();
+  check('vencer o Blaine deixa a cena das ondas devida, e a Fase 8 fica presa pela trava da história',
+        game.sceneRecord.depois_blaine === 'due' && storyLocked('gym_8_viridian', game.campaign.clearedStages)
+        && !isStageUnlocked('gym_8_viridian', game.campaign.clearedStages));
+  registry.get('btn-result-menu').click();
+  check('Continuar Jornada: a sala do Blaine em tela cheia, com o Blaine em pixel',
+        hub.mapId === 'ginasio_cinnabar' && hub.scene?.id === 'depois_blaine' && registry.get('screen-hub').classes.has('cinema')
+        && hub.npcs.some((n) => n.id === 'blaine' && n.sprite === 'blaine'));
+  let readout = false, emote = false, openedMid = false;
+  const blaine = runScene((d) => {
+    if (d.text.includes('captam umas ondas')) readout = hub.scene?.fx.item?.sprite === 'npc/leitura';
+    if (d.text.includes('lembra da máquina da Usina')) emote = true;
+    if (d.text.includes('Ondas de máquina')) openedMid = game.quests.isActive('c4_seafoam');
+  });
+  check('o quiz do Blaine, as ondas nos instrumentos (no quadro, a leitura com os pulsos) e o mar congelando',
+        readout && said(blaine, 'Pergunta bônus') && said(blaine, 'sempre vindas das Ilhas Seafoam') && said(blaine, 'está congelando'));
+  check('o jogador liga às ondas da máquina da Usina; a pista fecha a do Blaine e abre "Investigue as Ilhas Seafoam"',
+        emote && openedMid && game.quests.isDone('c4_blaine') && game.sceneRecord.depois_blaine === 'seen');
+  check('nada de spoiler: nem a cena, nem a quest, nem a trava citam o Articuno',
+        !blaine.some((d) => d.text.includes('Articuno')) && !QUESTS.c4_seafoam.desc.includes('Articuno')
+        && !QUESTS.c4_seafoam.objectives[0].text.includes('Articuno') && !STAGES.gym_8_viridian.lock.text.includes('Articuno'));
+  settle();
+  check('...e a volta é para a vila', hub.mapId === 'vila' && !hub.scene);
+  // o mapa da jornada: a Fase 8 presa pelo mar e a marca das ilhas
+  check('a Fase 8 está fechada até Seafoam: jogar não começa nada', (game.startStage('gym_8_viridian'), !game.run));
+  game.openCampaign();
+  check('o mapa mostra a Fase 8 como a próxima, com a trava: o mar da Rota 21 congelando e "Investigue as Ilhas Seafoam"',
+        game.menus.lobby.selected === 'gym_8_viridian' && panelJson().includes('O mar da Rota 21 está congelando')
+        && panelJson().includes('Investigue as Ilhas Seafoam'));
+  const seafoamNode = () => mapNodes().find((c) => c.classes.has('place') && String(c.title).includes('Rota 20'));
+  check('no mapa aparece a marca das Ilhas Seafoam, na Rota 20', !!seafoamNode());
+  nodesOf(registry.get('lobby-panel')).find((n) => n.id === 'panel-lock-go')?.onclick?.();
+  check('o botão da trava leva à marca das ilhas, com o Investigar',
+        game.menus.lobby.selected === 'place:seafoam' && panelJson().includes('ondas estranhas') && panelJson().includes('Investigar'));
+
+  // Seafoam a pé (só por onde o FireRed deixa, com a regra dos patamares)
+  check('o Investigar leva para dentro das ilhas, em tela cheia, com a música da caverna',
+        game.visitPlace('seafoam') && hub.mapId === 'seafoam_1f' && hub.player.x === 6 && hub.player.y === 20
+        && registry.get('screen-hub').classes.has('explore') && hub.place.music === 'mus_mt_moon');
+  check('...e a chegada toca uma vez: o frio, o gelo e um zumbido lá do fundo', hub.scene?.id === 'seafoam_entrada');
+  const chegada = runScene();
+  check('...e depois o jogador anda à vontade', said(chegada, 'coberto de gelo') && said(chegada, 'zumbido') && !hub.scene);
+  // a regra de altura: de um patamar para o outro, direto, não passa
+  hub.enter({ map: 'seafoam_b2f', x: 4, y: 9, dir: 'down' });
+  press('down');
+  check('na beirada de um patamar, o passo para o outro não sai (como no FireRed)',
+        hub.floor(4, 10) && hub.player.x === 4 && hub.player.y === 9 && !hub.canStep(4, 9, 4, 10));
+  // a descida inteira, por cliques, andar por andar: os buracos do 1F e do B1F, as escadas do B2F e do B3F
+  hub.enter({ map: 'seafoam_1f', x: 6, y: 20, dir: 'up' });
+  goTo(30, 8);
+  check('o buraco do 1F: o jogador cai no B1F', hub.mapId === 'seafoam_b1f' && hub.player.x === 29 && hub.player.y === 8);
+  goTo(28, 8);
+  check('o buraco do B1F: cai no B2F', hub.mapId === 'seafoam_b2f' && hub.player.x === 29 && hub.player.y === 8);
+  goTo(32, 4);
+  check('a escada do B2F leva ao B3F', hub.mapId === 'seafoam_b3f' && hub.player.x === 31 && hub.player.y === 4);
+  goTo(29, 5);
+  check('a escada do B3F leva ao fundo (B4F), com a névoa e a máquina com o Articuno acorrentado',
+        hub.mapId === 'seafoam_b4f' && hub.player.x === 32 && hub.player.y === 5 && hub.mist === 0.5 && !!hub.pulse
+        && hub.decor.some((d) => d.sprite === 'maquina_articuno_correntes') && hub.decor.some((d) => d.sprite === 'articuno')
+        && !hub.decor.some((d) => d.sprite === 'maquina_articuno_quebrada'));
+  // a margem: pisar nela começa a cena do fundo
+  goTo(12, 7);
+  check('pisar na margem começa a cena do fundo (o caminho para ali)', hub.scene?.id === 'seafoam_fundo' && !hub.path);
+  let mistOpen = 0, emoteShore = false, cleared = false;
+  const fundo = untilCard((d) => {
+    if (d.text.includes('A névoa cobre')) mistOpen = hub.mist;
+    if (d.text.includes('presa por correntes')) emoteShore = hub.mist < 0.3 && hub.player.x === 12 && hub.player.y === 7 && hub.player.dir === 'up';
+    if (d.text.includes('É o Articuno')) cleared = game.quests.isActive('c4_seafoam');
+  });
+  check('a névoa cobre a água, o zumbido, e ela se abre com o jogador de frente para a ilha',
+        mistOpen > 0.55 && emoteShore && said(fundo, 'O mesmo da Usina') && said(fundo, 'somem pelo teto'));
+  check('"É o Articuno!": a pista fecha "Investigue as Ilhas Seafoam" e abre "Derrote e liberte o Articuno"',
+        cleared && game.quests.isDone('c4_seafoam') && game.quests.isActive('c4_articuno'));
+  const card = registry.get('mission-card');
+  const cardHtml = () => JSON.stringify(card.children.map((c) => [c.className, c.innerHTML, c.children.map((k) => [k.className, k.innerHTML, k.src])]));
+  check('o card sobe: "Derrote e liberte o Articuno", a foto, sem captura, nível 57',
+        game.missionCard?.id === 'articuno' && !card.classes.has('hidden') && cardHtml().includes('Derrote e liberte o Articuno')
+        && cardHtml().includes('144.png') && cardHtml().includes('57'));
+  game.handleAction('cancel');
+  for (let i = 0; i < 4; i++) hub.update(1 / 60);
+  settle();
+  check('o Voltar fecha o card e deixa o jogador um passo atrás na margem', !game.missionCard && !hub.scene && hub.mapId === 'seafoam_b4f' && hub.player.x === 17 && hub.player.y === 7);
+  // de volta à margem: a versão curta, com o card de novo
+  press('left');
+  press('left');
+  check('pisar de novo na margem: a máquina e o card outra vez (a versão curta)', hub.scene?.id === 'seafoam_fundo_card');
+  untilCard();
+  game.handleAction('cancel');
+  for (let i = 0; i < 4; i++) hub.update(1 / 60);
+  settle();
+  // o Lutar logo no primeiro card: a cena da margem conta como vista ali mesmo (H-7; antes ficava
+  // 'started' e voltava a tocar na volta da luta, na frente da cena de depois)
+  delete game.campaign.scenes.seafoam_fundo;
+  press('left');
+  press('left');
+  untilCard();
+  game.handleAction('confirm');
+  for (let i = 0; i < 60 * BATTLE_INTRO + 2; i++) hub.update(1 / 60);
+  check('o Lutar no primeiro card: a cena da margem conta como vista (não volta na volta da luta)',
+        game.sceneRecord.seafoam_fundo === 'seen' && game.pendingScene !== 'seafoam_fundo');
+  check('o Lutar: a luta do Articuno, no fundo de Seafoam, preso na máquina, sem captura',
+        game.run?.stage.id === 'articuno' && game.run.fight?.kind === 'articuno' && game.run.fight.balls === 0
+        && game.run.world.scene === 'seafoam_arena' && !hub.battle && !hub.scene);
+  game.quitToMenu();
+  check('sair no meio da luta volta para a margem', !game.run && hubVisible() && hub.mapId === 'seafoam_b4f' && hub.player.x === 17 && hub.player.y === 7);
+  // a derrota: o Centro, com a enfermeira de Seafoam
+  hub.enter({ map: 'seafoam_b4f', x: 16, y: 7, dir: 'left' });
+  press('left');
+  untilCard();
+  game.handleAction('confirm');
+  for (let i = 0; i < 60 * BATTLE_INTRO + 2; i++) hub.update(1 / 60);
+  game.run.team.members.forEach((m) => { m.fainted = true; m.hp = 0; });
+  game.run.update(1 / 60, { x: 0, y: 0 });
+  game._handleRunState();
+  registry.get('btn-result-village').click();
+  check('caiu na luta: acorda no Centro, e a enfermeira conta do pescador de Cinnabar',
+        !game.run && hub.mapId === 'centro' && hub.dialog?.name === 'Enfermeira' && dialogText().includes('Ilhas Seafoam'));
+  closeDialog();
+  check('perder não libera o Articuno, e a Fase 8 continua presa',
+        game.missionState('articuno') === 'preso' && game.quests.isActive('c4_articuno') && storyLocked('gym_8_viridian', game.campaign.clearedStages));
+  // a vitória: ele cai sem forças
+  game.startMission('articuno');
+  for (let i = 0; i < 60 * BATTLE_INTRO + 2; i++) hub.update(1 / 60);
+  game.run.state = 'victory';
+  game._handleRunState();
+  check('venceu: o Articuno livre (sem captura), a quest fecha, e a dourada é "Vença o Giovanni" (Capítulo 5)',
+        game.missionState('articuno') === 'livre' && game.quests.isDone('c4_articuno') && game.quests.isActive('c5_giovanni')
+        && CHAPTERS[QUESTS.c5_giovanni.chapter] === 'Capítulo 5 — A suspeita' && game.sceneRecord.articuno_livre === 'due');
+  check('a Fase 8 abre, e o Articuno pode cair na Poké Ball das fases seguintes',
+        isStageUnlocked('gym_8_viridian', game.campaign.clearedStages) && game.liberatedSpecies().includes('articuno'));
+  registry.get('btn-result-menu').click();
+  check('Continuar Jornada: a ilha do fundo, sem névoa, a máquina quebrada e o Articuno caído',
+        hub.mapId === 'seafoam_b4f' && hub.scene?.id === 'articuno_livre' && hub.mist === 0 && !hub.pulse
+        && hub.decor.some((d) => d.sprite === 'maquina_articuno_quebrada') && !hub.decor.some((d) => d.sprite === 'articuno')
+        && hub.scene.actor('articuno')?.sprite === 'npc/articuno' && hub.player.x === 13 && hub.player.y === 2);
+  let fled = false;
+  const livre = runScene((d) => { if (d.text.includes('fugiu pela fenda')) fled = !!hub.scene?.actor('articuno')?.hidden; });
+  check('a cena: o Articuno se assusta e foge pela fenda do teto', fled && said(livre, 'grita, assustado') && game.sceneRecord.articuno_livre === 'seen');
+  check('...e a segunda máquina: "Duas máquinas, dois pássaros"', said(livre, 'O mesmo emblema vermelho') && said(livre, 'Duas máquinas, dois pássaros'));
+  settle();
+  check('...e o jogador fica na margem, de frente para a ilha', hub.mapId === 'seafoam_b4f' && hub.player.x === 12 && hub.player.y === 7 && !hub.scene);
+  press('left');
+  check('com o Articuno livre, a margem não toca mais nada', !hub.scene);
+  check('o Lutar de uma missão vencida não começa nada', !game.startMission('articuno') && !hub.battle);
+  // a vila comenta
+  hub.enter({ map: 'vila', x: 27, y: 22, dir: 'up' });
+  hub.say('sabio');
+  check('o velho sábio, uma vez: duas máquinas, e ainda falta um', dialogText().includes('E ainda falta um'));
+  closeDialog();
+  hub.say('sabio');
+  check('...só uma vez', !dialogText().includes('E ainda falta um'));
+  closeDialog();
+  hub.say('rapaz');
+  check('o rapaz da vila: o mar de Seafoam descongelou', dialogText().includes('descongelou'));
+  closeDialog();
+  game.openCampaign();
+  check('depois da missão, a marca das ilhas sai do mapa, e a Fase 8 é a próxima, aberta',
+        !seafoamNode() && game.menus.lobby.selected === 'gym_8_viridian' && !panelJson().includes('O mar da Rota 21'));
+  hub.enter('home');
+}
+
 // ---- Campeão e Hall da Fama ----
 game.region.campaign.slice(0, -1).forEach((e) => {
   if (!game.campaign.clearedStages.includes(e.stage)) game.campaign.clearedStages.push(e.stage);

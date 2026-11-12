@@ -1,11 +1,12 @@
 import { KyogreFight } from './kyogreFight.js';
 import { ZapdosFight } from './zapdosFight.js';
+import { ArticunoFight } from './articunoFight.js';
 
 /**
  * AS LUTAS DE LENDÁRIO (H-5): o `kind` do `legendaryFight` da fase diz qual classe
  * roda por cima dela. Todas estendem o molde (systems/legendaryFight.js).
  */
-const FIGHTS = { kyogre: KyogreFight, zapdos: ZapdosFight };
+const FIGHTS = { kyogre: KyogreFight, zapdos: ZapdosFight, articuno: ArticunoFight };
 
 /** A luta da fase, ou null numa fase comum. */
 export function createFight(run) {

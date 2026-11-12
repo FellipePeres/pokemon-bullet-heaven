@@ -219,6 +219,84 @@ const ROTEIROS = {
     { run: 'skip()' }, { wait: 2600 }, { shot: 'cel-15-o-koga' },
     { run: 'skip()' }, { wait: 2600 }, { shot: 'cel-16-a-vila' }
   ],
+  // o Capítulo 4 (H-7, "Seafoam: as ondas"): a cena do Blaine com a leitura dos instrumentos, a
+  // trava da Fase 8 e a marca das ilhas no mapa, Seafoam a pé (a chegada, os andares, o fundo com a
+  // névoa), a cena da margem com o card, a luta do Articuno (preso, as correntes, o Raio de Gelo, a
+  // Nevasca, o gelo no chão, o Frio Absoluto com o olho da nevasca, a névoa fechando) e a fuga
+  articuno: [
+    { open: 'index.html' }, { wait: 500 },
+    { run: "window.skip = (n = 1) => { for (let i = 0; i < n; i++) { const h = game.hub; if (!h.dialog) return; h.dialog.shown = 999; h.confirm(); } };" +
+           "game.newGame(); game.chooseTrainer('leaf'); game.chooseName('Fellipe'); game.chooseStarter('charmander');" +
+           "const mon = (uid, id, abilities) => ({ uid, pokemonId: id, level: 57, xp: 0, hp: 0, abilities, upgrades: {} });" +
+           "game.campaign.journey = { team: { members: [mon('a', 'charizard', ['flamethrower']), mon('b', 'gyarados', ['hydro_pump']), mon('c', 'arcanine', ['flamethrower'])], active: ['a', 'b', 'c'] }, pc: [] };" +
+           "game.campaign.clearedStages.push('gym_1_pewter', 'gym_2_cerulean', 'gym_3_vermilion', 'zapdos', 'gym_4_celadon', 'gym_5_fuchsia', 'gym_6_saffron');" +
+           "game.campaign.badges.push('boulder', 'cascade', 'thunder', 'rainbow', 'soul', 'marsh'); game.campaign.missions = { zapdos: { won: true, captured: false } };" +
+           "game.quests.state.active = ['c4_blaine']; document.getElementById('toast-container').style.display = 'none';" +
+           "game.startStage('gym_7_cinnabar'); game.run.state = 'victory'" },
+    { wait: 1500 }, { run: 'game.quitToMenu()' }, { wait: 2600 }, { shot: 'art-01-blaine' },
+    { run: 'skip()' }, { wait: 2200 }, { shot: 'art-02-o-quiz' },
+    { run: 'skip()' }, { wait: 2400 }, { shot: 'art-03-nao-sei' },
+    { run: 'skip()' }, { wait: 2600 }, { shot: 'art-04-os-instrumentos' },
+    { run: 'skip()' }, { wait: 2600 }, { shot: 'art-05-vindas-de-seafoam' },
+    { run: 'skip()' }, { wait: 500 }, { shot: 'art-06-o-susto', raw: true },
+    { wait: 2200 }, { shot: 'art-07-a-usina' },
+    { run: 'skip()' }, { wait: 2200 }, { shot: 'art-08-ondas-de-maquina' },
+    { run: 'skip()' }, { wait: 2600 }, { shot: 'art-09-o-mar-congelando' },
+    { run: 'skip()' }, { wait: 2400 }, { shot: 'art-10-um-casaco' },
+    { run: 'skip()' }, { wait: 2600 },
+    { run: "game.openCampaign()" }, { wait: 1500 }, { shot: 'art-11-a-trava' },
+    { run: "game.menus.lobby.selected = 'place:seafoam'; game.menus.lobby.render()" }, { wait: 900 }, { shot: 'art-12-a-marca' },
+    { run: "game.visitPlace('seafoam')" }, { wait: 2200 }, { shot: 'art-13-a-chegada' },
+    { run: 'skip()' }, { wait: 2400 }, { shot: 'art-14-o-zumbido' },
+    { run: 'skip()' }, { wait: 800 },
+    { run: "game.hub.enter({ map: 'seafoam_1f', x: 29, y: 9, dir: 'up' })" }, { wait: 900 }, { shot: 'art-15-o-buraco' },
+    { run: "game.hub.enter({ map: 'seafoam_b2f', x: 6, y: 9, dir: 'down' })" }, { wait: 900 }, { shot: 'art-16-os-patamares' },
+    { run: "game.hub.enter({ map: 'seafoam_b4f', x: 22, y: 7, dir: 'left' })" }, { wait: 1200 }, { shot: 'art-17-o-fundo' },
+    { run: "game.hub.clickTile(12, 7)" }, { wait: 2600 }, { shot: 'art-18-a-nevoa' },
+    { run: 'skip()' }, { wait: 2600 }, { shot: 'art-19-o-zumbido' },
+    { run: 'skip()' }, { wait: 3400 }, { shot: 'art-20-a-silhueta' },
+    { run: 'skip()' }, { wait: 2200 }, { shot: 'art-21-as-ondas' },
+    { run: 'skip()' }, { wait: 1800 }, { shot: 'art-22-e-o-articuno' },
+    { run: 'skip()' }, { wait: 2400 }, { shot: 'art-23-o-card' },
+    { run: "game.handleAction('confirm')" }, { wait: 520 }, { shot: 'art-24-transicao' },
+    { wait: 2400 }, { run: "game.run.time = 18" }, { wait: 2600 }, { shot: 'art-25-preso', raw: true },
+    { run: "game.run.time = 42" }, { wait: 1800 }, { shot: 'art-26-sobrecarga', raw: true },
+    { run: "game.run.time = 44.7" }, { wait: 1300 }, { shot: 'art-27-apresentacao' },
+    { run: "game.closeLeaderIntro()" }, { wait: 420 }, { shot: 'art-28-correntes', raw: true },
+    { wait: 2000 }, { shot: 'art-29-livre', raw: true },
+    { run: "{ const r = game.run, f = r.fight; r.damageCompanion = () => {}; r.spawner.update = () => {}; r.enemies.forEach((e) => { if (!e.boss) e.dead = true; });" +
+           " f.attackTimer = 99; f.summonTimer = 99; f.ultimates = []; f.boss.x = r.player.x - 280; f.boss.y = r.player.y - 170; f._startBeam(f.boss, 1, 1.2); }" },
+    { wait: 600 }, { shot: 'art-30-raio-mira', raw: true },
+    { wait: 700 }, { shot: 'art-31-raio', raw: true },
+    { wait: 900 }, { run: "{ const r = game.run, f = r.fight; r.player.x = (f.ice[0].x0 + f.ice[0].x1) / 2; r.player.y = (f.ice[0].y0 + f.ice[0].y1) / 2; }" },
+    { wait: 300 }, { shot: 'art-32-gelo-no-chao', raw: true },
+    { run: "{ const r = game.run, f = r.fight; f.attackTimer = 99; f.boss.x = r.player.x - 320; f.boss.y = r.player.y; f._startCone(f.boss); }" },
+    { wait: 550 }, { shot: 'art-33-nevasca-cone', raw: true },
+    { wait: 680 }, { shot: 'art-34-nevasca-rajada', raw: true },
+    { wait: 1600 }, { run: "{ const f = game.run.fight; f.attackTimer = 99; f._iceRing(f.boss); }" }, { wait: 420 }, { shot: 'art-35-anel-de-gelo', raw: true },
+    { wait: 1400 }, { run: "{ const f = game.run.fight; f.attackTimer = 99; f.ice = []; f._startCold(f.boss); }" }, { wait: 2200 }, { shot: 'art-36-frio-absoluto', raw: true },
+    { wait: 2600 }, { shot: 'art-37-o-olho-anda', raw: true },
+    { run: "{ const r = game.run, f = r.fight; r.player.x = f.cold.eye.x + 320; }" }, { wait: 500 }, { shot: 'art-38-fora-do-olho', raw: true },
+    { wait: 4400 }, { shot: 'art-39-o-mergulho', raw: true },
+    { wait: 1600 }, { run: "{ const f = game.run.fight; f.attackTimer = 99; f.boss.hp = f.boss.maxHp * 0.15; f.fury = true; game.run.spawner.update = () => {}; }" },
+    { wait: 900 }, { shot: 'art-40-a-nevoa-fecha', raw: true },
+    { run: "import('./src/systems/combat.js').then(({ damageEnemy }) => damageEnemy(game.run, game.run.boss, 1e9))" },
+    { wait: 900 }, { shot: 'art-41-vitoria' },
+    { run: "game.quitToMenu()" }, { wait: 2400 }, { shot: 'art-42-caido' },
+    { run: 'skip()' }, { wait: 1600 }, { shot: 'art-43-assustado' },
+    { wait: 2000 }, { shot: 'art-44-o-grito' },
+    { run: 'skip()' }, { wait: 600 }, { shot: 'art-45-fugindo', raw: true },
+    { wait: 1300 }, { shot: 'art-46-fugiu' },
+    { run: 'skip()' }, { wait: 2400 }, { shot: 'art-47-fraco-demais' },
+    { run: 'skip()' }, { wait: 3200 }, { shot: 'art-48-a-segunda-maquina' },
+    { run: 'skip()' }, { wait: 2600 }, { shot: 'art-49-dois-passaros' },
+    { run: 'skip()' }, { wait: 1600 }, { shot: 'art-50-a-correnteza' },
+    { run: "document.getElementById('toast-container').style.display = ''; skip()" }, { wait: 900 }, { shot: 'art-51-o-mar-descongelou' },
+    { wait: 1800 }, { shot: 'art-52-na-margem' },
+    { run: "document.getElementById('toast-container').style.display = 'none'; game.hub.enter({ map: 'casa_sabio', x: 3, y: 6, dir: 'up' }); game.hub.interact()" }, { wait: 3200 }, { shot: 'art-53-o-sabio' },
+    { run: "{ const d = game.hub.dialog; if (d) { d.shown = 999; game.hub.confirm(); } }" }, { wait: 2600 }, { shot: 'art-54-ainda-falta-um' },
+    { run: "{ const d = game.hub.dialog; if (d) { d.shown = 999; game.hub.confirm(); } } game.openCampaign()" }, { wait: 1500 }, { shot: 'art-55-a-fase-8' }
+  ],
   // a tela de Missões (H-3): o pontinho na barra, o começo da jornada e o diário depois do
   // Capítulo 3 (as quests concluídas por capítulo, com as datas, e o Pedaço de Metal)
   missoes: [

@@ -83,8 +83,22 @@ export function steer(run) {
     if (d < 24) return { x: 0, y: 0 };
     return { x: dx / d, y: dy / d };
   }
-  // a Investida do Zapdos: sai de lado da faixa acesa
-  const pk = run.fight?.peck;
+  // o Frio Absoluto do Articuno (H-7): vai para o olho da nevasca e fica lá dentro
+  const cold = run.fight?.cold;
+  if (cold?.eye && cold.phase === 'frost') {
+    const dx = cold.eye.x - player.x, dy = cold.eye.y - player.y, d = Math.hypot(dx, dy) || 1;
+    if (d < cold.eye.r * 0.35) return { x: 0, y: 0 };
+    return { x: dx / d, y: dy / d };
+  }
+  // a Nevasca do Articuno: sai do cone aceso pelo lado mais perto
+  const cone = run.fight?.cone;
+  if (cone?.phase === 'aim' && run.fight.inCone(player.x, player.y)) {
+    const side = Math.sin(Math.atan2(player.y - cone.y, player.x - cone.x) - cone.a) >= 0 ? 1 : -1;
+    const nx = -Math.sin(cone.a) * side, ny = Math.cos(cone.a) * side;
+    mx += nx * 5; my += ny * 5;
+  }
+  // a Investida do Zapdos e o Raio de Gelo do Articuno: sai de lado da faixa acesa
+  const pk = run.fight?.peck ?? run.fight?.beam;
   if (pk?.phase === 'aim') {
     const lx = pk.x1 - pk.x0, ly = pk.y1 - pk.y0, len = Math.hypot(lx, ly) || 1;
     const nx = -ly / len, ny = lx / len;

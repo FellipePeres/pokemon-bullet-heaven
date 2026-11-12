@@ -392,6 +392,22 @@ export const ENEMIES = {
     hp: 71, speed: 95, damage: 8, xp: 14, dropChance: 0.016,
     behavior: 'chaser', radius: 15, scale: 1.15
   },
+  // a horda das Ilhas Seafoam (H-7, a missão do Articuno): os evoluídos do fundo
+  dewgong: {
+    id: 'dewgong', dex: 87, name: 'Dewgong', types: ['water', 'ice'],
+    hp: 88, speed: 74, damage: 9, xp: 15, dropChance: 0.016,
+    behavior: 'chaser', radius: 16, scale: 1.2
+  },
+  cloyster: {
+    id: 'cloyster', dex: 91, name: 'Cloyster', types: ['water', 'ice'],
+    hp: 84, speed: 60, damage: 10, xp: 15, dropChance: 0.016,
+    behavior: 'tank', radius: 15, scale: 1.15
+  },
+  slowbro: {
+    id: 'slowbro', dex: 80, name: 'Slowbro', types: ['water', 'psychic'],
+    hp: 98, speed: 52, damage: 9, xp: 15, dropChance: 0.016,
+    behavior: 'tank', radius: 16, scale: 1.2
+  },
   sandslash: {
     id: 'sandslash', dex: 28, name: 'Sandslash', types: ['ground'],
     hp: 83, speed: 84, damage: 8, xp: 13, dropChance: 0.016,
@@ -1090,6 +1106,13 @@ export const ENEMIES = {
     hp: 85000, speed: 92, damage: 33, xp: 1600, dropChance: 0,
     behavior: 'boss', radius: 46, scale: 2.6, boss: true, ace: true, legendary: true, enrageAt: 0.2,
     leader: 'Zapdos', abilities: []
+  },
+  // o Articuno da missão (H-7): enfraquecido pela máquina de Seafoam, para logo depois da Fase 7
+  articuno_boss: {
+    id: 'articuno_boss', dex: 144, name: 'Articuno', types: ['ice', 'flying'], level: 57,
+    hp: 270000, speed: 82, damage: 40, xp: 2000, dropChance: 0,
+    behavior: 'boss', radius: 46, scale: 2.6, boss: true, ace: true, legendary: true, enrageAt: 0.2,
+    leader: 'Articuno', abilities: []
   }
 };
 
