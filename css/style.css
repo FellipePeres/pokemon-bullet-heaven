@@ -709,8 +709,10 @@ button { font: inherit; color: inherit; }
 }
 .leader-intro-text .menu-btn { min-width: 200px; }
 
-/* Hall da Fama: a equipe campeã entra um Pokémon por vez */
-.hall-card { max-width: 940px; width: 100%; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 14px; }
+/* Hall da Fama: a equipe campeã entra um Pokémon por vez. Só o card do Hall da Fama (o
+   overlay-card): o card do salão do Kyogre também usa .hall-card, e com esta regra o banner
+   dele encolhia a zero (0.37.10) */
+.overlay-card.hall-card { max-width: 940px; width: 100%; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 14px; }
 .hall-row { display: flex; align-items: center; gap: 20px; }
 .hall-trainer { width: 192px; height: 192px; flex-shrink: 0; image-rendering: pixelated; }
 .hall-team { display: grid; grid-template-columns: repeat(3, 150px); gap: 10px; }
