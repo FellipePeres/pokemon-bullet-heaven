@@ -2137,7 +2137,9 @@ O que está planejado:
 - **O roteiro geral** ([PLANEJAMENTO.md](PLANEJAMENTO.md), combinado em
   2026-11-02): o som que falta (gritos e efeitos, Etapa 5), o celular e os assets
   locais da interface (Etapa 6), o pós-jogo além do Modo Livre (a revanche dos
-  líderes, D9) e as outras regiões (Etapa 8; Hoenn é a recomendação). Em aberto
+  líderes, D9) e as outras regiões (Etapa 8; desde 2026-11-12, decisão 27 do
+  PLANEJAMENTO-HISTORIA: Hoenn, o vulcão do Maxie, é o **Pokémon Bullet Heaven 2**, um jogo
+  novo; a história deste termina em Kanto). Em aberto
   lá: o XP em orbes (D10) e as sinergias de tipo entre os membros da equipe.
 
 ---

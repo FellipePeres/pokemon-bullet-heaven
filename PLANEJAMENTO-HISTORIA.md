@@ -858,10 +858,14 @@ do Zapdos, o tipo, as fraquezas e o nível recomendado (36; sem captura, decisã
 
 ---
 
-## 10. Depois de Kanto: as vilas das outras gerações
+## 10. Depois de Kanto: o Pokémon Bullet Heaven 2
+
+> **Decisão 27 (2026-11-12):** a história deste jogo termina em Kanto. O vulcão é o
+> **Pokémon Bullet Heaven 2**, um jogo novo, e não uma segunda vila daqui. As notas abaixo
+> (do plano antigo) valem como ponto de partida para ele.
 
 - O Maxie parte "a caminho do vulcão", que é o **Monte Chimney, em Hoenn**. É a
-  ponte para a segunda vila: a da **Gen 3**, com os tiles do Emerald e as fases nos
+  ponte para o jogo seguinte: a **Gen 3**, com os tiles do Emerald e as fases nos
   mapas de Hoenn.
 - **Cada região tem** uma vila, a sua campanha de ginásios e os lendários que o
   Maxie roubou ali. As hordas existem em toda região por onde ele passou, e é por
@@ -912,7 +916,8 @@ do Zapdos, o tipo, as fraquezas e o nível recomendado (36; sem captura, decisã
    a quest é daquela fase (feito na 0.38).
 9. **Hoenn é a próxima vila**, pelo Maxie e pelos assets. Ainda falta decidir se a
    equipe de Kanto vai junto ou se a jornada recomeça (fica para quando Hoenn
-   chegar).
+   chegar). *(Mudou com a decisão 27: Hoenn é o Pokémon Bullet Heaven 2, não uma
+   segunda vila deste jogo.)*
 10. **A lagoa só abre depois do Campeão** (seção 5).
 11. **As cenas são antes e depois das fases, nunca no meio** (pedido do Fellipe
     depois da 0.39: "não se pode ter cenas no meio de fases, as cenas são antes e
@@ -1012,6 +1017,10 @@ do Zapdos, o tipo, as fraquezas e o nível recomendado (36; sem captura, decisã
     Kyogre, 5.600 no total), e Revivers e Novos Sorteios nas missões dos lendários, na Mansão, no
     Campeão e no Kyogre. Pagas uma vez por quest e jornada, também em silêncio. A tabela está na
     seção 7.1.
+27. **O vulcão é o Pokémon Bullet Heaven 2** (o Fellipe, 2026-11-12: "acabamos a história, certo?
+    O vulcão fica em outra Gen, o que se tornaria um Pokemon Bullet Heaven 2"). A história deste
+    jogo termina em Kanto, com o Maxie partindo "a caminho do vulcão". Hoenn não vira uma segunda
+    vila aqui: é o jogo seguinte. Muda a decisão 9 e a seção 10.
 
 ---
 

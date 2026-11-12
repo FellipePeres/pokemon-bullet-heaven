@@ -326,10 +326,11 @@ E antes, sobre o momento: "vai ser antes da lagoa".
 A energia dos três pássaros alimenta uma máquina numa base do Maxie, e é ela que desorienta os
 Pokémon. É a ideia de End Game, depois de Kanto. Até lá, o jogador só pergunta "para onde?".
 
-### 8.3 Depois de Kanto 🗺️
-O Maxie parte "a caminho do vulcão", que é o Monte Chimney, em Hoenn. É a ponte para a próxima
-vila. As hordas existem em toda região por onde ele passou, por isso o problema não acaba em
-Kanto.
+### 8.3 Depois de Kanto: o Pokémon Bullet Heaven 2 🗺️
+O Maxie parte "a caminho do vulcão", que é o Monte Chimney, em Hoenn. **A história deste jogo
+termina aí** (o Fellipe, 2026-11-12): o vulcão fica em outra geração e vira o **Pokémon Bullet
+Heaven 2**. As hordas existem em toda região por onde ele passou, por isso o problema não acaba
+em Kanto; a máquina central do Maxie (8.2) é a candidata natural para o 2.
 
 ### 8.4 Guardado, por enquanto
 Saíram por enquanto, e podem voltar:
