@@ -47,6 +47,20 @@ export const MUSIC_TRACKS = {
   mus_sevii_123: { loopStart: 0.485533, loopEnd: 61.730340 },
   /** A missão do Zapdos, no fundo da Usina (H-6): a música da Usina no FireRed. */
   mus_poke_mansion: { loopStart: 14.633107, loopEnd: 65.782086 },
+  /** As cenas do laboratório do Carvalho: o tema do laboratório. */
+  mus_oak_lab: { loopStart: 1.021270, loopEnd: 17.094240 },
+  /** As cenas de depois dos líderes e da Elite dos Quatro, nos ginásios e nas salas. */
+  mus_gym: { loopStart: 0.016735, loopEnd: 33.920726 },
+  /** Os vilões: o Giovanni e o Maxie (a Mansão e a lagoa). */
+  mus_encounter_rocket: { loopStart: 2.076054, loopEnd: 8.672698 },
+  /** O rival indo embora: o fim do laboratório e o Campeão vencido. */
+  mus_rival_exit: { loopStart: 1.456599, loopEnd: 18.684853 },
+  /** Os pássaros presos nas máquinas: a Usina, Seafoam e o Monte Brasa. */
+  mus_lavender: { loopStart: 7.550930, loopEnd: 82.893107 },
+  /** O Mew no laboratório: o encontro com o mítico. */
+  mus_encounter_deoxys: { loopStart: 0.016735, loopEnd: 15.085170 },
+  /** Os pássaros libertados, caídos e fugindo assustados. */
+  mus_slow_pallet: { loopStart: 0.016735, loopEnd: 53.593379 },
   /** A descida do Dive, Níveis 1 a 3 (0.37.6): a música do mergulho do Emerald. */
   mus_underwater: { loopStart: 25.231247, loopEnd: 86.911338 },
   /** A descida do Dive, Níveis 4 e 5 (0.37.7): a de quando o Kyogre desperta. */

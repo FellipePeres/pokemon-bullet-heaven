@@ -40,6 +40,9 @@ export class Cutscene {
     this.hub = hub;
     this.id = id;
     this.band = def.band ?? null;
+    // a música da cena (a lapidação da história): a do clima dela por cima da do lugar; o passo
+    // `music` troca no meio (o rival indo embora, o Mew aparecendo). Sem ela, toca a do lugar
+    this.music = def.music ?? null;
     this.steps = def.steps;
     this.step = 0;
     this.t = 0;
@@ -201,6 +204,7 @@ export class Cutscene {
       case 'quest': this._quest?.(a.id); done = true; break;
       case 'cry': this._cry?.(a.dex); done = true; break;
       case 'toast': this._toast?.(this._fill(a.text), a.icon ?? 'stages'); done = true; break;
+      case 'music': this.music = a.track ?? null; done = true; break;
       // a lembrança da tempestade (a Erika, H-4): a tela azul-escura, os clarões e uma sombra de
       // asas cruzando o alto; fica até o `storm` com `off`
       case 'storm': this.fx.storm = a.off ? null : { t: 0, sprite: a.sprite ?? 'dive/crobat' }; done = true; break;

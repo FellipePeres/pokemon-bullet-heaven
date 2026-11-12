@@ -234,6 +234,7 @@ export const HUB = {
     // A saída é o tapete da entrada. Os Voltorb fecham um corredor (sem isolar a escotilha)
     usina: {
       name: 'Usina',
+      music: 'mus_poke_mansion',   // a da Usina no FireRed (a lapidação da história)
       explore: true,
       warps: [
         { x: 5, y: 38, on: 'mat', to: 'vila', tx: 6, ty: 17, dir: 'down' },
@@ -277,6 +278,7 @@ export const HUB = {
     // o fundo da Usina: no escuro (`dark`), só o círculo de luz em volta do jogador
     usina_fundo: {
       name: 'O fundo da Usina',
+      music: 'mus_poke_mansion',   // a da Usina no FireRed (a lapidação da história)
       scene: true,
       dark: true,
       npcs: [],
@@ -286,6 +288,7 @@ export const HUB = {
     // vermelho está destruída no meio da sala. Um palco: só as cenas (`zapdos_livre` e a volta)
     usina_luz: {
       name: 'O fundo da Usina',
+      music: 'mus_poke_mansion',   // a da Usina no FireRed (a lapidação da história)
       scene: true,
       npcs: [],
       things: [],

@@ -1754,10 +1754,20 @@ game.menus.closeModal();
   press('up');
   check('entrar no laboratório com a quest começa a cena do Carvalho', hub.mapId === 'lab' && hub.scene?.id === 'carvalho_mew');
   let mewIn = false, mewOut = false;
+  const tracks = {};   // a música que o jogo pede em cada fala (a lapidação: a trilha das cenas)
   const lab = runScene((d) => {
     if (d.text.includes('Uma luz rosa')) mewIn = hub.scene?.actor('mew')?.hidden === false;
     if (d.text.includes('dá uma volta no ar')) mewOut = !!hub.scene?.actor('mew')?.hidden;
+    game._updateMusic();
+    for (const [key, text] of [['start', 'O novo Campeão'], ['mew', 'Obrigado por libertar'], ['after', 'Você também viu?']]) {
+      if (d.text.includes(text)) tracks[key] = game.music.wanted;
+    }
   });
+  check('a trilha da cena: o tema do laboratório, o do mítico quando o Mew aparece, e o laboratório de novo',
+        tracks.start === 'mus_oak_lab' && tracks.mew === 'mus_encounter_deoxys' && tracks.after === 'mus_oak_lab', JSON.stringify(tracks));
+  settle();
+  game._updateMusic();
+  check('...e, acabada a cena, volta a música do lugar', !hub.scene && game.music.wanted === 'mus_sevii_123', game.music.wanted);
   check('o Carvalho: o novo Campeão, e "ainda falta alguma coisa"', said(lab, 'O novo Campeão de Kanto') && said(lab, 'Ainda falta alguma coisa'));
   check('a luz rosa e o Mew; o jogador o reconhece dos diários da Mansão', mewIn && said(lab, 'o Pokémon dos diários da Mansão'));
   check('o Mew, por telepatia: escapou do Maxie, que rouba a energia de lendários em outras regiões; o próximo dorme na lagoa',

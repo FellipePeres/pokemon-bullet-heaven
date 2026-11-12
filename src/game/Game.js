@@ -274,7 +274,8 @@ export class Game {
     // música calma (as Ilhas 1, 2 e 3); a descida com as do Emerald
     const screen = typeof document !== 'undefined' ? document.getElementById('app')?.dataset.screen : null;
     let track = 'lobby-theme';
-    if (this.hubOpen) track = this.hub.place?.music ?? VILLAGE_MUSIC;
+    // a cena toca a música do clima dela (a lapidação da história); sem ela, a do lugar
+    if (this.hubOpen) track = this.hub.scene?.music ?? this.hub.place?.music ?? VILLAGE_MUSIC;
     else if (screen === 'screen-campaign' || screen === 'screen-starter') track = VILLAGE_MUSIC;
     // a descida: a Underwater nos Níveis 1 a 3 e, depois do bolsão de ar, a Abnormal Weather (0.37.7); o salão do Kyogre
     if (this.diveOpen) track = this.hall.active ? 'mus_sevii_dungeon' : this.dive.level >= DIVE.airPocketLevel ? 'mus_abnormal_weather' : 'mus_underwater';

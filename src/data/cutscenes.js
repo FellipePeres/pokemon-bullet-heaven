@@ -121,6 +121,7 @@ export const CUTSCENES = {
     steps: [
       { do: 'wait', t: 0.6 },
       { do: 'say', lines: ['{player} voltou à superfície pela lagoa, com o Kyogre!'] },
+      { do: 'music', track: 'mus_encounter_rocket' },   // o Maxie chega
       { do: 'show', who: 'maxie' },
       { do: 'walk', who: 'maxie', path: [[22, 12], [23, 12], [24, 12], [25, 12], [26, 12], [27, 12], [28, 12], [29, 12], [30, 12]], speed: 0.13 },
       { do: 'face', who: 'maxie', dir: 'up' }, { do: 'face', who: 'player', dir: 'down' },
@@ -150,6 +151,7 @@ export const CUTSCENES = {
         'Disse que fisgou você desmaiado lá no fundo... e que foi o maior peixe da vida dele.',
         'E o Pokémon gigante que veio com você também está bem.'
       ] },
+      { do: 'music', track: 'mus_encounter_rocket' },   // o Maxie chega
       { do: 'show', who: 'maxie' },
       { do: 'walk', who: 'maxie', path: [[2, 8], [2, 7], [3, 7], [4, 7], [4, 6]], speed: 0.13 },
       { do: 'face', who: 'maxie', dir: 'up' }, { do: 'face', who: 'player', dir: 'down' },
@@ -171,6 +173,7 @@ export const CUTSCENES = {
 
   // 1. o discurso do Carvalho, encenado: ele chama o jogador, olha o quadro e vai até a mesa
   prologo_carvalho: {
+    music: 'mus_oak_lab',   // a música da cena: o laboratório
     map: 'lab', spot: { x: 6, y: 11, dir: 'up' },
     trigger: [{ on: 'enter', target: 'lab' }, { on: 'npc', target: 'carvalho' }],
     when: { starter: false, veteran: false },
@@ -213,6 +216,7 @@ export const CUTSCENES = {
   // 2. o rival chega atrasado, pega o inicial com vantagem sobre o seu e acha bobagem
   // se preocupar com as hordas (decisão 1 do planejamento)
   prologo_rival: {
+    music: 'mus_encounter_rival',   // a música da cena: o rival chegando
     map: 'lab', spot: { x: 8, y: 5, dir: 'up' },
     trigger: [{ on: 'starter' }],
     actors: { rival: { sprite: 'npc/rival', x: 6, y: 12, dir: 'up', hidden: true } },
@@ -247,6 +251,7 @@ export const CUTSCENES = {
         'Os Pokémon selvagens que se virem. Eu vou juntar as oito insígnias.'
       ] },
       { do: 'face', who: 'rival', toward: 'player' },
+      { do: 'music', track: 'mus_rival_exit' },   // o rival vai embora
       { do: 'say', name: 'Rival', lines: ['A gente se vê na Liga, {player}. Se você chegar lá!'] },
       { do: 'walk', who: 'rival', to: [[6, 12]], speed: 0.13 },
       { do: 'hide', who: 'rival' },
@@ -265,6 +270,7 @@ export const CUTSCENES = {
   // estranhos e pede ajuda. É a apresentação do problema (o Maxie ainda não aparece), e
   // abre a quest da Misty, com as pistas em Cerulean
   depois_brock: {
+    music: 'mus_gym',   // a música da cena: o ginásio
     map: 'ginasio_pewter', spot: { x: 6, y: 6, dir: 'up' },
     trigger: [{ on: 'win', target: 'gym_1_pewter' }],
     steps: [
@@ -347,6 +353,7 @@ export const CUTSCENES = {
   // depois da Fase 2, no ginásio dela: a Misty conta que o mar ficou bravo desde que o
   // Articuno sumiu (a primeira prova de que o sábio tem razão) e aponta o Surge e o Zapdos
   depois_misty: {
+    music: 'mus_gym',   // a música da cena: o ginásio
     map: 'ginasio_cerulean', spot: { x: 8, y: 7, dir: 'up' },
     trigger: [{ on: 'win', target: 'gym_2_cerulean' }],
     steps: [
@@ -382,6 +389,7 @@ export const CUTSCENES = {
   // falsa), mas o ladrão só levou peças de máquina (as máquinas que prendem os pássaros, no
   // Capítulo 4). O rival passa correndo, a caminho de Vermilion
   cerulean_roubo: {
+    music: 'mus_fuchsia',   // a música da cena: a cidade (no FireRed, Cerulean toca a de Fuchsia)
     map: 'cerulean', spot: { x: 10, y: 10, dir: 'up' },
     trigger: [{ on: 'win', target: 'gym_2_cerulean' }],
     actors: { rival: { sprite: 'npc/rival', x: 1, y: 9, dir: 'right', hidden: true } },
@@ -414,6 +422,7 @@ export const CUTSCENES = {
   // depois da Fase 3, no ginásio dele: a Usina apagou, o Zapdos sumiu (já são dois), e naquela
   // noite pareceu haver um combate lá dentro, como se o Zapdos estivesse brigando (pedido do Fellipe)
   depois_surge: {
+    music: 'mus_gym',   // a música da cena: o ginásio
     map: 'ginasio_vermilion', spot: { x: 5, y: 3, dir: 'up' },
     trigger: [{ on: 'win', target: 'gym_3_vermilion' }],
     steps: [
@@ -452,6 +461,7 @@ export const CUTSCENES = {
   // logo depois, no cais: o mar agitado (o mesmo da Misty) prendeu o marinheiro em terra, e
   // trabalhando pela Rota 10 ele escutou correntes dentro da Usina fechada. Abre a quest dela
   vermilion_correntes: {
+    music: 'mus_vermillion',   // a música da cena: a cidade
     map: 'vermilion', spot: { x: 11, y: 11, dir: 'right' },
     trigger: [{ on: 'win', target: 'gym_3_vermilion' }],
     steps: [
@@ -502,6 +512,7 @@ export const CUTSCENES = {
   // brilho fraco em volta; 2 s depois os olhos vermelhos (em pixel, num tile do mapa); mais 2 s e
   // o card da missão (pedido do Fellipe)
   usina_fundo: {
+    music: 'mus_lavender',   // a música da cena: o pássaro preso: tensão
     map: 'usina_fundo', spot: { x: 7, y: 9, dir: 'up' }, record: false,
     trigger: [{ on: 'enter', target: 'usina_fundo' }],
     // só enquanto o Zapdos está preso (depois da missão, a escotilha leva à sala iluminada)
@@ -526,6 +537,7 @@ export const CUTSCENES = {
   // sugada e mandada para longe, e o emblema vermelho. Toca na volta da luta (o "Continuar
   // Jornada" da vitória) e deixa o jogador em cima, ao lado da escotilha
   zapdos_livre: {
+    music: 'mus_slow_pallet',   // a música da cena: o pássaro libertado e assustado
     map: 'usina_luz', spot: { x: 7, y: 9, dir: 'up' },
     trigger: [{ on: 'win', target: 'zapdos' }],
     actors: { zapdos: { sprite: 'npc/zapdos', x: 7, y: 7, dir: 'down' } },
@@ -574,6 +586,7 @@ export const CUTSCENES = {
   // jogador reconhece o emblema da máquina da Usina. A pista falsa da Rocket continua, mas a
   // sombra seguiu para o sul, rumo ao mar. Depois, a história dos lendários descansa
   depois_erika: {
+    music: 'mus_gym',   // a música da cena: o ginásio
     map: 'ginasio_celadon', spot: { x: 7, y: 4, dir: 'left' },
     trigger: [{ on: 'win', target: 'gym_4_celadon' }],
     preload: ['dive/crobat', 'npc/pedaco_metal'],
@@ -630,6 +643,7 @@ export const CUTSCENES = {
   // captando ondas que saem das Ilhas Seafoam e seguem para o sul, e o mar congelando em volta
   // delas. O jogador liga às ondas da máquina da Usina. Sem citar o Articuno (sem spoiler)
   depois_blaine: {
+    music: 'mus_gym',   // a música da cena: o ginásio
     map: 'ginasio_cinnabar', spot: { x: 5, y: 5, dir: 'up' },
     trigger: [{ on: 'win', target: 'gym_7_cinnabar' }],
     preload: ['npc/leitura'],
@@ -683,6 +697,7 @@ export const CUTSCENES = {
   // ondas subindo; a névoa se abre e, na ilha do canto (onde o Articuno fica no FireRed), a máquina
   // do emblema vermelho coberta de gelo com o Articuno preso por correntes. O card sobe
   seafoam_fundo: {
+    music: 'mus_lavender',   // a música da cena: o pássaro preso: tensão
     map: 'seafoam_b4f', spot: { x: 17, y: 7, dir: 'left' },
     trigger: [{ on: 'tile', target: 'seafoam_b4f', cells: SEAFOAM_SHORE }],
     when: { caged: 'articuno' },
@@ -713,6 +728,7 @@ export const CUTSCENES = {
 
   // de volta à margem com o Articuno ainda preso, toda vez: a névoa se abre, a máquina e o card
   seafoam_fundo_card: {
+    music: 'mus_lavender',   // a música da cena: o pássaro preso: tensão
     map: 'seafoam_b4f', spot: { x: 17, y: 7, dir: 'left' }, record: false,
     trigger: [{ on: 'tile', target: 'seafoam_b4f', cells: SEAFOAM_SHORE }],
     when: { caged: 'articuno', scene: 'seafoam_fundo' },
@@ -731,6 +747,7 @@ export const CUTSCENES = {
   // emblema: duas máquinas, dois pássaros. O mar descongela, e a Fase 8 abre. No fim, o atalho
   // (pedido do Fellipe): o jogador aparece na vila, sem subir os cinco andares de volta
   articuno_livre: {
+    music: 'mus_slow_pallet',   // a música da cena: o pássaro libertado e assustado
     map: 'seafoam_b4f', spot: { x: 13, y: 2, dir: 'left' },
     trigger: [{ on: 'win', target: 'articuno' }],
     actors: { articuno: { sprite: 'npc/articuno', x: 11, y: 3, dir: 'down' } },
@@ -771,6 +788,7 @@ export const CUTSCENES = {
   // mostra o Pedaço de Metal. O Giovanni ri: não é da Rocket, e ele também quer saber quem é. Os
   // homens dele viram o emblema subindo o Monte Brasa, com peças de máquina (as de Cerulean)
   depois_giovanni: {
+    music: 'mus_encounter_rocket',   // a música da cena: o chefe da Equipe Rocket
     map: 'ginasio_viridian', spot: { x: 2, y: 4, dir: 'up' },
     trigger: [{ on: 'win', target: 'gym_8_viridian' }],
     preload: ['npc/pedaco_metal'],
@@ -825,6 +843,7 @@ export const CUTSCENES = {
   // o cume (pisou logo abaixo do alto pela primeira vez): o calor, a máquina em brasa com o Moltres
   // preso por correntes e as ondas subindo pela boca do vulcão. O card sobe
   brasa_cume: {
+    music: 'mus_lavender',   // a música da cena: o pássaro preso: tensão
     map: 'brasa_cume', spot: { x: 8, y: 10, dir: 'up' },
     trigger: [{ on: 'tile', target: 'brasa_cume', cells: BRASA_SUMMIT }],
     when: { caged: 'moltres' },
@@ -851,6 +870,7 @@ export const CUTSCENES = {
 
   // de volta ao alto com o Moltres ainda preso, toda vez: a máquina e o card
   brasa_cume_card: {
+    music: 'mus_lavender',   // a música da cena: o pássaro preso: tensão
     map: 'brasa_cume', spot: { x: 8, y: 10, dir: 'up' }, record: false,
     trigger: [{ on: 'tile', target: 'brasa_cume', cells: BRASA_SUMMIT }],
     when: { caged: 'moltres', scene: 'brasa_cume' },
@@ -867,6 +887,7 @@ export const CUTSCENES = {
   // ele está caído, treme, grita e foge para o céu. A terceira máquina, e a pista nova: o pico escuro
   // do emblema lembra um vulcão. A Liga reabre a Victory Road, e o atalho leva para a vila
   moltres_livre: {
+    music: 'mus_slow_pallet',   // a música da cena: o pássaro libertado e assustado
     map: 'brasa_cume', spot: { x: 10, y: 8, dir: 'left' },
     trigger: [{ on: 'win', target: 'moltres' }],
     actors: { moltres: { sprite: 'npc/moltres', x: 9, y: 7, dir: 'down' } },
@@ -912,6 +933,7 @@ export const CUTSCENES = {
   // a proposta "O sonho da Liga", aprovada ("top, tudo aprovado"). Depois da primeira vitória contra
   // cada um dos quatro, a volta passa pela sala dele, com duas falas que lembram a Mansão
   depois_lorelei: {
+    music: 'mus_gym',   // a música da cena: a sala da Liga
     map: 'sala_lorelei', spot: { x: 6, y: 5, dir: 'up' },
     trigger: [{ on: 'win', target: 'e4_lorelei' }],
     steps: [
@@ -923,6 +945,7 @@ export const CUTSCENES = {
     ]
   },
   depois_bruno: {
+    music: 'mus_gym',   // a música da cena: a sala da Liga
     map: 'sala_bruno', spot: { x: 6, y: 5, dir: 'up' },
     trigger: [{ on: 'win', target: 'e4_bruno' }],
     steps: [
@@ -934,6 +957,7 @@ export const CUTSCENES = {
     ]
   },
   depois_agatha: {
+    music: 'mus_gym',   // a música da cena: a sala da Liga
     map: 'sala_agatha', spot: { x: 6, y: 5, dir: 'up' },
     trigger: [{ on: 'win', target: 'e4_agatha' }],
     steps: [
@@ -945,6 +969,7 @@ export const CUTSCENES = {
     ]
   },
   depois_lance: {
+    music: 'mus_gym',   // a música da cena: a sala da Liga
     map: 'sala_lance', spot: { x: 6, y: 5, dir: 'up' },
     trigger: [{ on: 'win', target: 'e4_lance' }],
     steps: [
@@ -959,6 +984,7 @@ export const CUTSCENES = {
   // o primeiro Jogar do Campeão: o rival na sala dele. Ele venceu os quatro antes do jogador,
   // aproveitando que o jogador os trouxe de volta (como no FireRed, em que ele chega antes)
   campeao_antes: {
+    music: 'mus_encounter_rival',   // a música da cena: o rival Campeão
     map: 'sala_campeao', spot: { x: 6, y: 8, dir: 'up' },
     trigger: [{ on: 'play', target: 'champion' }],
     steps: [
@@ -974,6 +1000,7 @@ export const CUTSCENES = {
 
   // depois do Campeão (e do Hall da Fama): o rival vencido admite que o jogador estava certo
   campeao_depois: {
+    music: 'mus_rival_exit',   // a música da cena: o rival vencido, indo embora
     map: 'sala_campeao', spot: { x: 6, y: 6, dir: 'up' },
     trigger: [{ on: 'win', target: 'champion' }],
     steps: [
@@ -994,6 +1021,7 @@ export const CUTSCENES = {
   // Carvalho ("ainda falta alguma coisa") e o Mew, por telepatia. A captura dos lendários já está
   // aberta pelo Campeão (decisão 24); o Carvalho conta isso ao jogador
   carvalho_mew: {
+    music: 'mus_oak_lab',   // a música da cena: o laboratório
     map: 'lab', spot: { x: 6, y: 11, dir: 'up' },
     trigger: [{ on: 'enter', target: 'lab' }, { on: 'npc', target: 'carvalho' }],
     when: { quest: 'c7_carvalho' },
@@ -1005,6 +1033,7 @@ export const CUTSCENES = {
       { do: 'say', name: OAK, lines: ['{player}! O novo Campeão de Kanto! Eu sempre soube.'] },
       { do: 'say', name: OAK, lines: ['As rotas estão mais calmas desde que os pássaros voltaram... mas não como antes. Ainda falta alguma coisa.'] },
       // a luz rosa e o Mew flutuando
+      { do: 'music', track: 'mus_encounter_deoxys' },   // a luz rosa: o Mew
       { do: 'flash', t: 0.8, power: 0.7, color: '255,170,225' },
       { do: 'show', who: 'mew' },
       { do: 'emote', who: 'player' },
@@ -1020,6 +1049,7 @@ export const CUTSCENES = {
       { do: 'flash', t: 0.6, power: 0.8, color: '255,170,225' },
       { do: 'say', lines: ['O Mew dá uma volta no ar... e some.'] },
       { do: 'face', who: 'player', dir: 'up' },
+      { do: 'music', track: 'mus_oak_lab' },   // o Mew foi embora
       { do: 'say', name: OAK, lines: ['Você também viu? Um Pokémon rosa! Ele olhava para você como se estivesse falando...'] },
       { do: 'say', name: OAK, lines: ['Os lendários confiam em você agora. Se cruzar com eles por aí, talvez aceitem seguir com você.'] },
       { do: 'end' }
@@ -1034,6 +1064,7 @@ export const CUTSCENES = {
   // da Victory Road, o guarda conta que a Liga está vazia e entrega o bilhete do Lance. A fase não
   // começa: a volta é para o mapa da jornada, com a trava nova (data/stages.js)
   victory_road: {
+    music: 'mus_victory_road',   // a música da cena: a porta da Victory Road
     map: 'rota23_portao', spot: { x: 5, y: 8, dir: 'right' },
     trigger: [{ on: 'play', target: 'e4_lorelei' }],
     preload: ['npc/bilhete'],
@@ -1116,6 +1147,7 @@ export const CUTSCENES = {
       { do: 'face', who: 'agatha', dir: 'left' },
       { do: 'say', name: 'Agatha', lines: ['Hehe... Os meus fantasmas não mentem. Ele sofre há dias aí dentro.'] },
       // a emboscada: o homem de vermelho e os dois capangas de capuz, pela passagem
+      { do: 'music', track: 'mus_encounter_rocket' },   // a emboscada do Maxie
       { do: 'show', who: 'maxie' },
       { do: 'show', who: 'capanga1' },
       { do: 'show', who: 'capanga2' },
@@ -1135,6 +1167,7 @@ export const CUTSCENES = {
       { do: 'walk', who: 'capanga2', to: [[12, 12, 'up']], speed: 0.16 },
       { do: 'say', name: 'Maxie', lines: ['Peguem a criança. Ela vai para uma jaula também.'] },
       // os três pássaros: o raio, o gelo e o fogo
+      { do: 'music', track: 'mus_vs_legend' },   // os três pássaros chegam
       { do: 'show', who: 'raio' },
       { do: 'flash', t: 0.45 },
       { do: 'cry', dex: 145 },
@@ -1176,6 +1209,7 @@ export const CUTSCENES = {
       { do: 'walk', who: 'agatha', to: [[10, 5, 'left']], speed: 0.16 },
       { do: 'walk', who: 'lance', to: [[11, 5, 'left']], speed: 0.16 },
       { do: 'face', who: 'player', dir: 'up' },
+      { do: 'music', track: 'mus_slow_pallet' },   // a libertação
       { do: 'say', name: 'Lance', lines: ['A máquina caiu, e as jaulas abriram. Você nos salvou, {player}.'] },
       { do: 'say', name: 'Lorelei', lines: ['Viemos acabar com ele e caímos direto na armadilha. Que vergonha.'] },
       { do: 'say', name: 'Bruno', lines: ['Hmph! Toda a minha força, e eu não dobrei uma grade. Você tem coragem.'] },
@@ -1196,7 +1230,7 @@ export const CUTSCENES = {
 /** Os passos que o game/Cutscene.js conhece (o check-data confere). */
 export const CUTSCENE_STEPS = ['wait', 'say', 'talk', 'show', 'hide', 'place', 'walk', 'face', 'emote', 'throw', 'cutin',
   'bird', 'fade', 'camera', 'shake', 'give', 'quest', 'emit', 'card', 'flag', 'cry', 'tremble', 'fly', 'toast', 'storm', 'item',
-  'mist', 'land', 'flash', 'end'];
+  'mist', 'land', 'flash', 'music', 'end'];
 
 /** O que pode começar uma cena. */
 export const CUTSCENE_TRIGGERS = ['enter', 'npc', 'starter', 'win', 'play', 'tile'];

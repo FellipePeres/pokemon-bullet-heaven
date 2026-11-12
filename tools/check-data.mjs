@@ -519,6 +519,7 @@ const inside = (mapId, x, y) => { const m = HUB_MAPS[mapId]; return !!m && x >= 
     const place = HUB.maps[def.map];
     if (!place) { issues.push(`${id}: lugar que não existe (${def.map})`); continue; }
     if (def.spot && !floor(def.map, def.spot.x, def.spot.y)) issues.push(`${id}: spot fora do chão`);
+    for (const track of [def.music, place.music]) if (track && !existsSync(join(root, 'assets', 'music', `${track}.ogg`))) issues.push(`${id}: música que não existe (${track})`);
     if (def.record !== false && !def.spot) issues.push(`${id}: sem spot (a cena pendente não teria onde voltar)`);
     for (const t of def.trigger ?? []) {
       if (!CUTSCENE_TRIGGERS.includes(t.on)) issues.push(`${id}: trigger desconhecido (${t.on})`);
@@ -587,6 +588,7 @@ const inside = (mapId, x, y) => { const m = HUB_MAPS[mapId]; return !!m && x >= 
         if (step.do === 'bird' && !['in', 'grab', 'away', 'gone'].includes(step.mode)) issues.push(`${at}: modo desconhecido (${step.mode})`);
         if (step.do === 'give' && getMartItem(step.item)?.kind !== 'bag' && !KEY_ITEMS[step.item]) issues.push(`${at}: item que não existe (${step.item})`);
         if (step.do === 'quest' && !QUESTS[step.id]) issues.push(`${at}: quest que não existe (${step.id})`);
+        if (step.do === 'music' && !existsSync(join(root, 'assets', 'music', `${step.track}.ogg`))) issues.push(`${at}: música que não existe (${step.track})`);
         if (step.do === 'emit') {
           if (!QUEST_EVENTS.includes(step.on)) issues.push(`${at}: acontecimento desconhecido (${step.on})`);
           else emitted.add(`${step.on}:${step.target ?? ''}`);
