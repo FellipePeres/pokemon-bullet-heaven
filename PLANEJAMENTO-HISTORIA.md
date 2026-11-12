@@ -1048,7 +1048,9 @@ quando passarem da fase, uma tentativa de equilibrar, mas deixa isso no planejam
 - **Antes de construir**: ganha um plano e uma maquete próprios, e o `balance.mjs` mede a
   campanha de novo com o teto.
 
-### 13.3 A emboscada do Maxie no Mewtwo
+### 13.3 A emboscada do Maxie no Mewtwo ✅ (construída na H-9)
+
+Construída na H-9, no subsolo da Mansão Pokémon (seção 5.4, o Capítulo 6). O registro da ideia:
 
 Ideia do Fellipe (2026-11-12): ao ir libertar o Mewtwo, o Maxie aparece e surpreende o jogador,
 que está vulnerável e prestes a ser capturado; os três pássaros lendários aparecem para

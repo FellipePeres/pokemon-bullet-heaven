@@ -260,7 +260,8 @@ ladrão: o **Maxie**.
 
 ## 8. Ideias em aberto
 
-### 8.1 A base do Maxie: a Elite dos Quatro, o Mewtwo e a emboscada (o Fellipe, 2026-11-12)
+### 8.1 A base do Maxie: a Elite dos Quatro, o Mewtwo e a emboscada (o Fellipe, 2026-11-12) ✅
+(Construída na H-9: a Mansão Pokémon, o Capítulo 6. O texto abaixo é o registro da ideia.)
 
 > "O Mewtwo não está na caverna, vai estar na base do Maxie, em algum lugar que vamos pensar que
 > dá para usar como base do FireRed. Ao jogador iniciar a jornada da Victory Road, uma cena entra
