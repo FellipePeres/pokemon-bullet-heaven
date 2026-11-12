@@ -402,6 +402,7 @@ const inside = (mapId, x, y) => { const m = HUB_MAPS[mapId]; return !!m && x >= 
       if (objective.on === 'talk' && !DIALOGUE[objective.target]) issues.push(`${id}: fala que não existe (${objective.target})`);
       if (objective.on === 'enter' && !HUB.maps[objective.target]) issues.push(`${id}: lugar que não existe (${objective.target})`);
       if (objective.on === 'win' && !STAGES[objective.target]) issues.push(`${id}: fase que não existe (${objective.target})`);
+      if (objective.on === 'capture' && !POKEMON[objective.target]) issues.push(`${id}: Pokémon que não existe (${objective.target})`);
       for (const key of Object.keys(objective.doneIf ?? {})) if (!DONE_IF_KEYS.includes(key)) issues.push(`${id}: doneIf de objetivo desconhecido (${key})`);
       if (objective.doneIf?.cleared && !STAGES[objective.doneIf.cleared]) issues.push(`${id}: doneIf de objetivo de uma fase que não existe (${objective.doneIf.cleared})`);
     }

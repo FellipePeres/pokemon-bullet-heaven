@@ -207,18 +207,21 @@ ladrão: o **Maxie**.
 - **O Mew**, no laboratório, por telepatia (só o jogador entende): escapou do Maxie; as hordas
   continuam porque o Maxie rouba a energia de lendários em outras regiões; o próximo da lista dorme
   no fundo da lagoa.
-- **Os lendários confiam no jogador**: a partir daqui, eles podem aparecer nas Poké Balls (a captura
-  abre com o Campeão). A TM Dive chega ao Poké Mart.
+- **Os lendários confiam no jogador** (o Carvalho). A captura deles já abriu na Mansão (decisão
+  25). A TM Dive chega ao Poké Mart.
 
 -Mew aparece quando o jogador é campeão volta para vila e fala com o carvalho, Mew faz telepatia com o jogador, por isso  o jogador entende, Ele explica que conseguiu fugir do Maxie, e que as hordas ainda estão estranhas pois ele anda roubando energia de lendários em outras regiões também
 
-### Capítulo 8 — O que a lagoa guarda 🗺️
-- O pescador fala da lagoa da vila. O jogador desce com o Dive e captura **o Kyogre** no fundo
-  (isso já existe desde a 0.37).
-- **A cena do Maxie na lagoa** (já existe), agora o segundo encontro:
-  - "Não acredito que cheguei tarde! Você capturou o lendário Kyogre!";
+### Capítulo 8 — O que a lagoa guarda ✅
+(Feito na H-11.)
+- A quest "Descubra o que a lagoa guarda", pelo aviso do Mew. O pescador conta que a lagoa anda
+  borbulhando e que o Poké Mart tem uma TM de mergulho. O jogador desce com o Dive e captura **o
+  Kyogre** no fundo (a descida e a luta existem desde a 0.36 e a 0.37).
+- **A cena do Maxie na lagoa**, agora o segundo encontro:
+  - "Você de novo?! Não acredito que cheguei tarde! Você capturou o lendário Kyogre!";
   - o Crobat, e "A caminho do vulcão! O próximo lendário será meu!".
 - É a ponte para Hoenn (o Monte Chimney).
+- Na vila, o sábio: "Kanto está em paz. Mas as hordas não vão sumir enquanto ele estiver por aí."
 
 ## 6. As pistas e onde elas se pagam
 
@@ -246,13 +249,12 @@ ladrão: o **Maxie**.
 | **Moltres** ✅ | o cume do Monte Brasa (Cap. 5), nível 62 | o Sol forte, o chão em brasa e o Fogo Sagrado com a sombra das rochas | foge para o céu; a Victory Road abre |
 
 - **Eles não ficam com o jogador.** Derrotados nas missões, fogem com medo.
-- **A captura deles está fechada** (decisão 20, o Fellipe em 2026-11-12: "ainda não pode aparecer
-  os lendários na captura, mesmo que depois de liberados"). Nenhum lendário aparece na Poké Ball
-  das fases, nem o Mewtwo e o Mew na Liga. A forma de eles entrarem na equipe fica para a
-  história decidir (ver a seção 8.1).
+- **A captura deles abre com a cena que salva a Elite dos Quatro** (decisão 25, o Fellipe em
+  2026-11-12: "capturas de lendários liberam depois da cena que salva a E4"). Antes dela, fechada
+  (decisão 20): nenhum lendário aparece na Poké Ball das fases. Depois, os pássaros (desde a Fase
+  7), o Mewtwo e o Mew (na Liga) podem aparecer, um de cada.
   - O Kyogre é à parte: ele é capturado na luta do salão, no fundo da lagoa.
-  - Enquanto a captura estiver fechada, a Pokédex chega no máximo a 146 de 151, e o último
-    degrau da conquista "Pokédex" espera.
+  - Enquanto a captura estiver fechada, a Pokédex chega no máximo a 146 de 151; depois, a 151.
 
 ---
 

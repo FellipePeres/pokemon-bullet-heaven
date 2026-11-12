@@ -342,12 +342,18 @@ export const DIALOGUE = {
   sabio: {
     name: 'Velho sábio',
     lines: [
-      { when: { champion: true }, say: ['Você venceu a Liga. Mas me diga: já foi até o fim do mato a oeste? Ninguém nunca foi.'] },
+      // (H-11) as falas de "uma vez" vêm antes da do Campeão, que vale sempre depois da Liga
+      // o Kyogre (H-11): uma vez, depois da captura e da fuga do Maxie
+      { when: { kyogre: true, once: 'sabio_kyogre' }, say: [
+        'O Kyogre, dormindo na nossa lagoa esse tempo todo... E o Maxie fugiu outra vez, atrás de um vulcão.',
+        'Kanto está em paz, {player}. Mas as hordas não vão sumir enquanto ele estiver por aí.'
+      ] },
       // a Mansão (H-9): uma vez, depois da cena do subsolo
       { when: { scene: 'mansao_lab', once: 'sabio_mansao' }, say: [
         'A Elite dos Quatro presa numa jaula... E o homem do emblema enfim mostrou a cara. Maxie.',
         'Os pássaros voltaram por você, {player}. Eles confiam em você agora.'
       ] },
+      { when: { champion: true }, say: ['Você venceu a Liga. Mas me diga: já foi até o fim do mato a oeste? Ninguém nunca foi.'] },
       // a missão do Moltres (H-8): uma vez, depois da cena da terceira máquina
       { when: { scene: 'moltres_livre', once: 'sabio_moltres' }, say: [
         'Os três pássaros livres... Que alívio, {player}.',
@@ -391,6 +397,11 @@ export const DIALOGUE = {
       { when: { scene: 'vermilion_correntes', quest: 'z_usina' }, say: ['O mar de Vermilion também está bravo, é? Pois é, nem os barcos saem mais.'] },
       { when: { diveRescued: true, once: 'pescador_resgate' }, say: ['Ô, peixão! Quase arrebentou a minha linha. Da próxima vez, avisa antes de afundar!'] },
       { when: { dive: true }, say: ['Esse seu Pokémon... ele sabe mergulhar, não sabe? Vai lá e me conta o que tem no fundo!'] },
+      // o Capítulo 8 (H-11): a lagoa borbulhando, e a dica da TM Dive
+      { when: { quest: 'c8_lagoa' }, say: [
+        'A lagoa anda borbulhando à noite, e os peixes sumiram. Tem alguma coisa grande lá embaixo...',
+        'Se você tiver um Pokémon de Água, dizem que o Poké Mart recebeu uma TM que ensina a mergulhar.'
+      ] },
       { say: ['Às vezes fico imaginando o que tem lá embaixo... Se eu soubesse mergulhar, descobriria.'] }
     ]
   },
@@ -405,6 +416,7 @@ export const DIALOGUE = {
     name: 'Rapaz',
     lines: [
       { when: { locked: true }, say: ['Ei! Vai sair sem Pokémon? As hordas te pegam na primeira curva.', 'Passa no laboratório do Prof. Carvalho antes!'] },
+      { when: { kyogre: true, once: 'rapaz_kyogre' }, say: ['Você viu? Saiu um Pokémon gigante da lagoa! E um homem de vermelho voando num morcego, gritando alguma coisa sobre um vulcão!'] },
       { when: { scene: 'mansao_lab', once: 'rapaz_mansao' }, say: ['Soube? A Elite dos Quatro voltou para a Liga! Dizem que estavam presos na velha Mansão de Cinnabar.'] },
       // depois da casa roubada de Cerulean (0.39): a vila culpa a Equipe Rocket
       // a missão do Moltres (H-8): o vulcão e a Victory Road

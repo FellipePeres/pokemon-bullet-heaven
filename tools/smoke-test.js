@@ -1762,8 +1762,8 @@ console.log('\n[a Liga e a Mansão — a trava por cena, os interruptores das es
         !hub.floor(12, 11) && (hub._act('switch'), hub.floor(12, 11)));
 }
 
-// ------------------------------------------- a captura aberta pelo Campeão (H-10)
-console.log('\n[a captura dos lendários depois do Campeão — decisão 24]');
+// ------------------------------------------- a captura aberta pela cena da Mansão (decisão 25)
+console.log('\n[a captura dos lendários depois da cena que salva a Elite dos Quatro — decisão 25]');
 {
   const keep = JSON.parse(JSON.stringify(LEGENDARY_ENCOUNTERS));
   for (const enc of Object.values(LEGENDARY_ENCOUNTERS)) enc.chance = 1;
@@ -1771,10 +1771,10 @@ console.log('\n[a captura dos lendários depois do Campeão — decisão 24]');
   // (o Mew tem o menor peso do sorteio: 400 Poké Balls para ver todos, sem depender da sorte)
   const offers = (run) => { const seen = new Set(); for (let i = 0; i < 400; i++) { run.legendariesOffered.clear(); for (const c of run.captureSystem.rollChoices()) if (LEG.includes(c.id)) seen.add(c.id); } return seen; };
   const birds = ['zapdos', 'articuno', 'moltres'];
-  check('com a chave fechada e a jornada sem o Campeão, nenhum lendário aparece (nem com a chance no máximo)',
+  check('com a chave fechada e a jornada antes da cena da Mansão, nenhum lendário aparece (nem com a chance no máximo)',
         !LEGENDARY_CAPTURE.open && offers(new Run('champion', { starter: 'charmander', liberated: birds })).size === 0);
   const liga = offers(new Run('champion', { starter: 'charmander', liberated: birds, legendsOpen: true }));
-  check('com o Campeão vencido (legendsOpen), eles aparecem: na Liga, as aves, o Mewtwo e o Mew',
+  check('com a cena da Mansão vista (legendsOpen), eles aparecem: na Liga, as aves, o Mewtwo e o Mew',
         ['zapdos', 'articuno', 'moltres', 'mewtwo', 'mew'].every((id) => liga.has(id)), [...liga].join(', '));
   const fase7 = offers(new Run('gym_7_cinnabar', { starter: 'charmander', liberated: birds, legendsOpen: true }));
   check('...e na Fase 7, só as aves (a tabela de sempre)', fase7.size === 3 && birds.every((id) => fase7.has(id)), [...fase7].join(', '));

@@ -221,6 +221,8 @@ export function matchesDoneIf(cond, ctx) {
       case 'cleared': if (!(ctx.cleared ?? []).includes(value)) return false; break;
       // H-5: o lendário já foi liberado (a missão vencida, ou a jornada já tinha ele)
       case 'freed': if (!(ctx.freed ?? []).includes(value)) return false; break;
+      // H-11: o Kyogre já foi capturado nesta jornada
+      case 'kyogre': if (!!ctx.kyogre !== value) return false; break;
       default: return false;
     }
   }
@@ -228,4 +230,4 @@ export function matchesDoneIf(cond, ctx) {
 }
 
 /** As chaves que o `doneIf` entende (o check-data recusa as outras). */
-export const DONE_IF_KEYS = ['starter', 'mapSeen', 'cleared', 'freed'];
+export const DONE_IF_KEYS = ['starter', 'mapSeen', 'cleared', 'freed', 'kyogre'];

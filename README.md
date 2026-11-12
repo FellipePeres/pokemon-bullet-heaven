@@ -199,7 +199,12 @@ não abre até você vencer.
   que as hordas importavam. Na vila, o Carvalho diz que ainda falta alguma coisa, e o Mew
   aparece no laboratório e fala com o jogador por telepatia: o Maxie continua roubando a
   energia de lendários em outras regiões, e o próximo da lista dorme na lagoa. Depois do
-  Campeão, os lendários podem aparecer nas Poké Balls, e a TM Dive chega ao Poké Mart.
+  Campeão, a TM Dive chega ao Poké Mart.
+- **A lagoa e o Kyogre**: o pescador conta que a lagoa anda borbulhando. Com a TM Dive, o
+  jogador desce ao fundo, enfrenta o Kyogre e o captura; o Maxie chega tarde ("Você de
+  novo?!") e parte a caminho do vulcão.
+- **Os lendários nas Poké Balls**: depois da cena que salva a Elite dos Quatro, os pássaros,
+  o Mewtwo e o Mew podem aparecer nas Poké Balls das fases finais, um de cada.
 - **A tela de Missões**: o Diário na barra, ao lado das Conquistas. Em cima, o que
   fazer agora; embaixo, o que já aconteceu, capítulo por capítulo, com a data de cada
   missão, para reler a história; no fim, os itens importantes que ela deu. Um

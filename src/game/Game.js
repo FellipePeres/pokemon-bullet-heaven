@@ -330,7 +330,8 @@ export class Game {
       starter: !!campaign.starter,
       mapSeen: !!campaign.hub?.flags?.mapa_visto,
       cleared: campaign.clearedStages,
-      freed: this.liberatedSpecies()
+      freed: this.liberatedSpecies(),
+      kyogre: !!campaign.dive?.captured
     };
   }
 
@@ -674,8 +675,9 @@ export class Game {
     }
     options.ownedElsewhere = (journey?.pc ?? []).map((m) => m.pokemonId);   // lendário: um de cada
     options.liberated = this.liberatedSpecies();   // H-5: quem tem missão só cai na Poké Ball depois dela
-    // H-10 (decisão 24): depois do Campeão, os lendários podem aparecer nas Poké Balls
-    options.legendsOpen = this.isChampion();
+    // (decisão 25, o Fellipe: "capturas de lendários liberam depois da cena que salva a E4") os
+    // lendários podem aparecer nas Poké Balls depois da cena do subsolo da Mansão (H-9)
+    options.legendsOpen = this.legendsOpen();
     options.trainer = this.profile.trainer;
     options.campaignStarter = this.campaign.starter;
 
@@ -999,7 +1001,11 @@ export class Game {
       // do Fellipe depois do bug do Theo): a maré final é sem ele, e ele espera no PC.
       // A cena do Maxie vem depois, na volta à vila. O mesmo vale para o lendário de cada
       // missão (H-5, o presente `toPC` da luta)
-      if (pokemonId === 'kyogre') this.diveRecord.captured = true;
+      if (pokemonId === 'kyogre') {
+        this.diveRecord.captured = true;
+        // a história (H-11): "Descubra o que a lagoa guarda" fecha aqui
+        bus.emit(EVENTS.STORY, { on: 'capture', target: 'kyogre' });
+      }
       run.captureSystem.captureToPC(pokemonId, {
         shiny, note: 'Ele descansa da luta: para levá-lo, use o PC do Centro Pokémon ou do mapa da jornada.'
       });
@@ -1663,6 +1669,14 @@ export class Game {
   /* ============================== Poké Mart (0.23) ============================== */
 
   /** Os Pokémon da jornada (equipe e PC) que podem receber um item da loja. */
+  /**
+   * A captura dos lendários já abriu nesta jornada? Abre com a cena que salva a Elite dos Quatro
+   * (o subsolo da Mansão, decisão 25); antes, fechada (decisão 20).
+   */
+  legendsOpen() {
+    return this.sceneRecord?.mansao_lab === 'seen' || this.isChampion();
+  }
+
   /** O jogador já é Campeão nesta jornada (venceu a última fase da região)? */
   isChampion() {
     const last = this.region.campaign.filter((e) => e.stage).at(-1)?.stage;

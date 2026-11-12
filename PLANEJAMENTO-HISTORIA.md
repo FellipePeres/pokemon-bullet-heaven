@@ -125,7 +125,7 @@ quando o jogador volta, ou o lugar da fase antes dela.
 | **5 — A suspeita** | Fase 8 (Giovanni) | **Feito na 0.39 (H-8)**, a proposta "Monte Brasa: o fogo", aprovada ("construa a h-8 então"; seção 5.3). O jogador chega achando que é a Rocket. O Giovanni olha o Pedaço de Metal e ri: não é da Rocket, e ele também quer saber quem é. Os homens dele viram gente com o emblema subindo o Monte Brasa, na Ilha 1, com peças de máquina (as da casa de Cerulean). A Liga fica fechada até o Moltres (decisão 2). O jogador sobe a pé até o cume e acha o Moltres preso na terceira máquina, em brasa. (No jogo, o título é só "A suspeita": "o fogo" adiantaria o Moltres, sem spoiler em título.) | **Moltres** |
 | **6 — A Elite dos Quatro** | o começo da Victory Road | **Feito na 0.39 (H-9)**, a proposta "A base na Mansão" (seção 5.4). **Ajuste de 2026-11-12** (decisão 22; HISTORIA.md, seção 8.1). A Victory Road só abre com os três pássaros de volta (decisão 2). Ao começar por ela, uma cena: a Elite dos Quatro se juntou para derrotar uma ameaça maior e foi até a base do Maxie (o lugar a pensar). A quest "Ajude a Elite dos Quatro". Na base, o Mewtwo preso numa máquina e os quatro em jaulas; a emboscada: o Maxie aparece pela primeira vez, o jogador vai ser capturado, os três pássaros chegam e o Maxie foge. Só então a Liga abre. | **Mewtwo** |
 | **7 — O sonho** | Liga e Campeão | **Feito na 0.39 (H-10)**, a proposta "O sonho da Liga" (seção 5.5). A Elite dos Quatro, libertada, de volta à Liga. O rival no fim, e o Hall da Fama. Depois, o Carvalho: as rotas estão mais calmas, mas não como antes: "ainda falta alguma coisa". | — |
-| **8 — O que a lagoa guarda** | late game, depois do Campeão | O pescador fala da lagoa: a descida, o Kyogre e o **Maxie** (a cena que já existe), agora o segundo encontro. "A caminho do vulcão!" leva a Hoenn. | **Kyogre** |
+| **8 — O que a lagoa guarda** | late game, depois do Campeão | **Feito na 0.39 (H-11).** O pescador fala da lagoa: a descida, o Kyogre e o **Maxie** (a cena que já existe), agora o segundo encontro. "A caminho do vulcão!" leva a Hoenn. | **Kyogre** |
 | **Epílogo — O Pokémon rosa** (ideia) | depois do Maxie | O Mew aparece na vila. | **Mew** (decisão 5) |
 
 **Recuperar um pássaro** acalma as rotas perto do ninho dele, mas só na história:
@@ -743,8 +743,8 @@ para o objetivo `scene` das quests. O check-data recusa a caixa com retrato
 | 19a | Depois de cada um dos quatro: duas falas na sala dele (`depois_lorelei` a `depois_lance`) | as salas da Liga | 7 | H-10 ✅ |
 | 19 | O rival Campeão: antes da batalha, e depois dela, vencido ("Você estava certo") | sala do Campeão (`campeao_antes`, `campeao_depois`) | 7 | H-10 ✅ |
 | 20 | "Ainda falta alguma coisa": o Carvalho e o Mew, por telepatia | laboratório da vila (`carvalho_mew`) | 7 | H-10 ✅ |
-| 22 | O Kyogre e o Maxie (o segundo encontro) | lagoa ou Centro (já existe) | 8 | H-11 |
-| 23 | O Pokémon rosa | vila | Epílogo | H-11 |
+| 22 | O Kyogre e o Maxie (o segundo encontro: "Você de novo?!") | lagoa ou Centro (já existia) | 8 | H-11 ✅ |
+| 23 | ~~O Pokémon rosa~~ (veio para o laboratório, com o Carvalho: a cena 20, H-10) | — | — | — |
 
 Cada cena chega na etapa do capítulo dela. A H-2 trouxe o motor, as duas do
 prólogo e as duas da volta da Fase 1, a do Brock e a do velho sábio (pedidos do
@@ -861,7 +861,7 @@ do Zapdos, o tipo, as fraquezas e o nível recomendado (36; sem captura, decisã
 | **H-8** ✅ 0.39 | O Moltres e o Capítulo 5 (seção 5.3, página "Monte Brasa: o fogo"): a cena do Giovanni, a trava da Liga, o Monte Brasa a pé com as pedras arrastadas, os degraus de pular e as 15 Poké Balls, a luta sob o Sol forte e as duas cenas da missão. |
 | **H-9** ✅ 0.39 | A Victory Road e a base do Maxie (decisão 22; seção 5.4, página "A base na Mansão"): a cena da Elite dos Quatro, a quest "Ajude a Elite dos Quatro", a base com o Mewtwo e as jaulas, a emboscada do Maxie e os pássaros. Ganha proposta e maquete. |
 | **H-10** ✅ 0.39 | A Liga e o fim do Capítulo 7 (seção 5.5, página "O sonho da Liga"): a Elite dos Quatro de volta, o rival Campeão e o "ainda falta alguma coisa". |
-| **H-11** | O Kyogre como fecho de Kanto (as quests em volta da cena que já existe, a lagoa depois do Campeão, o Maxie como segundo encontro) e o Mew. |
+| **H-11** ✅ 0.39 | O Kyogre como fecho de Kanto: a quest da lagoa (fecha com a captura), o pescador, o Maxie no segundo encontro ("Você de novo?!") e a vila depois do Kyogre. O Mew veio para a H-10. Junto, a decisão 25 (a captura abre com a cena da Mansão). |
 | **H-12** | As recompensas das quests (no final, pedido do Fellipe). |
 
 ---
@@ -972,6 +972,10 @@ do Zapdos, o tipo, as fraquezas e o nível recomendado (36; sem captura, decisã
 24. **Os lendários nas Poké Balls depois do Campeão** (a nota do Fellipe no HANDOFF: "Lendários
     podem aparecer em pokebolas pós derrotar a E4 e o Campeão"). A captura fechada da decisão 20
     abre com o Campeão vencido (a construção é a da H-10).
+25. **A captura dos lendários abre com a cena que salva a Elite dos Quatro** (o Fellipe,
+    2026-11-12: "capturas de lendários liberam depois da cena que salva a E4, portanto você pode
+    capturar lendários após isso, não precisa mexer em cena nenhuma"). Muda a decisão 24: a captura
+    abre com a cena do subsolo da Mansão (H-9), não mais com o Campeão. Nenhuma cena mudou.
 
 ---
 

@@ -1625,6 +1625,7 @@ game.menus.closeModal();
   check('a primeira estátua do subsolo vira o interruptor de volta', !hub.switchOn);
   statue(27, 5);
   check('...a segunda vira de novo', hub.switchOn);
+  check('antes da cena do laboratório, a captura dos lendários ainda está fechada', !game.legendsOpen());
   hub.clickTile(12, 11);
   for (let i = 0; i < 60 * 90 && busy() && !hub.scene; i++) hub.update(1 / 60);
   check('pisar na passagem do laboratório começa a cena (o caminho para ali)', hub.scene?.id === 'mansao_lab' && !hub.path);
@@ -1653,6 +1654,7 @@ game.menus.closeModal();
         game.quests.isDone('c6_e4') && game.quests.isActive('c7_liga') && CHAPTERS[QUESTS.c7_liga.chapter] === 'Capítulo 7 — O sonho'
         && game.sceneRecord.mansao_lab === 'seen');
   check('a Liga abre de vez', isStageUnlocked('e4_lorelei', storyProgress(game.campaign)) && !storyLocked('e4_lorelei', storyProgress(game.campaign)));
+  check('...e a captura dos lendários abre com esta cena (decisão 25: "liberam depois da cena que salva a E4")', game.legendsOpen());
   settle();
   check('...e o atalho: o jogador aparece na vila, na frente de casa', hub.mapId === 'vila' && hub.player.x === 6 && hub.player.y === 17 && !hub.scene);
   hub.enter({ map: 'mansao_b1f', x: 13, y: 11, dir: 'left' });
@@ -1681,7 +1683,7 @@ game.menus.closeModal();
   const { QUESTS, CHAPTERS } = await import('../src/data/quests.js');
   const win = (stageId) => { game.startStage(stageId); game.run.state = 'victory'; game._handleRunState(); };
   game.startStage('e4_lorelei');
-  check('antes do Campeão, a partida da Liga não abre a captura dos lendários', !!game.run && !game.run.legendsOpen);
+  check('depois da cena que salvou a Elite dos Quatro, a partida da Liga já abre a captura dos lendários (decisão 25)', !!game.run && game.run.legendsOpen);
   game.run.state = 'victory';
   game._handleRunState();
   check('vencer a Lorelei deixa a cena da sala dela devida', game.sceneRecord.depois_lorelei === 'due');
@@ -1733,7 +1735,7 @@ game.menus.closeModal();
         hubVisible() && hub.mapId === 'vila' && game.quests.isDone('c7_campeao') && game.quests.isActive('c7_carvalho'));
   // a captura abre com o Campeão (decisão 24)
   game.startStage('gym_7_cinnabar');
-  check('vencido o Campeão, as partidas abrem a captura dos lendários (a nota do Fellipe no HANDOFF)', !!game.run?.legendsOpen && game.isChampion());
+  check('...e continua aberta depois do Campeão', !!game.run?.legendsOpen && game.isChampion());
   game.quitToMenu();
   // o laboratório: o Carvalho e o Mew
   hub.enter({ map: 'vila', x: 26, y: 7, dir: 'up' });
@@ -1750,6 +1752,14 @@ game.menus.closeModal();
         lab.filter((d) => d.name === 'Mew').length === 4 && said(lab, 'Eu consegui fugir') && said(lab, 'outras regiões') && said(lab, 'no fundo da lagoa'));
   check('...ele some, e o Carvalho só viu: os lendários confiam no jogador', mewOut && said(lab, 'Você também viu?') && said(lab, 'talvez aceitem seguir com você'));
   check('a quest fecha', game.quests.isDone('c7_carvalho') && game.sceneRecord.carvalho_mew === 'seen' && !hub.scene && hub.mapId === 'lab');
+  // (H-11) o Capítulo 8: o aviso do Mew vira a quest da lagoa, e o pescador fala dela
+  check('a quest do Capítulo 8: "Descubra o que a lagoa guarda" (sem spoiler)',
+        game.quests.isActive('c8_lagoa') && CHAPTERS[QUESTS.c8_lagoa.chapter] === 'Capítulo 8 — O que a lagoa guarda'
+        && !QUESTS.c8_lagoa.objectives[0].text.includes('Kyogre') && !QUESTS.c8_lagoa.desc.includes('Kyogre'));
+  hub.enter({ map: 'vila', x: 27, y: 22, dir: 'up' });
+  hub.say('pescador');
+  check('o pescador: a lagoa borbulhando, e a dica da TM Dive', dialogText().includes('borbulhando') && dialogText().includes('TM'));
+  closeDialog();
   game.openCampaign();
   check('o mapa mostra o botão do Hall da Fama', !registry.get('btn-hall').classes.has('hidden'));
   hub.enter('home');
@@ -2043,7 +2053,9 @@ const DIVE_LAST = (await import('../src/data/dive.js')).DIVE.levels.length - 1; 
   check('capturou: a tela de captura do Kyogre, sem Ignorar', game.captureOpen && registry.get('capture-skip').classes.has('hidden'));
   check('...e o card avisa que ele vai para o PC', registry.get('capture-note').innerHTML.includes('vai direto para o PC'));
   const spare = !game.run.team.isFull;
+  const lakeOpen = game.quests.isActive('c8_lagoa');
   game.pickCapture('kyogre');
+  check('a captura do Kyogre fecha "Descubra o que a lagoa guarda" (o Capítulo 8, H-11)', lakeOpen && game.quests.isDone('c8_lagoa'));
   check('o Kyogre vai sempre para o PC, mesmo com espaço na equipe (0.37.9), revela o "???" e fica fora das 151',
         spare && !game.run.team.has('kyogre') && game.run.pc.some((m) => m.pokemonId === 'kyogre')
         && game.profile.pokedex.secret.includes('kyogre') && !game.profile.pokedex.caught.includes(382) && game.campaign.dive.captured);
@@ -2065,12 +2077,24 @@ const DIVE_LAST = (await import('../src/data/dive.js')).DIVE.levels.length - 1; 
         && hub.player.x === 30 && hub.player.y === 11 && hub.scene?.step === 0 && !game.campaign.dive.sceneSeen);
   await game.loadFromFile({ text: async () => JSON.stringify(game.buildSaveData()) });
   check('...e carregar o save também', hubVisible() && hub.mapId === 'vila' && hub.player.x === 30 && hub.scene?.step === 0);
-  for (let i = 0; i < 60 * 60 && hub.scene; i++) { if (hub.dialog) { hub.dialog.shown = 999; hub.confirm(); } hub.update(1 / 60); }
+  const maxieSaid = [];
+  for (let i = 0; i < 60 * 60 && hub.scene; i++) { if (hub.dialog) { maxieSaid.push(hub.dialog.pages[hub.dialog.index]); hub.dialog.shown = 999; hub.confirm(); } hub.update(1 / 60); }
+  check('o Maxie, no segundo encontro, reconhece o jogador: "Você de novo?!" (H-11)', maxieSaid.some((t) => t.includes('Você de novo')) && maxieSaid.some((t) => t.includes('cheguei tarde')));
   check('a cena acaba, devolve o controle e conta como vista (uma vez por jornada)', !hub.scene && !hub.dialog && game.campaign.dive.sceneSeen);
   game.continueGame();
   check('vista a cena, continuar volta à frente de casa, sem cena', hubVisible() && !hub.scene && hub.mapId === 'vila' && hub.player.x !== 30);
   hub.say('pescador');
   check('o pescador depois da captura', dialogText().includes('minhoca'));
+  closeDialog();
+  hub.say('sabio');
+  check('o velho sábio, uma vez, depois do Kyogre: o Maxie fugiu outra vez; Kanto em paz, mas as hordas não somem (H-11)',
+        dialogText().includes('fugiu outra vez') && dialogText().includes('Kanto está em paz'));
+  closeDialog();
+  hub.say('sabio');
+  check('...só uma vez', !dialogText().includes('fugiu outra vez'));
+  closeDialog();
+  hub.say('rapaz');
+  check('o rapaz da vila: o Pokémon gigante da lagoa e o homem num morcego', dialogText().includes('Pokémon gigante'));
   closeDialog();
 
   // depois da captura, o salão vazio: o card do Endless aquático (sem XP)

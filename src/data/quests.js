@@ -42,6 +42,7 @@ export const CHAPTERS = {
   // H-8 e a decisão 22: o Capítulo 6 é o da Elite dos Quatro (a Victory Road e a base do Maxie, H-9)
   cap6: 'Capítulo 6 — A Elite dos Quatro',
   cap7: 'Capítulo 7 — O sonho',
+  cap8: 'Capítulo 8 — O que a lagoa guarda',
   // as missões dos lendários (azuis) levam o nome do lugar
   usina: 'A Usina'
 };
@@ -254,11 +255,20 @@ export const QUESTS = {
     next: ['c7_carvalho'],
     reward: null
   },
+  // (H-11) o aviso do Mew: o próximo da lista do Maxie dorme no fundo da lagoa da vila. Fecha com a
+  // captura do Kyogre, no salão (a luta que já existia desde a 0.37)
+  c8_lagoa: {
+    kind: 'story', chapter: 'cap8',
+    desc: 'O Mew avisou: o próximo da lista do Maxie dorme no fundo da lagoa da vila. Para descer, só com um Pokémon que saiba mergulhar.',
+    objectives: [{ text: 'Descubra o que a lagoa guarda', on: 'capture', target: 'kyogre', doneIf: { kyogre: true } }],
+    next: [],
+    reward: null
+  },
   c7_carvalho: {
     kind: 'story', chapter: 'cap7',
     desc: 'Você é o Campeão de Kanto. O Prof. Carvalho pediu: "volte e me conte".',
     objectives: [{ text: 'Conte ao Prof. Carvalho', on: 'scene', target: 'carvalho_mew' }],
-    next: [],
+    next: ['c8_lagoa'],
     reward: null
   },
 
@@ -288,4 +298,4 @@ export const QUESTS = {
 export const FIRST_QUEST = 'p_mae';
 
 /** Os eventos que um objetivo pode esperar (o check-data recusa os outros). */
-export const QUEST_EVENTS = ['talk', 'enter', 'map', 'win', 'scene', 'clue'];
+export const QUEST_EVENTS = ['talk', 'enter', 'map', 'win', 'scene', 'clue', 'capture'];

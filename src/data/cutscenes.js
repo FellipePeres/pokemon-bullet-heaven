@@ -72,6 +72,8 @@
 
 // a cena do Maxie (0.37, PLANEJAMENTO-DIVE.md seção 10), igual à de antes, agora em dados
 const MAXIE = [
+  // (H-11) o segundo encontro: ele já viu o jogador na Mansão
+  'Você de novo?!',
   'Não acredito que cheguei tarde!',
   'Você capturou o lendário Kyogre!',
   'Não posso deixar que isso aconteça com os próximos...'

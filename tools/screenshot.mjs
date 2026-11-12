@@ -493,6 +493,29 @@ const ROTEIROS = {
     { run: 'skip()' }, { wait: 2600 }, { shot: 'lg-30-confiam-em-voce' },
     { run: 'skip()' }, { wait: 1200 }, { run: "game.openCampaign()" }, { wait: 1400 }, { shot: 'lg-31-o-mapa' }
   ],
+  // o Capítulo 8 (H-11): a quest da lagoa, o pescador, o Maxie no segundo encontro e o sábio
+  lagoa: [
+    { open: 'index.html' }, { wait: 500 },
+    { run: "window.skip = (n = 1) => { for (let i = 0; i < n; i++) { const h = game.hub; if (!h.dialog) return; h.dialog.shown = 999; h.confirm(); } };" +
+           "game.newGame(); game.chooseTrainer('leaf'); game.chooseName('Fellipe'); game.chooseStarter('charmander');" +
+           "const mon = (uid, id, abilities) => ({ uid, pokemonId: id, level: 75, xp: 0, hp: 0, abilities, upgrades: {} });" +
+           "game.campaign.journey = { team: { members: [mon('a', 'charizard', ['flamethrower']), mon('b', 'gyarados', ['hydro_pump']), mon('c', 'arcanine', ['flamethrower'])], active: ['a', 'b', 'c'] }, pc: [] };" +
+           "game.region.campaign.forEach((e) => { if (e.stage && !game.campaign.clearedStages.includes(e.stage)) game.campaign.clearedStages.push(e.stage); });" +
+           "game.campaign.clearedStages.push('zapdos', 'articuno', 'moltres');" +
+           "Object.assign(game.campaign.scenes ??= {}, { victory_road: 'seen', mansao_entrada: 'seen', mansao_lab: 'seen', carvalho_mew: 'seen' });" +
+           "game.quests.state.active = ['c8_lagoa']; document.getElementById('toast-container').style.display = 'none';" +
+           "game.openHub({ map: 'vila', x: 27, y: 9, dir: 'right' })" },
+    { wait: 1600 }, { shot: 'lag-01-a-quest' },
+    { run: "game.hub.interact()" }, { wait: 2600 }, { shot: 'lag-02-o-pescador' },
+    { run: 'skip()' }, { wait: 2600 }, { shot: 'lag-03-a-tm' },
+    { run: "skip(); game.campaign.dive = { ...(game.campaign.dive ?? {}), captured: true }; game.hub.enter({ map: 'vila', x: 30, y: 11, dir: 'down' }); game.playScene('maxie_lagoa')" },
+    { wait: 2600 }, { run: 'skip()' }, { wait: 6500 }, { shot: 'lag-04-voce-de-novo' },
+    { run: 'skip()' }, { wait: 2200 }, { shot: 'lag-05-cheguei-tarde' },
+    { run: 'skip(3)' }, { wait: 4200 }, { shot: 'lag-06-a-caminho-do-vulcao' },
+    { run: 'skip(2)' }, { wait: 4000 },
+    { run: "game.hub.enter({ map: 'casa_sabio', x: 3, y: 6, dir: 'up' }); game.hub.interact()" }, { wait: 3200 }, { shot: 'lag-07-o-sabio' },
+    { run: "{ const d = game.hub.dialog; if (d) { d.shown = 999; game.hub.confirm(); } }" }, { wait: 2600 }, { shot: 'lag-08-kanto-em-paz' }
+  ],
   // a tela de Missões (H-3): o pontinho na barra, o começo da jornada e o diário depois do
   // Capítulo 3 (as quests concluídas por capítulo, com as datas, e o Pedaço de Metal)
   missoes: [

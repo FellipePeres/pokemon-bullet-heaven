@@ -52,11 +52,12 @@ export class CaptureSystem {
    * a captura (`run.liberated`). Os que ainda não têm missão continuam como antes.
    *
    * Desde a decisão 20 (2026-11-12), a captura dos lendários está fechada
-   * (`LEGENDARY_CAPTURE.open`): nenhum aparece, nem depois de liberado. Ela abre com o Campeão
-   * vencido (decisão 24, H-10: `run.legendsOpen`), e a regra acima vale.
+   * (`LEGENDARY_CAPTURE.open`): nenhum aparece, nem depois de liberado. Ela abre com a cena que
+   * salva a Elite dos Quatro (decisão 25: `run.legendsOpen`, o `Game.legendsOpen`), e a regra
+   * acima vale.
    */
   rollLegendary() {
-    // fechada até o Campeão (decisão 20); vencido o Campeão, abre (decisão 24, H-10)
+    // fechada até a cena que salva a Elite dos Quatro (decisões 20 e 25); depois dela, abre
     if (!LEGENDARY_CAPTURE.open && !this.run.legendsOpen) return null;
     const encounter = LEGENDARY_ENCOUNTERS[this.run.stage.id];
     if (!encounter || Math.random() >= encounter.chance) return null;
