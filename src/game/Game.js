@@ -1661,6 +1661,12 @@ export class Game {
   /* ============================== Poké Mart (0.23) ============================== */
 
   /** Os Pokémon da jornada (equipe e PC) que podem receber um item da loja. */
+  /** O jogador já é Campeão nesta jornada (venceu a última fase da região)? */
+  isChampion() {
+    const last = this.region.campaign.filter((e) => e.stage).at(-1)?.stage;
+    return !!last && this.campaign.clearedStages.includes(last);
+  }
+
   martTargets(itemId) {
     const item = getMartItem(itemId);
     const journey = this.campaign.journey;
@@ -1675,6 +1681,9 @@ export class Game {
         .map((m) => ({ ...m, label: `${getAbility(m.member.abilities[0])?.name} → ${getAbility(m.result)?.name}` }));
     }
     if (item.kind === 'tm_dive') {
+      // (H-10, pedido do Fellipe) só depois de o jogador ser Campeão: o Dive leva à lagoa do
+      // Kyogre (o Capítulo 8), e assim não há como pular a Liga
+      if (!this.isChampion()) return [];
       // de Água (principal ou secundário), com um Golpe Desperto que ainda não é o Dive
       return mons.filter((m) => getPokemon(m.member.pokemonId)?.types.includes('water'))
         .map((m) => ({ ...m, result: m.member.abilities?.find(isBonusMove) }))

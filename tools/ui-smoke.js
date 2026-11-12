@@ -1736,6 +1736,11 @@ check('depois da escolha, o Continuar segue para a jornada (na vila); sem nome, 
         game.martTargets('tm_dive').length === 0 && !registry.get('mart-list').children.some((c) => c.innerHTML.includes('TM Dive')));
   journey.pc.push({ uid: 'mart-kabuto', pokemonId: 'kabuto', level: 40, xp: 0, hp: 80, abilities: ['rock_throw', 'surf'], upgrades: {} });
   journey.pc.push({ uid: 'mart-squirtle', pokemonId: 'squirtle', level: 20, xp: 0, hp: 40, abilities: ['water_gun'], upgrades: {} });
+  // (H-10) antes de ser Campeão, nem com o Pokémon certo: o Dive leva à lagoa do Capítulo 8
+  game.campaign.clearedStages = game.campaign.clearedStages.filter((id) => id !== 'champion');
+  check('antes de vencer o Campeão, a TM Dive não aparece na loja, nem com um Pokémon de Água com Golpe Desperto',
+        game.martTargets('tm_dive').length === 0 && (game.menus.buildMart(), !registry.get('mart-list').children.some((c) => c.innerHTML.includes('TM Dive'))));
+  game.campaign.clearedStages.push('champion');
   const diveTargets = game.martTargets('tm_dive');
   check('com um Pokémon de Água (mesmo de tipo secundário) com Golpe Desperto, ela aparece; sem o Golpe Desperto, não',
         diveTargets.length === 1 && diveTargets[0].member.uid === 'mart-kabuto' && diveTargets[0].label.includes('Surf'));
