@@ -382,6 +382,58 @@ da cena final, como ele pediu na H-7.
   (Capítulo 5, "A suspeita"); depois, "Investigue o Monte Brasa, na Ilha 1" e "Derrote e liberte
   o Moltres", todas douradas.
 
+### 5.4 A Elite dos Quatro e a base do Maxie (H-9, proposta de 2026-11-12)
+
+Pedido do Fellipe: "vamos para o planejamento da H-9 e essa proposta de base, onde pode ser". A
+proposta, com as opções de lugar, as três cenas montadas em pixel (uma fala por quadro) e o caminho
+a pé andar por andar, está na página **"A base na Mansão"**
+(https://claude.ai/artifact/PmKT7En4wqaNBYMubwW7NU). Esperando aprovação; tudo abaixo é o padrão
+recomendado. Já vale a decisão dele no HISTORIA.md: o Mewtwo é libertado numa cena, sem luta, e na
+mesma cena a Elite dos Quatro agradece e volta para a Liga.
+
+- **O lugar: a Mansão Pokémon, em Cinnabar** (recomendada). É onde o Mewtwo nasceu (os diários do
+  FireRed), e o Maxie o trouxe de volta para o laboratório do subsolo. Os diários falam do Mew
+  (prepara o epílogo dele), as estátuas dos interruptores fazem a exploração, e Cinnabar fica entre
+  Seafoam e a Ilha 1, para onde iam as ondas. As outras: o Laboratório Pokémon de Cinnabar (quatro
+  salas pequenas, sem o que explorar) e o Armazém da Ilha 5 (é da Rocket no FireRed, o que confunde
+  depois do Giovanni). O Esconderijo Magma do Emerald fica guardado para o End Game.
+- **A cena da Victory Road** (o gatilho de antes da fase da Lorelei, uma vez; ela não começa a
+  fase): na Rota 23, o último guarda das insígnias (o da Insígnia da Terra, na porta da Victory Road)
+  vê as oito, mas a Liga está vazia: os quatro desceram juntos ontem à noite. O bilhete do Lance:
+  "Os pássaros de Kanto voltaram, mas alguém continua prendendo Pokémon fortes. Os fantasmas da
+  Agatha sentiram um sofrendo na velha Mansão de Cinnabar." A quest "Ajude a Elite dos Quatro".
+- **A trava da Liga muda**: "A Liga está vazia: a Elite dos Quatro partiu." O botão: "Vá até a
+  Mansão Pokémon, em Cinnabar". A Lorelei passa a esperar a cena do subsolo (uma trava por cena,
+  porque a missão não tem luta). Nada cita o Maxie nem o Mewtwo.
+- **A chegada** (a marca da Mansão no mapa da jornada): o Blaine na porta. Os quatro entraram e não
+  saíram; a mansão foi um laboratório onde ele trabalhou ("O que fizemos lá embaixo... eu prefiro
+  esquecer"); a dica das estátuas e a pergunta bônus ("o que se esconde no porão de uma casa
+  queimada? Essa, eu não quero saber a resposta").
+- **A Mansão a pé**: os quatro andares do FireRed com os interruptores funcionando como no jogo (o
+  estado vale para os quatro andares; as barreiras vêm do script do pret,
+  `data/scripts/pokemon_mansion.inc`). O caminho mais curto até o laboratório tem 219 passos e três
+  viradas (uma no 3º andar, duas no subsolo), com a queda pelo buraco do 3º andar. 15 Poké Balls: as
+  11 do FireRed (a Chave Secreta sai) e 4 no caminho de ida. Os quatro diários do FireRed, traduzidos,
+  e uma anotação nova do capuz vermelho perto do laboratório.
+- **O laboratório** (a sala da Chave Secreta do FireRed; pisar na entrada começa a cena): o Mewtwo
+  numa máquina roxa, os quatro em jaulas. O Lance grita que é uma armadilha; a Agatha: os fantasmas
+  dela sentem o sofrimento dele. O Maxie aparece pela primeira vez, com dois capangas de capuz
+  vermelho (a Equipe Magma do Emerald), e se apresenta; o emblema do uniforme é o das máquinas. O que
+  deixa o jogador sem defesa: as Poké Balls não abrem perto da máquina (foi assim que os quatro
+  caíram). Os capangas avançam; o raio do Zapdos rasga o teto, o gelo do Articuno prende os capangas,
+  a parede de fogo do Moltres separa o Maxie. "Os pássaros... vieram por você?!" O Crobat leva o
+  Maxie embora ("A energia deles já está onde precisa estar"). Os três destroem a máquina; o Mewtwo
+  encara o jogador e some num clarão. As jaulas abrem, cada um dos quatro fala, o Lance promete
+  esperar na Liga, os pássaros voam juntos, sem medo. O aviso "A Elite dos Quatro voltou para a
+  Liga" e o atalho para a vila.
+- **As quests**: "Siga pela Victory Road" fecha na cena da Rota 23; "Ajude a Elite dos Quatro"
+  (dourada) fecha na cena do subsolo; depois, "Vença a Elite dos Quatro" (Capítulo 7, "O sonho").
+- **Para o Fellipe decidir** (com o padrão): o lugar (a Mansão); quem dá a notícia (o guarda, com o
+  bilhete do Lance; ou o rival); o Blaine na porta (sim); os interruptores como no FireRed (sim; ou
+  barreiras fixas); o que deixa o jogador sem defesa (as Poké Balls que não abrem); o Mewtwo depois
+  (some num clarão; ideia guardada: aparecer na Caverna de Cerulean, como no FireRed); os pássaros
+  depois (voam juntos, ainda fora da equipe); a anotação nova (sim); a volta (o atalho).
+
 ---
 
 ## 6. A captura muda: o lendário só depois da missão dele
@@ -650,8 +702,9 @@ para o objetivo `scene` das quests. O check-data recusa a caixa com retrato
 | 16 | O Giovanni e o emblema (`depois_giovanni`) | ginásio de Viridian, depois da Fase 8 | 5 | H-8 ✅ |
 | 17 | O cume: a terceira máquina e o card (`brasa_cume`, e a versão curta `brasa_cume_card`) | o cume do Monte Brasa | 5 | H-8 ✅ |
 | 17b | Depois da luta: o Moltres foge e o emblema que lembra um vulcão (`moltres_livre`) | o cume do Monte Brasa | 5 | H-8 ✅ |
-| 18 | A Victory Road: a Elite dos Quatro partiu atrás de uma ameaça maior | o começo da Victory Road | 6 | H-9 |
-| 18b | A base do Maxie: o Mewtwo na máquina, os quatro em jaulas, a emboscada e os pássaros | a base do Maxie (a pensar) | 6 (missão) | H-9 |
+| 18 | A Victory Road: a Elite dos Quatro partiu, e o bilhete do Lance (`victory_road`, antes da fase da Lorelei) | Rota 23, o último guarda das insígnias | 6 (proposta) | H-9 (proposta) |
+| 18a | A Mansão: o Blaine na porta e as estátuas | Mansão Pokémon, 1º andar | 6 (proposta) | H-9 (proposta) |
+| 18b | O laboratório: o Mewtwo na máquina, os quatro em jaulas, a emboscada do Maxie, os pássaros e a libertação | Mansão Pokémon, o subsolo | 6 (proposta) | H-9 (proposta) |
 | 19 | O rival Campeão | sala do Campeão | 7 | H-10 |
 | 20 | "Ainda falta alguma coisa" | laboratório | 7 | H-10 |
 | 22 | O Kyogre e o Maxie (o segundo encontro) | lagoa ou Centro (já existe) | 8 | H-11 |
@@ -770,7 +823,7 @@ do Zapdos, o tipo, as fraquezas e o nível recomendado (36; sem captura, decisã
 | **H-6** ✅ 0.39 | O Zapdos (seção 5.1): o Lutar com a transição, a luta no fundo da Usina com ele enfraquecido pela máquina, a tempestade, e a cena de depois, em que ele foge assustado (sem captura, decisão 16). |
 | **H-7** ✅ 0.39 | O Articuno e o Capítulo 4 (seção 5.2, página "Seafoam: as ondas"): a cena do Blaine, a trava da Fase 8, Seafoam a pé com a regra de altura, a luta e as duas cenas da missão. |
 | **H-8** ✅ 0.39 | O Moltres e o Capítulo 5 (seção 5.3, página "Monte Brasa: o fogo"): a cena do Giovanni, a trava da Liga, o Monte Brasa a pé com as pedras arrastadas, os degraus de pular e as 15 Poké Balls, a luta sob o Sol forte e as duas cenas da missão. |
-| **H-9** | A Victory Road e a base do Maxie (decisão 22): a cena da Elite dos Quatro, a quest "Ajude a Elite dos Quatro", a base com o Mewtwo e as jaulas, a emboscada do Maxie e os pássaros. Ganha proposta e maquete. |
+| **H-9** (proposta) | A Victory Road e a base do Maxie (decisão 22; seção 5.4, página "A base na Mansão"): a cena da Elite dos Quatro, a quest "Ajude a Elite dos Quatro", a base com o Mewtwo e as jaulas, a emboscada do Maxie e os pássaros. Ganha proposta e maquete. |
 | **H-10** | A Liga e o fim do Capítulo 7: a Elite dos Quatro de volta, o rival Campeão e o "ainda falta alguma coisa". |
 | **H-11** | O Kyogre como fecho de Kanto (as quests em volta da cena que já existe, a lagoa depois do Campeão, o Maxie como segundo encontro) e o Mew. |
 | **H-12** | As recompensas das quests (no final, pedido do Fellipe). |

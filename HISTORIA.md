@@ -181,16 +181,18 @@ ladrão: o **Maxie**.
   - de perto, o pico escuro do emblema **lembra um vulcão**;
   - a Liga reabre a Victory Road.
 
-### Capítulo 6 — A Elite dos Quatro 🗺️
-(O ajuste do Fellipe de 2026-11-12, seção 8.1.)
+### Capítulo 6 — A Elite dos Quatro 📝
+(O ajuste do Fellipe de 2026-11-12, seção 8.1, e a proposta "A base na Mansão".)
 - A Victory Road se abre com os três pássaros livres.
 - **Ao começar a Victory Road**, a cena: a Elite dos Quatro se juntou para derrotar uma ameaça
   maior e foi até a base. A quest: "Ajude a Elite dos Quatro". A Liga fica fechada.
-- **A base do Maxie** (o lugar a pensar): o Mewtwo preso numa máquina e os quatro em jaulas.
+- **A base do Maxie** (proposta: a Mansão Pokémon, em Cinnabar, onde o Mewtwo nasceu): o Blaine na
+  porta, os quatro andares com os interruptores e os diários, e no subsolo o Mewtwo preso numa
+  máquina e os quatro em jaulas.
 - **A emboscada:**
   - o Maxie aparece pela primeira vez e surpreende o jogador;
   - o emblema do uniforme dele é o mesmo das máquinas, e é aqui que o jogador entende;
-  - o jogador, vulnerável, vai ser capturado;
+  - o jogador, vulnerável (as Poké Balls não abrem perto da máquina), vai ser capturado;
   - os três pássaros chegam para protegê-lo, e o Maxie foge.
 - A Elite dos Quatro é libertada, e as fases da Liga abrem.
 (aqui não tem combate para liberar o mewtwo, ele é liberto em uma cena, e nessa mesma cena ao liberar os treinadores da E4 eles agradecem e falam que vão para a E4 para o jogador poder desafiar)
