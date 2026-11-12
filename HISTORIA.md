@@ -196,8 +196,8 @@ ladrão: o **Maxie**.
   - os três pássaros chegam para protegê-lo, e o Maxie foge.
 - A Elite dos Quatro é libertada, e as fases da Liga abrem.
 (aqui não tem combate para liberar o mewtwo, ele é liberto em uma cena, e nessa mesma cena ao liberar os treinadores da E4 eles agradecem e falam que vão para a E4 para o jogador poder desafiar)
-### Capítulo 7 — O sonho 📝
-(Proposta "O sonho da Liga".)
+### Capítulo 7 — O sonho ✅
+(A proposta "O sonho da Liga", feita na H-10.)
 - A Liga: Lorelei, Bruno, Agatha e Lance, agora conhecidos. Depois de cada vitória, duas falas que
   lembram a Mansão.
 - **O rival como Campeão**: ele venceu os quatro antes do jogador, aproveitando que o jogador os

@@ -239,7 +239,7 @@ export class HubRenderer {
       const q = at(x, y);
       if (sheet) ctx.drawImage(sheet.img, q.x, q.y, 12 * S, 12 * S);
     }
-    if (fx.flash > 0) { ctx.fillStyle = `rgba(255,255,255,${fx.flash * 0.8})`; ctx.fillRect(0, 0, this.canvas.width, this.canvas.height); }
+    if (fx.flash > 0) { ctx.fillStyle = `rgba(${fx.flashColor ?? '255,255,255'},${fx.flash * 0.8})`; ctx.fillRect(0, 0, this.canvas.width, this.canvas.height); }
     const bird = fx.bird;
     const birdSheet = getSheet('dive/bird');
     if (bird && bird.x != null && birdSheet) {

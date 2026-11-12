@@ -75,6 +75,8 @@ export class Run {
     this.legendariesOffered = new Set();   // os que já apareceram nesta tentativa
     // os lendários liberados nesta jornada (H-5): quem tem missão só cai na Poké Ball depois dela
     this.liberated = new Set(options.liberated ?? []);
+    // a captura dos lendários aberta nesta jornada (H-10, decisão 24: o Campeão vencido)
+    this.legendsOpen = !!options.legendsOpen;
     // buffs dos 2º golpes na equipe: Tailwind (treinador mais rápido) e Reflect (menos dano)
     this.buffs = { tailwind: 0, reflect: 0 };
 

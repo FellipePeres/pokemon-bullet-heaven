@@ -194,6 +194,12 @@ não abre até você vencer.
   pela primeira vez, e os três pássaros chegam para proteger o jogador. Sem luta: a máquina
   cai, o Mewtwo some, e os quatro voltam para a Liga. Nas cenas, a caixa de texto nunca
   tampa ninguém.
+- **A Liga e o Mew**: cada um dos quatro tem uma palavra depois da batalha, lembrando a
+  Mansão. O rival chegou antes e virou Campeão nas costas do jogador; vencido, ele admite
+  que as hordas importavam. Na vila, o Carvalho diz que ainda falta alguma coisa, e o Mew
+  aparece no laboratório e fala com o jogador por telepatia: o Maxie continua roubando a
+  energia de lendários em outras regiões, e o próximo da lista dorme na lagoa. Depois do
+  Campeão, os lendários podem aparecer nas Poké Balls, e a TM Dive chega ao Poké Mart.
 - **A tela de Missões**: o Diário na barra, ao lado das Conquistas. Em cima, o que
   fazer agora; embaixo, o que já aconteceu, capítulo por capítulo, com a data de cada
   missão, para reler a história; no fim, os itens importantes que ela deu. Um

@@ -1503,6 +1503,81 @@ export const HUB_MAPS = {
       '######################################',
       '######################################'
     ]
+  },
+  sala_lorelei: {
+    src: 'assets/hub/sala_lorelei.png', top: 'assets/hub/sala_lorelei-top.png', width: 13, height: 10,
+    walk: [
+      '#############',
+      '#.#.......#.#',
+      '#...........#',
+      '#.#.......#.#',
+      '#.#.......#.#',
+      '#...........#',
+      '#.#.......#.#',
+      '#.#.......#.#',
+      '#...........#',
+      '#############'
+    ]
+  },
+  sala_bruno: {
+    src: 'assets/hub/sala_bruno.png', top: 'assets/hub/sala_bruno-top.png', width: 13, height: 10,
+    walk: [
+      '#############',
+      '#.#.......#.#',
+      '#...........#',
+      '#.#.......#.#',
+      '#.#.......#.#',
+      '#...........#',
+      '#.#.......#.#',
+      '#.#.......#.#',
+      '#...........#',
+      '#############'
+    ]
+  },
+  sala_agatha: {
+    src: 'assets/hub/sala_agatha.png', top: 'assets/hub/sala_agatha-top.png', width: 13, height: 10,
+    walk: [
+      '#############',
+      '#.#.......#.#',
+      '#...........#',
+      '#.#.......#.#',
+      '#.#.......#.#',
+      '#...........#',
+      '#.#.......#.#',
+      '#.#.......#.#',
+      '#...........#',
+      '#############'
+    ]
+  },
+  sala_lance: {
+    src: 'assets/hub/sala_lance.png', top: 'assets/hub/sala_lance-top.png', width: 15, height: 10,
+    walk: [
+      '###############',
+      '#.#.......#.###',
+      '#...........###',
+      '#.#.......#.###',
+      '#.#.......#.###',
+      '#...........###',
+      '#.#.......#.###',
+      '#.#.......#.###',
+      '#...........###',
+      '######.########'
+    ]
+  },
+  sala_campeao: {
+    src: 'assets/hub/sala_campeao.png', top: 'assets/hub/sala_campeao-top.png', width: 13, height: 10,
+    walk: [
+      '.............',
+      '.............',
+      '.............',
+      '.............',
+      '.............',
+      '.............',
+      '.............',
+      '.............',
+      '.............',
+      '#...........#'
+    ]
   }
 };
 
@@ -1550,6 +1625,7 @@ export const HUB_SPRITES = {
   'npc/maquina_zapdos': { src: 'assets/hub/npc/maquina_zapdos.png', frameWidth: 64, frameHeight: 48, frames: 1 },
   'npc/maquina_zapdos_quebrada': { src: 'assets/hub/npc/maquina_zapdos_quebrada.png', frameWidth: 64, frameHeight: 48, frames: 1 },
   'npc/meowth': { src: 'assets/hub/npc/meowth.png', frameWidth: 16, frameHeight: 16, frames: 3 },
+  'npc/mew': { src: 'assets/hub/npc/mew.png', frameWidth: 32, frameHeight: 32, frames: 1 },
   'npc/mewtwo': { src: 'assets/hub/npc/mewtwo.png', frameWidth: 32, frameHeight: 32, frames: 1 },
   'npc/misty': { src: 'assets/hub/npc/misty.png', frameWidth: 16, frameHeight: 32, frames: 3 },
   'npc/moltres': { src: 'assets/hub/npc/moltres.png', frameWidth: 32, frameHeight: 32, frames: 1 },

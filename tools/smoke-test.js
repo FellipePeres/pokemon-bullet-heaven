@@ -1762,6 +1762,26 @@ console.log('\n[a Liga e a Mansão — a trava por cena, os interruptores das es
         !hub.floor(12, 11) && (hub._act('switch'), hub.floor(12, 11)));
 }
 
+// ------------------------------------------- a captura aberta pelo Campeão (H-10)
+console.log('\n[a captura dos lendários depois do Campeão — decisão 24]');
+{
+  const keep = JSON.parse(JSON.stringify(LEGENDARY_ENCOUNTERS));
+  for (const enc of Object.values(LEGENDARY_ENCOUNTERS)) enc.chance = 1;
+  const LEG = Object.keys(LEGENDARY_KITS);
+  const offers = (run) => { const seen = new Set(); for (let i = 0; i < 40; i++) { run.legendariesOffered.clear(); for (const c of run.captureSystem.rollChoices()) if (LEG.includes(c.id)) seen.add(c.id); } return seen; };
+  const birds = ['zapdos', 'articuno', 'moltres'];
+  check('com a chave fechada e a jornada sem o Campeão, nenhum lendário aparece (nem com a chance no máximo)',
+        !LEGENDARY_CAPTURE.open && offers(new Run('champion', { starter: 'charmander', liberated: birds })).size === 0);
+  const liga = offers(new Run('champion', { starter: 'charmander', liberated: birds, legendsOpen: true }));
+  check('com o Campeão vencido (legendsOpen), eles aparecem: na Liga, as aves, o Mewtwo e o Mew',
+        ['zapdos', 'articuno', 'moltres', 'mewtwo', 'mew'].every((id) => liga.has(id)), [...liga].join(', '));
+  const fase7 = offers(new Run('gym_7_cinnabar', { starter: 'charmander', liberated: birds, legendsOpen: true }));
+  check('...e na Fase 7, só as aves (a tabela de sempre)', fase7.size === 3 && birds.every((id) => fase7.has(id)), [...fase7].join(', '));
+  check('...um de cada: quem está no PC não volta',
+        !offers(new Run('champion', { starter: 'charmander', liberated: birds, legendsOpen: true, ownedElsewhere: ['mew'] })).has('mew'));
+  for (const [id, enc] of Object.entries(keep)) Object.assign(LEGENDARY_ENCOUNTERS[id], enc);
+}
+
 // ------------------------------------------- a regra dos patamares de Seafoam (H-7)
 console.log('\n[as Ilhas Seafoam — a regra de altura do FireRed]');
 {

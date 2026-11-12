@@ -674,6 +674,8 @@ export class Game {
     }
     options.ownedElsewhere = (journey?.pc ?? []).map((m) => m.pokemonId);   // lendário: um de cada
     options.liberated = this.liberatedSpecies();   // H-5: quem tem missão só cai na Poké Ball depois dela
+    // H-10 (decisão 24): depois do Campeão, os lendários podem aparecer nas Poké Balls
+    options.legendsOpen = this.isChampion();
     options.trainer = this.profile.trainer;
     options.campaignStarter = this.campaign.starter;
 

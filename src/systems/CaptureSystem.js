@@ -52,11 +52,12 @@ export class CaptureSystem {
    * a captura (`run.liberated`). Os que ainda não têm missão continuam como antes.
    *
    * Desde a decisão 20 (2026-11-12), a captura dos lendários está fechada
-   * (`LEGENDARY_CAPTURE.open`): nenhum aparece, nem depois de liberado. A regra acima vale
-   * quando a história abrir.
+   * (`LEGENDARY_CAPTURE.open`): nenhum aparece, nem depois de liberado. Ela abre com o Campeão
+   * vencido (decisão 24, H-10: `run.legendsOpen`), e a regra acima vale.
    */
   rollLegendary() {
-    if (!LEGENDARY_CAPTURE.open) return null;
+    // fechada até o Campeão (decisão 20); vencido o Campeão, abre (decisão 24, H-10)
+    if (!LEGENDARY_CAPTURE.open && !this.run.legendsOpen) return null;
     const encounter = LEGENDARY_ENCOUNTERS[this.run.stage.id];
     if (!encounter || Math.random() >= encounter.chance) return null;
     const owned = (id) => this.run.team.has(id) || this.run.pc.some((m) => m.pokemonId === id)

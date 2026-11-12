@@ -124,7 +124,7 @@ quando o jogador volta, ou o lugar da fase antes dela.
 | **4 — As ondas** | Fase 7 (Blaine) | **Feito na 0.39 (H-7)**, a proposta "Seafoam: as ondas", aprovada ("pode seguir com o que fez"; seção 5.2). Depois do Blaine, no ginásio dele, os instrumentos do Laboratório Pokémon medem ondas estranhas saindo das Ilhas Seafoam rumo ao sul, e o jogador liga às ondas da máquina da Usina; o mar em volta de Seafoam está congelando, e nenhum barco sai de Cinnabar (a trava da Fase 8). O jogador desce a pé os cinco andares do FireRed até o fundo e acha o Articuno preso numa máquina coberta de gelo; vence a luta, ele foge pela fenda do teto, e na máquina quebrada: "Duas máquinas, dois pássaros". O mar descongela, e a Fase 8 abre. | **Articuno** |
 | **5 — A suspeita** | Fase 8 (Giovanni) | **Feito na 0.39 (H-8)**, a proposta "Monte Brasa: o fogo", aprovada ("construa a h-8 então"; seção 5.3). O jogador chega achando que é a Rocket. O Giovanni olha o Pedaço de Metal e ri: não é da Rocket, e ele também quer saber quem é. Os homens dele viram gente com o emblema subindo o Monte Brasa, na Ilha 1, com peças de máquina (as da casa de Cerulean). A Liga fica fechada até o Moltres (decisão 2). O jogador sobe a pé até o cume e acha o Moltres preso na terceira máquina, em brasa. (No jogo, o título é só "A suspeita": "o fogo" adiantaria o Moltres, sem spoiler em título.) | **Moltres** |
 | **6 — A Elite dos Quatro** | o começo da Victory Road | **Feito na 0.39 (H-9)**, a proposta "A base na Mansão" (seção 5.4). **Ajuste de 2026-11-12** (decisão 22; HISTORIA.md, seção 8.1). A Victory Road só abre com os três pássaros de volta (decisão 2). Ao começar por ela, uma cena: a Elite dos Quatro se juntou para derrotar uma ameaça maior e foi até a base do Maxie (o lugar a pensar). A quest "Ajude a Elite dos Quatro". Na base, o Mewtwo preso numa máquina e os quatro em jaulas; a emboscada: o Maxie aparece pela primeira vez, o jogador vai ser capturado, os três pássaros chegam e o Maxie foge. Só então a Liga abre. | **Mewtwo** |
-| **7 — O sonho** | Liga e Campeão | A Elite dos Quatro, libertada, de volta à Liga. O rival no fim, e o Hall da Fama. Depois, o Carvalho: as rotas estão mais calmas, mas não como antes: "ainda falta alguma coisa". | — |
+| **7 — O sonho** | Liga e Campeão | **Feito na 0.39 (H-10)**, a proposta "O sonho da Liga" (seção 5.5). A Elite dos Quatro, libertada, de volta à Liga. O rival no fim, e o Hall da Fama. Depois, o Carvalho: as rotas estão mais calmas, mas não como antes: "ainda falta alguma coisa". | — |
 | **8 — O que a lagoa guarda** | late game, depois do Campeão | O pescador fala da lagoa: a descida, o Kyogre e o **Maxie** (a cena que já existe), agora o segundo encontro. "A caminho do vulcão!" leva a Hoenn. | **Kyogre** |
 | **Epílogo — O Pokémon rosa** (ideia) | depois do Maxie | O Mew aparece na vila. | **Mew** (decisão 5) |
 
@@ -435,13 +435,13 @@ mesma cena a Elite dos Quatro agradece e volta para a Liga.
   (some num clarão; ideia guardada: aparecer na Caverna de Cerulean, como no FireRed); os pássaros
   depois (voam juntos, ainda fora da equipe); a anotação nova (sim); a volta (o atalho).
 
-### 5.5 A Liga, o rival Campeão, o Carvalho e o Mew (H-10, proposta de 2026-11-12)
+### 5.5 A Liga, o rival Campeão, o Carvalho e o Mew (H-10 ✅, feita na 0.39)
 
 Pedido do Fellipe: "bora para o próximo passo que é H-10", com a nota dele no HISTORIA.md (o Mew
 depois do Campeão, no laboratório, por telepatia) e a do HANDOFF ("Lendários podem aparecer em
 pokebolas pós derrotar a E4 e o Campeão"). A proposta, com as sete cenas montadas em pixel, está na
-página **"O sonho da Liga"** (https://claude.ai/artifact/SZeNrehqRifiRCVy5bXTzD). Esperando
-aprovação; tudo abaixo é o padrão recomendado.
+página **"O sonho da Liga"** (https://claude.ai/artifact/SZeNrehqRifiRCVy5bXTzD). Aprovada ("top,
+tudo aprovado") e feita na 0.39, como está abaixo.
 
 - **Depois de cada um dos quatro** (o gatilho `win` de cada fase da Liga, uma vez), a volta passa
   pela sala dele, num palco do FireRed (`PokemonLeague_*Room`): duas falas que lembram a Mansão. A
@@ -740,9 +740,9 @@ para o objetivo `scene` das quests. O check-data recusa a caixa com retrato
 | 18 | A Victory Road: a Elite dos Quatro partiu, e o bilhete do Lance (`victory_road`, antes da fase da Lorelei) | Rota 23, o último guarda das insígnias | 6 | H-9 ✅ |
 | 18a | A Mansão: o Blaine na porta e as estátuas (`mansao_entrada`) | Mansão Pokémon, 1º andar | 6 | H-9 ✅ |
 | 18b | O laboratório: o Mewtwo na máquina, os quatro em jaulas, a emboscada do Maxie, os pássaros e a libertação | Mansão Pokémon, o subsolo (`mansao_lab`) | 6 | H-9 ✅ |
-| 19a | Depois de cada um dos quatro: duas falas na sala dele | as salas da Liga | 7 (proposta) | H-10 (proposta) |
-| 19 | O rival Campeão: antes da batalha, e depois dela, vencido ("Você estava certo") | sala do Campeão | 7 (proposta) | H-10 (proposta) |
-| 20 | "Ainda falta alguma coisa": o Carvalho e o Mew, por telepatia | laboratório da vila | 7 (proposta) | H-10 (proposta) |
+| 19a | Depois de cada um dos quatro: duas falas na sala dele (`depois_lorelei` a `depois_lance`) | as salas da Liga | 7 | H-10 ✅ |
+| 19 | O rival Campeão: antes da batalha, e depois dela, vencido ("Você estava certo") | sala do Campeão (`campeao_antes`, `campeao_depois`) | 7 | H-10 ✅ |
+| 20 | "Ainda falta alguma coisa": o Carvalho e o Mew, por telepatia | laboratório da vila (`carvalho_mew`) | 7 | H-10 ✅ |
 | 22 | O Kyogre e o Maxie (o segundo encontro) | lagoa ou Centro (já existe) | 8 | H-11 |
 | 23 | O Pokémon rosa | vila | Epílogo | H-11 |
 
@@ -860,7 +860,7 @@ do Zapdos, o tipo, as fraquezas e o nível recomendado (36; sem captura, decisã
 | **H-7** ✅ 0.39 | O Articuno e o Capítulo 4 (seção 5.2, página "Seafoam: as ondas"): a cena do Blaine, a trava da Fase 8, Seafoam a pé com a regra de altura, a luta e as duas cenas da missão. |
 | **H-8** ✅ 0.39 | O Moltres e o Capítulo 5 (seção 5.3, página "Monte Brasa: o fogo"): a cena do Giovanni, a trava da Liga, o Monte Brasa a pé com as pedras arrastadas, os degraus de pular e as 15 Poké Balls, a luta sob o Sol forte e as duas cenas da missão. |
 | **H-9** ✅ 0.39 | A Victory Road e a base do Maxie (decisão 22; seção 5.4, página "A base na Mansão"): a cena da Elite dos Quatro, a quest "Ajude a Elite dos Quatro", a base com o Mewtwo e as jaulas, a emboscada do Maxie e os pássaros. Ganha proposta e maquete. |
-| **H-10** (proposta) | A Liga e o fim do Capítulo 7 (seção 5.5, página "O sonho da Liga"): a Elite dos Quatro de volta, o rival Campeão e o "ainda falta alguma coisa". |
+| **H-10** ✅ 0.39 | A Liga e o fim do Capítulo 7 (seção 5.5, página "O sonho da Liga"): a Elite dos Quatro de volta, o rival Campeão e o "ainda falta alguma coisa". |
 | **H-11** | O Kyogre como fecho de Kanto (as quests em volta da cena que já existe, a lagoa depois do Campeão, o Maxie como segundo encontro) e o Mew. |
 | **H-12** | As recompensas das quests (no final, pedido do Fellipe). |
 

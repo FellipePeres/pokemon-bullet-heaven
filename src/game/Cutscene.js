@@ -45,7 +45,7 @@ export class Cutscene {
     this.t = 0;
     this.local = {};           // o estado do passo atual (o roteiro em si nunca muda)
     this.cast = Object.entries(def.actors ?? {}).map(([actorId, a]) => ({
-      id: actorId, sprite: a.sprite, x: a.x, y: a.y, dir: a.dir ?? 'down', hidden: !!a.hidden, glow: !!a.glow,
+      id: actorId, sprite: a.sprite, x: a.x, y: a.y, dir: a.dir ?? 'down', hidden: !!a.hidden, glow: !!a.glow, lift: a.lift ?? 0,
       moving: false, steps: 0, prog: 0, walkPath: null, from: null, speed: CONFIG.hub.walkTime
     }));
     this.fx = { emote: null, ball: null, flash: 0, bird: null, cutin: null, fade: 0, camera: null, shake: null, storm: null, item: null, mist: null };
@@ -217,7 +217,8 @@ export class Cutscene {
         // levanta voo e some pelo alto da tela (`height` pixels do GBA em `t` segundos, acelerando)
         const m = this.actor(a.who);
         const k = Math.min(1, this.t / (a.t ?? 0.9));
-        m.lift = (a.height ?? 200) * k * k;
+        if (local.base == null) local.base = m.lift ?? 0;
+        m.lift = local.base + (a.height ?? 200) * k * k;
         m.jx = Math.round(Math.sin(this.t * 25) * 2 * (1 - k));
         done = k >= 1;
         if (done) { m.hidden = true; m.lift = 0; m.jx = 0; }
@@ -237,6 +238,7 @@ export class Cutscene {
         // um clarão branco na tela inteira, que some em `t` segundos (o raio, a máquina explodindo)
         const k = Math.min(1, this.t / (a.t ?? 0.4));
         this.fx.flash = (a.power ?? 1) * (1 - k);
+        this.fx.flashColor = a.color ?? null;   // (H-10) a luz rosa do Mew
         done = k >= 1;
         if (done) this.fx.flash = 0;
         break;

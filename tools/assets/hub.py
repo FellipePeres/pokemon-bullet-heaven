@@ -412,6 +412,8 @@ EMBER = ['MtEmber_Exterior', 'MtEmber_SummitPath_1F', 'MtEmber_SummitPath_2F', '
 SEAFOAM = ['SeafoamIslands_1F', 'SeafoamIslands_B1F', 'SeafoamIslands_B2F', 'SeafoamIslands_B3F', 'SeafoamIslands_B4F']
 MANSION = ['PokemonMansion_1F', 'PokemonMansion_2F', 'PokemonMansion_3F', 'PokemonMansion_B1F']
 ROUTE23 = 'Route23'
+LEAGUE = ['PokemonLeague_LoreleisRoom', 'PokemonLeague_BrunosRoom', 'PokemonLeague_AgathasRoom',
+          'PokemonLeague_LancesRoom', 'PokemonLeague_ChampionsRoom']
 
 # Os interruptores da Mansão Pokémon (H-9): as barreiras que a estátua troca, do script do pret
 # (data/scripts/pokemon_mansion.inc, copiado em tools/assets/pret/; o decomp do Pokemon All não
@@ -494,6 +496,16 @@ def build_rota23(s):
     s.stamp(0, 0, ROUTE23, 0, 27, 15, 10)
 
 
+def league(room, x0, y0):
+    """
+    Uma sala da Liga do FireRed (H-10), recortada em volta do líder: o palco da cena de depois da
+    vitória (e, no Campeão, a de antes). O líder fica em 6,3 no recorte (o rival, em 6,4).
+    """
+    def build(s):
+        s.stamp(0, 0, room, x0, y0, s.w, s.h)
+    return build
+
+
 def build_cerulean(s):
     """
     Um recorte de Cerulean (0.39): a casa assaltada do FireRed (a porta da frente em
@@ -543,6 +555,12 @@ MAPS = {
     'mansao_2f': (38, 38, mansion(MANSION[1])),
     'mansao_3f': (38, 35, mansion(MANSION[2])),
     'mansao_b1f': (38, 35, mansion(MANSION[3])),
+    # o Capítulo 7 (H-10): as salas da Liga
+    'sala_lorelei': (13, 10, league(LEAGUE[0], 0, 2)),
+    'sala_bruno': (13, 10, league(LEAGUE[1], 0, 2)),
+    'sala_agatha': (13, 10, league(LEAGUE[2], 0, 2)),
+    'sala_lance': (15, 10, league(LEAGUE[3], 0, 5)),
+    'sala_campeao': (13, 10, league(LEAGUE[4], 0, 4)),
 }
 BRASA = {'brasa_encosta', 'brasa_caminho_1f', 'brasa_caminho_2f', 'brasa_caminho_3f', 'brasa_cume'}
 # os mapas que levam a altura de cada tile (a regra dos patamares, H-7) e os degraus de pular (H-8)
@@ -553,7 +571,7 @@ SWITCH_MAPS = {'mansao_1f': MANSION[0], 'mansao_2f': MANSION[1], 'mansao_3f': MA
 # o comportamento do metatile (MB_JUMP_*) e a letra de cada sentido
 JUMP_BEHAVIOR = {0x38: '>', 0x39: '<', 0x3A: '^', 0x3B: 'v'}
 SOURCES = [P, V, R, F, CE, FU, IP, DS4, DS1, PH1, PH2, LAB, HOUSE1, WARDEN, COPYCAT, GYM1, GYM2, GYM3, VE, PP, GYM4, GYM7, *SEAFOAM,
-           GYM8, *EMBER, *MANSION, ROUTE23]
+           GYM8, *EMBER, *MANSION, ROUTE23, *LEAGUE]
 
 
 # ============================ os móveis do quarto ============================
@@ -1014,6 +1032,8 @@ def export_base(catalog, emerald):
     }
     icon = ROOT / 'assets' / 'pokemon' / 'gen3' / 'icons' / '150.png'
     out['mewtwo'] = Image.open(icon).convert('RGBA').crop((0, 0, 32, 32))   # o ícone do Gen 3: 32x32, como os pássaros
+    # o Mew (H-10), do mesmo jeito
+    out['mew'] = Image.open(ROOT / 'assets' / 'pokemon' / 'gen3' / 'icons' / '151.png').convert('RGBA').crop((0, 0, 32, 32))
     magma = emerald / 'graphics' / 'object_events' / 'pics' / 'people' / 'team_magma' / 'magma_member_f.png'
     if magma.exists():
         # a capanga de capuz vermelho, do Emerald, com a paleta do próprio PNG (o índice 0 é o fundo)

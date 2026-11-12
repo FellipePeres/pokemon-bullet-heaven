@@ -137,6 +137,9 @@ export const LEGENDARY_ENCOUNTERS = {
  * Mewtwo e o Mew na Liga. O sorteio desta tabela fica guardado, com as regras de sempre, para
  * quando a história abrir a captura (`open: true`). O Kyogre não muda: ele vem da luta do salão.
  */
+// (H-10, decisão 24) a chave continua fechada, mas cada jornada abre a dela com o Campeão vencido
+// (`legendsOpen` da partida, systems/CaptureSystem.js): "Lendários podem aparecer em pokebolas
+// pós derrotar a E4 e o Campeão" (o Fellipe, no HANDOFF)
 export const LEGENDARY_CAPTURE = { open: false };
 
 /** Entre os lendários sorteados: as aves comuns, Mewtwo e Mew raros. */

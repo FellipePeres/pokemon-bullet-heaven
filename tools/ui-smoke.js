@@ -1675,29 +1675,89 @@ game.menus.closeModal();
   hub.enter('home');
 }
 
+// ---- o Capítulo 7 (H-10, "O sonho da Liga"): as falas da Elite dos Quatro, o rival Campeão, o Hall
+// da Fama, o Carvalho e o Mew, e a captura dos lendários aberta pelo Campeão ----
+{
+  const { QUESTS, CHAPTERS } = await import('../src/data/quests.js');
+  const win = (stageId) => { game.startStage(stageId); game.run.state = 'victory'; game._handleRunState(); };
+  game.startStage('e4_lorelei');
+  check('antes do Campeão, a partida da Liga não abre a captura dos lendários', !!game.run && !game.run.legendsOpen);
+  game.run.state = 'victory';
+  game._handleRunState();
+  check('vencer a Lorelei deixa a cena da sala dela devida', game.sceneRecord.depois_lorelei === 'due');
+  registry.get('btn-result-menu').click();
+  check('Continuar Jornada: a sala da Lorelei do FireRed em tela cheia, com ela em pixel',
+        hub.mapId === 'sala_lorelei' && hub.scene?.id === 'depois_lorelei' && registry.get('screen-hub').classes.has('cinema')
+        && hub.npcs.some((n) => n.id === 'lorelei' && n.sprite === 'lorelei'));
+  const lorelei = runScene();
+  check('a Lorelei: não era sorte; o Bruno espera', said(lorelei, 'Não era sorte') && said(lorelei, 'o Bruno está esperando'));
+  settle();
+  check('...e a volta é para a vila', hub.mapId === 'vila' && !hub.scene);
+  for (const [stage, id, line] of [['e4_bruno', 'bruno', 'Treinei a noite inteira'], ['e4_agatha', 'agatha', 'Os meus fantasmas avisaram'],
+    ['e4_lance', 'lance', 'Alguém chegou lá antes de você']]) {
+    win(stage);
+    registry.get('btn-result-menu').click();
+    const there = hub.mapId === `sala_${id}` && hub.scene?.id === `depois_${id}`;
+    const lines = runScene();
+    check(`depois de ${id === 'agatha' ? 'a Agatha' : `o ${id[0].toUpperCase()}${id.slice(1)}`}: a sala dele e as duas falas`, there && said(lines, line));
+    settle();
+  }
+  check('vencidos os quatro, a quest "Vença o Campeão" (Capítulo 7)', game.quests.isDone('c7_liga') && game.quests.isActive('c7_campeao')
+        && CHAPTERS[QUESTS.c7_campeao.chapter] === 'Capítulo 7 — O sonho');
+  // o rival Campeão: o primeiro Jogar toca a cena antes da fase
+  game.startStage('champion');
+  check('o primeiro Jogar do Campeão toca a cena na sala dele, ainda sem a fase',
+        !game.run && hub.mapId === 'sala_campeao' && hub.scene?.id === 'campeao_antes' && hub.npcs.some((n) => n.id === 'rival' && n.sprite === 'rival'));
+  const antes = runScene();
+  check('o rival venceu os quatro antes, aproveitando que o jogador os trouxe de volta',
+        said(antes, 'Adivinha quem é o Campeão') && said(antes, 'eu venci os quatro antes de você') && said(antes, 'Valeu por trazer eles de volta'));
+  for (let i = 0; i < 60 * 3 && !game.run; i++) hub.update(1 / 60);
+  check('...e no fim da cena, a batalha do Campeão começa', game.run?.stage.id === 'champion');
+  game.run.state = 'victory';
+  game._handleRunState();
+  check('vencer o Campeão abre o Hall da Fama com a equipe',
+        !registry.get('hall-overlay').classes.has('hidden') && game.profile.hallOfFame.length === 1 &&
+        registry.get('hall-team').children.length === game.profile.hallOfFame[0].team.length,
+        `${registry.get('hall-team').children.length} Pokémon`);
+  check('o Hall da Fama guarda o nome do jogador', game.profile.hallOfFame[0].trainerName === 'Fellipe');
+  registry.get('hall-close').click();
+  check('fechar o Hall da Fama mostra a tela de vitória (com o Modo Livre, 0.27)',
+        registry.get('hall-overlay').classes.has('hidden') && !registry.get('result-overlay').classes.has('hidden'));
+  registry.get('btn-result-menu').click();
+  check('Continuar Jornada: a sala do Campeão, com o rival vencido', hub.mapId === 'sala_campeao' && hub.scene?.id === 'campeao_depois');
+  const depois = runScene();
+  check('o rival vencido admite que o jogador estava certo e promete ajudar',
+        said(depois, 'Logo agora que eu era o Campeão') && said(depois, 'Você estava certo') && said(depois, 'eu também ajudo'));
+  settle();
+  check('...e de lá a volta é para a vila, com a quest "Conte ao Prof. Carvalho"',
+        hubVisible() && hub.mapId === 'vila' && game.quests.isDone('c7_campeao') && game.quests.isActive('c7_carvalho'));
+  // a captura abre com o Campeão (decisão 24)
+  game.startStage('gym_7_cinnabar');
+  check('vencido o Campeão, as partidas abrem a captura dos lendários (a nota do Fellipe no HANDOFF)', !!game.run?.legendsOpen && game.isChampion());
+  game.quitToMenu();
+  // o laboratório: o Carvalho e o Mew
+  hub.enter({ map: 'vila', x: 26, y: 7, dir: 'up' });
+  press('up');
+  check('entrar no laboratório com a quest começa a cena do Carvalho', hub.mapId === 'lab' && hub.scene?.id === 'carvalho_mew');
+  let mewIn = false, mewOut = false;
+  const lab = runScene((d) => {
+    if (d.text.includes('Uma luz rosa')) mewIn = hub.scene?.actor('mew')?.hidden === false;
+    if (d.text.includes('dá uma volta no ar')) mewOut = !!hub.scene?.actor('mew')?.hidden;
+  });
+  check('o Carvalho: o novo Campeão, e "ainda falta alguma coisa"', said(lab, 'O novo Campeão de Kanto') && said(lab, 'Ainda falta alguma coisa'));
+  check('a luz rosa e o Mew; o jogador o reconhece dos diários da Mansão', mewIn && said(lab, 'o Pokémon dos diários da Mansão'));
+  check('o Mew, por telepatia: escapou do Maxie, que rouba a energia de lendários em outras regiões; o próximo dorme na lagoa',
+        lab.filter((d) => d.name === 'Mew').length === 4 && said(lab, 'Eu consegui fugir') && said(lab, 'outras regiões') && said(lab, 'no fundo da lagoa'));
+  check('...ele some, e o Carvalho só viu: os lendários confiam no jogador', mewOut && said(lab, 'Você também viu?') && said(lab, 'talvez aceitem seguir com você'));
+  check('a quest fecha', game.quests.isDone('c7_carvalho') && game.sceneRecord.carvalho_mew === 'seen' && !hub.scene && hub.mapId === 'lab');
+  game.openCampaign();
+  check('o mapa mostra o botão do Hall da Fama', !registry.get('btn-hall').classes.has('hidden'));
+  hub.enter('home');
+}
+
 // ---- a caixa de texto nunca tampa quem está em cena (todas as falas das cenas acima) ----
 check(`a caixa de texto não tampa ninguém em cena (${framing.checked} falas conferidas numa tela de 1280x720)`,
       framing.checked > 100 && framing.covered.length === 0, framing.covered.slice(0, 8).join(' | '));
-
-// ---- Campeão e Hall da Fama ----
-game.region.campaign.slice(0, -1).forEach((e) => {
-  if (!game.campaign.clearedStages.includes(e.stage)) game.campaign.clearedStages.push(e.stage);
-});
-game.startStage('champion');
-game.run.state = 'victory';
-game._handleRunState();
-check('vencer o Campeão abre o Hall da Fama com a equipe',
-      !registry.get('hall-overlay').classes.has('hidden') && game.profile.hallOfFame.length === 1 &&
-      registry.get('hall-team').children.length === game.profile.hallOfFame[0].team.length,
-      `${registry.get('hall-team').children.length} Pokémon`);
-check('o Hall da Fama guarda o nome do jogador', game.profile.hallOfFame[0].trainerName === 'Fellipe');
-registry.get('hall-close').click();
-check('fechar o Hall da Fama mostra a tela de vitória (com o Modo Livre, 0.27)',
-      registry.get('hall-overlay').classes.has('hidden') && !registry.get('result-overlay').classes.has('hidden'));
-registry.get('btn-result-menu').click();
-check('e de lá "Continuar Jornada" volta para a vila', hubVisible());
-game.openCampaign();
-check('o mapa mostra o botão do Hall da Fama', !registry.get('btn-hall').classes.has('hidden'));
 
 const save = game.buildSaveData();
 check('save é montado a partir do estado atual',

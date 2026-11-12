@@ -588,6 +588,33 @@ export const HUB = {
       ]
     },
 
+    // ---------------- o Capítulo 7 (H-10): as salas da Liga do FireRed (os palcos das cenas) ----------------
+    sala_lorelei: {
+      name: 'Liga Pokémon', scene: true,
+      npcs: [{ id: 'lorelei', sprite: 'lorelei', x: 6, y: 3, dir: 'down', talk: 'e4_jaula' }],
+      things: []
+    },
+    sala_bruno: {
+      name: 'Liga Pokémon', scene: true,
+      npcs: [{ id: 'bruno', sprite: 'bruno', x: 6, y: 3, dir: 'down', talk: 'e4_jaula' }],
+      things: []
+    },
+    sala_agatha: {
+      name: 'Liga Pokémon', scene: true,
+      npcs: [{ id: 'agatha', sprite: 'agatha', x: 6, y: 3, dir: 'down', talk: 'e4_jaula' }],
+      things: []
+    },
+    sala_lance: {
+      name: 'Liga Pokémon', scene: true,
+      npcs: [{ id: 'lance', sprite: 'lance', x: 6, y: 3, dir: 'down', talk: 'e4_jaula' }],
+      things: []
+    },
+    sala_campeao: {
+      name: 'Liga Pokémon', scene: true,
+      npcs: [{ id: 'rival', sprite: 'rival', x: 6, y: 4, dir: 'down', talk: 'e4_jaula' }],
+      things: []
+    },
+
     // ---------------- o Capítulo 6 (H-9): a porta da Victory Road e a Mansão Pokémon ----------------
     // o recorte da Rota 23: o último guarda das insígnias, na porta da Victory Road (o palco da cena
     // de antes da fase da Lorelei)

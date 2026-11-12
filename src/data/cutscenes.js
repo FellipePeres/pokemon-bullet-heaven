@@ -906,6 +906,124 @@ export const CUTSCENES = {
     ]
   },
 
+  /* ========================= Capítulo 7: o sonho (H-10) ========================= */
+  // a proposta "O sonho da Liga", aprovada ("top, tudo aprovado"). Depois da primeira vitória contra
+  // cada um dos quatro, a volta passa pela sala dele, com duas falas que lembram a Mansão
+  depois_lorelei: {
+    map: 'sala_lorelei', spot: { x: 6, y: 5, dir: 'up' },
+    trigger: [{ on: 'win', target: 'e4_lorelei' }],
+    steps: [
+      { do: 'wait', t: 0.4 },
+      { do: 'say', name: 'Lorelei', lines: ['Na Mansão, eu achei que você tinha tido sorte. Não era sorte.'] },
+      { do: 'say', name: 'Lorelei', lines: ['Só agora parei de tremer daquela jaula. Vá em frente, {player}: o Bruno está esperando.'] },
+      { do: 'wait', t: 0.3 },
+      { do: 'end', then: 'home' }
+    ]
+  },
+  depois_bruno: {
+    map: 'sala_bruno', spot: { x: 6, y: 5, dir: 'up' },
+    trigger: [{ on: 'win', target: 'e4_bruno' }],
+    steps: [
+      { do: 'wait', t: 0.4 },
+      { do: 'say', name: 'Bruno', lines: ['Hmph! Treinei a noite inteira depois daquela grade. Não foi o bastante.'] },
+      { do: 'say', name: 'Bruno', lines: ['A Agatha é a próxima. Ela não perdoa ninguém, nem quem a tirou de uma jaula.'] },
+      { do: 'wait', t: 0.3 },
+      { do: 'end', then: 'home' }
+    ]
+  },
+  depois_agatha: {
+    map: 'sala_agatha', spot: { x: 6, y: 5, dir: 'up' },
+    trigger: [{ on: 'win', target: 'e4_agatha' }],
+    steps: [
+      { do: 'wait', t: 0.4 },
+      { do: 'say', name: 'Agatha', lines: ['Hehe... Os meus fantasmas avisaram que você ia ganhar. Eu não quis ouvir.'] },
+      { do: 'say', name: 'Agatha', lines: ['Vá. O Lance espera, e os pássaros estão de olho em você.'] },
+      { do: 'wait', t: 0.3 },
+      { do: 'end', then: 'home' }
+    ]
+  },
+  depois_lance: {
+    map: 'sala_lance', spot: { x: 6, y: 5, dir: 'up' },
+    trigger: [{ on: 'win', target: 'e4_lance' }],
+    steps: [
+      { do: 'wait', t: 0.4 },
+      { do: 'say', name: 'Lance', lines: ['Você nos tirou de uma jaula e agora nos venceu. A Liga vai lembrar desse nome.'] },
+      { do: 'say', name: 'Lance', lines: ['Mas ainda há uma porta. Alguém chegou lá antes de você.'] },
+      { do: 'wait', t: 0.3 },
+      { do: 'end', then: 'home' }
+    ]
+  },
+
+  // o primeiro Jogar do Campeão: o rival na sala dele. Ele venceu os quatro antes do jogador,
+  // aproveitando que o jogador os trouxe de volta (como no FireRed, em que ele chega antes)
+  campeao_antes: {
+    map: 'sala_campeao', spot: { x: 6, y: 8, dir: 'up' },
+    trigger: [{ on: 'play', target: 'champion' }],
+    steps: [
+      { do: 'wait', t: 0.4 },
+      { do: 'walk', who: 'player', to: [[6, 6, 'up']] },
+      { do: 'say', name: 'Rival', lines: ['Até que enfim, {player}! Adivinha quem é o Campeão?'] },
+      { do: 'emote', who: 'player' },
+      { do: 'say', name: 'Rival', lines: ['Enquanto você brincava de detetive, a Elite dos Quatro voltou. E eu venci os quatro antes de você!'] },
+      { do: 'say', name: 'Rival', lines: ['Valeu por trazer eles de volta. Agora vem: o melhor treinador do mundo está bem aqui!'] },
+      { do: 'end', then: 'stage' }
+    ]
+  },
+
+  // depois do Campeão (e do Hall da Fama): o rival vencido admite que o jogador estava certo
+  campeao_depois: {
+    map: 'sala_campeao', spot: { x: 6, y: 6, dir: 'up' },
+    trigger: [{ on: 'win', target: 'champion' }],
+    steps: [
+      { do: 'wait', t: 0.4 },
+      { do: 'say', name: 'Rival', lines: ['Eu... perdi? Logo agora que eu era o Campeão?'] },
+      { do: 'face', who: 'rival', dir: 'left' },
+      { do: 'say', name: 'Rival', lines: ['As hordas, as máquinas, os pássaros... Você estava certo, {player}. Eu só olhava para as insígnias.'] },
+      { do: 'face', who: 'rival', dir: 'down' },
+      { do: 'say', name: 'Rival', lines: ['Vou treinar de verdade. E da próxima vez que alguém precisar, eu também ajudo.'] },
+      { do: 'walk', who: 'rival', to: [[6, 9]], speed: 0.14 },
+      { do: 'hide', who: 'rival' },
+      // fecha "Vença o Campeão" pela vitória; abre "Conte ao Prof. Carvalho"
+      { do: 'end', then: 'home' }
+    ]
+  },
+
+  // no laboratório da vila, com a quest "Conte ao Prof. Carvalho" (a nota do Fellipe no HISTORIA): o
+  // Carvalho ("ainda falta alguma coisa") e o Mew, por telepatia. A captura dos lendários já está
+  // aberta pelo Campeão (decisão 24); o Carvalho conta isso ao jogador
+  carvalho_mew: {
+    map: 'lab', spot: { x: 6, y: 11, dir: 'up' },
+    trigger: [{ on: 'enter', target: 'lab' }, { on: 'npc', target: 'carvalho' }],
+    when: { quest: 'c7_carvalho' },
+    actors: { mew: { sprite: 'npc/mew', x: 10, y: 6, hidden: true, lift: 12 } },
+    steps: [
+      { do: 'wait', t: 0.3 },
+      { do: 'walk', who: 'player', to: [[6, 5, 'up']] },
+      { do: 'face', who: 'carvalho', dir: 'down' },
+      { do: 'say', name: OAK, lines: ['{player}! O novo Campeão de Kanto! Eu sempre soube.'] },
+      { do: 'say', name: OAK, lines: ['As rotas estão mais calmas desde que os pássaros voltaram... mas não como antes. Ainda falta alguma coisa.'] },
+      // a luz rosa e o Mew flutuando
+      { do: 'flash', t: 0.8, power: 0.7, color: '255,170,225' },
+      { do: 'show', who: 'mew' },
+      { do: 'emote', who: 'player' },
+      { do: 'say', lines: ['Uma luz rosa se acende no meio do laboratório.'] },
+      { do: 'face', who: 'player', dir: 'right' },
+      { do: 'say', lines: ['É o Mew, o Pokémon dos diários da Mansão! Uma voz soa dentro da cabeça de {player}...'] },
+      // a telepatia: só o jogador entende
+      { do: 'say', name: 'Mew', lines: ['Obrigado por libertar os pássaros e o Mewtwo.'] },
+      { do: 'say', name: 'Mew', lines: ['O Maxie também tentou me prender numa das máquinas dele. Eu consegui fugir.'] },
+      { do: 'say', name: 'Mew', lines: ['As hordas continuam estranhas porque ele não parou. Ele anda roubando a energia de lendários em outras regiões também.'] },
+      { do: 'say', name: 'Mew', lines: ['E o próximo da lista dorme aqui perto, no fundo da lagoa.'] },
+      { do: 'fly', who: 'mew', t: 0.8, height: 120 },
+      { do: 'flash', t: 0.6, power: 0.8, color: '255,170,225' },
+      { do: 'say', lines: ['O Mew dá uma volta no ar... e some.'] },
+      { do: 'face', who: 'player', dir: 'up' },
+      { do: 'say', name: OAK, lines: ['Você também viu? Um Pokémon rosa! Ele olhava para você como se estivesse falando...'] },
+      { do: 'say', name: OAK, lines: ['Os lendários confiam em você agora. Se cruzar com eles por aí, talvez aceitem seguir com você.'] },
+      { do: 'end' }
+    ]
+  },
+
   /* ========================= Capítulo 6: a Elite dos Quatro (H-9) ========================= */
   // a proposta "A base na Mansão", aprovada ("pode seguir exatamente com esse roteiro"), com o refino
   // do Fellipe: a caixa de texto nunca tampa ninguém (a câmera das cenas e o teste do ui-smoke)

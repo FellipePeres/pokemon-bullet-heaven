@@ -1134,6 +1134,36 @@ Nunca voltar bônus globais para o pool de level up — foi pedido explícito.
   meio, a derrota, a vitória, a cena de depois, a vila) e o `check-data` (o caminho a pé com os pulos,
   as bolas, os enfeites com `cells`). O roteiro de screenshots é `moltres`.
 
+### O Capítulo 7: a Liga, o rival Campeão, o Carvalho e o Mew (H-10, 0.39 na branch)
+- Pedido do Fellipe: a proposta "O sonho da Liga" (PLANEJAMENTO-HISTORIA.md, seção 5.5), aprovada
+  inteira ("top, tudo aprovado"), com as notas dele: o Mew no laboratório, por telepatia, depois do
+  Campeão (HISTORIA.md), e os lendários nas Poké Balls depois do Campeão (a seção Captura, abaixo).
+- **As falas da Elite dos Quatro** (`depois_lorelei`, `depois_bruno`, `depois_agatha`,
+  `depois_lance`, o gatilho `win` de cada fase da Liga, uma vez): a volta passa pela sala dele, num
+  palco recortado do FireRed (`sala_lorelei` etc., `PokemonLeague_*Room` no `hub.py`), com duas
+  falas que lembram a Mansão. O Lance avisa: "Alguém chegou lá antes de você."
+- **O rival Campeão**: o primeiro Jogar do Campeão toca `campeao_antes` na sala dele (a cena de antes
+  da fase, que solta a batalha no fim): ele venceu os quatro antes do jogador, aproveitando que o
+  jogador os trouxe de volta. Depois da vitória e do Hall da Fama, `campeao_depois`: ele admite que o
+  jogador estava certo sobre as hordas, promete ajudar e sai.
+- **O Carvalho e o Mew** (`carvalho_mew`, entrar no laboratório ou falar com o Carvalho com a quest
+  "Conte ao Prof. Carvalho"): "Ainda falta alguma coisa"; uma luz rosa (o passo `flash` ganhou `color`)
+  e o Mew flutuando (`npc/mew`, o ícone do Gen 3; o ator começa com `lift`, e o `fly` sobe de onde ele
+  está); o jogador o reconhece dos diários da Mansão; por telepatia, ele conta que escapou do Maxie,
+  que as hordas continuam porque o Maxie rouba a energia de lendários em outras regiões e que o
+  próximo da lista dorme no fundo da lagoa. Ele some; o Carvalho só viu, e diz que os lendários
+  confiam no jogador.
+- **As quests do Capítulo 7**: "Vença a Elite dos Quatro" (até o Lance), "Vença o Campeão" e "Conte ao
+  Prof. Carvalho" (objetivo `scene`). A do Capítulo 8 fica para a H-11.
+- **A captura aberta pelo Campeão** (decisão 24): o `Game.startStage` passa `legendsOpen:
+  isChampion()` para a partida, e o `CaptureSystem.rollLegendary` sorteia quando a chave fechada da
+  decisão 20 ou a jornada estiver aberta. A tabela e as regras não mudam.
+- **A TM Dive só depois do Campeão** (decisão 23, antes da H-10): ver a TM Dive na seção da loja.
+- **O teste do Hall da Fama** virou parte do caminho da H-10 no `ui-smoke`: as quatro salas, a cena
+  do rival antes e depois, o Hall, a captura aberta, o laboratório com o Mew. A caixa de texto, em
+  172 falas. O `smoke-test` confere a captura fechada sem o Campeão e aberta com ele (as aves desde a
+  Fase 7, o Mewtwo e o Mew na Liga, um de cada). O roteiro de screenshots é `liga`.
+
 ### O Capítulo 6: a Elite dos Quatro e a base na Mansão (H-9, 0.39 na branch)
 - Pedido do Fellipe: a proposta "A base na Mansão" (PLANEJAMENTO-HISTORIA.md, seção 5.4), aprovada
   inteira ("pode seguir exatamente com esse roteiro") com um refino: **a caixa de texto nunca tampa
@@ -1217,13 +1247,15 @@ Nunca voltar bônus globais para o pool de level up — foi pedido explícito.
   `ui/diveHud.js`, `data/dive.js`; a tela é `screen-dive`. Roteiro: `descida`.
 
 ### Captura
-- **Os lendários não aparecem na Poké Ball** (decisão 20 do PLANEJAMENTO-HISTORIA, o
-  Fellipe em 2026-11-12: "ainda não pode aparecer os lendários na captura, mesmo que depois
-  de liberados"). `LEGENDARY_CAPTURE.open` (`data/legendaries.js`) é `false`, e o
-  `CaptureSystem.rollLegendary` não sorteia nada. A tabela `LEGENDARY_ENCOUNTERS` e as regras
-  (um de cada, a missão antes, H-5) continuam no código para quando a história abrir; o
-  `smoke-test` confere as duas coisas (fechada, e o sorteio guardado com a chave aberta) - Lendários podem aparecer em pokebolas pós derrotar a E4 e o Campeão. O
-  Kyogre não muda (a luta do salão). Enquanto estiver fechada, a Pokédex chega no máximo a 146.
+- **Os lendários só aparecem na Poké Ball depois do Campeão.** Até lá, a captura está fechada
+  (decisão 20 do PLANEJAMENTO-HISTORIA, o Fellipe em 2026-11-12: "ainda não pode aparecer os
+  lendários na captura, mesmo que depois de liberados"). Depois do Campeão, ela abre (decisão 24,
+  a nota do Fellipe: "Lendários podem aparecer em pokebolas pós derrotar a E4 e o Campeão"):
+  `LEGENDARY_CAPTURE.open` (`data/legendaries.js`) continua `false`, mas o `Game.startStage` passa
+  `legendsOpen: isChampion()` para a partida, e o `CaptureSystem.rollLegendary` sorteia com a tabela
+  `LEGENDARY_ENCOUNTERS` e as regras de sempre (as aves desde a Fase 7, o Mewtwo e o Mew só na Liga;
+  um de cada; a missão antes, H-5). O `smoke-test` confere as duas coisas. O Kyogre não muda (a luta
+  do salão). Antes do Campeão, a Pokédex chega no máximo a 146; depois, a 151.
 - Poké Ball dropa de inimigos derrotados, com **teto por fase** (`maxBalls`: 3 na
   Fase 1, 2 nas outras, 1 em cada sala da Liga e 1 no Campeão, que tinha 0 até a
   0.17). Desde a 0.10 só a
@@ -1671,6 +1703,7 @@ o Brock como está, todas as outras mais duras, menos níveis.
 | 76 | o refino da história: "essas maquinas que prendem os lendários sugam a energia deles" e mandam em ondas para um lugar misterioso, onde uma máquina central numa base do Maxie desorienta os Pokémon (ideia de End Game); o Zapdos enfraquecido explica a vitória de um jogador de nível baixo; "ao derrotar o Zapdos, rola uma cutscene do Zapdos voando e fugindo, assustado", sem captura por enquanto | 0.39 (na branch): a luta sem captura e de nível 36 (medida: 11 de 12 no 36), a energia escorrendo pelas correntes, a cena com o Zapdos do FireRed caído que foge pelo alto (os passos `cry`, `tremble` e `fly`) e a pista da energia mandada para longe; o card "Sem captura nesta luta" |
 | 77 | "A fase da Erika é barrada, o jogador precisa passar do Zapdos para liberar a Erika, o emblema pode ser visto outra vez e o jogador faz ligação que era o mesmo da máquina"; "não pode ter spoilers no título das fases ou quests"; a cena do emblema "montada já no artifact" e "um bate papo simples dando indícios da continuação"; "ficou excelente" | 0.39 (na branch): a trava da Fase 4 (`lock`, o Túnel de Pedra no escuro, sem o nome do Zapdos), as quests douradas da Usina, a do Koga e a da Sabrina, o palco do ginásio de Celadon com a Erika, a cena `depois_erika` (a lembrança com a sombra de asas, o pedaço de metal, o emblema reconhecido, as pistas: a Rocket no Cassino, a sombra para o sul) e os passos `toast`, `storm` e `item` |
 | 78 | "vamos para o H-3" | 0.39 (na branch): a tela de Missões (seção 7.3 do PLANEJAMENTO-HISTORIA): o Diário nas duas barras com o pontinho de quest nova, o que fazer agora, o diário por capítulo com as datas e os itens importantes; nenhuma quest futura aparece |
+| 85 | "top, tudo aprovado" (a proposta "O sonho da Liga") | 0.39 (na branch): o Capítulo 7: as falas da Elite dos Quatro depois de cada vitória, o rival Campeão (antes e depois da batalha), o Carvalho e o Mew por telepatia no laboratório, as quests do capítulo e a captura dos lendários aberta pelo Campeão |
 | 84 | "bora para o próximo passo que é H-10 e só um detalhe, para não ter como pular uma parte da história, vamos só liberar o TM Dive quando o jogador for campeão da E4"; a nota dele no HANDOFF sobre os lendários nas Poké Balls depois do Campeão | 0.39 (na branch): a TM Dive só aparece no Poké Mart depois do Campeão (`Game.isChampion`, `martTargets`); a proposta da H-10, "O sonho da Liga" (seção 5.5 do PLANEJAMENTO-HISTORIA), com a captura aberta pelo Campeão |
 | 83 | "aprovo tudo com apenas um refino simples, temos que garantir que a legenda não está tampando algo importante na animação, como uma pessoa ou alguma movimentação" (a proposta "A base na Mansão") | 0.39 (na branch): a câmera das cenas centraliza acima da caixa de texto e o ui-smoke confere isso a cada fala; o Capítulo 6: a cena da porta da Victory Road com o bilhete do Lance, a trava por cena da Liga, a Mansão Pokémon a pé com os interruptores do FireRed (o script do pret), os diários, o Blaine na porta e a cena do laboratório (o Mewtwo, as jaulas, a emboscada do Maxie, os pássaros, a libertação sem luta) |
 | 82 | "construa a h-8 então" (a proposta "Monte Brasa: o fogo", depois do ajuste da decisão 22) | 0.39 (na branch): o Capítulo 5 até o fim e o 6 começando: a cena do Giovanni com o Pedaço de Metal, a trava da Liga (as hordas na Victory Road), o Monte Brasa a pé (as pedras do Strength já arrastadas pelos ladrões, os degraus de pular do FireRed, 15 Poké Balls), o cume com o calor, a luta do Moltres (o Sol forte, o chão em brasa, o Lança-chamas, o Redemoinho de Fogo, a Onda de Calor, o Fogo Sagrado com a sombra das rochas; nível 62, 11 de 12), a fuga, o emblema que lembra um vulcão e o atalho para a vila |
@@ -1996,11 +2029,11 @@ O que está planejado:
   Kyogre. **A H-1 está no jogo desde a 0.38** (as quests, o rastreador e o
   prólogo; ver a seção 4), e **a H-2 desde a 0.39** (o motor das cenas, as duas do
   prólogo, a do Brock e as cenas de antes e de depois das fases, em tela cheia nos
-  palcos; **nunca no meio de uma fase**, regra do Fellipe). **A H-3 a H-9 também, na
+  palcos; **nunca no meio de uma fase**, regra do Fellipe). **A H-3 a H-10 também, na
   branch** (a tela de Missões, os Capítulos 1 a 3, o molde das missões, a missão do
-  Zapdos, o Capítulo 4 com a do Articuno, o 5 com a do Moltres e o 6, a Elite dos
-  Quatro e a base na Mansão). Falta, em ordem: a Liga (H-10), a lagoa e o Mew (H-11)
-  e as recompensas (H-12).
+  Zapdos, o Capítulo 4 com a do Articuno, o 5 com a do Moltres, o 6, a Elite dos
+  Quatro e a base na Mansão, e o 7, a Liga, o rival Campeão e o Mew). Falta, em ordem:
+  a lagoa e o Kyogre (H-11) e as recompensas (H-12).
   **A captura dos lendários está fechada** (decisão 20, 2026-11-12): nenhum lendário
   aparece na Poké Ball, nem depois de liberado (`LEGENDARY_CAPTURE.open` em
   `data/legendaries.js`). A regra da H-5 (o liberado volta à Poké Ball das fases

@@ -243,6 +243,21 @@ export const QUESTS = {
     kind: 'story', chapter: 'cap7',
     desc: 'A Elite dos Quatro voltou para a Liga e espera você, sem pegar leve.',
     objectives: [{ text: 'Vença a Elite dos Quatro', on: 'win', target: 'e4_lance', doneIf: { cleared: 'e4_lance' } }],
+    next: ['c7_campeao'],
+    reward: null
+  },
+  // (H-10) o rival chegou antes: a porta do Campeão
+  c7_campeao: {
+    kind: 'story', chapter: 'cap7',
+    desc: 'O Lance avisou: ainda há uma porta, e alguém chegou lá antes de você.',
+    objectives: [{ text: 'Vença o Campeão', on: 'win', target: 'champion', doneIf: { cleared: 'champion' } }],
+    next: ['c7_carvalho'],
+    reward: null
+  },
+  c7_carvalho: {
+    kind: 'story', chapter: 'cap7',
+    desc: 'Você é o Campeão de Kanto. O Prof. Carvalho pediu: "volte e me conte".',
+    objectives: [{ text: 'Conte ao Prof. Carvalho', on: 'scene', target: 'carvalho_mew' }],
     next: [],
     reward: null
   },

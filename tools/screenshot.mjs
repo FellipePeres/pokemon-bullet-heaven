@@ -446,6 +446,53 @@ const ROTEIROS = {
     { run: "{ const d = game.hub.dialog; if (d) { d.shown = 999; game.hub.confirm(); } }" }, { wait: 2600 }, { shot: 'mh-52-confiam-em-voce' },
     { run: "{ const d = game.hub.dialog; if (d) { d.shown = 999; game.hub.confirm(); } } game.openCampaign()" }, { wait: 1500 }, { shot: 'mh-53-a-liga' }
   ],
+  // o Capítulo 7 (H-10, "O sonho da Liga"): as falas da Elite dos Quatro depois de cada vitória, o rival
+  // Campeão (antes e depois), o Hall da Fama, e o Carvalho e o Mew no laboratório
+  liga: [
+    { open: 'index.html' }, { wait: 500 },
+    { run: "window.skip = (n = 1) => { for (let i = 0; i < n; i++) { const h = game.hub; if (!h.dialog) return; h.dialog.shown = 999; h.confirm(); } };" +
+           "window.win = (id) => { game.startStage(id); game.run.state = 'victory'; };" +
+           "game.newGame(); game.chooseTrainer('leaf'); game.chooseName('Fellipe'); game.chooseStarter('charmander');" +
+           "const mon = (uid, id, abilities) => ({ uid, pokemonId: id, level: 70, xp: 0, hp: 0, abilities, upgrades: {} });" +
+           "game.campaign.journey = { team: { members: [mon('a', 'charizard', ['flamethrower']), mon('b', 'gyarados', ['hydro_pump']), mon('c', 'arcanine', ['flamethrower'])], active: ['a', 'b', 'c'] }, pc: [] };" +
+           "game.campaign.clearedStages.push('gym_1_pewter', 'gym_2_cerulean', 'gym_3_vermilion', 'zapdos', 'gym_4_celadon', 'gym_5_fuchsia', 'gym_6_saffron', 'gym_7_cinnabar', 'articuno', 'gym_8_viridian', 'moltres');" +
+           "game.campaign.badges.push('boulder', 'cascade', 'thunder', 'rainbow', 'soul', 'marsh', 'volcano', 'earth');" +
+           "game.campaign.missions = { zapdos: { won: true, captured: false }, articuno: { won: true, captured: false }, moltres: { won: true, captured: false } };" +
+           "Object.assign(game.campaign.scenes ??= {}, { victory_road: 'seen', mansao_entrada: 'seen', mansao_lab: 'seen' });" +
+           "game.quests.state.active = ['c7_liga']; document.getElementById('toast-container').style.display = 'none'; win('e4_lorelei')" },
+    { wait: 1500 }, { run: 'game.quitToMenu()' }, { wait: 2600 }, { shot: 'lg-01-lorelei' },
+    { run: 'skip()' }, { wait: 2400 }, { shot: 'lg-02-lorelei-2' },
+    { run: 'skip()' }, { wait: 2000 }, { run: "win('e4_bruno')" }, { wait: 1500 }, { run: 'game.quitToMenu()' }, { wait: 2600 }, { shot: 'lg-03-bruno' },
+    { run: 'skip()' }, { wait: 2400 }, { shot: 'lg-04-bruno-2' },
+    { run: 'skip()' }, { wait: 2000 }, { run: "win('e4_agatha')" }, { wait: 1500 }, { run: 'game.quitToMenu()' }, { wait: 2600 }, { shot: 'lg-05-agatha' },
+    { run: 'skip()' }, { wait: 2400 }, { shot: 'lg-06-agatha-2' },
+    { run: 'skip()' }, { wait: 2000 }, { run: "win('e4_lance')" }, { wait: 1500 }, { run: 'game.quitToMenu()' }, { wait: 2600 }, { shot: 'lg-07-lance' },
+    { run: 'skip()' }, { wait: 2400 }, { shot: 'lg-08-lance-2' },
+    { run: 'skip()' }, { wait: 2000 }, { run: "game.openCampaign()" }, { wait: 1400 }, { shot: 'lg-09-o-campeao-no-mapa' },
+    { run: "game.startStage('champion')" }, { wait: 3000 }, { shot: 'lg-10-adivinha' },
+    { run: 'skip()' }, { wait: 2600 }, { shot: 'lg-11-venci-os-quatro' },
+    { run: 'skip()' }, { wait: 2400 }, { shot: 'lg-12-valeu' },
+    { run: 'skip()' }, { wait: 3200 }, { run: "game.run.state = 'victory'" }, { wait: 1800 }, { shot: 'lg-13-hall-da-fama' },
+    { run: "document.getElementById('hall-close').click()" }, { wait: 900 },
+    { run: "document.getElementById('btn-result-menu').click()" }, { wait: 2600 }, { shot: 'lg-14-eu-perdi' },
+    { run: 'skip()' }, { wait: 2600 }, { shot: 'lg-15-voce-estava-certo' },
+    { run: 'skip()' }, { wait: 2400 }, { shot: 'lg-16-eu-tambem-ajudo' },
+    { run: 'skip()' }, { wait: 3400 }, { shot: 'lg-17-na-vila' },
+    { run: "game.hub.enter({ map: 'vila', x: 26, y: 7, dir: 'up' }); game.hub._tryMove('up', false)" }, { wait: 3800 }, { shot: 'lg-18-o-novo-campeao' },
+    { run: 'skip()' }, { wait: 2600 }, { shot: 'lg-19-ainda-falta' },
+    { run: 'skip()' }, { wait: 300 }, { shot: 'lg-20-a-luz-rosa', raw: true },
+    { wait: 2000 }, { shot: 'lg-21-o-mew' },
+    { run: 'skip()' }, { wait: 2400 }, { shot: 'lg-22-dos-diarios' },
+    { run: 'skip()' }, { wait: 2000 }, { shot: 'lg-23-obrigado' },
+    { run: 'skip()' }, { wait: 2200 }, { shot: 'lg-24-fugiu' },
+    { run: 'skip()' }, { wait: 2600 }, { shot: 'lg-25-outras-regioes' },
+    { run: 'skip()' }, { wait: 2200 }, { shot: 'lg-26-a-lagoa' },
+    { run: 'skip()' }, { wait: 500 }, { shot: 'lg-27-ele-voa', raw: true },
+    { wait: 2200 }, { shot: 'lg-28-sumiu' },
+    { run: 'skip()' }, { wait: 2600 }, { shot: 'lg-29-voce-tambem-viu' },
+    { run: 'skip()' }, { wait: 2600 }, { shot: 'lg-30-confiam-em-voce' },
+    { run: 'skip()' }, { wait: 1200 }, { run: "game.openCampaign()" }, { wait: 1400 }, { shot: 'lg-31-o-mapa' }
+  ],
   // a tela de Missões (H-3): o pontinho na barra, o começo da jornada e o diário depois do
   // Capítulo 3 (as quests concluídas por capítulo, com as datas, e o Pedaço de Metal)
   missoes: [
