@@ -37,10 +37,10 @@ ladrão: o **Maxie**.
   - uma sombra de asas (o **Crobat** do Maxie) carregou a máquina pelo céu na noite do apagão;
   - capangas de capuz vermelho arrastaram as peças montanha acima.
 - **O Kyogre era o próximo da lista.** Ele dorme no fundo da lagoa da vila. Depois de fugir dos
-  pássaros no Mewtwo, o Maxie volta atrás dele, mas chega tarde demais: o jogador já o capturou.
-- **O Mewtwo:** o Maxie vai atrás dele também. Quando o jogador chega para libertá-lo, o Maxie
-  aparece, e é a primeira vez que o jogador o vê (a emboscada da seção 8.1, decidida em
-  2026-11-12).
+  pássaros na base, o Maxie volta atrás dele, mas chega tarde demais: o jogador já o capturou.
+- **O Mewtwo:** o Maxie o capturou e o prendeu numa máquina na **base dele em Kanto**. A Elite dos
+  Quatro descobre a ameaça, vai até a base para enfrentá-la e cai presa em jaulas. É lá que o
+  jogador vê o Maxie pela primeira vez (seção 8.1).
 - **O Mew** escapou do ladrão e aparece no epílogo.
 - **A pista falsa:** todo mundo em Kanto culpa a Equipe Rocket. O Giovanni também não sabe quem
   é, e quer saber.
@@ -80,7 +80,8 @@ ladrão: o **Maxie**.
 | **Os líderes** | Brock, Misty, Surge e Erika dão pistas; Koga e Sabrina são ginásios comuns; Blaine mede as ondas; Giovanni desmonta a pista falsa. |
 | **O marinheiro de Vermilion** | preso em terra pelo mar agitado, escutou correntes dentro da Usina. |
 | **Os pássaros lendários** | as vítimas. Presos, enfraquecidos e fora de si. Derrotados, fogem assustados ("fraco demais para confiar em alguém"). |
-| **O Maxie** | o ladrão. Aparece pela primeira vez na emboscada do Mewtwo (seção 8.1) e depois na lagoa, na cena do Kyogre. Usa o Crobat para voar. |
+| **A Elite dos Quatro** | Lorelei, Bruno, Agatha e Lance. Juntam-se para derrotar uma ameaça maior, vão até a base do Maxie e caem presos em jaulas. Libertados pelo jogador, voltam para a Liga. |
+| **O Maxie** | o ladrão. Aparece pela primeira vez na base dele, na emboscada (seção 8.1), e depois na lagoa, na cena do Kyogre. Usa o Crobat para voar. |
 | **O Mew** | o Pokémon rosa do epílogo. Aparece de relance em algumas cenas antes (ideia). |
 
 ---
@@ -179,20 +180,27 @@ ladrão: o **Maxie**.
   - de perto, o pico escuro do emblema **lembra um vulcão**;
   - a Liga reabre a Victory Road.
 
-### Capítulo 6 — O sonho 🗺️
+### Capítulo 6 — A Elite dos Quatro 🗺️
+(O ajuste do Fellipe de 2026-11-12, seção 8.1.)
 - A Victory Road se abre com os três pássaros livres.
-- A Liga e o rival como Campeão, no fim, e o Hall da Fama.
-- Depois, o Carvalho: as rotas estão mais calmas, mas não como antes. "Ainda falta alguma coisa."
-
-### Capítulo 7 — O que a lagoa guarda 🗺️
-- O velho sábio fala do Pokémon criado pelo homem, na Caverna Desconhecida: **a missão do
-  Mewtwo**.
-- **A emboscada** (seção 8.1, decidida: antes da lagoa):
+- **Ao começar a Victory Road**, a cena: a Elite dos Quatro se juntou para derrotar uma ameaça
+  maior e foi até a base. A quest: "Ajude a Elite dos Quatro". A Liga fica fechada.
+- **A base do Maxie** (o lugar a pensar): o Mewtwo preso numa máquina e os quatro em jaulas.
+- **A emboscada:**
   - o Maxie aparece pela primeira vez e surpreende o jogador;
   - o emblema do uniforme dele é o mesmo das máquinas, e é aqui que o jogador entende;
-  - os três pássaros lendários aparecem para proteger o jogador, e o Maxie foge.
-- Depois, o pescador fala da lagoa da vila. O jogador desce com o Dive e captura **o Kyogre** no
-  fundo (isso já existe desde a 0.37).
+  - o jogador, vulnerável, vai ser capturado;
+  - os três pássaros chegam para protegê-lo, e o Maxie foge.
+- A Elite dos Quatro é libertada, e as fases da Liga abrem.
+
+### Capítulo 7 — O sonho 🗺️
+- A Liga: Lorelei, Bruno, Agatha e Lance, agora conhecidos.
+- O rival como Campeão, no fim, e o Hall da Fama.
+- Depois, o Carvalho: as rotas estão mais calmas, mas não como antes. "Ainda falta alguma coisa."
+
+### Capítulo 8 — O que a lagoa guarda 🗺️
+- O pescador fala da lagoa da vila. O jogador desce com o Dive e captura **o Kyogre** no fundo
+  (isso já existe desde a 0.37).
 - **A cena do Maxie na lagoa** (já existe), agora o segundo encontro:
   - "Não acredito que cheguei tarde! Você capturou o lendário Kyogre!";
   - o Crobat, e "A caminho do vulcão! O próximo lendário será meu!".
@@ -209,13 +217,13 @@ ladrão: o **Maxie**.
 |---|---|---|
 | Os pássaros sumiram dos céus | o velho sábio (Cap. 1) | as três missões |
 | As peças de máquina roubadas | a casa de Cerulean (Cap. 2) | as máquinas; o Giovanni no Cap. 5 liga as duas coisas |
-| O emblema vermelho | a máquina da Usina (Cap. 2), o pedaço de metal da Erika (Cap. 3), as outras máquinas | o uniforme do Maxie, na emboscada do Mewtwo |
+| O emblema vermelho | a máquina da Usina (Cap. 2), o pedaço de metal da Erika (Cap. 3), as outras máquinas | o uniforme do Maxie, na base (Cap. 6) |
 | A energia mandada em ondas | a Usina (Cap. 2), os instrumentos do Blaine (Cap. 4) | a máquina central (End Game) |
 | A sombra de asas | a lembrança da Erika (Cap. 3) | o Crobat do Maxie, na emboscada e na lagoa |
 | O capuz vermelho | o Hiker e os recrutas no Monte Brasa (Cap. 5) | os capangas do Maxie |
 | "Ainda falta um" | o sábio (Cap. 4) | o Moltres (Cap. 5) |
-| O emblema que lembra um vulcão | a máquina do Moltres (Cap. 5) | "A caminho do vulcão!" (Cap. 7) |
-| "Fraco demais para confiar em alguém" | a fuga de cada pássaro | 💡 a seção 8.1: eles voltam para proteger o jogador |
+| O emblema que lembra um vulcão | a máquina do Moltres (Cap. 5) | "A caminho do vulcão!" (Cap. 8) |
+| "Fraco demais para confiar em alguém" | a fuga de cada pássaro | a base (Cap. 6): eles voltam para proteger o jogador |
 | A Equipe Rocket (pista falsa) | a vila, o policial, a Erika | o Giovanni ri (Cap. 5) |
 
 ---
@@ -241,43 +249,66 @@ ladrão: o **Maxie**.
 
 ## 8. Ideias em aberto
 
-### 8.1 A emboscada do Maxie no Mewtwo (o Fellipe, 2026-11-12; o momento, decidido)
+### 8.1 A base do Maxie: a Elite dos Quatro, o Mewtwo e a emboscada (o Fellipe, 2026-11-12)
 
-> "Algum momento vamos liberar o Mewtwo, e nesse momento a cena vai ser: ao ir liberar o Mewtwo,
-> o Maxie aparece e surpreende a gente, o jogador está vulnerável e vai ser capturado, até então
-> os 3 pássaros lendários aparecem para proteger o jogador, nesse momento Maxie foge, é o que ele
-> pode fazer. Mas ainda não tenho certeza em qual momento da história isso vai ser."
+> "O Mewtwo não está na caverna, vai estar na base do Maxie, em algum lugar que vamos pensar que
+> dá para usar como base do FireRed. Ao jogador iniciar a jornada da Victory Road, uma cena entra
+> falando que os treinadores da E4 se juntaram para derrotar uma ameaça maior; eles se
+> direcionaram para a base. O jogador então recebe a missão 'Ajude a E4' e vai até a base. Lá ele
+> encontra o Mewtwo preso na máquina e os 4 treinadores em jaulas também, e aí então começa a cena
+> em que ele é surpreendido pelo Maxie, vai ser capturado, e então os pássaros chegam. Só depois
+> de concluir isso libera a E4 para o jogador."
 
-**A cena:**
-1. O jogador vai libertar o Mewtwo.
-2. O Maxie aparece e o surpreende.
-3. O jogador está vulnerável, prestes a ser capturado.
-4. Os três pássaros lendários aparecem para protegê-lo.
-5. Diante dos três, o Maxie foge.
+E antes, sobre o momento: "vai ser antes da lagoa".
+
+**A sequência:**
+1. Com os três pássaros livres, a Victory Road se abre, e o jogador parte para a Liga.
+2. **Ao começar a Victory Road**, uma cena: a Elite dos Quatro não está na Liga. Os quatro se
+   juntaram para derrotar uma ameaça maior e foram até a base. A quest: **"Ajude a Elite dos
+   Quatro"**. A Liga fica fechada até lá.
+3. **Na base**, o jogador encontra o **Mewtwo preso numa máquina**, como os pássaros, e a **Lorelei,
+   o Bruno, a Agatha e o Lance presos em jaulas**.
+4. **A emboscada:** o Maxie aparece pela primeira vez e surpreende o jogador. O jogador está
+   vulnerável, prestes a ser capturado.
+5. **Os três pássaros lendários chegam** para proteger o jogador. Diante dos três, o Maxie foge: é o
+   que ele pode fazer.
+6. **Só depois** a Elite dos Quatro é libertada, e as fases da Liga abrem para o jogador.
 
 **Por que encaixa no que já existe:**
 - Em cada fuga, o pássaro estava "fraco demais para confiar em alguém". A volta dos três para
   proteger o jogador é o pagamento desse arco: é quando eles passam a confiar nele.
-- A decisão 6 (o ladrão tentou levar o Mewtwo e falhou) vira uma cena ao vivo, em vez de uma
-  máquina quebrada contada pelo sábio.
-
-**Quando acontece: antes da lagoa** (o Fellipe, 2026-11-12: "vai ser antes da lagoa"). Isso quer
-dizer:
-- **A primeira aparição do Maxie** sai da cena do Kyogre e vem para cá. É aqui que o emblema das
-  máquinas aparece no uniforme dele, o pagamento de todos os rastros.
-- **A regra da escrita** passa a ser: ninguém diz "Maxie" antes da emboscada do Mewtwo.
+- **A primeira aparição do Maxie** é aqui, antes da lagoa. É na base que o emblema das máquinas
+  aparece no uniforme dele: o pagamento de todos os rastros. A regra da escrita passa a ser
+  "ninguém diz Maxie antes da base".
 - **A cena do Kyogre vira o segundo encontro.** As falas dela ("Não acredito que cheguei tarde!
   Você capturou o lendário Kyogre!") continuam funcionando: ele fugiu dos pássaros e foi atrás do
   próximo da lista.
-- **Para garantir a ordem** (padrão recomendado, até você decidir): a lagoa abre depois da missão
-  do Mewtwo, e não logo depois do Campeão.
+- **A Elite dos Quatro ganha personalidade:** em vez de quatro salas esperando o jogador, quatro
+  treinadores que tentaram resolver o problema sozinhos e caíram na armadilha. Na Liga, depois, a
+  luta contra cada um tem outro peso.
+- A decisão 6 (o ladrão tentou levar o Mewtwo e falhou) muda: ele conseguiu, e o Mewtwo está preso
+  na base.
+
+**Onde fica a base** (a pensar; mapas do FireRed que servem):
+- **A Mansão Pokémon, em Cinnabar** (recomendada). O laboratório queimado onde o Mewtwo foi criado
+  (os diários do FireRed contam isso). O Maxie montou a base no lugar onde o Mewtwo nasceu,
+  abandonado e longe de todo mundo. Fica no sul, para onde iam as ondas. São quatro andares (1F,
+  2F, 3F e B1F), e o B1F é o laboratório.
+- **O Armazém da Ilha 5** (Five Island). Um armazém industrial, cheio de máquinas e caixas, com cara
+  de base. No FireRed ele é da Rocket, o que pode confundir quem conhece o jogo.
+- **O Laboratório Pokémon de Cinnabar.** Salas pequenas de pesquisa, onde o Blaine trabalha; seria
+  uma base escondida debaixo do nariz de todo mundo.
 
 **Ainda em aberto:**
-- **O que deixa o jogador vulnerável:** a equipe desmaiada depois da luta do Mewtwo? Os capangas
-  de capuz vermelho? O Crobat?
+- **Onde fica a base** (as opções acima).
+- **Há luta?** Contra o Mewtwo, como os pássaros? Contra os capangas de capuz vermelho? Ou só a
+  cena?
+- **O que deixa o jogador vulnerável:** a equipe desmaiada? Os capangas cercando? O Crobat?
 - **O que acontece com o Mewtwo:** livre, foge, fica?
 - **Os pássaros entram na equipe nessa hora?** Seria uma forma natural de abrir a captura fechada
   pela decisão 20 (uma sugestão, não decidido).
+- **A lagoa** (padrão até você decidir): abre depois do Campeão, como no plano; o Maxie já foi
+  visto na base.
 
 ### 8.2 A máquina central do Maxie 🗺️
 A energia dos três pássaros alimenta uma máquina numa base do Maxie, e é ela que desorienta os

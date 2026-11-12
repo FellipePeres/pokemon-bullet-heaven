@@ -81,9 +81,9 @@ trava, card ou aviso revela uma descoberta antes da cena dela. A trava da Fase 4
 exemplo, fala do Túnel de Pedra no escuro e da Usina, nunca do Zapdos.
 
 **A regra da escrita:** o jogador descobre antes de entender. Ninguém diz "Maxie"
-antes da emboscada do Mewtwo (decisão 21; até então era a cena do Kyogre). O que aparece são **rastros**: as máquinas vazias, um
+antes da base dele, na emboscada (decisões 21 e 22; até então era a cena do Kyogre). O que aparece são **rastros**: as máquinas vazias, um
 vulto de capuz vermelho visto de longe e um **emblema vermelho** que ninguém
-reconhece. Na emboscada do Mewtwo, o emblema está no uniforme dele. Esse é o pagamento.
+reconhece. Na base, o emblema está no uniforme dele. Esse é o pagamento.
 
 **A pista falsa:** a vila inteira culpa a Equipe Rocket. O jogador chega ao
 Giovanni (Fase 8) achando que encontrou o culpado, e o Giovanni ri: o emblema não
@@ -123,8 +123,9 @@ quando o jogador volta, ou o lugar da fase antes dela.
 | ~~O trovão preso~~ | — | **Saiu** (decisão 19): a Sabrina ficou no Capítulo 3, como ginásio comum (decisão 18), e os capítulos seguintes desceram um número. A ideia de antes (a visão da Sabrina) fica guardada. | — |
 | **4 — As ondas** | Fase 7 (Blaine) | **Feito na 0.39 (H-7)**, a proposta "Seafoam: as ondas", aprovada ("pode seguir com o que fez"; seção 5.2). Depois do Blaine, no ginásio dele, os instrumentos do Laboratório Pokémon medem ondas estranhas saindo das Ilhas Seafoam rumo ao sul, e o jogador liga às ondas da máquina da Usina; o mar em volta de Seafoam está congelando, e nenhum barco sai de Cinnabar (a trava da Fase 8). O jogador desce a pé os cinco andares do FireRed até o fundo e acha o Articuno preso numa máquina coberta de gelo; vence a luta, ele foge pela fenda do teto, e na máquina quebrada: "Duas máquinas, dois pássaros". O mar descongela, e a Fase 8 abre. | **Articuno** |
 | **5 — A suspeita** | Fase 8 (Giovanni) | **Proposta de 2026-11-12, esperando aprovação** (página "Monte Brasa: o fogo", seção 5.3). O jogador chega achando que é a Rocket. O Giovanni olha o Pedaço de Metal e ri: não é da Rocket, e ele também quer saber quem é. Os homens dele viram gente com o emblema subindo o Monte Brasa, na Ilha 1, com peças de máquina (as da casa de Cerulean). A Liga fica fechada até o Moltres (decisão 2). O jogador sobe a pé até o cume e acha o Moltres preso na terceira máquina, em brasa. (No jogo, o título é só "A suspeita": "o fogo" adiantaria o Moltres, sem spoiler em título.) | **Moltres** |
-| **6 — O sonho** | Liga e Campeão | A Victory Road só abre com os três pássaros de volta (padrão; decisão 2). O rival no fim, e o Hall da Fama. Depois, o Carvalho: as rotas estão mais calmas, mas não como antes: "ainda falta alguma coisa". | — |
-| **7 — O que a lagoa guarda** | late game, depois do Campeão | O velho sábio fala do Pokémon criado pelo homem, na Caverna Desconhecida: o ladrão tentou levá-lo e falhou. O pescador fala da lagoa: a descida, o Kyogre e o **Maxie** (a cena que já existe). O emblema do uniforme dele é o mesmo das máquinas. "A caminho do vulcão!" leva a Hoenn. | **Mewtwo**, **Kyogre** |
+| **6 — A Elite dos Quatro** | o começo da Victory Road | **Ajuste de 2026-11-12** (decisão 22; HISTORIA.md, seção 8.1). A Victory Road só abre com os três pássaros de volta (decisão 2). Ao começar por ela, uma cena: a Elite dos Quatro se juntou para derrotar uma ameaça maior e foi até a base do Maxie (o lugar a pensar). A quest "Ajude a Elite dos Quatro". Na base, o Mewtwo preso numa máquina e os quatro em jaulas; a emboscada: o Maxie aparece pela primeira vez, o jogador vai ser capturado, os três pássaros chegam e o Maxie foge. Só então a Liga abre. | **Mewtwo** |
+| **7 — O sonho** | Liga e Campeão | A Elite dos Quatro, libertada, de volta à Liga. O rival no fim, e o Hall da Fama. Depois, o Carvalho: as rotas estão mais calmas, mas não como antes: "ainda falta alguma coisa". | — |
+| **8 — O que a lagoa guarda** | late game, depois do Campeão | O pescador fala da lagoa: a descida, o Kyogre e o **Maxie** (a cena que já existe), agora o segundo encontro. "A caminho do vulcão!" leva a Hoenn. | **Kyogre** |
 | **Epílogo — O Pokémon rosa** (ideia) | depois do Maxie | O Mew aparece na vila. | **Mew** (decisão 5) |
 
 **Recuperar um pássaro** acalma as rotas perto do ninho dele, mas só na história:
@@ -159,7 +160,7 @@ passos:
 | **Zapdos** | o fundo da Usina (`PowerPlant`), pela escotilha da sala do gerador | o card aparece depois da Fase 3 (a Usina andável) | 36 (enfraquecido pela máquina) | Tempestade: raios marcados no chão antes de cair |
 | **Articuno** | Ilhas Seafoam, o fundo (`SeafoamIslands_B4F`), a pé pelos cinco andares | depois do Blaine | 57 (enfraquecido; feito na 0.39) | A nevasca: a névoa que esconde a horda e o gelo no chão que desacelera; o Frio Absoluto com o olho da nevasca |
 | **Moltres** | o cume do Monte Brasa, na Ilha 1 (`MtEmber_Summit`), a pé pela encosta e pelo caminho do cume | depois do Giovanni | 62 (enfraquecido; proposta) | O Sol forte (Fogo ×1,5 e Água ×0,5, o contrário do Drizzle) e o chão em brasa; o Fogo Sagrado com a sombra das rochas |
-| **Mewtwo** | a Caverna Desconhecida (`CeruleanCave_B1F`) | depois do Campeão | ~82 | Psíquico: teletransporte e uma barreira que devolve golpes |
+| **Mewtwo** | a base do Maxie em Kanto (o lugar a pensar; decisão 22) | ao começar a Victory Road, na missão "Ajude a Elite dos Quatro" | a decidir | a decidir (há luta? HISTORIA.md, seção 8.1) |
 | **Kyogre** | a lagoa da vila (já existe) | depois do Campeão (padrão), com o Dive | 90 | o Drizzle (já existe) |
 | **Mew** | — | epílogo | — | decisão 5 |
 
@@ -648,11 +649,11 @@ para o objetivo `scene` das quests. O check-data recusa a caixa com retrato
 | 16 | O Giovanni e o emblema (`depois_giovanni`) | ginásio de Viridian, depois da Fase 8 | 5 (proposta) | H-8 (proposta) |
 | 17 | O cume: a terceira máquina e o card (`brasa_cume`) | o cume do Monte Brasa | 5 (proposta) | H-8 (proposta) |
 | 17b | Depois da luta: o Moltres foge e o emblema que lembra um vulcão (`moltres_livre`) | o cume do Monte Brasa | 5 (proposta) | H-8 (proposta) |
-| 18 | A Victory Road se abre | mapa da jornada | 7 | H-9 |
-| 19 | O rival Campeão | sala do Campeão | 7 | H-9 |
-| 20 | "Ainda falta alguma coisa" | laboratório | 7 | H-9 |
-| 21 | O Mewtwo e a máquina quebrada | Caverna Desconhecida | 8 (missão) | H-10 |
-| 22 | O Kyogre e o Maxie | lagoa ou Centro (já existe) | 8 | H-11 |
+| 18 | A Victory Road: a Elite dos Quatro partiu atrás de uma ameaça maior | o começo da Victory Road | 6 | H-9 |
+| 18b | A base do Maxie: o Mewtwo na máquina, os quatro em jaulas, a emboscada e os pássaros | a base do Maxie (a pensar) | 6 (missão) | H-9 |
+| 19 | O rival Campeão | sala do Campeão | 7 | H-10 |
+| 20 | "Ainda falta alguma coisa" | laboratório | 7 | H-10 |
+| 22 | O Kyogre e o Maxie (o segundo encontro) | lagoa ou Centro (já existe) | 8 | H-11 |
 | 23 | O Pokémon rosa | vila | Epílogo | H-11 |
 
 Cada cena chega na etapa do capítulo dela. A H-2 trouxe o motor, as duas do
@@ -768,9 +769,9 @@ do Zapdos, o tipo, as fraquezas e o nível recomendado (36; sem captura, decisã
 | **H-6** ✅ 0.39 | O Zapdos (seção 5.1): o Lutar com a transição, a luta no fundo da Usina com ele enfraquecido pela máquina, a tempestade, e a cena de depois, em que ele foge assustado (sem captura, decisão 16). |
 | **H-7** ✅ 0.39 | O Articuno e o Capítulo 4 (seção 5.2, página "Seafoam: as ondas"): a cena do Blaine, a trava da Fase 8, Seafoam a pé com a regra de altura, a luta e as duas cenas da missão. |
 | **H-8** (proposta) | O Moltres e o Capítulo 5 (seção 5.3, página "Monte Brasa: o fogo"): a cena do Giovanni, a trava da Liga, o Monte Brasa a pé com as pedras arrastadas, os degraus de pular e as 15 Poké Balls, a luta sob o Sol forte e as duas cenas da missão. |
-| **H-9** | A Liga com os pássaros e o fim do Capítulo 7 (o rival e o "ainda falta alguma coisa"). |
-| **H-10** | O Mewtwo. |
-| **H-11** | O Kyogre como fecho de Kanto (as quests em volta da cena que já existe, a lagoa depois do Campeão) e o Mew. |
+| **H-9** | A Victory Road e a base do Maxie (decisão 22): a cena da Elite dos Quatro, a quest "Ajude a Elite dos Quatro", a base com o Mewtwo e as jaulas, a emboscada do Maxie e os pássaros. Ganha proposta e maquete. |
+| **H-10** | A Liga e o fim do Capítulo 7: a Elite dos Quatro de volta, o rival Campeão e o "ainda falta alguma coisa". |
+| **H-11** | O Kyogre como fecho de Kanto (as quests em volta da cena que já existe, a lagoa depois do Campeão, o Maxie como segundo encontro) e o Mew. |
 | **H-12** | As recompensas das quests (no final, pedido do Fellipe). |
 
 ---
@@ -866,6 +867,15 @@ do Zapdos, o tipo, as fraquezas e o nível recomendado (36; sem captura, decisã
     encontro, sem mudar as falas. A regra da escrita passa a ser "ninguém diz Maxie antes do
     Mewtwo". Padrão até ele decidir: a lagoa abre depois da missão do Mewtwo. Muda a decisão 6
     (o ladrão "tentou levar o Mewtwo e falhou" vira a cena ao vivo). HISTORIA.md, seção 8.1.
+22. **O Mewtwo está na base do Maxie, e a Elite dos Quatro cai presa lá** (o Fellipe,
+    2026-11-12). O Mewtwo não fica na Caverna Desconhecida: está preso numa máquina na base do
+    Maxie em Kanto (um mapa do FireRed, a escolher; a recomendação é a Mansão Pokémon de
+    Cinnabar, onde ele foi criado). Ao começar a Victory Road, uma cena conta que a Elite dos
+    Quatro se juntou para derrotar uma ameaça maior e foi até a base; a quest "Ajude a Elite dos
+    Quatro". Na base, o Mewtwo na máquina e os quatro em jaulas; a emboscada da decisão 21; os
+    pássaros; o Maxie foge. Só depois a Liga abre. Os capítulos passam a ser: 6, a Elite dos
+    Quatro; 7, o sonho (a Liga); 8, a lagoa. As etapas: a H-9 é a Victory Road e a base; a H-10,
+    a Liga e o rival; a H-11, a lagoa e o Mew.
 
 ---
 
@@ -907,7 +917,8 @@ quando passarem da fase, uma tentativa de equilibrar, mas deixa isso no planejam
 Ideia do Fellipe (2026-11-12): ao ir libertar o Mewtwo, o Maxie aparece e surpreende o jogador,
 que está vulnerável e prestes a ser capturado; os três pássaros lendários aparecem para
 protegê-lo, e o Maxie foge. **Antes da lagoa** (decisão 21): é a primeira aparição do Maxie.
-Detalhes e o que ainda está em aberto: [HISTORIA.md](HISTORIA.md), seção 8.1.
+**Na base do Maxie, com a Elite dos Quatro presa** (decisão 22). Detalhes, as opções de lugar
+para a base e o que ainda está em aberto: [HISTORIA.md](HISTORIA.md), seção 8.1.
 
 ### 13.2 A máquina central do Maxie
 
