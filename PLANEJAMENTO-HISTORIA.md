@@ -435,6 +435,40 @@ mesma cena a Elite dos Quatro agradece e volta para a Liga.
   (some num clarão; ideia guardada: aparecer na Caverna de Cerulean, como no FireRed); os pássaros
   depois (voam juntos, ainda fora da equipe); a anotação nova (sim); a volta (o atalho).
 
+### 5.5 A Liga, o rival Campeão, o Carvalho e o Mew (H-10, proposta de 2026-11-12)
+
+Pedido do Fellipe: "bora para o próximo passo que é H-10", com a nota dele no HISTORIA.md (o Mew
+depois do Campeão, no laboratório, por telepatia) e a do HANDOFF ("Lendários podem aparecer em
+pokebolas pós derrotar a E4 e o Campeão"). A proposta, com as sete cenas montadas em pixel, está na
+página **"O sonho da Liga"** (https://claude.ai/artifact/SZeNrehqRifiRCVy5bXTzD). Esperando
+aprovação; tudo abaixo é o padrão recomendado.
+
+- **Depois de cada um dos quatro** (o gatilho `win` de cada fase da Liga, uma vez), a volta passa
+  pela sala dele, num palco do FireRed (`PokemonLeague_*Room`): duas falas que lembram a Mansão. A
+  Lorelei ("Não era sorte"), o Bruno (treinou a noite inteira depois da grade), a Agatha (os
+  fantasmas avisaram) e o Lance ("Alguém chegou lá antes de você").
+- **O rival Campeão**: o primeiro Jogar do Campeão toca a cena na sala dele (o gatilho de antes da
+  fase, que solta a batalha no fim). Ele venceu os quatro antes do jogador, aproveitando que o
+  jogador os trouxe de volta, como no FireRed em que ele chega antes.
+- **Depois do Campeão** (depois do Hall da Fama, que já existe): o rival vencido admite que o
+  jogador estava certo sobre as hordas e promete ajudar. A quest "Conte ao Prof. Carvalho".
+- **O Carvalho e o Mew** (entrar no laboratório da vila com a quest): "Ainda falta alguma coisa."
+  Uma luz rosa e o Mew (o ícone do Gen 3, como o Mewtwo); o jogador o reconhece dos diários da
+  Mansão. Por telepatia: obrigado por libertar os pássaros e o Mewtwo; o Maxie tentou prendê-lo e
+  ele fugiu; as hordas continuam porque o Maxie rouba a energia de lendários em outras regiões; o
+  próximo da lista dorme no fundo da lagoa. Ele some; o Carvalho não ouviu nada, só viu, e diz que
+  os lendários confiam no jogador agora.
+- **A captura abre com o Campeão** (a nota do HANDOFF): a chave fechada da decisão 20 passa a abrir
+  quando a jornada tem o Campeão vencido, com a tabela que já existe (as aves desde a Fase 7; o
+  Mewtwo e o Mew só na Liga; 3% a 12%), um de cada. O Kyogre continua à parte.
+- **A TM Dive só depois do Campeão** (decisão 23, já feita).
+- **As quests do Capítulo 7**: "Vença a Elite dos Quatro" (até o Lance), "Vença o Campeão" e "Conte ao
+  Prof. Carvalho". A do Capítulo 8 fica para a H-11.
+- **Para o Fellipe decidir** (com o padrão): as cenas curtas dos quatro (sim); o rival que venceu os
+  quatro antes (sim); o rival que admite que o jogador estava certo (sim); o Carvalho no laboratório
+  (sim, a nota dele); o Mew que avisa da lagoa (sim); a tabela da captura (a de sempre); como o
+  jogador fica sabendo da captura (o Carvalho diz na cena).
+
 ---
 
 ## 6. A captura muda: o lendário só depois da missão dele
@@ -706,8 +740,9 @@ para o objetivo `scene` das quests. O check-data recusa a caixa com retrato
 | 18 | A Victory Road: a Elite dos Quatro partiu, e o bilhete do Lance (`victory_road`, antes da fase da Lorelei) | Rota 23, o último guarda das insígnias | 6 | H-9 ✅ |
 | 18a | A Mansão: o Blaine na porta e as estátuas (`mansao_entrada`) | Mansão Pokémon, 1º andar | 6 | H-9 ✅ |
 | 18b | O laboratório: o Mewtwo na máquina, os quatro em jaulas, a emboscada do Maxie, os pássaros e a libertação | Mansão Pokémon, o subsolo (`mansao_lab`) | 6 | H-9 ✅ |
-| 19 | O rival Campeão | sala do Campeão | 7 | H-10 |
-| 20 | "Ainda falta alguma coisa" | laboratório | 7 | H-10 |
+| 19a | Depois de cada um dos quatro: duas falas na sala dele | as salas da Liga | 7 (proposta) | H-10 (proposta) |
+| 19 | O rival Campeão: antes da batalha, e depois dela, vencido ("Você estava certo") | sala do Campeão | 7 (proposta) | H-10 (proposta) |
+| 20 | "Ainda falta alguma coisa": o Carvalho e o Mew, por telepatia | laboratório da vila | 7 (proposta) | H-10 (proposta) |
 | 22 | O Kyogre e o Maxie (o segundo encontro) | lagoa ou Centro (já existe) | 8 | H-11 |
 | 23 | O Pokémon rosa | vila | Epílogo | H-11 |
 
@@ -825,7 +860,7 @@ do Zapdos, o tipo, as fraquezas e o nível recomendado (36; sem captura, decisã
 | **H-7** ✅ 0.39 | O Articuno e o Capítulo 4 (seção 5.2, página "Seafoam: as ondas"): a cena do Blaine, a trava da Fase 8, Seafoam a pé com a regra de altura, a luta e as duas cenas da missão. |
 | **H-8** ✅ 0.39 | O Moltres e o Capítulo 5 (seção 5.3, página "Monte Brasa: o fogo"): a cena do Giovanni, a trava da Liga, o Monte Brasa a pé com as pedras arrastadas, os degraus de pular e as 15 Poké Balls, a luta sob o Sol forte e as duas cenas da missão. |
 | **H-9** ✅ 0.39 | A Victory Road e a base do Maxie (decisão 22; seção 5.4, página "A base na Mansão"): a cena da Elite dos Quatro, a quest "Ajude a Elite dos Quatro", a base com o Mewtwo e as jaulas, a emboscada do Maxie e os pássaros. Ganha proposta e maquete. |
-| **H-10** | A Liga e o fim do Capítulo 7: a Elite dos Quatro de volta, o rival Campeão e o "ainda falta alguma coisa". |
+| **H-10** (proposta) | A Liga e o fim do Capítulo 7 (seção 5.5, página "O sonho da Liga"): a Elite dos Quatro de volta, o rival Campeão e o "ainda falta alguma coisa". |
 | **H-11** | O Kyogre como fecho de Kanto (as quests em volta da cena que já existe, a lagoa depois do Campeão, o Maxie como segundo encontro) e o Mew. |
 | **H-12** | As recompensas das quests (no final, pedido do Fellipe). |
 
@@ -931,6 +966,12 @@ do Zapdos, o tipo, as fraquezas e o nível recomendado (36; sem captura, decisã
     pássaros; o Maxie foge. Só depois a Liga abre. Os capítulos passam a ser: 6, a Elite dos
     Quatro; 7, o sonho (a Liga); 8, a lagoa. As etapas: a H-9 é a Victory Road e a base; a H-10,
     a Liga e o rival; a H-11, a lagoa e o Mew.
+23. **A TM Dive só depois do Campeão** (o Fellipe, 2026-11-12: "para não ter como pular uma
+    parte da história, vamos só liberar o TM Dive quando o jogador for campeão da E4"). O Dive leva
+    à lagoa do Kyogre (o Capítulo 8); antes do Campeão, a TM não aparece no Poké Mart.
+24. **Os lendários nas Poké Balls depois do Campeão** (a nota do Fellipe no HANDOFF: "Lendários
+    podem aparecer em pokebolas pós derrotar a E4 e o Campeão"). A captura fechada da decisão 20
+    abre com o Campeão vencido (a construção é a da H-10).
 
 ---
 

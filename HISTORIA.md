@@ -196,10 +196,19 @@ ladrão: o **Maxie**.
   - os três pássaros chegam para protegê-lo, e o Maxie foge.
 - A Elite dos Quatro é libertada, e as fases da Liga abrem.
 (aqui não tem combate para liberar o mewtwo, ele é liberto em uma cena, e nessa mesma cena ao liberar os treinadores da E4 eles agradecem e falam que vão para a E4 para o jogador poder desafiar)
-### Capítulo 7 — O sonho 🗺️
-- A Liga: Lorelei, Bruno, Agatha e Lance, agora conhecidos.
-- O rival como Campeão, no fim, e o Hall da Fama.
-- Depois, o Carvalho: as rotas estão mais calmas, mas não como antes. "Ainda falta alguma coisa."
+### Capítulo 7 — O sonho 📝
+(Proposta "O sonho da Liga".)
+- A Liga: Lorelei, Bruno, Agatha e Lance, agora conhecidos. Depois de cada vitória, duas falas que
+  lembram a Mansão.
+- **O rival como Campeão**: ele venceu os quatro antes do jogador, aproveitando que o jogador os
+  trouxe de volta. Vencido (depois do Hall da Fama), admite: "Você estava certo. Eu só olhava para as
+  insígnias."
+- **Depois, o Carvalho**: as rotas estão mais calmas, mas não como antes. "Ainda falta alguma coisa."
+- **O Mew**, no laboratório, por telepatia (só o jogador entende): escapou do Maxie; as hordas
+  continuam porque o Maxie rouba a energia de lendários em outras regiões; o próximo da lista dorme
+  no fundo da lagoa.
+- **Os lendários confiam no jogador**: a partir daqui, eles podem aparecer nas Poké Balls (a captura
+  abre com o Campeão). A TM Dive chega ao Poké Mart.
 
 -Mew aparece quando o jogador é campeão volta para vila e fala com o carvalho, Mew faz telepatia com o jogador, por isso  o jogador entende, Ele explica que conseguiu fugir do Maxie, e que as hordas ainda estão estranhas pois ele anda roubando energia de lendários em outras regiões também
 
