@@ -136,8 +136,11 @@ const { normalizeProfile } = await import('../src/save/profile.js');
 
 console.log('\n=== INTERFACE — teste sem navegador ===\n');
 
+// o aviso do reset da história começa escondido, como no index.html (o stub não lê as classes)
+registry.get('story-reset').classes.add('hidden');
 const game = new Game(registry.get('game-canvas'));
 check('jogo inicia no menu principal', !registry.get('screen-title').classes.has('hidden'));
+check('sem save de antes da história, o título não fala de reset', registry.get('story-reset').classes.has('hidden') && !game.storyReset);
 check('barra lateral visível no menu', !registry.get('side-rail').classes.has('hidden'));
 
 // ---- janelas da barra lateral ----
@@ -2067,6 +2070,17 @@ const DIVE_LAST = (await import('../src/data/dive.js')).DIVE.levels.length - 1; 
   const lakeOpen = game.quests.isActive('c8_lagoa');
   game.pickCapture('kyogre');
   check('a captura do Kyogre fecha "Descubra o que a lagoa guarda" (o Capítulo 8, H-11)', lakeOpen && game.quests.isDone('c8_lagoa'));
+  {
+    // o check final da história (H-12): esta jornada do teste veio do quarto até aqui pelo jogo, sem atalho nas quests
+    const { QUESTS } = await import('../src/data/quests.js');
+    const st = game.quests.state;
+    const missing = Object.keys(QUESTS).filter((id) => !st.done[id]);
+    const unpaid = Object.keys(QUESTS).filter((id) => st.done[id] && !st.done[id].paid);
+    const silent = Object.keys(QUESTS).filter((id) => st.done[id]?.skipped);
+    check('a história inteira nesta jornada: as 24 quests fechadas, todas pagas, nenhuma ativa',
+          !missing.length && !unpaid.length && !st.active.length && Object.keys(QUESTS).length === 24,
+          `faltam: ${missing.join(', ') || 'nenhuma'} · sem pagar: ${unpaid.join(', ') || 'nenhuma'} · em silêncio: ${silent.join(', ') || 'nenhuma'}`);
+  }
   check('o Kyogre vai sempre para o PC, mesmo com espaço na equipe (0.37.9), revela o "???" e fica fora das 151',
         spare && !game.run.team.has('kyogre') && game.run.pc.some((m) => m.pokemonId === 'kyogre')
         && game.profile.pokedex.secret.includes('kyogre') && !game.profile.pokedex.caught.includes(382) && game.campaign.dive.captured);
@@ -2390,6 +2404,26 @@ game.quitToMenu();
   qb.sync();
   check('sem o inicial, a jornada fica no começo do prólogo', qb.isActive('p_mae') && qb.tracked()[0]?.objectives[0].text === 'Fale com a mãe');
   check('evento de outro alvo não conta', !qb.notify('talk', 'tv').length && qb.isActive('p_mae'));
+}
+
+// ---- o reset da história (0.39, decisão 17): o autosave de antes dela vai para o backup ----
+{
+  const { SaveManager, BACKUP_KEY } = await import('../src/save/SaveManager.js');
+  const key = CONFIG.save.storageKey;
+  const keep = localStorage.getItem(key);
+  const oldRaw = JSON.stringify({ signature: 'pokemon-bullet-heaven', schemaVersion: 1, gameVersion: '0.37.10', profile: { trainer: 'red', shards: 9999 } });
+  localStorage.setItem(key, oldRaw);
+  localStorage.removeItem(BACKUP_KEY);
+  const loaded = SaveManager.loadLocal();
+  check('o autosave de antes da história não carrega: o título fica sabendo', loaded?.beforeStory === true && loaded.gameVersion === '0.37.10');
+  check('...ele sai do lugar e fica guardado no backup, inteiro', localStorage.getItem(key) === null && localStorage.getItem(BACKUP_KEY) === oldRaw);
+  localStorage.setItem(key, JSON.stringify({ signature: 'pokemon-bullet-heaven', schemaVersion: 1, gameVersion: '0.38.0', profile: {} }));
+  SaveManager.loadLocal();
+  check('...e o primeiro backup não é trocado por outro antigo', localStorage.getItem(BACKUP_KEY) === oldRaw);
+  localStorage.setItem(key, JSON.stringify(game.buildSaveData()));
+  { const now = SaveManager.loadLocal(); check('o save da história carrega normalmente', !!now?.profile && !now.beforeStory && now.schemaVersion === 2); }
+  localStorage.removeItem(BACKUP_KEY);
+  if (keep == null) localStorage.removeItem(key); else localStorage.setItem(key, keep);
 }
 
 // ---- as recompensas das quests (H-12): uma vez por quest e jornada, também em silêncio ----

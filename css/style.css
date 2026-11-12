@@ -337,6 +337,26 @@ button { font: inherit; color: inherit; }
   color: #ffffff;
   text-shadow: 2px 2px 0 var(--poke-red-dark);
 }
+/* o aviso do reset da história (0.39): a caixa de texto do FireRed, no canto livre do título
+   (o de cima à direita tem os atalhos; embaixo, a faixa do progresso) */
+.story-reset {
+  position: absolute;
+  top: 18px;
+  left: 18px;
+  z-index: 3;
+  max-width: 300px;
+  margin: 0;
+  padding: 10px 16px;
+  font-family: var(--font-pixel);
+  font-size: 15px;
+  line-height: 1.4;
+  text-align: left;
+  color: var(--gba-ink);
+  background: #fff;
+  border: 4px double var(--gba-frame);
+  border-radius: 6px;
+  box-shadow: 0 4px 0 rgba(0, 0, 0, .35);
+}
 .tagline {
   font-family: var(--font-pixel);
   font-size: 17px;

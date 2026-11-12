@@ -2097,7 +2097,14 @@ O que está planejado:
   `balance.mjs` mede a campanha de novo com ele. O teto segura a evolução por nível; a
   por item é livre. O valor de cada teto fica para depois.
 - **O jogo recomeça do zero quando a história subir** (o Fellipe, 2026-11-11; decisão 17
-  do PLANEJAMENTO-HISTORIA): as etapas novas não precisam tratar saves antigos.
+  do PLANEJAMENTO-HISTORIA): as etapas novas não precisam tratar saves antigos. **O reset
+  está no código (0.39)**: o save passou para o schema 2 (`SaveManager`, `STORY_SCHEMA`). O
+  autosave de antes (schema 1, até a 0.37) não carrega: vai inteiro para
+  `pbh.autosave.antes-da-historia` no navegador (o primeiro backup fica; dá para recuperar à
+  mão) e sai do lugar; a tela de título mostra uma vez "A história chegou a Kanto! Com ela, o
+  jogo recomeçou do zero..." no canto de cima à esquerda. Um arquivo .json de antes é
+  recusado com a mesma explicação. As Opções (outra chave) continuam. Roteiro de screenshots:
+  `reset`.
 - **A vila** ([PLANEJAMENTO-LOBBY.md](PLANEJAMENTO-LOBBY.md)): a L-7 (sons e
   capricho), o modo Endless pelo mato alto e o modo aquático pela lagoa (cada um
   com o seu plano, quando chegar a vez) e as decisões da seção 13 de lá (o nome

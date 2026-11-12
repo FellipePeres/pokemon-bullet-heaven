@@ -958,6 +958,8 @@ do Zapdos, o tipo, as fraquezas e o nível recomendado (36; sem captura, decisã
     lendários ou coisas do tipo"). As etapas daqui para a frente não precisam tratar
     saves antigos. O que existia só para eles nas missões (o estado 'antes', a fala do
     Carvalho e as quests da Usina fechando sozinhas para quem já tinha o Zapdos) saiu.
+    O reset em si entrou no check final (2026-11-12): o save de antes da história (o schema 1)
+    não carrega; o autosave antigo fica guardado no navegador, e o título avisa uma vez.
 18. **Celadon: a Fase 4 só abre com o Zapdos libertado, e a Erika mostra o emblema de
     novo** (o Fellipe, 2026-11-11: "A fase da Erika é barrada, o jogador precisa passar
     do Zapdos para liberar a Erika, o emblema pode ser visto outra vez e o jogador faz

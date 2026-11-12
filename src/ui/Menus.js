@@ -115,6 +115,7 @@ export class Menus {
   leaveTitle(next) {
     const title = el('screen-title');
     title.classList.add('leaving');
+    el('story-reset')?.classList.add('hidden');   // o aviso do reset da história é uma vez só (0.39)
     setTimeout(() => {
       title.classList.remove('leaving');
       next();

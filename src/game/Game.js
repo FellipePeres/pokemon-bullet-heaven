@@ -77,8 +77,11 @@ export class Game {
 
     // ---- perfil (progresso permanente) ----
     const local = SaveManager.loadLocal();
-    this.profile = local ? normalizeProfile(local.profile) : createProfile();
-    this.pendingRun = local?.run ?? null;
+    // o save de antes da história (0.39, decisão 17): o jogo recomeça do zero, e o título avisa
+    this.storyReset = !!local?.beforeStory;
+    const saved = local && !local.beforeStory ? local : null;
+    this.profile = saved ? normalizeProfile(saved.profile) : createProfile();
+    this.pendingRun = saved?.run ?? null;
     this._foldPendingRun();   // a partida que ficou no meio entra na jornada (0.24)
     this.tracker = new ProfileTracker(this.profile);
     // as quests da jornada (0.38, PLANEJAMENTO-HISTORIA.md): só existem com uma jornada começada
@@ -94,6 +97,7 @@ export class Game {
     this.input.onAction = (action) => this.handleAction(action);
     this.hud = new HUD(this);
     this.menus = new Menus(this);
+    if (this.storyReset) document.getElementById('story-reset')?.classList.remove('hidden');
     this.padNav = new PadNavigator();
     this.music = new MusicPlayer();
 

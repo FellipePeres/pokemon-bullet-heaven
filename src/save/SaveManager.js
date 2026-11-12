@@ -2,7 +2,19 @@ import { CONFIG } from '../core/config.js';
 import { normalizeProfile } from './profile.js';
 
 const SIGNATURE = 'pokemon-bullet-heaven';
-const SCHEMA_VERSION = 1;
+/**
+ * 2: a história (0.39). O jogo recomeçou do zero com ela (decisão 17 do PLANEJAMENTO-HISTORIA:
+ * "o jogo vai ser resetado quando tudo for pro ar"): os saves de antes (o schema 1, até a 0.37)
+ * não carregam. O autosave antigo não some: fica guardado em BACKUP_KEY, neste navegador.
+ */
+const SCHEMA_VERSION = 2;
+export const STORY_SCHEMA = 2;
+export const BACKUP_KEY = 'pbh.autosave.antes-da-historia';
+
+/** O save é de antes da história (o reset da 0.39)? */
+export function isBeforeStory(data) {
+  return (data?.schemaVersion ?? 1) < STORY_SCHEMA;
+}
 
 /**
  * SAVE EM ARQUIVO
@@ -57,6 +69,9 @@ export class SaveManager {
     if (!data || data.signature !== SIGNATURE) {
       throw new Error('Este arquivo não é um save do Pokémon Bullet Heaven.');
     }
+    if (isBeforeStory(data)) {
+      throw new Error(`Este save é de antes da história (v${data.gameVersion ?? '?'}). Com a história, o jogo recomeçou do zero: comece uma Nova jornada.`);
+    }
     return {
       schemaVersion: data.schemaVersion ?? 1,
       gameVersion: data.gameVersion ?? '?',
@@ -77,11 +92,25 @@ export class SaveManager {
     }
   }
 
+  /**
+   * O autosave deste navegador. O de antes da história (o reset da 0.39) vai para BACKUP_KEY
+   * (uma vez: o primeiro backup fica) e sai do lugar; volta `{ beforeStory, gameVersion }`
+   * para a tela de título avisar.
+   */
   static loadLocal() {
     if (!CONFIG.save.useLocalStorage) return null;
     try {
       const raw = localStorage.getItem(CONFIG.save.storageKey);
-      return raw ? SaveManager.parse(JSON.parse(raw)) : null;
+      if (!raw) return null;
+      const data = JSON.parse(raw);
+      if (data?.signature === SIGNATURE && isBeforeStory(data)) {
+        try {
+          if (!localStorage.getItem(BACKUP_KEY)) localStorage.setItem(BACKUP_KEY, raw);
+        } catch { /* sem espaço para o backup: o reset segue */ }
+        localStorage.removeItem(CONFIG.save.storageKey);
+        return { beforeStory: true, gameVersion: data.gameVersion ?? '?' };
+      }
+      return SaveManager.parse(data);
     } catch {
       return null;
     }

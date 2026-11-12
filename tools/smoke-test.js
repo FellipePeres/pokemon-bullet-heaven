@@ -11,7 +11,7 @@ import { STAGES } from '../src/data/stages.js';
 import { UPGRADES } from '../src/data/upgrades.js';
 import { ABILITIES } from '../src/data/abilities.js';
 import { POKEMON } from '../src/data/pokemon.js';
-import { SaveManager } from '../src/save/SaveManager.js';
+import { SaveManager, isBeforeStory } from '../src/save/SaveManager.js';
 import { createProfile, normalizeProfile, regionProgress } from '../src/save/profile.js';
 import { Player, facingDir, FEET_BOX } from '../src/entities/Player.js';
 import { CONFIG } from '../src/core/config.js';
@@ -1199,6 +1199,16 @@ console.log('\n[save]');
   let bad = null;
   try { SaveManager.parse({ foo: 'bar' }); } catch (e) { bad = e.message; }
   check('save inválido é rejeitado', !!bad, bad ?? '');
+
+  // o reset da história (0.39, decisão 17): o save de antes dela não carrega
+  check('o save novo sai com o schema da história', data.schemaVersion === 2 && !isBeforeStory(data));
+  let old = null;
+  try { SaveManager.parse({ ...JSON.parse(json), schemaVersion: 1, gameVersion: '0.37.10' }); } catch (e) { old = e.message; }
+  check('o save de antes da história (schema 1) não carrega, e a mensagem diz por quê',
+        !!old && old.includes('antes da história') && old.includes('v0.37.10') && old.includes('Nova jornada'), old ?? '');
+  let unversioned = null;
+  try { SaveManager.parse({ signature: 'pokemon-bullet-heaven', profile }); } catch (e) { unversioned = e.message; }
+  check('...nem o mais antigo, sem número de schema', !!unversioned && unversioned.includes('antes da história'));
 }
 
 // ------------------------------------------- a descida do Dive (0.36, PLANEJAMENTO-DIVE.md)

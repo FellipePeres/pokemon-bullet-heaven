@@ -46,6 +46,12 @@ const ROTEIROS = {
   banner: [
     { open: 'tools/banner.html' }, { run: 'document.fonts.ready.then(() => true)' }, { wait: 800 }, { shot: 'banner' }
   ],
+  // o reset da história (0.39, decisão 17): o autosave de antes dela sai, e o título avisa
+  reset: [
+    { open: 'index.html' }, { wait: 500 },
+    { run: "localStorage.setItem('pbh.autosave', JSON.stringify({ signature: 'pokemon-bullet-heaven', schemaVersion: 1, gameVersion: '0.37.10', profile: { trainer: 'red' } })); location.reload(); true" },
+    { wait: 2500 }, { shot: 'reset-01-o-aviso' }
+  ],
   treinador: [
     { open: 'index.html' }, { wait: 500 },
     { run: 'game.newGame()' }, { wait: 900 }, { shot: 'tela-treinador' }
