@@ -1768,7 +1768,8 @@ console.log('\n[a captura dos lendários depois do Campeão — decisão 24]');
   const keep = JSON.parse(JSON.stringify(LEGENDARY_ENCOUNTERS));
   for (const enc of Object.values(LEGENDARY_ENCOUNTERS)) enc.chance = 1;
   const LEG = Object.keys(LEGENDARY_KITS);
-  const offers = (run) => { const seen = new Set(); for (let i = 0; i < 40; i++) { run.legendariesOffered.clear(); for (const c of run.captureSystem.rollChoices()) if (LEG.includes(c.id)) seen.add(c.id); } return seen; };
+  // (o Mew tem o menor peso do sorteio: 400 Poké Balls para ver todos, sem depender da sorte)
+  const offers = (run) => { const seen = new Set(); for (let i = 0; i < 400; i++) { run.legendariesOffered.clear(); for (const c of run.captureSystem.rollChoices()) if (LEG.includes(c.id)) seen.add(c.id); } return seen; };
   const birds = ['zapdos', 'articuno', 'moltres'];
   check('com a chave fechada e a jornada sem o Campeão, nenhum lendário aparece (nem com a chance no máximo)',
         !LEGENDARY_CAPTURE.open && offers(new Run('champion', { starter: 'charmander', liberated: birds })).size === 0);
