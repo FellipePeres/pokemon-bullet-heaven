@@ -36,10 +36,11 @@ ladrão: o **Maxie**.
   - as peças vieram de roubos, como o da casa de Cerulean (motores, cabos, chapas de metal);
   - uma sombra de asas (o **Crobat** do Maxie) carregou a máquina pelo céu na noite do apagão;
   - capangas de capuz vermelho arrastaram as peças montanha acima.
-- **O Kyogre era o próximo da lista.** Ele dorme no fundo da lagoa da vila. O Maxie chega tarde
-  demais: o jogador já o capturou.
-- **O Mewtwo:** o ladrão tentou levá-lo e falhou (decisão 6 do planejamento). A ideia nova da
-  seção 8.1 pode mudar isso.
+- **O Kyogre era o próximo da lista.** Ele dorme no fundo da lagoa da vila. Depois de fugir dos
+  pássaros no Mewtwo, o Maxie volta atrás dele, mas chega tarde demais: o jogador já o capturou.
+- **O Mewtwo:** o Maxie vai atrás dele também. Quando o jogador chega para libertá-lo, o Maxie
+  aparece, e é a primeira vez que o jogador o vê (a emboscada da seção 8.1, decidida em
+  2026-11-12).
 - **O Mew** escapou do ladrão e aparece no epílogo.
 - **A pista falsa:** todo mundo em Kanto culpa a Equipe Rocket. O Giovanni também não sabe quem
   é, e quer saber.
@@ -79,7 +80,7 @@ ladrão: o **Maxie**.
 | **Os líderes** | Brock, Misty, Surge e Erika dão pistas; Koga e Sabrina são ginásios comuns; Blaine mede as ondas; Giovanni desmonta a pista falsa. |
 | **O marinheiro de Vermilion** | preso em terra pelo mar agitado, escutou correntes dentro da Usina. |
 | **Os pássaros lendários** | as vítimas. Presos, enfraquecidos e fora de si. Derrotados, fogem assustados ("fraco demais para confiar em alguém"). |
-| **O Maxie** | o ladrão. Aparece pela primeira vez na cena do Kyogre (seção 8.1 discute mudar isso). Usa o Crobat para voar. |
+| **O Maxie** | o ladrão. Aparece pela primeira vez na emboscada do Mewtwo (seção 8.1) e depois na lagoa, na cena do Kyogre. Usa o Crobat para voar. |
 | **O Mew** | o Pokémon rosa do epílogo. Aparece de relance em algumas cenas antes (ideia). |
 
 ---
@@ -184,13 +185,16 @@ ladrão: o **Maxie**.
 - Depois, o Carvalho: as rotas estão mais calmas, mas não como antes. "Ainda falta alguma coisa."
 
 ### Capítulo 7 — O que a lagoa guarda 🗺️
-- O velho sábio fala do Pokémon criado pelo homem, na Caverna Desconhecida. É **a missão do
-  Mewtwo**; ver a ideia da seção 8.1.
-- O pescador fala da lagoa da vila. O jogador desce com o Dive e captura **o Kyogre** no fundo
-  (isso já existe desde a 0.37).
-- **A cena do Maxie** (já existe):
+- O velho sábio fala do Pokémon criado pelo homem, na Caverna Desconhecida: **a missão do
+  Mewtwo**.
+- **A emboscada** (seção 8.1, decidida: antes da lagoa):
+  - o Maxie aparece pela primeira vez e surpreende o jogador;
+  - o emblema do uniforme dele é o mesmo das máquinas, e é aqui que o jogador entende;
+  - os três pássaros lendários aparecem para proteger o jogador, e o Maxie foge.
+- Depois, o pescador fala da lagoa da vila. O jogador desce com o Dive e captura **o Kyogre** no
+  fundo (isso já existe desde a 0.37).
+- **A cena do Maxie na lagoa** (já existe), agora o segundo encontro:
   - "Não acredito que cheguei tarde! Você capturou o lendário Kyogre!";
-  - o emblema do uniforme dele é o mesmo das máquinas;
   - o Crobat, e "A caminho do vulcão! O próximo lendário será meu!".
 - É a ponte para Hoenn (o Monte Chimney).
 
@@ -205,9 +209,9 @@ ladrão: o **Maxie**.
 |---|---|---|
 | Os pássaros sumiram dos céus | o velho sábio (Cap. 1) | as três missões |
 | As peças de máquina roubadas | a casa de Cerulean (Cap. 2) | as máquinas; o Giovanni no Cap. 5 liga as duas coisas |
-| O emblema vermelho | a máquina da Usina (Cap. 2), o pedaço de metal da Erika (Cap. 3), as outras máquinas | o uniforme do Maxie, na cena do Kyogre |
+| O emblema vermelho | a máquina da Usina (Cap. 2), o pedaço de metal da Erika (Cap. 3), as outras máquinas | o uniforme do Maxie, na emboscada do Mewtwo |
 | A energia mandada em ondas | a Usina (Cap. 2), os instrumentos do Blaine (Cap. 4) | a máquina central (End Game) |
-| A sombra de asas | a lembrança da Erika (Cap. 3) | o Crobat do Maxie, no corte de tela da cena dele |
+| A sombra de asas | a lembrança da Erika (Cap. 3) | o Crobat do Maxie, na emboscada e na lagoa |
 | O capuz vermelho | o Hiker e os recrutas no Monte Brasa (Cap. 5) | os capangas do Maxie |
 | "Ainda falta um" | o sábio (Cap. 4) | o Moltres (Cap. 5) |
 | O emblema que lembra um vulcão | a máquina do Moltres (Cap. 5) | "A caminho do vulcão!" (Cap. 7) |
@@ -237,7 +241,7 @@ ladrão: o **Maxie**.
 
 ## 8. Ideias em aberto
 
-### 8.1 A emboscada do Maxie no Mewtwo 💡 (o Fellipe, 2026-11-12)
+### 8.1 A emboscada do Maxie no Mewtwo (o Fellipe, 2026-11-12; o momento, decidido)
 
 > "Algum momento vamos liberar o Mewtwo, e nesse momento a cena vai ser: ao ir liberar o Mewtwo,
 > o Maxie aparece e surpreende a gente, o jogador está vulnerável e vai ser capturado, até então
@@ -257,15 +261,18 @@ ladrão: o **Maxie**.
 - A decisão 6 (o ladrão tentou levar o Mewtwo e falhou) vira uma cena ao vivo, em vez de uma
   máquina quebrada contada pelo sábio.
 
+**Quando acontece: antes da lagoa** (o Fellipe, 2026-11-12: "vai ser antes da lagoa"). Isso quer
+dizer:
+- **A primeira aparição do Maxie** sai da cena do Kyogre e vem para cá. É aqui que o emblema das
+  máquinas aparece no uniforme dele, o pagamento de todos os rastros.
+- **A regra da escrita** passa a ser: ninguém diz "Maxie" antes da emboscada do Mewtwo.
+- **A cena do Kyogre vira o segundo encontro.** As falas dela ("Não acredito que cheguei tarde!
+  Você capturou o lendário Kyogre!") continuam funcionando: ele fugiu dos pássaros e foi atrás do
+  próximo da lista.
+- **Para garantir a ordem** (padrão recomendado, até você decidir): a lagoa abre depois da missão
+  do Mewtwo, e não logo depois do Campeão.
+
 **Ainda em aberto:**
-- **Quando acontece.** Duas leituras, cada uma com consequências:
-  - **Antes da lagoa** (o Mewtwo antes do Kyogre, como no Capítulo 7 de hoje): a primeira
-    aparição do Maxie e o emblema no uniforme passam para esta cena. A cena do Kyogre vira o
-    segundo encontro; as falas dela ("Não acredito que cheguei tarde!") continuam funcionando.
-    A regra "ninguém diz Maxie antes do Kyogre" muda para "antes do Mewtwo".
-  - **Depois da lagoa** (o Kyogre primeiro): o Maxie já é conhecido, e a emboscada é a volta
-    dele atrás do "próximo lendário". Pede ajustar o "A caminho do vulcão!", que hoje o leva
-    para Hoenn logo depois.
 - **O que deixa o jogador vulnerável:** a equipe desmaiada depois da luta do Mewtwo? Os capangas
   de capuz vermelho? O Crobat?
 - **O que acontece com o Mewtwo:** livre, foge, fica?

@@ -81,9 +81,9 @@ trava, card ou aviso revela uma descoberta antes da cena dela. A trava da Fase 4
 exemplo, fala do Túnel de Pedra no escuro e da Usina, nunca do Zapdos.
 
 **A regra da escrita:** o jogador descobre antes de entender. Ninguém diz "Maxie"
-antes da cena do Kyogre. O que aparece são **rastros**: as máquinas vazias, um
+antes da emboscada do Mewtwo (decisão 21; até então era a cena do Kyogre). O que aparece são **rastros**: as máquinas vazias, um
 vulto de capuz vermelho visto de longe e um **emblema vermelho** que ninguém
-reconhece. Na cena do Kyogre, o emblema está no uniforme dele. Esse é o pagamento.
+reconhece. Na emboscada do Mewtwo, o emblema está no uniforme dele. Esse é o pagamento.
 
 **A pista falsa:** a vila inteira culpa a Equipe Rocket. O jogador chega ao
 Giovanni (Fase 8) achando que encontrou o culpado, e o Giovanni ri: o emblema não
@@ -860,6 +860,12 @@ do Zapdos, o tipo, as fraquezas e o nível recomendado (36; sem captura, decisã
     Ball das fases: nem os pássaros depois das missões, nem o Mewtwo e o Mew na Liga. O sorteio
     fica guardado (`LEGENDARY_CAPTURE.open`). O Kyogre não muda: ele vem da luta do salão.
     Enquanto ela estiver fechada, a Pokédex chega no máximo a 146 de 151.
+21. **A emboscada do Maxie no Mewtwo, antes da lagoa** (o Fellipe, 2026-11-12: "vai ser antes da
+    lagoa"). Ao ir libertar o Mewtwo, o Maxie aparece pela primeira vez e surpreende o jogador;
+    os três pássaros aparecem para protegê-lo, e o Maxie foge. A cena do Kyogre vira o segundo
+    encontro, sem mudar as falas. A regra da escrita passa a ser "ninguém diz Maxie antes do
+    Mewtwo". Padrão até ele decidir: a lagoa abre depois da missão do Mewtwo. Muda a decisão 6
+    (o ladrão "tentou levar o Mewtwo e falhou" vira a cena ao vivo). HISTORIA.md, seção 8.1.
 
 ---
 
@@ -898,10 +904,10 @@ quando passarem da fase, uma tentativa de equilibrar, mas deixa isso no planejam
 
 ### 13.3 A emboscada do Maxie no Mewtwo
 
-Ideia do Fellipe (2026-11-12), ainda sem momento na história: ao ir libertar o Mewtwo, o Maxie
-aparece e surpreende o jogador, que está vulnerável e prestes a ser capturado; os três pássaros
-lendários aparecem para protegê-lo, e o Maxie foge. Está na história inteira, com o que cada
-momento possível muda: [HISTORIA.md](HISTORIA.md), seção 8.1.
+Ideia do Fellipe (2026-11-12): ao ir libertar o Mewtwo, o Maxie aparece e surpreende o jogador,
+que está vulnerável e prestes a ser capturado; os três pássaros lendários aparecem para
+protegê-lo, e o Maxie foge. **Antes da lagoa** (decisão 21): é a primeira aparição do Maxie.
+Detalhes e o que ainda está em aberto: [HISTORIA.md](HISTORIA.md), seção 8.1.
 
 ### 13.2 A máquina central do Maxie
 
