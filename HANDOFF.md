@@ -801,6 +801,9 @@ Nunca voltar bônus globais para o pool de level up — foi pedido explícito.
   - a transição de batalha do Kyogre (`B_TRANSITION_KYOGRE`).
 - **O card da fase** (`ui/hallCard.js`): o painel do mapa da jornada, com Jogar e
   Voltar para a Vila. Voltar sai pela lagoa, e outra chance exige descer de novo.
+  Ele usa a classe `.hall-card`, como o card do Hall da Fama; até a 0.37.9 a regra do
+  Hall da Fama valia para os dois e o banner do Kyogre encolhia a zero. Desde a 0.37.10
+  ela é `.overlay-card.hall-card`.
 - **A luta**:
   - A fase `kyogre` (secreta, fora da campanha) e `systems/kyogreFight.js` por cima
     dela (desde a H-5, no molde `systems/legendaryFight.js`), com o desenho em
