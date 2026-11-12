@@ -304,7 +304,8 @@ export const HUB = {
        escadas (MB_LADDER) e os buracos do chão (MB_FALL_WARP, só de descida; os tiles onde se cai
        não levam de volta). Sem Surf e sem empurrar pedra, há caminho: 79 passos da entrada até a
        margem do fundo, pelos buracos do 1F e do B1F e pelas escadas do B2F e do B3F; e 87 de volta
-       até a saída. As pedras do Strength ficam onde estão no FireRed (as que estão à vista). */
+       até a saída (depois da missão, a cena termina com o atalho para a vila). As pedras do Strength
+       ficam onde estão no FireRed (as que estão à vista). */
     seafoam_1f: {
       name: 'Ilhas Seafoam',
       explore: true,
@@ -322,8 +323,15 @@ export const HUB = {
       npcs: [],
       things: [],
       decor: [{ sprite: 'pedra', x: 22, y: 12, solid: true }, { sprite: 'pedra', x: 32, y: 9, solid: true }],
-      // as Poké Balls: as do FireRed (o Ice Heal do 1F vira um Novo Sorteio) e três a mais nos becos
-      loot: [{ id: 'fr1', x: 11, y: 8, item: 'reroll' }]
+      // as Poké Balls (15 nos cinco andares): as cinco do FireRed (o item vira Reviver ou Novo
+      // Sorteio), sete no caminho de ida, à vista da rota sem fechá-la (pedido do Fellipe: "coloca
+      // pokeloot nesse caminho de ida ao Articuno"), e três nos becos
+      loot: [
+        { id: 'fr1', x: 11, y: 8, item: 'reroll' },
+        // no caminho: perto da escadinha da descida e no corredor de cima, antes do buraco
+        { id: 'c1', x: 8, y: 13, item: 'revive' },
+        { id: 'c2', x: 18, y: 4, item: 'reroll' }
+      ]
     },
     seafoam_b1f: {
       name: 'Ilhas Seafoam',
@@ -343,10 +351,12 @@ export const HUB = {
       npcs: [],
       things: [],
       decor: [{ sprite: 'pedra', x: 22, y: 8, solid: true }, { sprite: 'pedra', x: 30, y: 8, solid: true }],
-      // a Water Stone e o Revive do FireRed; e uma a mais, no canto de baixo à esquerda
+      // a Water Stone e o Revive do FireRed; uma ao lado de onde se cai do buraco do 1F (no
+      // caminho); e uma a mais, no canto de baixo à esquerda
       loot: [
         { id: 'fr1', x: 19, y: 18, item: 'reroll' },
         { id: 'fr2', x: 24, y: 14, item: 'revive' },
+        { id: 'c1', x: 29, y: 9, item: 'reroll' },
         { id: 'b1', x: 3, y: 13, item: 'revive' }
       ]
     },
@@ -366,9 +376,10 @@ export const HUB = {
       npcs: [],
       things: [],
       decor: [{ sprite: 'pedra', x: 22, y: 8, solid: true }, { sprite: 'pedra', x: 30, y: 8, solid: true }],
-      // a Big Pearl do FireRed; e uma a mais, na ponta do patamar de cima
+      // a Big Pearl do FireRed; uma no caminho até a escada; e uma a mais, na ponta do patamar de cima
       loot: [
         { id: 'fr1', x: 18, y: 15, item: 'reroll' },
+        { id: 'c1', x: 31, y: 7, item: 'revive' },
         { id: 'b1', x: 4, y: 13, item: 'reroll' }
       ]
     },
@@ -389,8 +400,12 @@ export const HUB = {
         { sprite: 'pedra', x: 12, y: 16, solid: true }, { sprite: 'pedra', x: 13, y: 16, solid: true },
         { sprite: 'pedra', x: 9, y: 16, solid: true }, { sprite: 'pedra', x: 6, y: 17, solid: true }
       ],
-      // uma a mais, no beco entre as pedras
-      loot: [{ id: 'b1', x: 10, y: 16, item: 'revive' }]
+      // uma ao lado da chegada (no caminho: a escada do fundo é logo ali); e uma a mais, no beco
+      // entre as pedras
+      loot: [
+        { id: 'c1', x: 31, y: 5, item: 'reroll' },
+        { id: 'b1', x: 10, y: 16, item: 'revive' }
+      ]
     },
     // o fundo (B4F): a margem de frente para a ilha onde o Articuno fica no FireRed. Enquanto ele
     // está preso, a névoa cobre a água (`mist`), e a máquina do emblema vermelho coberta de gelo
@@ -414,8 +429,12 @@ export const HUB = {
         { sprite: 'articuno', x: 10.5, y: 2.75, oy: -20, hideIf: { freed: 'articuno' } },
         { sprite: 'maquina_articuno_quebrada', x: 10.5, y: 2.75, hideIf: { caged: 'articuno' } }
       ],
-      // a Ultra Ball do FireRed (aqui, um Reviver)
-      loot: [{ id: 'fr1', x: 22, y: 19, item: 'revive' }]
+      // a Ultra Ball do FireRed (aqui, um Reviver); e duas no caminho até a margem
+      loot: [
+        { id: 'fr1', x: 22, y: 19, item: 'revive' },
+        { id: 'c1', x: 24, y: 3, item: 'reroll' },
+        { id: 'c2', x: 18, y: 9, item: 'revive' }
+      ]
     },
 
     // um recorte de Cerulean: a casa assaltada do FireRed, com o policial na porta

@@ -1187,6 +1187,10 @@ game.menus.closeModal();
   check('...e a chegada toca uma vez: o frio, o gelo e um zumbido lá do fundo', hub.scene?.id === 'seafoam_entrada');
   const chegada = runScene();
   check('...e depois o jogador anda à vontade', said(chegada, 'coberto de gelo') && said(chegada, 'zumbido') && !hub.scene);
+  const { HUB } = await import('../src/data/hub.js');
+  const seafoamLoot = ['seafoam_1f', 'seafoam_b1f', 'seafoam_b2f', 'seafoam_b3f', 'seafoam_b4f'].flatMap((id) => HUB.maps[id].loot);
+  check('15 Poké Balls pelas ilhas: as cinco do FireRed, sete no caminho de ida e três nos becos',
+        seafoamLoot.length === 15 && seafoamLoot.filter((l) => l.id.startsWith('c')).length === 7);
   // a regra de altura: de um patamar para o outro, direto, não passa
   hub.enter({ map: 'seafoam_b2f', x: 4, y: 9, dir: 'down' });
   press('down');
@@ -1285,9 +1289,11 @@ game.menus.closeModal();
   check('a cena: o Articuno se assusta e foge pela fenda do teto', fled && said(livre, 'grita, assustado') && game.sceneRecord.articuno_livre === 'seen');
   check('...e a segunda máquina: "Duas máquinas, dois pássaros"', said(livre, 'O mesmo emblema vermelho') && said(livre, 'Duas máquinas, dois pássaros'));
   settle();
-  check('...e o jogador fica na margem, de frente para a ilha', hub.mapId === 'seafoam_b4f' && hub.player.x === 12 && hub.player.y === 7 && !hub.scene);
+  check('...e o atalho: no fim da cena, o jogador aparece na vila, na frente de casa (sem subir os andares)',
+        hub.mapId === 'vila' && hub.player.x === 6 && hub.player.y === 17 && !hub.scene && !registry.get('screen-hub').classes.has('cinema'));
+  hub.enter({ map: 'seafoam_b4f', x: 16, y: 7, dir: 'left' });
   press('left');
-  check('com o Articuno livre, a margem não toca mais nada', !hub.scene);
+  check('com o Articuno livre, a margem não toca mais nada', !hub.scene && hub.mist === 0);
   check('o Lutar de uma missão vencida não começa nada', !game.startMission('articuno') && !hub.battle);
   // a vila comenta
   hub.enter({ map: 'vila', x: 27, y: 22, dir: 'up' });

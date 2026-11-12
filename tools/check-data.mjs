@@ -643,9 +643,11 @@ const inside = (mapId, x, y) => { const m = HUB_MAPS[mapId]; return !!m && x >= 
 {
   const issues = [];
   const notes = [];
+  // as Poké Balls do chão contam como paredes: o caminho nunca depende de pegar uma
   const solidAt = (mapId) => new Set([
     ...(HUB.maps[mapId].npcs ?? []).map((n) => `${n.x},${n.y}`),
-    ...(HUB.maps[mapId].decor ?? []).filter((d) => d.solid).map((d) => `${d.x},${d.y}`)
+    ...(HUB.maps[mapId].decor ?? []).filter((d) => d.solid).map((d) => `${d.x},${d.y}`),
+    ...(HUB.maps[mapId].loot ?? []).map((l) => `${l.x},${l.y}`)
   ]);
   /** Busca em largura por vários mapas: devolve os passos até o primeiro alvo, ou null. */
   const walk = (start, isGoal) => {

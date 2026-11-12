@@ -292,7 +292,7 @@ const ROTEIROS = {
     { run: 'skip()' }, { wait: 2600 }, { shot: 'art-49-dois-passaros' },
     { run: 'skip()' }, { wait: 1600 }, { shot: 'art-50-a-correnteza' },
     { run: "document.getElementById('toast-container').style.display = ''; skip()" }, { wait: 900 }, { shot: 'art-51-o-mar-descongelou' },
-    { wait: 1800 }, { shot: 'art-52-na-margem' },
+    { wait: 1800 }, { shot: 'art-52-na-vila' },
     { run: "document.getElementById('toast-container').style.display = 'none'; game.hub.enter({ map: 'casa_sabio', x: 3, y: 6, dir: 'up' }); game.hub.interact()" }, { wait: 3200 }, { shot: 'art-53-o-sabio' },
     { run: "{ const d = game.hub.dialog; if (d) { d.shown = 999; game.hub.confirm(); } }" }, { wait: 2600 }, { shot: 'art-54-ainda-falta-um' },
     { run: "{ const d = game.hub.dialog; if (d) { d.shown = 999; game.hub.confirm(); } } game.openCampaign()" }, { wait: 1500 }, { shot: 'art-55-a-fase-8' }

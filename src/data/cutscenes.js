@@ -707,7 +707,8 @@ export const CUTSCENES = {
 
   // depois da missão do Articuno (o gatilho 'win' da fase `articuno`), na ilha, sem névoa: ele está
   // caído, treme, vê o jogador, grita e foge pela fenda do teto. Na máquina quebrada, o mesmo
-  // emblema: duas máquinas, dois pássaros. O mar descongela, e a Fase 8 abre
+  // emblema: duas máquinas, dois pássaros. O mar descongela, e a Fase 8 abre. No fim, o atalho
+  // (pedido do Fellipe): o jogador aparece na vila, sem subir os cinco andares de volta
   articuno_livre: {
     map: 'seafoam_b4f', spot: { x: 13, y: 2, dir: 'left' },
     trigger: [{ on: 'win', target: 'articuno' }],
@@ -740,7 +741,7 @@ export const CUTSCENES = {
       { do: 'say', lines: ['A correnteza voltou a correr.'] },
       // o mar descongela, e com ele a Rota 21: a Fase 8 abre
       { do: 'toast', text: 'O mar descongelou: os barcos saem de Cinnabar de novo. O caminho para Viridian está aberto.', icon: 'stages' },
-      { do: 'end', then: { go: { map: 'seafoam_b4f', x: 12, y: 7, dir: 'up' } } }
+      { do: 'end', then: 'home' }
     ]
   }
 };

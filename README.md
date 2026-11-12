@@ -175,8 +175,8 @@ não abre até você vencer.
   e os buracos levam para baixo), até a margem do fundo, onde a névoa se abre sobre uma
   máquina coberta de gelo com o Articuno acorrentado. A luta tem a névoa que esconde a
   horda, o gelo no chão que deixa o treinador lento, o Raio de Gelo, a Nevasca e o Frio
-  Absoluto, em que só o olho da nevasca fica livre. Derrotado, ele foge, e o mar
-  descongela.
+  Absoluto, em que só o olho da nevasca fica livre. Derrotado, ele foge, o mar
+  descongela, e o jogador volta direto para a vila. Pelo caminho, 15 Poké Balls.
 - **A tela de Missões**: o Diário na barra, ao lado das Conquistas. Em cima, o que
   fazer agora; embaixo, o que já aconteceu, capítulo por capítulo, com a data de cada
   missão, para reler a história; no fim, os itens importantes que ela deu. Um

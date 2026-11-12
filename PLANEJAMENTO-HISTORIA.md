@@ -257,6 +257,10 @@ com o que fez", decisão 19) e construída na 0.39 como está abaixo. O que a co
 - **O Lutar no primeiro card** contava a cena como vista só depois da transição de batalha, e a
   cena da margem voltava a tocar na volta da luta. Corrigido no motor das cenas.
 - **O Capítulo 5** se chama só "A suspeita" no jogo (sem o "fogo", que adiantaria o Moltres).
+- **Depois de ver a H-7** (o Fellipe, 2026-11-12): o atalho ("o articuno foi derrotado, ele pode
+  aparecer na vila pós cena já"): a cena de depois termina na vila, sem a volta a pé; e 15 Poké
+  Balls nas ilhas ("pode por até 15"): as cinco do FireRed, sete à vista do caminho de ida e três
+  nos becos.
 
 - **As ondas** (`depois_blaine`, no ginásio de Cinnabar do FireRed, depois da Fase 7): o
   Blaine conta que os instrumentos do Laboratório Pokémon captam ondas estranhas, que

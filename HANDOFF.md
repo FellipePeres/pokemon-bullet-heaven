@@ -1009,8 +1009,10 @@ Nunca voltar bônus globais para o pool de level up — foi pedido explícito.
   da caverna): as passagens são as do FireRed que funcionam a pé, as escadas (`MB_LADDER`) e os
   buracos (`MB_FALL_WARP`, só de descida); os tiles onde se cai (`MB_CAVE`) não levam a nada, e a
   saída é a seta da Rota 20 (o tapete). As pedras do Strength à vista ficam como enfeites sólidos
-  (`npc/pedra`). As Poké Balls: as cinco do FireRed (o item vira Reviver ou Novo Sorteio) e três a
-  mais nos becos.
+  (`npc/pedra`). As 15 Poké Balls: as cinco do FireRed (o item vira Reviver ou Novo Sorteio), sete
+  no caminho de ida, à vista da rota sem fechá-la (pedido do Fellipe depois de ver a H-7: "coloca
+  pokeloot nesse caminho de ida ao Articuno, pode por até 15"), e três nos becos. O check-data mede o
+  caminho a pé com as bolas contando como paredes: a rota nunca depende de pegar uma.
 - **A regra de altura** (o achado técnico da proposta): o `hub.py` grava a altura de cada tile dos
   mapas com patamares (`levels` em `data/hubMaps.js`, em hexadecimal), e `heightOk` (`data/hub.js`)
   é a regra do FireRed: de uma altura para outra, só por um tile de altura 0 (as escadinhas). Vale no
@@ -1049,8 +1051,10 @@ Nunca voltar bônus globais para o pool de level up — foi pedido explícito.
 - **A volta**: a missão diz onde o jogador fica ao sair no meio (`retreat`, a margem) e qual
   enfermeira fala na derrota (`nurse`, `enfermeira_seafoam`); vencer toca `articuno_livre` na ilha:
   ele cai, se assusta, foge pela fenda do teto, e a máquina quebrada ("Duas máquinas, dois
-  pássaros"); o aviso do mar descongelado, e a Fase 8 abre. O sábio (uma vez: "E ainda falta um") e o
-  rapaz comentam.
+  pássaros"); o aviso do mar descongelado, e a Fase 8 abre. **O atalho** (pedido do Fellipe: "o
+  articuno foi derrotado, ele pode aparecer na vila pós cena já"): a cena termina com `then: 'home'`,
+  e o jogador aparece na frente de casa, sem os 86 passos de volta. O sábio (uma vez: "E ainda falta
+  um") e o rapaz comentam.
 - **A medição**: `node tools/kyogre.mjs 57 12 articuno`: 11 de 12, 2,3 desmaios, 153 s; no 51, 8 de 12
   (a curva do Zapdos: no 30, 7 de 12). As alavancas: a vida do `articuno_boss` (270.000), a
   `difficulty` da fase (1,2) e os danos do `legendaryFight`. O bot (`steer`) vai para o olho, sai do
@@ -1536,6 +1540,7 @@ o Brock como está, todas as outras mais duras, menos níveis.
 | 76 | o refino da história: "essas maquinas que prendem os lendários sugam a energia deles" e mandam em ondas para um lugar misterioso, onde uma máquina central numa base do Maxie desorienta os Pokémon (ideia de End Game); o Zapdos enfraquecido explica a vitória de um jogador de nível baixo; "ao derrotar o Zapdos, rola uma cutscene do Zapdos voando e fugindo, assustado", sem captura por enquanto | 0.39 (na branch): a luta sem captura e de nível 36 (medida: 11 de 12 no 36), a energia escorrendo pelas correntes, a cena com o Zapdos do FireRed caído que foge pelo alto (os passos `cry`, `tremble` e `fly`) e a pista da energia mandada para longe; o card "Sem captura nesta luta" |
 | 77 | "A fase da Erika é barrada, o jogador precisa passar do Zapdos para liberar a Erika, o emblema pode ser visto outra vez e o jogador faz ligação que era o mesmo da máquina"; "não pode ter spoilers no título das fases ou quests"; a cena do emblema "montada já no artifact" e "um bate papo simples dando indícios da continuação"; "ficou excelente" | 0.39 (na branch): a trava da Fase 4 (`lock`, o Túnel de Pedra no escuro, sem o nome do Zapdos), as quests douradas da Usina, a do Koga e a da Sabrina, o palco do ginásio de Celadon com a Erika, a cena `depois_erika` (a lembrança com a sombra de asas, o pedaço de metal, o emblema reconhecido, as pistas: a Rocket no Cassino, a sombra para o sul) e os passos `toast`, `storm` e `item` |
 | 78 | "vamos para o H-3" | 0.39 (na branch): a tela de Missões (seção 7.3 do PLANEJAMENTO-HISTORIA): o Diário nas duas barras com o pontinho de quest nova, o que fazer agora, o diário por capítulo com as datas e os itens importantes; nenhuma quest futura aparece |
+| 80 | "Coloca um atalho para o pós luta, o articuno foi derrotado ele pode aparecer na vila pós cena já"; "lembra de colocar pokeloot nesse caminho de ida ao articuno, pode por até 15" | 0.39 (na branch): a cena `articuno_livre` termina na vila (`then: 'home'`); 15 Poké Balls em Seafoam (as cinco do FireRed, sete à vista da rota de ida, três nos becos), nenhuma escondida pela camada de cima e nenhuma fechando o caminho (o check-data conta as bolas como paredes) |
 | 79 | a proposta da H-7, "Seafoam: as ondas": "pode seguir com o que fez" | 0.39 (na branch): o Capítulo 4, "As ondas" (decisão 19): a cena do Blaine com as ondas, a trava da Fase 8 (o mar congelando), Seafoam a pé com a regra de altura do FireRed (no passo e no desenho), o gatilho `tile` e a névoa, a luta do Articuno (a névoa, o gelo no chão, o Raio de Gelo, a Nevasca, o Frio Absoluto com o olho; nível 57, 11 de 12), a fuga e a segunda máquina; a cena que ficava `started` no Lutar do primeiro card, corrigida |
 | Fase 8 (Giovanni) | 1 → 0,8 | 4,0 | 4,5 | 60 | 84 → 62 |
 | Lorelei | 1,05 → 0,8 | 3,5 | 3,1–4,7 | 64 | 92 → 66 |
