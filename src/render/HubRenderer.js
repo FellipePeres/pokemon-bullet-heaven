@@ -10,6 +10,29 @@ const STAND = { down: 0, up: 1, left: 2, right: 2 };
 const WALK = { down: 3, up: 5, left: 7, right: 7 };
 const actorFrame = (a) => (a.moving && a.prog < 0.5 ? WALK[a.dir] + ((a.steps ?? 0) % 2) : STAND[a.dir]);
 const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
+
+/**
+ * A faixa de baixo da tela que a caixa de texto ocupa numa cena (px de CSS: a margem de 18, a
+ * caixa de 112 no mínimo e a plaquinha de quem fala, com folga para uma linha a mais).
+ */
+export const DIALOG_RESERVE = 160;
+
+/**
+ * A câmera da vila: onde o canto de cima do mapa fica na tela (px do canvas). Segue `view` (o
+ * tile no centro) sem sair do mapa; um mapa menor que a tela fica no meio. Na vertical, conta só
+ * a área entre a barra do topo (`top`) e a reserva de baixo (`reserve`): numa cena, a vista
+ * centraliza acima da caixa de texto, e ela nunca tampa quem está em cena (o refino do Fellipe
+ * na aprovação da H-9). Também é usada pelo teste que mede isso a cada fala.
+ */
+export function hubCamera({ W, H, top = 0, reserve = 0, size, mapW, mapH, view }) {
+  const bottom = H - reserve;
+  const areaH = bottom - top;
+  const ox = mapW <= W ? Math.round((W - mapW) / 2) : Math.round(clamp(W / 2 - (view.x + 0.5) * size, W - mapW, 0));
+  const oy = mapH <= areaH
+    ? Math.round(top + (areaH - mapH) / 2)
+    : Math.round(clamp(top + areaH / 2 - (view.y + 0.5) * size, Math.min(H, bottom) - mapH, top));
+  return { ox, oy };
+}
 /**
  * A prioridade do sprite pela altura (sElevationToPriority do FireRed/Emerald): 1 ou 0 fica por
  * cima da camada de cima do mapa (a BG1, prioridade 1); 2, embaixo dela. É o que faz o jogador
@@ -31,6 +54,9 @@ export class HubRenderer {
     this.scale = 3;
     this.insetTop = 0;      // a faixa de cima coberta pela barra (px do canvas)
     this.offset = { x: 0, y: 0 };
+    this.dpr = 1;
+    this.reserve = 0;       // a reserva da caixa de texto agora (desliza ao começar e ao acabar uma cena)
+    this.lastFrame = 0;
   }
 
   /**
@@ -42,6 +68,7 @@ export class HubRenderer {
     const canvas = this.canvas;
     if (!canvas) return;
     const dpr = (typeof window !== 'undefined' && window.devicePixelRatio) || 1;
+    this.dpr = dpr;
     const width = Math.max(320, Math.round((canvas.clientWidth || CONFIG.canvas.width) * dpr));
     const height = Math.max(240, Math.round((canvas.clientHeight || CONFIG.canvas.height) * dpr));
     if (canvas.width !== width) canvas.width = width;
@@ -73,12 +100,15 @@ export class HubRenderer {
     // meio. Na vertical, conta só a área abaixo da barra do topo. Numa cena, ela pode
     // ir até outro tile (o passo `camera` de game/Cutscene.js) e tremer (`shake`).
     const top = this.insetTop;
-    const areaH = H - top;
     const view = scene?.fx.camera ?? { x: p.fx, y: p.fy };
-    let ox = mapW <= W ? Math.round((W - mapW) / 2) : Math.round(clamp(W / 2 - (view.x + 0.5) * size, W - mapW, 0));
-    let oy = mapH <= areaH
-      ? Math.round(top + (areaH - mapH) / 2)
-      : Math.round(clamp(top + areaH / 2 - (view.y + 0.5) * size, H - mapH, top));
+    // numa cena, a câmera sobe para a caixa de texto não tampar ninguém (desliza em ~0,3 s)
+    const now = typeof performance !== 'undefined' ? performance.now() : 0;
+    const dt = this.lastFrame ? Math.min(0.1, (now - this.lastFrame) / 1000) : 1;
+    this.lastFrame = now;
+    const want = scene ? DIALOG_RESERVE * this.dpr : 0;
+    this.reserve += (want - this.reserve) * Math.min(1, dt * 12);
+    if (Math.abs(want - this.reserve) < 0.5) this.reserve = want;
+    let { ox, oy } = hubCamera({ W, H, top, reserve: this.reserve, size, mapW, mapH, view });
     const shake = scene?.fx.shake;
     if (shake) {
       const now = performance.now();

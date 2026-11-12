@@ -292,11 +292,40 @@ settle();
 
 // o laboratório (0.39): entrar começa a cena do discurso do Carvalho (data/cutscenes.js)
 // toca a cena até o fim, passando as páginas; devolve o que apareceu na caixa de texto
+// a caixa de texto nunca tampa quem está em cena (o refino do Fellipe na aprovação da H-9): a cada
+// fala de uma cena, numa tela de 1280x720, o jogador, os atores e as pessoas que a cena move ficam
+// acima da caixa (ou fora da tela). Junta o que tampar e confere no fim.
+const { hubCamera, DIALOG_RESERVE } = await import('../src/render/HubRenderer.js');
+const { HUB_SPRITES } = await import('../src/data/hubMaps.js');
+const { CUTSCENES } = await import('../src/data/cutscenes.js');
+const framing = { checked: 0, covered: [] };
+const frameCheck = () => {
+  const scene = hub.scene;
+  if (!scene || !hub.dialog || !hub.map) return;
+  const W = 1280, H = 720, S = Math.floor(Math.min(W / (CONFIG.hub.view.tilesWide * 16), H / (CONFIG.hub.view.tilesHigh * 16)));
+  const size = 16 * S, reserve = DIALOG_RESERVE;
+  const view = scene.fx.camera ?? { x: hub.player.fx, y: hub.player.fy };
+  const { ox, oy } = hubCamera({ W, H, top: 0, reserve, size, mapW: hub.map.width * size, mapH: hub.map.height * size, view });
+  const bw = Math.min(980, W - 32), bx0 = (W - bw) / 2, bx1 = (W + bw) / 2, by0 = H - reserve;
+  const dims = (key) => { const d = HUB_SPRITES[key] ?? HUB_SPRITES[key?.replace(/^npc\//, '')]; return d ? [d.frameWidth, d.frameHeight] : [16, 32]; };
+  const def = CUTSCENES[scene.id] ?? {};
+  const moved = new Set((def.steps ?? []).map((st) => st.who).filter(Boolean));
+  const who = [{ id: 'jogador', x: hub.player.fx, y: hub.player.fy, w: 16, h: 32 }];
+  for (const a of scene.cast ?? []) if (!a.hidden && !a.glow) { const [w, h] = dims(a.sprite); who.push({ id: a.id, x: a.x, y: a.y, w, h, lift: a.lift ?? 0 }); }
+  for (const n of hub.npcs) if (!n.hidden && moved.has(n.id)) who.push({ id: n.id, x: n.x, y: n.y, w: 16, h: 32 });
+  framing.checked++;
+  for (const a of who) {
+    const cx = ox + (a.x + 0.5) * size, bottom = oy + (a.y + 1) * size - (a.lift ?? 0) * S, topY = bottom - a.h * S;
+    const x0 = cx - (a.w / 2) * S, x1 = cx + (a.w / 2) * S;
+    if (x1 <= 0 || x0 >= W || bottom <= 0 || topY >= H) continue;          // fora da tela
+    if (bottom > by0 + 2 && x1 > bx0 && x0 < bx1) framing.covered.push(`${scene.id}: ${a.id} em ${a.x},${a.y} ("${hub.dialog.pages[0].slice(0, 40)}...")`);
+  }
+};
 const runScene = (watch = null) => {
   const seen = [];
   let last = null;
   for (let i = 0; i < 60 * 180 && hub.scene; i++) {
-    if (hub.dialog && hub.dialog !== last) { last = hub.dialog; seen.push({ name: hub.dialog.name, text: hub.dialog.pages.join(' ') }); watch?.(seen.at(-1)); }
+    if (hub.dialog && hub.dialog !== last) { last = hub.dialog; seen.push({ name: hub.dialog.name, text: hub.dialog.pages.join(' ') }); frameCheck(); watch?.(seen.at(-1)); }
     if (hub.dialog) { hub.dialog.shown = 999; hub.confirm(); }
     hub.update(1 / 60);
   }
@@ -1129,7 +1158,7 @@ game.menus.closeModal();
     const seen = [];
     let last = null;
     for (let i = 0; i < 60 * 120 && hub.scene && !game.missionCard; i++) {
-      if (hub.dialog && hub.dialog !== last) { last = hub.dialog; seen.push({ name: hub.dialog.name, text: hub.dialog.pages.join(' ') }); watch?.(seen.at(-1)); }
+      if (hub.dialog && hub.dialog !== last) { last = hub.dialog; seen.push({ name: hub.dialog.name, text: hub.dialog.pages.join(' ') }); frameCheck(); watch?.(seen.at(-1)); }
       if (hub.dialog) { hub.dialog.shown = 999; hub.confirm(); }
       hub.update(1 / 60);
     }
@@ -1324,7 +1353,7 @@ game.menus.closeModal();
     const seen = [];
     let last = null;
     for (let i = 0; i < 60 * 120 && hub.scene && !game.missionCard; i++) {
-      if (hub.dialog && hub.dialog !== last) { last = hub.dialog; seen.push({ name: hub.dialog.name, text: hub.dialog.pages.join(' ') }); watch?.(seen.at(-1)); }
+      if (hub.dialog && hub.dialog !== last) { last = hub.dialog; seen.push({ name: hub.dialog.name, text: hub.dialog.pages.join(' ') }); frameCheck(); watch?.(seen.at(-1)); }
       if (hub.dialog) { hub.dialog.shown = 999; hub.confirm(); }
       hub.update(1 / 60);
     }
@@ -1517,6 +1546,10 @@ game.menus.closeModal();
         !brasaNode() && game.menus.lobby.selected === 'e4_lorelei' && !panelJson().includes('Hordas furiosas'));
   hub.enter('home');
 }
+
+// ---- a caixa de texto nunca tampa quem está em cena (todas as falas das cenas acima) ----
+check(`a caixa de texto não tampa ninguém em cena (${framing.checked} falas conferidas numa tela de 1280x720)`,
+      framing.checked > 100 && framing.covered.length === 0, framing.covered.slice(0, 8).join(' | '));
 
 // ---- Campeão e Hall da Fama ----
 game.region.campaign.slice(0, -1).forEach((e) => {

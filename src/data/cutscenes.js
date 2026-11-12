@@ -168,7 +168,8 @@ export const CUTSCENES = {
     when: { starter: false, veteran: false },
     steps: [
       { do: 'wait', t: 0.3 },
-      { do: 'camera', x: 6, y: 4, t: 0.6 },
+      // a câmera mostra o professor e a porta juntos: a caixa de texto não tampa o jogador (H-9)
+      { do: 'camera', x: 6, y: 8, t: 0.6 },
       { do: 'face', who: 'carvalho', dir: 'down' },
       { do: 'emote', who: 'carvalho' },
       { do: 'say', name: OAK, lines: ['Ah, aí está você, {player}! Entre, entre. Antes de tudo, precisamos conversar.'] },
@@ -211,11 +212,14 @@ export const CUTSCENES = {
       // voltando pendente, a bola dele ainda está na mesa
       { do: 'flag', name: 'rival_inicial', value: false },
       { do: 'wait', t: 0.5 },
+      // a câmera desce até a porta, para a caixa de texto não tampar o rival chegando (H-9)
+      { do: 'camera', x: 8, y: 8, t: 0.4 },
       { do: 'show', who: 'rival' },
       { do: 'say', name: 'Rival', lines: ['Vô! Cheguei! Cadê o meu Pokémon?'] },
       { do: 'face', who: 'player', toward: 'rival' },
       { do: 'face', who: 'carvalho', toward: 'rival' },
       { do: 'say', name: OAK, lines: ['Atrasado como sempre! {player} chegou primeiro e já escolheu.'] },
+      { do: 'camera', to: 'player', t: 0.5 },
       // até a bola com vantagem sobre o inicial do jogador (como no FireRed)
       { do: 'walk', who: 'rival', speed: 0.16, pick: 'rivalStarter', cases: {
         bulbasaur: { to: [[8, 5, 'up'], [8, 3, 'down']] },
