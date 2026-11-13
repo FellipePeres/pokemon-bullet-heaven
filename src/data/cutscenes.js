@@ -90,8 +90,8 @@ const FIM_KANTO = (when) => [
   { do: 'fade', to: 1, t: 1.4, when },
   { do: 'music', track: 'mus_pallet', when },
   { do: 'title', when, t: 16, min: 3, text: 'Fim da história de Kanto', lines: [
-    'Os três pássaros voltaram aos céus, a Elite dos Quatro voltou para a Liga, e o Kyogre agora está com {player}.',
-    'Mas o Maxie partiu a caminho do vulcão, e as hordas continuam por onde ele passou.',
+    'Os pássaros voltaram aos céus, todos os lendários liberados.',
+    'Mas Maxie partiu para o Vulcão, as hordas continuam por onde ele passou!',
     'A história continua em Pokémon Bullet Heaven 2.'
   ] },
   { do: 'fade', to: 0, t: 1.2, when }

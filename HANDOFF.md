@@ -1195,9 +1195,10 @@ Nunca voltar bônus globais para o pool de level up — foi pedido explícito.
   branch, confio nas suas escolhas".
 - **O fim de Kanto** (`FIM_KANTO` em `data/cutscenes.js`): depois da cena do Maxie (na lagoa ou no
   Centro), a tela escurece, toca o tema de Pallet (`mus_pallet`, a casa; os créditos do FireRed não
-  têm loop) e sobe o card "Fim da história de Kanto": os pássaros nos céus, a Elite dos Quatro na Liga,
-  o Kyogre com o jogador, o Maxie a caminho do vulcão e "A história continua em Pokémon Bullet Heaven
-  2" (a decisão 27), dourado, na fonte do título. O Espaço (ou um clique) segue depois de 3 s; sozinho,
+  têm loop) e sobe o card "Fim da história de Kanto", com o texto do Fellipe: "Os pássaros voltaram aos
+  céus, todos os lendários liberados." / "Mas Maxie partiu para o Vulcão, as hordas continuam por onde
+  ele passou!" e o anúncio "A história continua em Pokémon Bullet Heaven 2" (a decisão 27), dourado, na
+  fonte do título. O Espaço (ou um clique) segue depois de 3 s; sozinho,
   depois de 16 s. Só com a cena do Mew vista: quem pegou o Kyogre antes de contar ao Carvalho vê o fim no
   fim da cena do Mew.
 - **O motor**: o passo pode ter `when` (a condição da vila; não valendo, a cena pula o passo); o passo

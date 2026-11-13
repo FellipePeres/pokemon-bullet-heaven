@@ -2144,7 +2144,8 @@ const DIVE_LAST = (await import('../src/data/dive.js')).DIVE.levels.length - 1; 
   check('o Maxie, no segundo encontro, reconhece o jogador: "Você de novo?!" (H-11)', maxieSaid.some((t) => t.includes('Você de novo')) && maxieSaid.some((t) => t.includes('cheguei tarde')));
   check('o fim de Kanto: depois do Maxie, o card "Fim da história de Kanto", com o tema de Pallet e o gancho do Bullet Heaven 2',
         endCard?.title === 'Fim da história de Kanto' && endMusic === 'mus_pallet'
-        && endCard.lines.some((l) => l.includes(game.playerName)) && endCard.lines.some((l) => l.includes('Pokémon Bullet Heaven 2')), `${endMusic} · ${JSON.stringify(endCard)}`);
+        && endCard.lines.length === 3 && endCard.lines[0].includes('todos os lendários liberados')
+        && endCard.lines[1].includes('Maxie partiu para o Vulcão') && endCard.lines[2].includes('Pokémon Bullet Heaven 2'), `${endMusic} · ${JSON.stringify(endCard)}`);
   check('...e o Espaço o segue depois do mínimo (sem esperar os 16 s)', cardGone != null && cardGone - cardAt <= 60 * 4 + 2, `${cardGone - cardAt} quadros`);
   check('a cena acaba, devolve o controle e conta como vista (uma vez por jornada)', !hub.scene && !hub.dialog && game.campaign.dive.sceneSeen);
   game.continueGame();
