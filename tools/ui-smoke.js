@@ -2131,13 +2131,84 @@ const DIVE_LAST = (await import('../src/data/dive.js')).DIVE.levels.length - 1; 
   await game.loadFromFile({ text: async () => JSON.stringify(game.buildSaveData()) });
   check('...e carregar o save também', hubVisible() && hub.mapId === 'vila' && hub.player.x === 30 && hub.scene?.step === 0);
   const maxieSaid = [];
-  for (let i = 0; i < 60 * 60 && hub.scene; i++) { if (hub.dialog) { maxieSaid.push(hub.dialog.pages[hub.dialog.index]); hub.dialog.shown = 999; hub.confirm(); } hub.update(1 / 60); }
+  // o fim de Kanto (a lapidação): o card de fim depois do Maxie, com o tema de Pallet; o A o segue
+  let endCard = null, endMusic = null, cardAt = null, cardGone = null;
+  for (let i = 0; i < 60 * 120 && hub.scene; i++) {
+    if (hub.dialog) { maxieSaid.push(hub.dialog.pages[hub.dialog.index]); hub.dialog.shown = 999; hub.confirm(); }
+    const card = hub.scene?.fx.title;
+    if (card && !endCard) { endCard = { ...card, lines: [...card.lines] }; game._updateMusic(); endMusic = game.music.wanted; cardAt = i; }
+    if (card && cardAt != null && i - cardAt === 60 * 4) hub.confirm();   // o Espaço depois do mínimo
+    if (!card && endCard && cardGone == null) cardGone = i;
+    hub.update(1 / 60);
+  }
   check('o Maxie, no segundo encontro, reconhece o jogador: "Você de novo?!" (H-11)', maxieSaid.some((t) => t.includes('Você de novo')) && maxieSaid.some((t) => t.includes('cheguei tarde')));
+  check('o fim de Kanto: depois do Maxie, o card "Fim da história de Kanto", com o tema de Pallet e o gancho do Bullet Heaven 2',
+        endCard?.title === 'Fim da história de Kanto' && endMusic === 'mus_pallet'
+        && endCard.lines.some((l) => l.includes(game.playerName)) && endCard.lines.some((l) => l.includes('Pokémon Bullet Heaven 2')), `${endMusic} · ${JSON.stringify(endCard)}`);
+  check('...e o Espaço o segue depois do mínimo (sem esperar os 16 s)', cardGone != null && cardGone - cardAt <= 60 * 4 + 2, `${cardGone - cardAt} quadros`);
   check('a cena acaba, devolve o controle e conta como vista (uma vez por jornada)', !hub.scene && !hub.dialog && game.campaign.dive.sceneSeen);
   game.continueGame();
   check('vista a cena, continuar volta à frente de casa, sem cena', hubVisible() && !hub.scene && hub.mapId === 'vila' && hub.player.x !== 30);
   hub.say('pescador');
   check('o pescador depois da captura', dialogText().includes('minhoca'));
+// a lapidação: o fim de Kanto fora de ordem, a tela de Missões no fim e os sons da vila (nesta jornada, que terminou a história)
+{
+  closeDialog();
+  const playThrough = (sceneId) => {
+    let card = false;
+    game.playScene(sceneId);
+    for (let i = 0; i < 60 * 120 && hub.scene; i++) {
+      if (hub.dialog) { hub.dialog.shown = 999; hub.confirm(); }
+      if (hub.scene?.fx.title) { card = true; hub.confirm(); }
+      hub.update(1 / 60);
+    }
+    return card;
+  };
+  // quem pegou o Kyogre antes de contar ao Carvalho (a cena do Mew ainda não vista)
+  const mewSeen = game.sceneRecord.carvalho_mew;
+  delete game.sceneRecord.carvalho_mew;
+  game.openHub();
+  hub.enter({ map: 'vila', x: 30, y: 11, dir: 'down' });
+  check('o Kyogre pego antes da cena do Mew: o Maxie não mostra o fim ainda', !playThrough('maxie_lagoa') && !hub.scene);
+  hub.enter({ map: 'lab', x: 6, y: 11, dir: 'up' });
+  check('...o fim vem no fim da cena do Mew', playThrough('carvalho_mew') && game.sceneRecord.carvalho_mew === 'seen');
+  game.sceneRecord.carvalho_mew = mewSeen ?? 'seen';
+  closeDialog();
+
+  // a tela de Missões: a história acabou
+  game.menus.showModal('modal-quests');
+  check('a tela de Missões no fim: a história de Kanto chegou ao fim, e o que dá para fazer depois',
+        registry.get('quests-sub').textContent.startsWith('A história de Kanto chegou ao fim') && textIn(questLog()).includes('Pokémon Bullet Heaven 2')
+        && textIn(questLog()).includes('Modo Livre'), registry.get('quests-sub').textContent);
+  game.menus.closeModal();
+
+  // os sons: a porta, o tapete, a Poké Ball do chão, o item importante da cena e a missão concluída
+  const realSfx = game.sfx, realJingle = game.music.jingle, realNotify = game.quests.notify;
+  const heard = [];
+  game.sfx = { textBox() {}, textTick() {}, play: (name) => heard.push(name) };
+  game.music.jingle = (track) => { heard.push(track); };
+  hub.enter({ map: 'vila', x: 6, y: 17, dir: 'up' });
+  hub._warpTo({ on: 'push', to: 'casa_1f', tx: 4, ty: 7, dir: 'up' }); settle();
+  hub._warpTo({ on: 'mat', to: 'vila', tx: 6, ty: 17, dir: 'down' }); settle();
+  check('a porta faz o som da porta do FireRed, e o tapete o da saída', heard[0] === 'se_door' && heard[1] === 'se_exit', heard.join(', '));
+  const revives = game.profile.bag.revive ?? 0;
+  hub._pickup({ id: 'teste_som', item: 'revive', count: 1 });
+  check('a Poké Ball do chão toca a vinheta do item', heard.includes('mus_obtain_item'), heard.join(', '));
+  closeDialog();
+  delete hub._flags()['loot:vila:teste_som'];
+  game.profile.bag.revive = revives;
+  game.playScene('maxie_lagoa');
+  hub.scene._give('emblema_vermelho', 0);
+  hub.scene = null; hub.dialog = null;
+  check('o item importante de uma cena toca a vinheta dele', heard.includes('mus_obtain_key_item'), heard.join(', '));
+  game.quests.notify = () => ['p_mae'];
+  game.storyEvent('talk', 'teste');
+  check('a missão concluída toca a vinheta curta', heard.includes('mus_level_up'), heard.join(', '));
+  game.quests.notify = realNotify;
+  game.sfx = realSfx;
+  game.music.jingle = realJingle;
+}
+
   closeDialog();
   hub.say('sabio');
   check('o velho sábio, uma vez, depois do Kyogre: o Maxie fugiu outra vez; Kanto em paz, mas as hordas não somem (H-11)',

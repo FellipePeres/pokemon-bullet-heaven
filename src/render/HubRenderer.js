@@ -180,7 +180,62 @@ export class HubRenderer {
       ctx.fillStyle = `rgba(0, 0, 0, ${fade.toFixed(3)})`;
       ctx.fillRect(0, 0, W, H);
     }
+    if (scene?.fx.title) this._titleCard(scene.fx.title, W, H);
     if (hub.battle) this._battleIntro(hub.battle.t, W, H);
+  }
+
+  /**
+   * O card de fim (o passo `title` das cenas, a lapidação): a tela preta, o título dourado em
+   * Press Start 2P e as linhas em Pixelify Sans no meio; o "Espaço para continuar" embaixo.
+   */
+  _titleCard(card, W, H) {
+    const ctx = this.ctx;
+    ctx.save();
+    ctx.globalAlpha = Math.min(1, card.t / 0.8);
+    ctx.fillStyle = '#000';
+    ctx.fillRect(0, 0, W, H);
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    const big = Math.max(14, Math.round(H * 0.034));
+    ctx.font = `${big}px "Press Start 2P", monospace`;
+    ctx.fillStyle = '#f8d030';
+    ctx.fillText(card.title.toUpperCase(), W / 2, H * 0.3);
+    const small = Math.max(13, Math.round(H * 0.028));
+    ctx.font = `${small}px "Pixelify Sans", sans-serif`;
+    ctx.fillStyle = '#eef2f8';
+    let y = H * 0.3 + big * 2.6;
+    card.lines.forEach((line, i) => {
+      // a última linha (o gancho do Bullet Heaven 2) vai na fonte do título, dourada: os números
+      // da Pixelify Sans ficam parecidos (o 2 com o 8)
+      const hook = card.lines.length > 1 && i === card.lines.length - 1;
+      if (hook) {
+        y += small * 0.8;
+        ctx.font = `${Math.round(small * 0.72)}px "Press Start 2P", monospace`;
+        ctx.fillStyle = '#f8d030';
+      }
+      for (const row of this._wrapText(line, W * 0.7)) { ctx.fillText(row, W / 2, y); y += small * 1.45; }
+      y += small * 0.7;
+    });
+    if (card.hint) {
+      ctx.font = `${Math.max(11, Math.round(H * 0.021))}px "Pixelify Sans", sans-serif`;
+      ctx.fillStyle = 'rgba(238, 242, 248, .55)';
+      ctx.fillText('Espaço para continuar', W / 2, H * 0.88);
+    }
+    ctx.restore();
+  }
+
+  /** Quebra o texto em linhas que cabem em `max` pixels, na fonte atual do contexto. */
+  _wrapText(text, max) {
+    const ctx = this.ctx;
+    const width = (s) => ctx.measureText?.(s)?.width ?? s.length * 8;
+    const rows = [];
+    let row = '';
+    for (const word of text.split(' ')) {
+      const next = row ? `${row} ${word}` : word;
+      if (row && width(next) > max) { rows.push(row); row = word; } else row = next;
+    }
+    if (row) rows.push(row);
+    return rows;
   }
 
   /**

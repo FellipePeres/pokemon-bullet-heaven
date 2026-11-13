@@ -356,6 +356,8 @@ export class Game {
     const completed = this.quests.notify(on, target);
     if (!completed.length) return;
     this.questTracker.celebrate(completed);
+    // a vinheta da missão concluída (a lapidação); na partida, a tela de vitória já tem a música dela
+    if (!this.run) this.music.jingle('mus_level_up');
     if (this.run) {
       for (const id of completed) toast(`Missão concluída: ${QUESTS[id].objectives[0].text}`, '◆');
     }
@@ -1330,12 +1332,18 @@ export class Game {
       id,
       fill: (text) => this.hub._fill(text, this.hub._context()),
       value: (key) => this.hub._context()[key] ?? null,
-      give: (item, count) => this.giveItem(item, count),
+      give: (item, count) => {
+        const name = this.giveItem(item, count);
+        // a vinheta do FireRed (a lapidação): a do item importante ou a do item comum
+        if (name) this.music.jingle(KEY_ITEMS[item] ? 'mus_obtain_key_item' : 'mus_obtain_item');
+        return name;
+      },
       quest: (questId) => this.openQuest(questId),
       emit: (on, target) => bus.emit(EVENTS.STORY, { on, target }),
       card: (missionId, answer) => this.showMission(missionId, answer),
       cry: (dex) => playCry(dex),
       toast: (text, icon) => toast(text, icon),
+      matches: (cond) => this.hub._matches(cond, this.hub._context()),
       onEnd: () => {
         if (record) this.sceneRecord[id] = 'seen';
         onEnd?.();

@@ -58,7 +58,8 @@ export class MusicPlayer {
    * esmaece, a vinheta toca inteira e depois entra a faixa pedida.
    */
   async jingle(track) {
-    if (!this.ctx) return;
+    // uma vinheta por vez: a segunda, enquanto a primeira toca, não sai (a missão e o item juntos)
+    if (!this.ctx || this.holding) return;
     this.holding = true;
     this._switch(null);
     const buffer = await this._buffer(track);

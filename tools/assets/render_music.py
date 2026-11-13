@@ -928,6 +928,7 @@ MUSIC = {
     'mus_lavender': 'os pássaros presos nas máquinas: a Usina, Seafoam e o Monte Brasa',
     'mus_encounter_deoxys': 'o Mew no laboratório: o encontro com o mítico',
     'mus_slow_pallet': 'os pássaros libertados, caídos e fugindo assustados',
+    'mus_pallet': 'o fim da história de Kanto: o card de fim, depois do Maxie (o tema de casa; os créditos do FireRed não têm loop)',
 }
 #: As músicas do Emerald (0.37.6): a partitura e os instrumentos do decomp pret/pokeemerald
 #: (o clone parcial em ../pokeemerald, com a pasta sound). O motor é o mesmo m4a.
@@ -938,10 +939,15 @@ EMERALD_MUSIC = {
 #: As vinhetas: tocam uma vez, sem loop (não entram em musicTracks.js).
 JINGLES = {
     'mus_heal': 'a cura do Centro Pokémon',
+    'mus_obtain_item': 'uma Poké Ball do chão ou um item recebido numa cena',
+    'mus_obtain_key_item': 'um item importante da história (o Pedaço de Metal)',
+    'mus_level_up': 'uma missão concluída',
 }
 #: Os efeitos sonoros do FireRed (a lapidação da história), em assets/sound/se: tocam uma vez
 SOUND_EFFECTS = {
     'se_select': 'a caixa de texto: ao abrir e ao avançar (o "pi" do A no FireRed)',
+    'se_door': 'entrar por uma porta da vila',
+    'se_exit': 'sair pelo tapete, ou subir e descer uma escada',
 }
 DECOMP_COMMIT = 'c75f352304d529f6ba92d4f74b9cf8b5c3810788'
 REPO = pathlib.Path(__file__).resolve().parents[2]

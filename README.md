@@ -152,8 +152,9 @@ não abre até você vencer.
   do teto dela (no card da fase). No teto, a barra de XP fica dourada e a parte dele no XP some
   (não vai para ninguém). Farmar rende só alguns níveis; quem joga normal quase nunca encosta nele. Depois do
   Campeão, não há teto.
-- **A trilha e os sons das cenas** (0.39): cada cena com a música do clima dela, do FireRed, e a
-  caixa de texto com o "pi" do A e o tique das letras.
+- **A trilha e os sons das cenas** (0.39): cada cena com a música do clima dela, do FireRed; a
+  caixa de texto com o "pi" do A e o tique das letras; a porta, a vinheta do item e a da missão
+  concluída na vila; e um card de fim quando a história de Kanto acaba.
 - **As recompensas das quests** (0.39): cada quest dá Shards, mais a cada capítulo, e as
   missões dos lendários e o fim dão também Revivers e Novos Sorteios. A comemoração do
   rastreador diz o que veio, e a tela de Missões mostra a recompensa de cada uma.

@@ -83,6 +83,20 @@ const MAXIE_SHEETS = ['dive/maxie', 'dive/exclam', 'dive/bird', 'dive/crobat', '
 
 const OAK = 'Prof. Carvalho';
 
+// (a lapidação) o fim da história de Kanto: depois do Maxie, a tela escurece e o card de fim sobe, com o
+// tema de Pallet. Só com a cena do Mew vista: quem pegou o Kyogre antes de contar ao Carvalho vê o fim no
+// fim da cena do Mew (o `when` de cada passo)
+const FIM_KANTO = (when) => [
+  { do: 'fade', to: 1, t: 1.4, when },
+  { do: 'music', track: 'mus_pallet', when },
+  { do: 'title', when, t: 16, min: 3, text: 'Fim da história de Kanto', lines: [
+    'Os três pássaros voltaram aos céus, a Elite dos Quatro voltou para a Liga, e o Kyogre agora está com {player}.',
+    'Mas o Maxie partiu a caminho do vulcão, e as hordas continuam por onde ele passou.',
+    'A história continua em Pokémon Bullet Heaven 2.'
+  ] },
+  { do: 'fade', to: 0, t: 1.2, when }
+];
+
 /**
  * A margem do fundo de Seafoam (H-7): pisar num destes tiles começa a cena do fundo. São os da
  * margem de frente para a ilha (x até 15, linhas 7 a 11); quem chega pela escada do B4F (15,9)
@@ -134,6 +148,7 @@ export const CUTSCENES = {
       { do: 'bird', who: 'maxie', mode: 'grab' },
       { do: 'bird', who: 'maxie', mode: 'away' },
       { do: 'wait', t: 0.6 },
+      ...FIM_KANTO({ scene: 'carvalho_mew' }),   // o fim de Kanto (a lapidação)
       { do: 'end' }
     ]
   },
@@ -165,6 +180,7 @@ export const CUTSCENES = {
       { do: 'walk', who: 'maxie', path: [[4, 7], [3, 7], [2, 7], [2, 8], [2, 9]], speed: 0.13, bird: true },
       { do: 'hide', who: 'maxie' }, { do: 'bird', who: 'maxie', mode: 'gone' },
       { do: 'wait', t: 0.6 },
+      ...FIM_KANTO({ scene: 'carvalho_mew' }),   // o fim de Kanto (a lapidação)
       { do: 'end' }
     ]
   },
@@ -1036,6 +1052,7 @@ export const CUTSCENES = {
       { do: 'music', track: 'mus_encounter_deoxys' },   // a luz rosa: o Mew
       { do: 'flash', t: 0.8, power: 0.7, color: '255,170,225' },
       { do: 'show', who: 'mew' },
+      { do: 'cry', dex: 151 },   // o grito do Mew (a lapidação)
       { do: 'emote', who: 'player' },
       { do: 'say', lines: ['Uma luz rosa se acende no meio do laboratório.'] },
       { do: 'face', who: 'player', dir: 'right' },
@@ -1045,6 +1062,7 @@ export const CUTSCENES = {
       { do: 'say', name: 'Mew', lines: ['O Maxie também tentou me prender numa das máquinas dele. Eu consegui fugir.'] },
       { do: 'say', name: 'Mew', lines: ['As hordas continuam estranhas porque ele não parou. Ele anda roubando a energia de lendários em outras regiões também.'] },
       { do: 'say', name: 'Mew', lines: ['E o próximo da lista dorme aqui perto, no fundo da lagoa.'] },
+      { do: 'cry', dex: 151 },
       { do: 'fly', who: 'mew', t: 0.8, height: 120 },
       { do: 'flash', t: 0.6, power: 0.8, color: '255,170,225' },
       { do: 'say', lines: ['O Mew dá uma volta no ar... e some.'] },
@@ -1052,6 +1070,7 @@ export const CUTSCENES = {
       { do: 'music', track: 'mus_oak_lab' },   // o Mew foi embora
       { do: 'say', name: OAK, lines: ['Você também viu? Um Pokémon rosa! Ele olhava para você como se estivesse falando...'] },
       { do: 'say', name: OAK, lines: ['Os lendários confiam em você agora. Se cruzar com eles por aí, talvez aceitem seguir com você.'] },
+      ...FIM_KANTO({ kyogre: true }),   // quem já pegou o Kyogre antes: o fim de Kanto aqui (a lapidação)
       { do: 'end' }
     ]
   },
@@ -1144,6 +1163,7 @@ export const CUTSCENES = {
       { do: 'say', name: 'Lance', lines: ['{player}?! Não chegue perto! É uma armadilha!'] },
       { do: 'face', who: 'player', dir: 'up' },
       { do: 'say', lines: ['No meio da sala, uma máquina como as dos pássaros. Presa nela, a criatura dos diários: o Mewtwo.'] },
+      { do: 'cry', dex: 150 },   // o grito do Mewtwo, fraco na máquina (a lapidação)
       { do: 'face', who: 'agatha', dir: 'left' },
       { do: 'say', name: 'Agatha', lines: ['Hehe... Os meus fantasmas não mentem. Ele sofre há dias aí dentro.'] },
       // a emboscada: o homem de vermelho e os dois capangas de capuz, pela passagem
@@ -1199,6 +1219,7 @@ export const CUTSCENES = {
       { do: 'flag', name: 'mansao_maquina' },
       { do: 'say', lines: ['Raio, gelo e fogo: a máquina explode!'] },
       // ele encara o jogador durante a fala, e o clarão vem depois dela
+      { do: 'cry', dex: 150 },
       { do: 'say', lines: ['O Mewtwo encara {player} por um instante... e some num clarão.'] },
       { do: 'flash', t: 0.5, power: 0.8 },
       { do: 'flag', name: 'mansao_mewtwo' },
@@ -1230,7 +1251,7 @@ export const CUTSCENES = {
 /** Os passos que o game/Cutscene.js conhece (o check-data confere). */
 export const CUTSCENE_STEPS = ['wait', 'say', 'talk', 'show', 'hide', 'place', 'walk', 'face', 'emote', 'throw', 'cutin',
   'bird', 'fade', 'camera', 'shake', 'give', 'quest', 'emit', 'card', 'flag', 'cry', 'tremble', 'fly', 'toast', 'storm', 'item',
-  'mist', 'land', 'flash', 'music', 'end'];
+  'mist', 'land', 'flash', 'music', 'title', 'end'];
 
 /** O que pode começar uma cena. */
 export const CUTSCENE_TRIGGERS = ['enter', 'npc', 'starter', 'win', 'play', 'tile'];

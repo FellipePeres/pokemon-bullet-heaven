@@ -588,6 +588,8 @@ const inside = (mapId, x, y) => { const m = HUB_MAPS[mapId]; return !!m && x >= 
         if (step.do === 'bird' && !['in', 'grab', 'away', 'gone'].includes(step.mode)) issues.push(`${at}: modo desconhecido (${step.mode})`);
         if (step.do === 'give' && getMartItem(step.item)?.kind !== 'bag' && !KEY_ITEMS[step.item]) issues.push(`${at}: item que não existe (${step.item})`);
         if (step.do === 'quest' && !QUESTS[step.id]) issues.push(`${at}: quest que não existe (${step.id})`);
+        for (const cond of Object.keys(step.when ?? {})) if (!KNOWN_WHEN.has(cond)) issues.push(`${at}: condição desconhecida no passo (${cond})`);
+        if (step.do === 'cry' && !existsSync(join(root, 'assets', 'sound', 'cries', `${step.dex}.ogg`))) issues.push(`${at}: grito que não existe (${step.dex})`);
         if (step.do === 'music' && !existsSync(join(root, 'assets', 'music', `${step.track}.ogg`))) issues.push(`${at}: música que não existe (${step.track})`);
         if (step.do === 'emit') {
           if (!QUEST_EVENTS.includes(step.on)) issues.push(`${at}: acontecimento desconhecido (${step.on})`);

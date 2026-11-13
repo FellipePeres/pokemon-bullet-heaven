@@ -64,14 +64,20 @@ export function buildQuestLog(game) {
     .map(([id, record]) => ({ view: quests.view(id), at: record.at ?? null }))
     .sort((a, b) => (a.at ?? '').localeCompare(b.at ?? ''));
 
+  // a última quest da história (H-11) fechada: a história de Kanto acabou (a lapidação)
+  const ended = !!state?.done?.c8_lagoa;
   el('quests-sub').textContent = active.length
     ? `${active.length === 1 ? 'Uma missão' : `${active.length} missões`} em andamento · ${done.length} concluída${done.length === 1 ? '' : 's'}`
-    : 'Nenhuma missão em andamento agora.';
+    : ended ? `A história de Kanto chegou ao fim · ${done.length} missões concluídas` : 'Nenhuma missão em andamento agora.';
 
   // ---- agora
   const now = create('section', 'ql-section');
   now.appendChild(t('h4', 'ql-head', 'Agora'));
-  if (!active.length) now.appendChild(t('p', 'ql-empty', 'Nenhuma missão em andamento. Siga a jornada pelo mapa.'));
+  if (!active.length) {
+    now.appendChild(t('p', 'ql-empty', ended
+      ? 'A história de Kanto chegou ao fim, e continua em Pokémon Bullet Heaven 2. Até lá, dá para completar a Pokédex, capturar os lendários nas Poké Balls e encarar o Modo Livre.'
+      : 'Nenhuma missão em andamento. Siga a jornada pelo mapa.'));
+  }
   for (const view of active) {
     const card = create('article', `ql-card ql-${view.kind}`);
     const top = create('div', 'ql-card-top');

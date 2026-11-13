@@ -61,6 +61,8 @@ export const MUSIC_TRACKS = {
   mus_encounter_deoxys: { loopStart: 0.016735, loopEnd: 15.085170 },
   /** Os pássaros libertados, caídos e fugindo assustados. */
   mus_slow_pallet: { loopStart: 0.016735, loopEnd: 53.593379 },
+  /** O fim da história de Kanto: o card de fim, depois do Maxie (o tema de casa; os créditos do FireRed não têm loop). */
+  mus_pallet: { loopStart: 0.016735, loopEnd: 43.849161 },
   /** A descida do Dive, Níveis 1 a 3 (0.37.6): a música do mergulho do Emerald. */
   mus_underwater: { loopStart: 25.231247, loopEnd: 86.911338 },
   /** A descida do Dive, Níveis 4 e 5 (0.37.7): a de quando o Kyogre desperta. */

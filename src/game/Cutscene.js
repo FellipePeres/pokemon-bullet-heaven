@@ -36,7 +36,7 @@ export class Cutscene {
    *                história (a pista); cry(dex) toca o grito de um Pokémon; toast(text, icon) põe
    *                um aviso no canto; onEnd() no fim
    */
-  constructor(hub, def, { id = null, fill = (text) => text, value = () => null, give = null, quest = null, emit = null, card = null, cry = null, toast = null, onEnd = null } = {}) {
+  constructor(hub, def, { id = null, fill = (text) => text, value = () => null, give = null, quest = null, emit = null, card = null, cry = null, toast = null, onEnd = null, matches = null } = {}) {
     this.hub = hub;
     this.id = id;
     this.band = def.band ?? null;
@@ -63,6 +63,12 @@ export class Cutscene {
     this._cry = cry;
     this._toast = toast;
     this._onEnd = onEnd;
+    this._matches = matches;   // (cond) => a condição `when` de um passo vale agora? (a lapidação)
+  }
+
+  /** O jogador apertou Espaço (ou clicou) sem caixa de texto: o card de fim segue (o passo `title`). */
+  confirm() {
+    this.local.go = true;
   }
 
   /** Um ator pelo nome: 'player', um da cena ou uma pessoa do lugar. */
@@ -88,6 +94,8 @@ export class Cutscene {
     if (this.fx.shake) { this.fx.shake.left -= dt; if (this.fx.shake.left <= 0) this.fx.shake = null; }
     const a = this._current();
     if (!a) return;
+    // o passo com `when` (a lapidação) só roda se a condição vale agora; senão, a cena segue
+    if (a.when && this._matches && !this._matches(a.when)) { this.step++; this.t = 0; this.local = {}; return; }
     this.t += dt;
     const local = this.local;
     let done = false;
@@ -205,6 +213,18 @@ export class Cutscene {
       case 'cry': this._cry?.(a.dex); done = true; break;
       case 'toast': this._toast?.(this._fill(a.text), a.icon ?? 'stages'); done = true; break;
       case 'music': this.music = a.track ?? null; done = true; break;
+      // o card de fim (a lapidação): a tela preta com o título e as linhas. Segue com o Espaço (ou
+      // um clique) depois de `min` segundos, ou sozinho depois de `t`
+      case 'title':
+        if (!local.open) {
+          local.open = true;
+          this.fx.title = { title: this._fill(a.text), lines: (a.lines ?? []).map((line) => this._fill(line)), t: 0, hint: false };
+        }
+        this.fx.title.t = this.t;
+        this.fx.title.hint = this.t >= (a.min ?? 2);
+        done = this.t >= (a.t ?? 12) || (!!local.go && this.t >= (a.min ?? 2));
+        if (done) this.fx.title = null;
+        break;
       // a lembrança da tempestade (a Erika, H-4): a tela azul-escura, os clarões e uma sombra de
       // asas cruzando o alto; fica até o `storm` com `off`
       case 'storm': this.fx.storm = a.off ? null : { t: 0, sprite: a.sprite ?? 'dive/crobat' }; done = true; break;

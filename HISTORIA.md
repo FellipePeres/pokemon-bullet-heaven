@@ -222,6 +222,9 @@ ladrão: o **Maxie**.
   - o Crobat, e "A caminho do vulcão! O próximo lendário será meu!".
 - É a ponte para Hoenn (o Monte Chimney).
 - Na vila, o sábio: "Kanto está em paz. Mas as hordas não vão sumir enquanto ele estiver por aí."
+- **O fim** (a lapidação): logo depois do Maxie, a tela escurece, toca o tema de Pallet e sobe o card
+  "Fim da história de Kanto": os pássaros voltaram aos céus, a Elite dos Quatro à Liga, o Kyogre está com
+  o jogador, mas o Maxie partiu a caminho do vulcão. "A história continua em Pokémon Bullet Heaven 2."
 
 ## 6. As pistas e onde elas se pagam
 

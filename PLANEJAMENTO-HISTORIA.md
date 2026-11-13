@@ -895,7 +895,7 @@ do Zapdos, o tipo, as fraquezas e o nível recomendado (36; sem captura, decisã
 | **H-9** ✅ 0.39 | A Victory Road e a base do Maxie (decisão 22; seção 5.4, página "A base na Mansão"): a cena da Elite dos Quatro, a quest "Ajude a Elite dos Quatro", a base com o Mewtwo e as jaulas, a emboscada do Maxie e os pássaros. Ganha proposta e maquete. |
 | **H-10** ✅ 0.39 | A Liga e o fim do Capítulo 7 (seção 5.5, página "O sonho da Liga"): a Elite dos Quatro de volta, o rival Campeão e o "ainda falta alguma coisa". |
 | **H-11** ✅ 0.39 | O Kyogre como fecho de Kanto: a quest da lagoa (fecha com a captura), o pescador, o Maxie no segundo encontro ("Você de novo?!") e a vila depois do Kyogre. O Mew veio para a H-10. Junto, a decisão 25 (a captura abre com a cena da Mansão). |
-| **H-13** ✅ 0.39 | A lapidação (o Fellipe, depois do check final): a trilha das cenas (cada cena com a música do clima dela, sete faixas novas do FireRed), os sons da caixa de texto (o "pi" do A e o tique das letras) e o Level Cap (seção 13.1, decisão 28). |
+| **H-13** ✅ 0.39 | A lapidação (o Fellipe, depois do check final): a trilha das cenas (cada cena com a música do clima dela, sete faixas novas do FireRed), os sons da caixa de texto (o "pi" do A e o tique das letras), o Level Cap (seção 13.1, decisão 28), as quatro primeiras fases mais duras, o fim de Kanto (o card de fim depois do Maxie), os gritos do Mewtwo e do Mew e os sons da vila (a porta, o item, a missão concluída). |
 | **H-12** ✅ 0.39 | As recompensas das quests (seção 7.1, decisão 26): Shards por capítulo e Revivers e Novos Sorteios nos lendários e no fim, pagos quando a quest fecha, na comemoração, num toast e na tela de missões. |
 
 ---

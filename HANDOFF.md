@@ -1190,6 +1190,31 @@ Nunca voltar bônus globais para o pool de level up — foi pedido explícito.
   FireRed (`mus_poke_mansion`) ao andar por ela.
 - O `check-data` confere que toda música de cena e de lugar existe; o `ui-smoke`, a troca na cena do Mew.
 
+### O fim de Kanto, os gritos do Mewtwo e do Mew e os sons da vila (H-13, a lapidação; 0.39 na branch)
+- Pedido do Fellipe (os itens 5, 6 e 7 das pendências): "você vai fazer agora, planejar e já levar para
+  branch, confio nas suas escolhas".
+- **O fim de Kanto** (`FIM_KANTO` em `data/cutscenes.js`): depois da cena do Maxie (na lagoa ou no
+  Centro), a tela escurece, toca o tema de Pallet (`mus_pallet`, a casa; os créditos do FireRed não
+  têm loop) e sobe o card "Fim da história de Kanto": os pássaros nos céus, a Elite dos Quatro na Liga,
+  o Kyogre com o jogador, o Maxie a caminho do vulcão e "A história continua em Pokémon Bullet Heaven
+  2" (a decisão 27), dourado, na fonte do título. O Espaço (ou um clique) segue depois de 3 s; sozinho,
+  depois de 16 s. Só com a cena do Mew vista: quem pegou o Kyogre antes de contar ao Carvalho vê o fim no
+  fim da cena do Mew.
+- **O motor**: o passo pode ter `when` (a condição da vila; não valendo, a cena pula o passo); o passo
+  novo `title` (o card, desenhado pelo `HubRenderer._titleCard`); o A e o clique numa cena sem caixa de
+  texto vão para `Cutscene.confirm`.
+- **A tela de Missões no fim**: "A história de Kanto chegou ao fim", com o que dá para fazer depois (a
+  Pokédex, os lendários nas Poké Balls, o Modo Livre).
+- **Os gritos** do Mewtwo (`150.ogg`) e do Mew (`151.ogg`), copiados do Pokemon All: o Mewtwo na máquina
+  e antes de sumir (a Mansão); o Mew ao aparecer e ao ir embora (o laboratório). O `check-data` confere
+  que o grito de cada passo `cry` existe.
+- **Os sons da vila** (do decomp, `render_music.py`): a porta (`se_door`), o tapete e a escada
+  (`se_exit`), a vinheta do item na Poké Ball do chão e no item de uma cena (`mus_obtain_item`), a do
+  item importante (`mus_obtain_key_item`) e a da missão concluída (`mus_level_up`, só fora da partida).
+  Uma vinheta por vez (`MusicPlayer.jingle` ignora a segunda).
+- **Os testes**: o `ui-smoke` (o card depois do Maxie, com o tema de Pallet; o Espaço; o caso fora de
+  ordem; a tela de Missões no fim; cada som pedido no lugar certo). Roteiro de screenshots: `fim`.
+
 ### Os sons da caixa de texto (H-13, a lapidação; 0.39 na branch)
 - Pedido do Fellipe: "deve ter um som de caixa de texto nas cenas e o som da escrita aparecendo".
 - **A caixa**: o `se_select` do FireRed (o "pi" do A), renderizado do decomp pelo `render_music.py`

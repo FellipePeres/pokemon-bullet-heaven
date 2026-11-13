@@ -500,6 +500,22 @@ const ROTEIROS = {
     { run: 'skip()' }, { wait: 1200 }, { run: "game.openCampaign()" }, { wait: 1400 }, { shot: 'lg-31-o-mapa' }
   ],
   // o Capítulo 8 (H-11): a quest da lagoa, o pescador, o Maxie no segundo encontro e o sábio
+  // o fim de Kanto (a lapidação): depois do Maxie na lagoa, o card de fim, e a tela de Missões no fim
+  fim: [
+    { open: 'index.html' }, { wait: 500 },
+    { run: "game.newGame(); game.chooseTrainer('leaf'); game.chooseName('Fellipe'); game.chooseStarter('charmander');" +
+           "game.region.campaign.forEach((e) => { if (e.stage && !game.campaign.clearedStages.includes(e.stage)) game.campaign.clearedStages.push(e.stage); });" +
+           "game.campaign.clearedStages.push('zapdos', 'articuno', 'moltres');" +
+           "Object.assign(game.campaign.scenes ??= {}, { victory_road: 'seen', mansao_entrada: 'seen', mansao_lab: 'seen', carvalho_mew: 'seen' });" +
+           "game.campaign.dive = { ...(game.campaign.dive ?? {}), captured: true }; document.getElementById('toast-container').style.display = 'none';" +
+           "const st = game.quests.state; st.active = []; ['c7_carvalho', 'c8_lagoa'].forEach((id, i) => { st.done[id] = { at: new Date(2026, 10, 12, 20, i).toISOString(), paid: true }; });" +
+           "game.openHub({ map: 'vila', x: 30, y: 11, dir: 'down' }); game.playScene('maxie_lagoa');" +
+           "for (let i = 0; i < 60 * 120 && !game.hub.scene?.fx.title; i++) { const h = game.hub; if (h.dialog) { h.dialog.shown = 999; h.confirm(); } h.update(1 / 60); }" },
+    { wait: 1500 }, { shot: 'fim-01-o-card' },
+    { wait: 2500 }, { shot: 'fim-02-o-card-espaco' },
+    { run: "for (let i = 0; i < 60 * 30 && game.hub.scene; i++) { game.hub.confirm(); game.hub.update(1 / 60); }" }, { wait: 1200 }, { shot: 'fim-03-a-vila' },
+    { run: "game.menus.showModal('modal-quests')" }, { wait: 900 }, { shot: 'fim-04-as-missoes' }
+  ],
   lagoa: [
     { open: 'index.html' }, { wait: 500 },
     { run: "window.skip = (n = 1) => { for (let i = 0; i < n; i++) { const h = game.hub; if (!h.dialog) return; h.dialog.shown = 999; h.confirm(); } };" +

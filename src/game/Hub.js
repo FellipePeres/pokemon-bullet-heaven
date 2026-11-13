@@ -163,6 +163,7 @@ export class Hub {
     this._flags()[`loot:${this.mapId}:${loot.id}`] = true;
     const what = `${count > 1 ? `${count} ` : 'um '}${name.toUpperCase()}`;
     this.dialog = { key: null, name: null, pages: [`${this.game.playerName} encontrou ${what}!`], index: 0, shown: 0, ask: null, then: null, npc: null };
+    this.game.music?.jingle?.('mus_obtain_item');   // a vinheta do item do FireRed (a lapidação)
     this.game.autosave?.();
   }
 
@@ -414,6 +415,8 @@ export class Hub {
   _warpTo(warp) {
     this.path = null;
     this.pending = null;
+    // a porta faz o som da porta do FireRed; o tapete e a escada, o da saída (a lapidação)
+    this.game?.sfx?.play?.(warp.on === 'push' ? 'se_door' : 'se_exit');
     this._fadeOut(() => {
       this._load(warp.to);
       this._place(warp.tx, warp.ty, warp.dir);
@@ -488,7 +491,9 @@ export class Hub {
   confirm() {
     if (this.fade || this.battle || !this.map) return;
     if (this.dialog) { this._advance(); return; }
-    if (this.player.moving || this.scene) return;
+    // numa cena sem caixa de texto, o A segue o card de fim (o passo `title`, a lapidação)
+    if (this.scene) { this.scene.confirm?.(); return; }
+    if (this.player.moving) return;
     this.interact();
   }
 
@@ -756,7 +761,7 @@ export class Hub {
    */
   clickTile(tx, ty) {
     if (this.battle) return;
-    if (this.scene) { if (this.dialog) this.confirm(); return; }
+    if (this.scene) { if (this.dialog) this.confirm(); else this.scene.confirm?.(); return; }
     if (this.fade || !this.map) return;
     if (this.dialog) { this.confirm(); return; }
     const p = this.player;
