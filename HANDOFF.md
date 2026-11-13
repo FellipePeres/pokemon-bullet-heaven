@@ -8,7 +8,7 @@
 **Versão atual:** `1.0.1` · **Última atualização:** 2026-11-13 (o lançamento: a história no ar)
 **Stack:** HTML + CSS + JavaScript puro (ES Modules). Sem backend, sem build, sem dependências.
 **Repositório:** https://github.com/FellipePeres/pokemon-bullet-heaven (público)
-**Jogo no ar:** https://fellipeperes.github.io/pokemon-bullet-heaven/
+**Jogo no ar:** https://pokebulletheaven.online/
 
 ---
 
@@ -79,9 +79,19 @@ retratos. **Olhe os screenshots antes de entregar mudança visual.** O feel
 
 ## 2b. Publicação (GitHub Pages)
 
-O jogo está no ar em **https://fellipeperes.github.io/pokemon-bullet-heaven/**
-(desde a 0.10.1, em 2026-11-03),
-servido pelo GitHub Pages direto da branch `main`, pasta raiz (`build_type: legacy`).
+O jogo está no ar em **https://pokebulletheaven.online/** (o domínio próprio, desde a
+1.0.1, em 2026-11-13; antes, desde a 0.10.1, em https://fellipeperes.github.io/pokemon-bullet-heaven/,
+que agora redireciona para o domínio), servido pelo GitHub Pages direto da branch `main`,
+pasta raiz (`build_type: legacy`).
+
+**O domínio:** `pokebulletheaven.online`, comprado pelo Fellipe na Cloudflare (registrador e
+DNS). O arquivo `CNAME` na raiz do repositório guarda o domínio para o Pages: **não apague**.
+O DNS na Cloudflare tem os quatro **A** (`185.199.108.153` a `185.199.111.153`) e os quatro
+**AAAA** (`2606:50c0:8000::153` a `2606:50c0:8003::153`) do GitHub Pages na raiz, e o `www`
+como **CNAME** para `fellipeperes.github.io`, todos em **DNS only** (a nuvem cinza: com o
+proxy da Cloudflare, o GitHub não emite o certificado). O HTTPS é o do GitHub (Let's Encrypt),
+com "Enforce HTTPS" ligado. O autosave fica no navegador por endereço: quem jogava no
+endereço antigo leva a jornada pelo Salvar (o .json) e carrega no domínio.
 
 **Publicar é levar o commit para a `main`, e só quando o Fellipe pedir** (o push
 coloca o jogo no ar). O trabalho fica na branch `etapa-0-1-treinador`; a
@@ -92,8 +102,8 @@ leva ~1-2 minutos. Acompanhe com:
 ```bash
 gh run list --limit 3                  # status do deploy
 gh api repos/FellipePeres/pokemon-bullet-heaven/pages --jq .status
-curl -sI https://fellipeperes.github.io/pokemon-bullet-heaven/ | head -1
-curl -s https://fellipeperes.github.io/pokemon-bullet-heaven/src/core/config.js | grep "version:"   # a versão no ar
+curl -sI https://pokebulletheaven.online/ | head -1
+curl -s https://pokebulletheaven.online/src/core/config.js | grep "version:"   # a versão no ar
 ```
 
 ⚠️ **O site é servido em um subcaminho** (`/pokemon-bullet-heaven/`), então
@@ -1846,6 +1856,7 @@ o Brock como está, todas as outras mais duras, menos níveis.
 | 76 | o refino da história: "essas maquinas que prendem os lendários sugam a energia deles" e mandam em ondas para um lugar misterioso, onde uma máquina central numa base do Maxie desorienta os Pokémon (ideia de End Game); o Zapdos enfraquecido explica a vitória de um jogador de nível baixo; "ao derrotar o Zapdos, rola uma cutscene do Zapdos voando e fugindo, assustado", sem captura por enquanto | 0.39 (na branch): a luta sem captura e de nível 36 (medida: 11 de 12 no 36), a energia escorrendo pelas correntes, a cena com o Zapdos do FireRed caído que foge pelo alto (os passos `cry`, `tremble` e `fly`) e a pista da energia mandada para longe; o card "Sem captura nesta luta" |
 | 77 | "A fase da Erika é barrada, o jogador precisa passar do Zapdos para liberar a Erika, o emblema pode ser visto outra vez e o jogador faz ligação que era o mesmo da máquina"; "não pode ter spoilers no título das fases ou quests"; a cena do emblema "montada já no artifact" e "um bate papo simples dando indícios da continuação"; "ficou excelente" | 0.39 (na branch): a trava da Fase 4 (`lock`, o Túnel de Pedra no escuro, sem o nome do Zapdos), as quests douradas da Usina, a do Koga e a da Sabrina, o palco do ginásio de Celadon com a Erika, a cena `depois_erika` (a lembrança com a sombra de asas, o pedaço de metal, o emblema reconhecido, as pistas: a Rocket no Cassino, a sombra para o sul) e os passos `toast`, `storm` e `item` |
 | 78 | "vamos para o H-3" | 0.39 (na branch): a tela de Missões (seção 7.3 do PLANEJAMENTO-HISTORIA): o Diário nas duas barras com o pontinho de quest nova, o que fazer agora, o diário por capítulo com as datas e os itens importantes; nenhuma quest futura aparece |
+| 92 | o domínio: "pode consultar os mais baratos possíveis com PokeBulletHeaven"; depois "comprei o dominio, vou te passar o api token e vc arruma tudo" | o jogo em https://pokebulletheaven.online/: o DNS na Cloudflare (os A e AAAA do Pages e o `www`), o domínio no GitHub Pages (o arquivo `CNAME`), o HTTPS obrigatório e os links do README, do HANDOFF, do repositório e do release v1.0.0 |
 | 91 | "uma observação importante, jogadores com saves antigos perderam o save, e backups antigos tambem nao devem funcionar mais" | 1.0.1: o autosave de antes da história é apagado, sem cópia, e a cópia que a 1.0.0 guardou no navegador também sai; o aviso do título, a mensagem do arquivo recusado, o README e as notas do release v1.0.0 dizem que os saves e os backups de antes não funcionam mais |
 | 90 | "1.0.0, perfeito esse vai ser o realese" | 1.0.0 (2026-11-13): o lançamento. É a 0.39 com o número de versão final (nos comentários do código e neste arquivo, "0.39" continua sendo o rótulo de quando cada parte da história foi feita); a tag `v1.0.0` e o release no GitHub |
 | 89 | "Finalizamos o game, pequenos ajustes vou arrumando com ele no ar, quero subir tudo que fizemos a versão final do game" | 0.39 no ar (2026-11-13): a branch `etapa-0-1-treinador` (a H-1 à H-13 e a lapidação) entrou inteira na `main` e foi publicada; o jogo recomeça do zero (decisão 17). Daqui em diante os ajustes vão direto para a `main`, como antes da história |

@@ -5,7 +5,7 @@
 <h1 align="center">Pokémon Bullet Heaven</h1>
 
 <p align="center">
-  <b><a href="https://fellipeperes.github.io/pokemon-bullet-heaven/">▶ JOGAR AGORA NO NAVEGADOR</a></b>
+  <b><a href="https://pokebulletheaven.online/">▶ JOGAR AGORA NO NAVEGADOR</a></b>
 </p>
 
 <p align="center">
