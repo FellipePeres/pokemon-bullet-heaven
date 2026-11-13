@@ -1198,7 +1198,8 @@ Nunca voltar bônus globais para o pool de level up — foi pedido explícito.
   têm loop) e sobe o card "Fim da história de Kanto", com o texto do Fellipe: "Os pássaros voltaram aos
   céus, todos os lendários liberados." / "Mas Maxie partiu para o Vulcão, as hordas continuam por onde
   ele passou!" e o anúncio "A história continua em Pokémon Bullet Heaven 2" (a decisão 27), dourado, na
-  fonte do título. O Espaço (ou um clique) segue depois de 3 s; sozinho,
+  fonte do título. As linhas aparecem letra a letra com o tique da caixa de texto (o primeiro Espaço
+  completa as letras), e o Espaço que segue o card faz o "pi". O Espaço (ou um clique) segue depois de 3 s; sozinho,
   depois de 16 s. Só com a cena do Mew vista: quem pegou o Kyogre antes de contar ao Carvalho vê o fim no
   fim da cena do Mew.
 - **O motor**: o passo pode ter `when` (a condição da vila; não valendo, a cena pula o passo); o passo

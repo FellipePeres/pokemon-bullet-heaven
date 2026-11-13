@@ -204,6 +204,11 @@ export class HubRenderer {
     ctx.font = `${small}px "Pixelify Sans", sans-serif`;
     ctx.fillStyle = '#eef2f8';
     let y = H * 0.3 + big * 2.6;
+    // as letras que já apareceram (o Hub as anda com o tique); cada linha fica no lugar final
+    // enquanto é escrita, alinhada pela esquerda da linha inteira, sem pular para o lado
+    let budget = card.typed ? Math.floor(card.typed.shown) : Infinity;
+    const typing = budget < card.lines.join('').length;
+    ctx.textAlign = 'left';
     card.lines.forEach((line, i) => {
       // a última linha (o gancho do Bullet Heaven 2) vai na fonte do título, dourada: os números
       // da Pixelify Sans ficam parecidos (o 2 com o 8)
@@ -213,10 +218,18 @@ export class HubRenderer {
         ctx.font = `${Math.round(small * 0.72)}px "Press Start 2P", monospace`;
         ctx.fillStyle = '#f8d030';
       }
-      for (const row of this._wrapText(line, W * 0.7)) { ctx.fillText(row, W / 2, y); y += small * 1.45; }
+      for (const row of this._wrapText(line, W * 0.7)) {
+        const shown = row.slice(0, Math.max(0, budget));
+        const width = ctx.measureText?.(row)?.width ?? row.length * 8;
+        if (shown) ctx.fillText(shown, W / 2 - width / 2, y);
+        budget -= row.length + 1;   // o espaço da quebra (o _wrapText quebra nos espaços)
+        y += small * 1.45;
+      }
+      budget += 1;                  // a última linha da frase não tem o espaço da quebra
       y += small * 0.7;
     });
-    if (card.hint) {
+    ctx.textAlign = 'center';
+    if (card.hint && !typing) {
       ctx.font = `${Math.max(11, Math.round(H * 0.021))}px "Pixelify Sans", sans-serif`;
       ctx.fillStyle = 'rgba(238, 242, 248, .55)';
       ctx.fillText('Espaço para continuar', W / 2, H * 0.88);

@@ -16,6 +16,7 @@ const OPPOSITE = { up: 'down', down: 'up', left: 'right', right: 'left' };
 const LOOK_DIRS = ['down', 'left', 'right', 'down', 'up'];
 
 /** "LT. SURGE" -> "Lt. Surge": os nomes dos líderes vêm em maiúsculas nos dados. */
+const CARD_TYPE_DELAY = 0.8;   // o card de fim: as letras começam quando o título acaba de acender
 const titleCase = (text) => text.toLowerCase().replace(/(^|[\s.])\p{L}/gu, (c) => c.toUpperCase());
 const between = (min, max) => min + Math.random() * (max - min);
 /**
@@ -293,6 +294,7 @@ export class Hub {
     if (this.scene) {
       this.scene.update(dt);
       if (this.dialog) this._updateDialog(dt);
+      this._updateCard(dt);
       if (this.scene?.done) {
         const then = this.scene.then;
         this.scene = null;
@@ -492,7 +494,7 @@ export class Hub {
     if (this.fade || this.battle || !this.map) return;
     if (this.dialog) { this._advance(); return; }
     // numa cena sem caixa de texto, o A segue o card de fim (o passo `title`, a lapidação)
-    if (this.scene) { this.scene.confirm?.(); return; }
+    if (this.scene) { this._confirmScene(); return; }
     if (this.player.moving) return;
     this.interact();
   }
@@ -576,6 +578,34 @@ export class Hub {
     // a caixa que acabou de abrir faz o "pi" do FireRed; as letras, o tique (audio/sfx.js)
     if (d !== this._voiced) { this._voiced = d; this.game?.sfx?.textBox(); }
     typeDialog(d, dt, CONFIG.hub.textSpeed, this.game?.sfx);
+  }
+
+  /**
+   * O card de fim (o passo `title`, a lapidação): depois que o título acende, as linhas aparecem
+   * letra a letra com o tique, como na caixa de texto (`card.typed`, que o HubRenderer desenha).
+   */
+  _cardText(card) {
+    return (card.typed ??= { pages: [card.lines.join('')], index: 0, shown: 0 });
+  }
+
+  _updateCard(dt) {
+    const card = this.scene?.fx.title;
+    if (card && card.t >= CARD_TYPE_DELAY) typeDialog(this._cardText(card), dt, CONFIG.hub.textSpeed, this.game?.sfx);
+  }
+
+  /**
+   * O A numa cena sem caixa de texto. No card de fim: o primeiro completa as letras; com tudo
+   * escrito e o "Espaço para continuar" na tela, o segue, com o "pi" da caixa de texto.
+   */
+  _confirmScene() {
+    const card = this.scene.fx?.title;
+    if (card) {
+      const typed = this._cardText(card);
+      if (typed.shown < typed.pages[0].length) { typed.shown = typed.pages[0].length; return; }
+      if (!card.hint) return;
+      this.game?.sfx?.textBox();
+    }
+    this.scene.confirm?.();
   }
 
   _advance() {
@@ -761,7 +791,7 @@ export class Hub {
    */
   clickTile(tx, ty) {
     if (this.battle) return;
-    if (this.scene) { if (this.dialog) this.confirm(); else this.scene.confirm?.(); return; }
+    if (this.scene) { if (this.dialog) this.confirm(); else this._confirmScene(); return; }
     if (this.fade || !this.map) return;
     if (this.dialog) { this.confirm(); return; }
     const p = this.player;

@@ -9,6 +9,8 @@ import { CONFIG } from '../core/config.js';
  *   e a seguinte abre no mesmo quadro).
  * - **As letras** (`textTick`): o FireRed não tem som de digitação; este é um tique curtinho de
  *   onda quadrada, no timbre do GBA, gerado na hora, no máximo um a cada 55 ms.
+ * - **O card de fim** (o passo `title` das cenas): as linhas aparecem com o mesmo tique, e o
+ *   Espaço que o segue faz o "pi" (Hub._updateCard e Hub._confirmScene).
  *
  * Usa o contexto de áudio da música (destravado no primeiro clique ou tecla) e o volume dela,
  * o do mixer das Opções. Sem áudio (os testes), não toca nada.

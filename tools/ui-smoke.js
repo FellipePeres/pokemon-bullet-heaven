@@ -2132,12 +2132,17 @@ const DIVE_LAST = (await import('../src/data/dive.js')).DIVE.levels.length - 1; 
   check('...e carregar o save também', hubVisible() && hub.mapId === 'vila' && hub.player.x === 30 && hub.scene?.step === 0);
   const maxieSaid = [];
   // o fim de Kanto (a lapidação): o card de fim depois do Maxie, com o tema de Pallet; o A o segue
-  let endCard = null, endMusic = null, cardAt = null, cardGone = null;
+  let endCard = null, endMusic = null, cardAt = null, cardGone = null, cardMid = null, cardAfterFirst = false;
   for (let i = 0; i < 60 * 120 && hub.scene; i++) {
     if (hub.dialog) { maxieSaid.push(hub.dialog.pages[hub.dialog.index]); hub.dialog.shown = 999; hub.confirm(); }
     const card = hub.scene?.fx.title;
     if (card && !endCard) { endCard = { ...card, lines: [...card.lines] }; game._updateMusic(); endMusic = game.music.wanted; cardAt = i; }
-    if (card && cardAt != null && i - cardAt === 60 * 4) hub.confirm();   // o Espaço depois do mínimo
+    if (card && cardAt != null && i - cardAt === 60) cardMid = { shown: card.typed?.shown ?? -1, total: card.lines.join('').length };
+    // o Espaço depois do mínimo: o primeiro completa as letras, o segundo segue o card
+    if (card && cardAt != null && (i - cardAt === 60 * 4 || i - cardAt === 60 * 4 + 1)) {
+      hub.confirm();
+      if (i - cardAt === 60 * 4) cardAfterFirst = !!hub.scene?.fx.title && card.typed.shown === cardMid.total;
+    }
     if (!card && endCard && cardGone == null) cardGone = i;
     hub.update(1 / 60);
   }
@@ -2146,7 +2151,9 @@ const DIVE_LAST = (await import('../src/data/dive.js')).DIVE.levels.length - 1; 
         endCard?.title === 'Fim da história de Kanto' && endMusic === 'mus_pallet'
         && endCard.lines.length === 3 && endCard.lines[0].includes('todos os lendários liberados')
         && endCard.lines[1].includes('Maxie partiu para o Vulcão') && endCard.lines[2].includes('Pokémon Bullet Heaven 2'), `${endMusic} · ${JSON.stringify(endCard)}`);
-  check('...e o Espaço o segue depois do mínimo (sem esperar os 16 s)', cardGone != null && cardGone - cardAt <= 60 * 4 + 2, `${cardGone - cardAt} quadros`);
+  check('...as letras aparecem aos poucos, como na caixa de texto', cardMid && cardMid.shown > 0 && cardMid.shown < cardMid.total, JSON.stringify(cardMid));
+  check('...o Espaço completa as letras sem fechar o card', cardAfterFirst);
+  check('...e o Espaço o segue depois do mínimo (sem esperar os 16 s)', cardGone != null && cardGone - cardAt <= 60 * 4 + 3, `${cardGone - cardAt} quadros`);
   check('a cena acaba, devolve o controle e conta como vista (uma vez por jornada)', !hub.scene && !hub.dialog && game.campaign.dive.sceneSeen);
   game.continueGame();
   check('vista a cena, continuar volta à frente de casa, sem cena', hubVisible() && !hub.scene && hub.mapId === 'vila' && hub.player.x !== 30);
@@ -2524,6 +2531,18 @@ game.quitToMenu();
   let spaces = 0;
   typeDialog({ pages: ['     '], index: 0, shown: 0 }, 1, 55, { textTick: () => spaces++ });
   check('...e espaço não faz tique', spaces === 0);
+  // o card de fim (a lapidação): as letras com o tique; o Espaço, com tudo escrito, faz o "pi"
+  const { Cutscene } = await import('../src/game/Cutscene.js');
+  const cardHeard = { box: 0, tick: 0 };
+  game.sfx = { textBox: () => cardHeard.box++, textTick: () => cardHeard.tick++ };
+  game.openHub();
+  hub.scene = new Cutscene(hub, { steps: [{ do: 'title', text: 'Teste', min: 1, lines: ['Uma linha', 'O gancho'] }, { do: 'end' }] });
+  for (let i = 0; i < 60 * 3; i++) hub.update(1 / 60);
+  const cardTicks = cardHeard.tick;
+  hub.confirm();
+  for (let i = 0; i < 3; i++) hub.update(1 / 60);
+  check('o card de fim: as letras com o tique, e o Espaço com o "pi" da caixa', cardTicks > 5 && cardHeard.box === 1 && !hub.scene, JSON.stringify(cardHeard));
+  game.sfx = real;
 }
 
 // ---- o reset da história (0.39, decisão 17): o autosave de antes dela vai para o backup ----

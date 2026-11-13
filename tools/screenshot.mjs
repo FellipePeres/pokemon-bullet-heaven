@@ -512,7 +512,7 @@ const ROTEIROS = {
            "game.openHub({ map: 'vila', x: 30, y: 11, dir: 'down' }); game.playScene('maxie_lagoa');" +
            "for (let i = 0; i < 60 * 120 && !game.hub.scene?.fx.title; i++) { const h = game.hub; if (h.dialog) { h.dialog.shown = 999; h.confirm(); } h.update(1 / 60); }" },
     { wait: 1500 }, { shot: 'fim-01-o-card' },
-    { wait: 2500 }, { shot: 'fim-02-o-card-espaco' },
+    { wait: 3500 }, { shot: 'fim-02-o-card-espaco' },
     { run: "for (let i = 0; i < 60 * 30 && game.hub.scene; i++) { game.hub.confirm(); game.hub.update(1 / 60); }" }, { wait: 1200 }, { shot: 'fim-03-a-vila' },
     { run: "game.menus.showModal('modal-quests')" }, { wait: 900 }, { shot: 'fim-04-as-missoes' }
   ],
