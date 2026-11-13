@@ -32,6 +32,7 @@ import { QuestSystem } from '../systems/QuestSystem.js';
 import { QuestTracker } from '../ui/questTracker.js';
 import { QUESTS } from '../data/quests.js';
 import { rewardText } from '../ui/questLog.js';
+import { levelCapFor, MAX_LEVEL } from '../data/levelCap.js';
 
 /** X, Y e B põem em campo os da reserva (posições 4, 5 e 6 da equipe). */
 const RESERVE_BUTTONS = { x: 3, y: 4, b: 5 };
@@ -46,6 +47,7 @@ import { TRAINER_LOOKS, getTrainerLook, trainerName, cleanTrainerName } from '..
 import { POKEMON, getPokemon } from '../data/pokemon.js';
 import { ENEMIES } from '../data/enemies.js';
 import { MusicPlayer } from '../audio/music.js';
+import { SoundEffects } from '../audio/sfx.js';
 import { swapWithPC, moveMon, normalizePC, fixDuplicateUids } from '../systems/pc.js';
 import { getMartItem, itemEvolutions, KEY_ITEMS } from '../data/items.js';
 import { getDecor, decorMax } from '../data/decor.js';
@@ -100,6 +102,7 @@ export class Game {
     if (this.storyReset) document.getElementById('story-reset')?.classList.remove('hidden');
     this.padNav = new PadNavigator();
     this.music = new MusicPlayer();
+    this.sfx = new SoundEffects(this.music);   // a caixa de texto: o "pi" do FireRed e o tique das letras
 
     // a vila, o lobby jogável (0.29): a regra, o desenho e a interface
     this.hubOpen = false;
@@ -119,7 +122,7 @@ export class Game {
     this.diveRenderer = new DiveRenderer(document.getElementById('dive-canvas'));
     this.diveHud = new DiveHUD(this);
     // o salão do Kyogre (0.37): o encontro e o card da fase, na mesma tela da descida
-    this.hall = new KyogreHall({ onCard: (stageId) => this._hallCard(stageId) });
+    this.hall = new KyogreHall({ onCard: (stageId) => this._hallCard(stageId), sfx: this.sfx });
     this.hallRenderer = new KyogreHallRenderer(document.getElementById('hall-canvas'));
     if (typeof window !== 'undefined') window.addEventListener('resize', () => { if (this.diveOpen) this._resizeDive(); });
 
@@ -685,6 +688,7 @@ export class Game {
     // (decisão 25, o Fellipe: "capturas de lendários liberam depois da cena que salva a E4") os
     // lendários podem aparecer nas Poké Balls depois da cena do subsolo da Mansão (H-9)
     options.legendsOpen = this.legendsOpen();
+    options.levelCap = this.levelCap();   // o Level Cap: o teto da próxima fase da história
     options.trainer = this.profile.trainer;
     options.campaignStarter = this.campaign.starter;
 
@@ -1055,6 +1059,7 @@ export class Game {
     const run = this.run;
 
     const bestLevel = run.team.members.reduce((max, m) => Math.max(max, m.level), 0);
+    const capBefore = this.levelCap();
     this.tracker.applyRunResult({
       stage: run.stage,
       victory,
@@ -1070,6 +1075,12 @@ export class Game {
     if (victory && run.stage.mission) {
       const missions = (this.campaign.missions ??= {});
       missions[run.stage.mission] = { won: true, captured: !!run.fight?.captured, date: new Date().toISOString() };
+    }
+    // o Level Cap: vencer a próxima fase da história sobe o teto (e o Modo Livre já usa o novo)
+    const capAfter = this.levelCap();
+    if (victory && capAfter > capBefore) {
+      run.levelCap = capAfter;
+      toast(capAfter >= MAX_LEVEL ? 'Sem teto de nível: agora os Pokémon sobem até o 100!' : `O teto de nível subiu: agora é ${capAfter}.`, 'levelUp');
     }
     // a história (0.38): "Vença o Brock" fecha aqui
     if (victory) bus.emit(EVENTS.STORY, { on: 'win', target: run.stage.id });
@@ -1699,6 +1710,14 @@ export class Game {
    */
   legendsOpen() {
     return this.sceneRecord?.mansao_lab === 'seen' || this.isChampion();
+  }
+
+  /**
+   * O teto de nível da jornada agora (o Level Cap, data/levelCap.js): o da próxima fase da
+   * história a vencer; depois do Campeão, sem teto (MAX_LEVEL).
+   */
+  levelCap() {
+    return levelCapFor(this.campaign?.clearedStages ?? []);
   }
 
   /** O jogador já é Campeão nesta jornada (venceu a última fase da região)? */

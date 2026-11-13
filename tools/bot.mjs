@@ -167,8 +167,8 @@ export function resolveLevelUp(run) {
  * Roda uma partida inteira com um "jogador virtual":
  * foge em círculos, desvia para pegar Poké Balls, resolve melhorias e capturas.
  */
-export function simulate(stageId, starter, { maxSeconds = 600, journey = null, typeAware = false } = {}) {
-  const run = new Run(stageId, journey ? { team: journey.team, campaignStarter: starter } : { starter, campaignStarter: starter });
+export function simulate(stageId, starter, { maxSeconds = 600, journey = null, typeAware = false, levelCap = null } = {}) {
+  const run = new Run(stageId, { ...(journey ? { team: journey.team } : { starter }), campaignStarter: starter, levelCap });
   // a nota de cada Pokémon contra o time do líder desta fase (só o bot que pensa em tipos usa)
   const teamTypes = typeAware ? leaderTeamTypes(run.stage, starter) : [];
   const speciesFit = (pokemonId) => matchupScore(matchupAgainst(pokemonId, moveTypesOf(pokemonId), teamTypes));

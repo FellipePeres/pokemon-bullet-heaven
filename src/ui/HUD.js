@@ -175,7 +175,7 @@ export class HUD {
 
     if (member.pendingLevels > 0) card.appendChild(this._levelButton(member));
 
-    this.nodes.set(member.uid, { card, hpBar, hpFill, xpFill, lv });
+    this.nodes.set(member.uid, { card, hpBar, hpFill, xpBar, xpFill, lv });
     return card;
   }
 
@@ -259,8 +259,15 @@ export class HUD {
       node.hpBar.classList.toggle('low', ratio <= 0.5 && ratio > 0.25);
       node.hpBar.classList.toggle('critical', ratio <= 0.25);
 
-      if (node.xpFill) node.xpFill.style.width = `${xpRatio(member) * 100}%`;
-      if (node.lv) node.lv.textContent = `Nv.${member.level}`;
+      // o Level Cap: no teto, a barra de XP fica cheia e dourada, e o nível também
+      const capped = run.levelCap != null && member.level >= run.levelCap;
+      if (node.xpFill) node.xpFill.style.width = `${capped ? 100 : xpRatio(member) * 100}%`;
+      node.xpBar?.classList.toggle('capped', capped);
+      if (node.lv) {
+        node.lv.textContent = `Nv.${member.level}`;
+        node.lv.classList.toggle('capped', capped);
+        node.lv.title = capped ? `No teto de nível (${run.levelCap}): vença a próxima fase da história para subir` : '';
+      }
     }
   }
 

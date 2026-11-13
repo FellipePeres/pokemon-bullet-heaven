@@ -1145,6 +1145,9 @@ button { font: inherit; color: inherit; }
 .bar.hp.critical i { background-color: var(--hp-low); }
 .bar.xp { height: 7px; }
 .bar.xp i { background-color: var(--xp); }
+/* o Level Cap: no teto, a barra de XP cheia e dourada, e o nível num selo */
+.bar.xp.capped i { background-color: var(--gba-gold); }
+.mon-card .mon-lv.capped { color: #2b1d00; background: var(--gba-gold); padding: 2px 4px; border-radius: 2px; }
 .bar.swap { width: 90px; height: 8px; }
 .bar.swap i { background-color: #a07cff; }
 .bar.tiny { height: 6px; margin-top: 3px; }

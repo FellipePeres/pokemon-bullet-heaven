@@ -939,6 +939,10 @@ EMERALD_MUSIC = {
 JINGLES = {
     'mus_heal': 'a cura do Centro Pokémon',
 }
+#: Os efeitos sonoros do FireRed (a lapidação da história), em assets/sound/se: tocam uma vez
+SOUND_EFFECTS = {
+    'se_select': 'a caixa de texto: ao abrir e ao avançar (o "pi" do A no FireRed)',
+}
 DECOMP_COMMIT = 'c75f352304d529f6ba92d4f74b9cf8b5c3810788'
 REPO = pathlib.Path(__file__).resolve().parents[2]
 
@@ -1056,6 +1060,14 @@ def main() -> None:
         audio = Song(midi_for(name, cache), cfg.get(name, {})).render()
         write_ogg(OUT / f'{name}.ogg', audio)
         print(f'  music/{name}.ogg  {len(audio) / OUT_RATE:6.2f} s, vinheta')
+    se_out = REPO / 'assets' / 'sound' / 'se'
+    for name in SOUND_EFFECTS:
+        if args.only and not name.startswith(args.only):
+            continue
+        se_out.mkdir(parents=True, exist_ok=True)
+        audio = Song(midi_for(name, cache), cfg.get(name, {})).render()
+        write_ogg(se_out / f'{name}.ogg', audio)
+        print(f'  sound/se/{name}.ogg  {len(audio) / OUT_RATE:6.2f} s, efeito')
 
     # as do Emerald por último: o motor troca de instrumentos
     wanted = [n for n in EMERALD_MUSIC if not args.only or n.startswith(args.only)]

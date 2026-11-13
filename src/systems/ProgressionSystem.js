@@ -54,7 +54,9 @@ export class ProgressionSystem {
     if (run.stage.noXp) return;   // o Endless aquático (0.37): sem XP, só Shards
     // no Modo Livre o XP é reduzido (0.20, CONFIG.endless.xpMult)
     const total = amount * run.playerStats.xpGain * (run.endless ? CONFIG.endless.xpMult : 1);
-    const members = run.team.members.filter((m) => !m.fainted);
+    // o Level Cap: quem está no teto não ganha XP, e a parte dele vai para os outros (com todos
+    // no teto, o XP se perde)
+    const members = run.team.members.filter((m) => !m.fainted && !this.atCap(m));
     if (!members.length) return;
 
     const { active: wActive, benched: wBench } = CONFIG.progression.xpWeight;
@@ -66,12 +68,19 @@ export class ProgressionSystem {
     });
   }
 
+  /** O Pokémon está no teto de nível da jornada (o Level Cap, data/levelCap.js)? */
+  atCap(member) {
+    const cap = this.run.levelCap;
+    return cap != null && member.level >= cap;
+  }
+
   /** XP para um Pokémon específico, acumulando níveis e melhorias pendentes. */
   addXpTo(member, amount) {
+    if (this.atCap(member)) { member.xp = 0; return; }
     member.xp += amount;
     let need = this.xpToNext(member.level);
 
-    while (member.xp >= need) {
+    while (member.xp >= need && !this.atCap(member)) {
       member.xp -= need;
       member.level++;
       // subir de nível cura 1/10 da vida de quem subiu, do nível 11 em diante
@@ -93,6 +102,8 @@ export class ProgressionSystem {
       need = this.xpToNext(member.level);
       bus.emit(EVENTS.POKEMON_LEVELED, { member, level: member.level });
     }
+    // chegou no teto: o resto do XP não fica guardado (a barra fica cheia, com o TETO)
+    if (this.atCap(member)) member.xp = 0;
   }
 
   /**

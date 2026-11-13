@@ -1137,6 +1137,65 @@ Nunca voltar bônus globais para o pool de level up — foi pedido explícito.
   meio, a derrota, a vitória, a cena de depois, a vila) e o `check-data` (o caminho a pé com os pulos,
   as bolas, os enfeites com `cells`). O roteiro de screenshots é `moltres`.
 
+### O Level Cap (H-13, a lapidação; 0.39 na branch)
+- Pedido do Fellipe: "o próximo é level cap, não pode ser um level cap onde fica impossível, mas
+  não pode ser fácil por fase". As regras abertas do PLANEJAMENTO-HISTORIA (seção 13.1) ficaram no
+  padrão (decisão 28).
+- **`data/levelCap.js`**: `STORY_ORDER` (as fases e as missões, na ordem da história),
+  `LEVEL_CAPS` (o teto enquanto a fase é a próxima a vencer), `levelCapFor(cleared)` (MAX_LEVEL
+  depois do Campeão) e `STORY_MISSIONS` (para o bot). `Game.levelCap()` passa o teto para a
+  partida (`options.levelCap`, `Run.levelCap`).
+- **A regra** (`ProgressionSystem`): `atCap(member)`; quem está no teto não recebe XP, e a divisão
+  do XP só conta quem está abaixo (a parte dele vai para os outros); o XP que passa do teto se
+  perde. A evolução por nível para no teto; a por item é livre. A captura e os presentes chegam
+  pela média da equipe (já ficam abaixo).
+- **Na tela**: a linha "Teto de nível N" no card da fase (`lobby.js`) e no das missões
+  (`missionCard.js`); o selo dourado no nível e a barra de XP dourada no HUD (`.capped`); o aviso
+  ao vencer (`endRun`: "O teto de nível subiu: agora é N.", e o Modo Livre da mesma partida já usa
+  o novo); uma linha no "Como jogar". Roteiro de screenshots: `teto`.
+- **Os valores** saíram do bot: 4 níveis acima da média com que a equipe vence a fase sem farmar
+  (a tabela está no PLANEJAMENTO-HISTORIA). Medido com 24 jornadas: sem teto, 55,4 tentativas
+  somadas, 22 paradas e 2 Campeões; com o teto, 54,2, 21 e 3. Com 3 de folga, a Liga ficou dura
+  demais para o bot; com 6, nada mudou antes dela.
+- **O `balance.mjs`** joga as missões no lugar delas (`--sem-missoes` tira), mede com `--teto` e
+  `--teto-mais N`, mostra o nível do mais alto (`máx (P90)`) e quantas vitórias encostaram no teto,
+  e refaz a fatia de um processo que cai (no Windows, com muitos subindo juntos, alguns saem com
+  código 1 sem mensagem; sozinhos, rodam até o fim).
+- **Os testes**: o `smoke-test` (o teto por fase, sem teto depois do Campeão, o XP indo para os
+  outros, a evolução segurada, a captura abaixo do teto) e o `ui-smoke` (a partida com o teto, o
+  selo do HUD, o aviso e o Modo Livre com o teto novo, a linha no card da missão).
+
+### A trilha das cenas (H-13, a lapidação; 0.39 na branch)
+- Pedido do Fellipe: "músicas nas cenas que combine com a tensão do ambiente ou ambientação
+  pacífica, você decide". Antes, toda cena tocava a música do lugar, e nos ginásios, nas salas da
+  Liga, no laboratório, na Usina e nas cidades era a calma da vila.
+- **O motor**: o roteiro ganhou `music` (a faixa da cena, por cima da do lugar) e o passo `music`
+  (troca no meio). O `Game._updateMusic` toca `hub.scene.music ?? place.music ?? vila`; acabada
+  a cena, volta a do lugar.
+- **Sete faixas novas do FireRed** (`render_music.py`, a lista MUSIC): `mus_oak_lab` (as cenas do
+  laboratório), `mus_gym` (depois dos líderes e da Elite dos Quatro), `mus_encounter_rocket` (o
+  Giovanni e o Maxie), `mus_rival_exit` (o rival indo embora), `mus_lavender` (os pássaros presos),
+  `mus_encounter_deoxys` (o Mew) e `mus_slow_pallet` (os pássaros libertados). 1,8 MB no total.
+- **As trocas no meio**: o rival vai embora no prólogo (`mus_rival_exit`); o Mew aparece e some
+  (`mus_encounter_deoxys` e de volta o laboratório); na Mansão, o Maxie chega (`mus_encounter_rocket`),
+  os pássaros chegam (`mus_vs_legend`) e a libertação (`mus_slow_pallet`); o Maxie na lagoa e no Centro.
+- **Ficaram com a do lugar** (já combinam): a vila (o sábio), a Mansão (`mus_poke_mansion`), as
+  cavernas de Seafoam (`mus_mt_moon`) e o Monte Brasa (as Ilhas 1, 2 e 3). A Usina ganhou a dela no
+  FireRed (`mus_poke_mansion`) ao andar por ela.
+- O `check-data` confere que toda música de cena e de lugar existe; o `ui-smoke`, a troca na cena do Mew.
+
+### Os sons da caixa de texto (H-13, a lapidação; 0.39 na branch)
+- Pedido do Fellipe: "deve ter um som de caixa de texto nas cenas e o som da escrita aparecendo".
+- **A caixa**: o `se_select` do FireRed (o "pi" do A), renderizado do decomp pelo `render_music.py`
+  (a lista nova SOUND_EFFECTS, em `assets/sound/se/`). Toca quando uma fala abre e quando o
+  jogador avança ou fecha a caixa, no máximo uma vez a cada 120 ms (numa cena, uma fala fecha e
+  a seguinte abre no mesmo quadro).
+- **As letras**: o FireRed não tem som de digitação; o tique é uma onda quadrada curtinha, gerada
+  na hora (sem arquivo), no máximo um a cada 55 ms, e espaço não faz tique.
+- `audio/sfx.js` (`SoundEffects`, `typeDialog`): usa o contexto de áudio da música e o volume do
+  mixer das Opções. Vale nas cenas, nas conversas da vila e no salão do Kyogre. Conferido no
+  Chrome (o efeito decodifica, sem erro) e no `ui-smoke` (quantas vezes cada som é pedido).
+
 ### As recompensas das quests (H-12, 0.39 na branch)
 - Pedido do Fellipe: "pode fazer tudo o que falta" (as recompensas ficaram para o final, pedido dele
   desde a H-1). Os valores são o padrão (decisão 26; a tabela está na seção 7.1 do
@@ -1754,6 +1813,7 @@ o Brock como está, todas as outras mais duras, menos níveis.
 | 76 | o refino da história: "essas maquinas que prendem os lendários sugam a energia deles" e mandam em ondas para um lugar misterioso, onde uma máquina central numa base do Maxie desorienta os Pokémon (ideia de End Game); o Zapdos enfraquecido explica a vitória de um jogador de nível baixo; "ao derrotar o Zapdos, rola uma cutscene do Zapdos voando e fugindo, assustado", sem captura por enquanto | 0.39 (na branch): a luta sem captura e de nível 36 (medida: 11 de 12 no 36), a energia escorrendo pelas correntes, a cena com o Zapdos do FireRed caído que foge pelo alto (os passos `cry`, `tremble` e `fly`) e a pista da energia mandada para longe; o card "Sem captura nesta luta" |
 | 77 | "A fase da Erika é barrada, o jogador precisa passar do Zapdos para liberar a Erika, o emblema pode ser visto outra vez e o jogador faz ligação que era o mesmo da máquina"; "não pode ter spoilers no título das fases ou quests"; a cena do emblema "montada já no artifact" e "um bate papo simples dando indícios da continuação"; "ficou excelente" | 0.39 (na branch): a trava da Fase 4 (`lock`, o Túnel de Pedra no escuro, sem o nome do Zapdos), as quests douradas da Usina, a do Koga e a da Sabrina, o palco do ginásio de Celadon com a Erika, a cena `depois_erika` (a lembrança com a sombra de asas, o pedaço de metal, o emblema reconhecido, as pistas: a Rocket no Cassino, a sombra para o sul) e os passos `toast`, `storm` e `item` |
 | 78 | "vamos para o H-3" | 0.39 (na branch): a tela de Missões (seção 7.3 do PLANEJAMENTO-HISTORIA): o Diário nas duas barras com o pontinho de quest nova, o que fazer agora, o diário por capítulo com as datas e os itens importantes; nenhuma quest futura aparece |
+| 88 | "músicas nas cenas que combine com a tensão do ambiente ou ambientação pacífica, você decide, e o próximo é level cap, não pode ser um level cap onde fica impossível, mas não pode ser fácil por fase"; "deve ter um som de caixa de texto nas cenas e o som da escrita aparecendo" | 0.39 (na branch): a H-13, a lapidação: a trilha das cenas (sete faixas novas do FireRed e o passo `music`), os sons da caixa de texto (o `se_select` e o tique das letras) e o Level Cap (o teto da próxima fase, 4 níveis acima de quem joga normal, medido pelo bot com as missões) |
 | 87 | "pode fazer tudo o que falta, ai vamos dar um check se acabamos tudo" | 0.39 (na branch): a H-12, as recompensas das quests (decisão 26): Shards por capítulo e Revivers e Novos Sorteios nos lendários e no fim, na comemoração, num toast e na tela de Missões. Fora da branch, na `main` (0.37.10): o card do Kyogre do salão, cujo banner sumia |
 | 86 | "capturas de lendários liberam depois da cena que salva a E4 ... só muda a regra mesmo"; "me mostra a taxa de captura de hoje de um lendário em relação aos demais pokemons nas fases da E4 + Campeão"; "pode fazer todo o resto que falta" | 0.39 (na branch): a captura abre com a cena do subsolo da Mansão (decisão 25); a taxa medida (5% a 12% por Poké Ball na Liga, contra ~2,9% de uma espécie comum em média); a H-11: a quest da lagoa, o pescador, o Maxie no segundo encontro e a vila depois do Kyogre |
 | 85 | "top, tudo aprovado" (a proposta "O sonho da Liga") | 0.39 (na branch): o Capítulo 7: as falas da Elite dos Quatro depois de cada vitória, o rival Campeão (antes e depois da batalha), o Carvalho e o Mew por telepatia no laboratório, as quests do capítulo e a captura dos lendários aberta pelo Campeão |

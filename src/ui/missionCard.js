@@ -1,6 +1,7 @@
 import { el, create, clear, show, hide } from './dom.js';
 import { typeName, typeColor } from '../data/types.js';
 import { getMission } from '../data/missions.js';
+import { MAX_LEVEL } from '../data/levelCap.js';
 
 /**
  * O CARD DE UMA MISSÃO DE LENDÁRIO (0.39): o mesmo painel do mapa da jornada (as classes
@@ -64,7 +65,9 @@ export function showMissionCard(game, missionId, { onPlay, onBack }) {
   const team = members.length ? Math.round(members.reduce((sum, m) => sum + m.level, 0) / members.length) : 1;
   const gap = mission.recommendedLevel - team;
   const line = create('p', `panel-level ${gap <= 0 ? 'ok' : gap <= 5 ? 'close' : 'far'}`);
-  line.innerHTML = `Nível recomendado <b>${mission.recommendedLevel}</b> · sua equipe <b>${team}</b>`;
+  const cap = game.levelCap();   // o Level Cap
+  line.innerHTML = `Nível recomendado <b>${mission.recommendedLevel}</b> · sua equipe <b>${team}</b>`
+    + (cap < MAX_LEVEL ? `<br>Teto de nível <b>${cap}</b>` : '');
   panel.appendChild(line);
 
   const actions = create('div', 'panel-actions');

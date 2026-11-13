@@ -1,3 +1,4 @@
+import { typeDialog } from '../audio/sfx.js';
 import { DIVE_WORLD } from '../data/diveWorld.js';
 import { playCry } from '../audio/cry.js';
 
@@ -21,8 +22,9 @@ const DIRS = { up: [0, -1], down: [0, 1], left: [-1, 0], right: [1, 0] };
  * Só a regra: o desenho está em render/KyogreHallRenderer.js. `onCard` avisa o Game.
  */
 export class KyogreHall {
-  constructor({ onCard = null } = {}) {
+  constructor({ onCard = null, sfx = null } = {}) {
     this.onCard = onCard;
+    this.sfx = sfx;   // os sons da caixa de texto (audio/sfx.js)
     this.active = false;
   }
 
@@ -55,6 +57,7 @@ export class KyogreHall {
     const d = this.dialog;
     if (!d) return false;
     if (d.shown < d.pages[d.index].length) { d.shown = d.pages[d.index].length; return true; }
+    this.sfx?.textBox();   // avançar ou fechar a caixa: o "pi" do A
     if (d.index < d.pages.length - 1) { d.index++; d.shown = 0; return true; }
     this.dialog = null;
     d.then?.();
@@ -74,7 +77,8 @@ export class KyogreHall {
   update(dt, dir = null, running = false) {
     if (!this.active) return;
     const d = this.dialog;
-    if (d) d.shown = Math.min(d.pages[d.index].length, d.shown + dt * 50);
+    if (d && d !== this._voiced) { this._voiced = d; this.sfx?.textBox(); }
+    if (d) typeDialog(d, dt, 50, this.sfx);
     this.fogX += dt * 10;
     this.shake = Math.max(0, this.shake - dt);
     this.t += dt;

@@ -1,3 +1,4 @@
+import { typeDialog } from '../audio/sfx.js';
 import { CONFIG } from '../core/config.js';
 import { HUB, heightOk } from '../data/hub.js';
 import { HUB_MAPS, HUB_DECOR } from '../data/hubMaps.js';
@@ -567,14 +568,16 @@ export class Hub {
 
   _updateDialog(dt) {
     const d = this.dialog;
-    const page = d.pages[d.index];
-    if (d.shown < page.length) d.shown = Math.min(page.length, d.shown + dt * CONFIG.hub.textSpeed);
+    // a caixa que acabou de abrir faz o "pi" do FireRed; as letras, o tique (audio/sfx.js)
+    if (d !== this._voiced) { this._voiced = d; this.game?.sfx?.textBox(); }
+    typeDialog(d, dt, CONFIG.hub.textSpeed, this.game?.sfx);
   }
 
   _advance() {
     const d = this.dialog;
     const page = d.pages[d.index];
     if (d.shown < page.length) { d.shown = page.length; return; }
+    this.game?.sfx?.textBox();   // avançar ou fechar a caixa: o "pi" do A
     if (d.index < d.pages.length - 1) { d.index++; d.shown = 0; return; }
     if (d.ask) {
       this.dialog = null;

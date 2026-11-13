@@ -1793,6 +1793,37 @@ console.log('\n[a captura dos lendários depois da cena que salva a Elite dos Qu
   for (const [id, enc] of Object.entries(keep)) Object.assign(LEGENDARY_ENCOUNTERS[id], enc);
 }
 
+console.log('\n[o Level Cap — o teto da próxima fase da história]');
+{
+  const { STORY_ORDER, LEVEL_CAPS, MAX_LEVEL, levelCapFor, capStage } = await import('../src/data/levelCap.js');
+  check('toda fase da história tem teto, e ele só sobe', STORY_ORDER.every((id, i) => STAGES[id] && LEVEL_CAPS[id] > (LEVEL_CAPS[STORY_ORDER[i - 1]] ?? 0)));
+  check('jornada nova: o teto é o da Fase 1', levelCapFor([]) === LEVEL_CAPS.gym_1_pewter && capStage([]) === 'gym_1_pewter');
+  check('depois da Fase 3, o teto é o do Zapdos (a missão vem antes da Fase 4)', capStage(['gym_1_pewter', 'gym_2_cerulean', 'gym_3_vermilion']) === 'zapdos');
+  check('depois do Campeão, sem teto', levelCapFor(STORY_ORDER) === MAX_LEVEL && capStage(STORY_ORDER) === null);
+
+  const run = new Run('gym_1_pewter', { starter: 'charmander', levelCap: 15 });
+  run.team.add('pidgey', 10);
+  const [lead, other] = run.team.members;
+  lead.level = 15; lead.xp = 0;
+  run.progression.addXp(5000);
+  check('no teto, o Pokémon não ganha XP nem nível', lead.level === 15 && lead.xp === 0);
+  check('...e o XP dele vai para quem está abaixo', other.level > 10, `Pidgey Nv.${other.level}`);
+  check('...que também para no teto', other.level <= 15);
+  check('o teto segura a evolução por nível (o Charmander no 15 não vira Charmeleon no 16)', lead.pokemonId === 'charmander');
+  const free = new Run('gym_1_pewter', { starter: 'charmander' });
+  free.team.members[0].level = 15;
+  free.progression.addXpTo(free.team.members[0], free.progression.xpToNext(15) + 1);
+  check('sem teto, o mesmo XP sobe o nível e evolui', free.team.members[0].level === 16 && free.team.members[0].pokemonId === 'charmeleon');
+  const capped = new Run('gym_1_pewter', { starter: 'charmander', levelCap: 15 });
+  capped.team.members[0].level = 14;
+  capped.progression.addXpTo(capped.team.members[0], 999999);
+  check('um XP grande para no teto, sem guardar o resto', capped.team.members[0].level === 15 && capped.team.members[0].xp === 0);
+  const captured = new Run('gym_1_pewter', { starter: 'charmander', levelCap: 15 });
+  captured.team.members[0].level = 15;
+  captured.captureSystem.capture('rattata');
+  check('quem é capturado chega abaixo do teto (pela média da equipe)', captured.team.members[1].level <= 15);
+}
+
 // ------------------------------------------- a regra dos patamares de Seafoam (H-7)
 console.log('\n[as Ilhas Seafoam — a regra de altura do FireRed]');
 {

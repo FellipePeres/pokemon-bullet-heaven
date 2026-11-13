@@ -77,6 +77,8 @@ export class Run {
     this.liberated = new Set(options.liberated ?? []);
     // a captura dos lendários aberta nesta jornada (decisão 25: a cena que salva a Elite dos Quatro)
     this.legendsOpen = !!options.legendsOpen;
+    // o Level Cap (data/levelCap.js): o teto de nível da jornada agora; null = sem teto
+    this.levelCap = options.levelCap ?? null;
     // buffs dos 2º golpes na equipe: Tailwind (treinador mais rápido) e Reflect (menos dano)
     this.buffs = { tailwind: 0, reflect: 0 };
 

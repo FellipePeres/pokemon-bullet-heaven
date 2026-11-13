@@ -662,8 +662,24 @@ check('abandonar no meio também guarda o progresso', game.campaign.journey.team
 
 // ---- vitória e save ----
 game.startStage('gym_1_pewter');
-game.run.state = 'victory';
-game._handleRunState();
+{
+  const { LEVEL_CAPS } = await import('../src/data/levelCap.js');
+  check('o Level Cap: a partida recebe o teto da próxima fase da história', game.run.levelCap === LEVEL_CAPS.gym_1_pewter && game.levelCap() === LEVEL_CAPS.gym_1_pewter);
+  const lead = game.run.team.members[0];
+  const keepLevel = lead.level;
+  lead.level = game.run.levelCap;
+  game.hud._refreshBars?.(game.run);
+  const lv = [...game.hud.nodes.values()][0]?.lv;
+  check('...e o HUD marca quem está no teto (o selo e a barra dourada)', !!lv?.classes.has('capped') && lv.title.includes('teto'), lv?.title);
+  lead.level = keepLevel;
+  const toasts = () => registry.get('toast-container').children.map((c) => c.innerHTML).join(' | ');
+  const before = toasts();
+  game.run.state = 'victory';
+  game._handleRunState();
+  check('vencer a fase sobe o teto, com o aviso', game.levelCap() === LEVEL_CAPS.gym_2_cerulean
+        && toasts().slice(before.length).includes(`O teto de nível subiu: agora é ${LEVEL_CAPS.gym_2_cerulean}`), toasts().slice(before.length));
+  check('...e o Modo Livre desta partida já usa o teto novo', game.run.levelCap === LEVEL_CAPS.gym_2_cerulean);
+}
 check('vitória conclui a fase', game.campaign.clearedStages.includes('gym_1_pewter'));
 check('...e a quest "Vença o Brock" fecha com a comemoração, não em silêncio',
       game.quests.isDone('c1_brock') && !game.campaign.quests.done.c1_brock.skipped);
@@ -978,6 +994,8 @@ game.menus.closeModal();
   check('mais 2 segundos e o card sobe, no padrão do card de fase, com a foto do Zapdos',
         game.missionCard?.id === 'zapdos' && !card.classes.has('hidden') && cardHtml().includes('Derrote e liberte o Zapdos') && cardHtml().includes('145.png')
         && deepText(card).includes('Sem captura nesta luta') && cardHtml().includes('Nível recomendado'));
+  check('...e o teto de nível (o Level Cap) na linha do nível: o do Zapdos, a próxima da história',
+        cardHtml().includes(`Teto de nível <b>${game.levelCap()}</b>`) && game.levelCap() === (await import('../src/data/levelCap.js')).LEVEL_CAPS.zapdos, game.levelCap());
   game.handleAction('cancel');
   for (let i = 0; i < 4; i++) hub.update(1 / 60);
   settle();
@@ -2414,6 +2432,26 @@ game.quitToMenu();
   qb.sync();
   check('sem o inicial, a jornada fica no começo do prólogo', qb.isActive('p_mae') && qb.tracked()[0]?.objectives[0].text === 'Fale com a mãe');
   check('evento de outro alvo não conta', !qb.notify('talk', 'tv').length && qb.isActive('p_mae'));
+}
+
+// ---- os sons da caixa de texto (a lapidação): o "pi" do FireRed e o tique das letras ----
+{
+  const real = game.sfx;
+  const heard = { box: 0, tick: 0 };
+  game.sfx = { textBox: () => heard.box++, textTick: () => heard.tick++ };
+  game.openHub();
+  hub.say('mae');
+  for (let i = 0; i < 60 * 3; i++) hub.update(1 / 60);
+  check('a caixa de texto abre com o "pi" e as letras aparecem com o tique', heard.box === 1 && heard.tick > 5, JSON.stringify(heard));
+  const ticks = heard.tick;
+  hub.confirm();
+  check('...avançar ou fechar faz o "pi" de novo, e a letra que já apareceu não toca outra vez', heard.box === 2 && heard.tick === ticks, JSON.stringify(heard));
+  closeDialog();
+  game.sfx = real;
+  const { typeDialog } = await import('../src/audio/sfx.js');
+  let spaces = 0;
+  typeDialog({ pages: ['     '], index: 0, shown: 0 }, 1, 55, { textTick: () => spaces++ });
+  check('...e espaço não faz tique', spaces === 0);
 }
 
 // ---- o reset da história (0.39, decisão 17): o autosave de antes dela vai para o backup ----

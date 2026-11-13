@@ -626,6 +626,20 @@ const ROTEIROS = {
     { wait: 900 }, { shot: 'opcoes-2-reiniciar' },
     { run: "game.menus.confirmRestart = true; game.menus.buildOptions()" }, { wait: 500 }, { shot: 'opcoes-3-confirmar' }
   ],
+  // o Level Cap: o teto no card da fase (o mapa da jornada) e o selo dourado no HUD da partida
+  teto: [
+    { open: 'index.html' }, { wait: 500 },
+    { run: "game.newGame(); game.chooseTrainer('red'); game.chooseName('Fellipe'); game.chooseStarter('bulbasaur');" +
+           "game.campaign.clearedStages.push('gym_1_pewter', 'gym_2_cerulean'); game.campaign.badges.push('boulder', 'cascade');" +
+           "game.campaign.journey = { team: { members: [" +
+           "{ uid: 'a', pokemonId: 'ivysaur', level: 40, xp: 0, hp: 0, abilities: ['razor_leaf'], upgrades: {} }," +
+           "{ uid: 'b', pokemonId: 'pidgeotto', level: 38, xp: 0, hp: 0, abilities: ['gust'], upgrades: {} }," +
+           "{ uid: 'c', pokemonId: 'pikachu', level: 35, xp: 0, hp: 0, abilities: ['thunder_shock'], upgrades: {} }], active: ['a', 'b', 'c'] }, pc: [] };" +
+           "document.getElementById('toast-container').style.display = 'none'; game.openCampaign()" },
+    { wait: 1500 }, { shot: 'teto-01-o-card' },
+    { run: "game.startStage('gym_3_vermilion'); game.run.team.members[0].level = game.run.levelCap" }, { wait: 2500 },
+    { run: "game.run.state = 'running'; game.hud.signature = ''" }, { wait: 800 }, { shot: 'teto-02-o-hud' }
+  ],
   partida: [
     { open: 'index.html' }, { wait: 500 },
     { run: START_RUN }, { wait: 1200 },

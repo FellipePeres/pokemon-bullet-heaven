@@ -895,6 +895,7 @@ do Zapdos, o tipo, as fraquezas e o nível recomendado (36; sem captura, decisã
 | **H-9** ✅ 0.39 | A Victory Road e a base do Maxie (decisão 22; seção 5.4, página "A base na Mansão"): a cena da Elite dos Quatro, a quest "Ajude a Elite dos Quatro", a base com o Mewtwo e as jaulas, a emboscada do Maxie e os pássaros. Ganha proposta e maquete. |
 | **H-10** ✅ 0.39 | A Liga e o fim do Capítulo 7 (seção 5.5, página "O sonho da Liga"): a Elite dos Quatro de volta, o rival Campeão e o "ainda falta alguma coisa". |
 | **H-11** ✅ 0.39 | O Kyogre como fecho de Kanto: a quest da lagoa (fecha com a captura), o pescador, o Maxie no segundo encontro ("Você de novo?!") e a vila depois do Kyogre. O Mew veio para a H-10. Junto, a decisão 25 (a captura abre com a cena da Mansão). |
+| **H-13** ✅ 0.39 | A lapidação (o Fellipe, depois do check final): a trilha das cenas (cada cena com a música do clima dela, sete faixas novas do FireRed), os sons da caixa de texto (o "pi" do A e o tique das letras) e o Level Cap (seção 13.1, decisão 28). |
 | **H-12** ✅ 0.39 | As recompensas das quests (seção 7.1, decisão 26): Shards por capítulo e Revivers e Novos Sorteios nos lendários e no fim, pagos quando a quest fecha, na comemoração, num toast e na tela de missões. |
 
 ---
@@ -1021,12 +1022,66 @@ do Zapdos, o tipo, as fraquezas e o nível recomendado (36; sem captura, decisã
     O vulcão fica em outra Gen, o que se tornaria um Pokemon Bullet Heaven 2"). A história deste
     jogo termina em Kanto, com o Maxie partindo "a caminho do vulcão". Hoenn não vira uma segunda
     vila aqui: é o jogo seguinte. Muda a decisão 9 e a seção 10.
+28. **O Level Cap** (H-13; o Fellipe, 2026-11-12: "não pode ser um level cap onde fica impossível,
+    mas não pode ser fácil por fase"; as regras abertas da seção 13.1 ficaram no padrão): vale o
+    teto da próxima fase da história, em qualquer lugar; no teto, o XP vai para os outros da
+    equipe; a evolução por item é livre; depois do Campeão, sem teto. Os valores saíram do bot:
+    4 níveis acima da média com que a equipe vence a fase jogando normal. A tabela e a medida
+    estão na seção 13.1.
 
 ---
 
 ## 13. Para depois (ideias registradas, sem construir)
 
-### 13.1 O Level Cap
+### 13.1 O Level Cap ✅ (construído na H-13, decisão 28)
+
+**Como ficou** (`src/data/levelCap.js`):
+
+- **Qual teto vale**: o da próxima fase da história a vencer (as fases e as missões, na ordem),
+  em qualquer lugar: na tentativa dela, ao rejogar uma vencida e no Modo Livre. Vencer a fase
+  sobe o teto, com o aviso "O teto de nível subiu: agora é 51.".
+- **No teto**: o Pokémon não ganha XP, e a parte dele vai para os outros da equipe abaixo do
+  teto (a equipe se nivela). Com todos no teto, o XP se perde. Sem melhorias novas: elas vêm com
+  o nível.
+- **A evolução**: por nível, o teto segura; por item, livre (o Poké Mart), como decidido.
+- **Quem entra**: a captura, o presente e o lendário chegam pela média da equipe, então ficam
+  abaixo do teto sozinhos.
+- **O Modo Livre, o Endless e as missões**: o mesmo teto. Depois do Campeão não há teto: o
+  Kyogre (90) é o desafio de depois da história.
+- **Como aparece**: "Teto de nível 51" no card da fase e no das missões; na partida, o selo
+  dourado no nível e a barra de XP dourada de quem está no teto; uma linha no "Como jogar".
+
+**Os valores** saíram do bot (`tools/balance.mjs`, que agora joga as missões no lugar delas e
+mede com `--teto`): 4 níveis acima da média com que a equipe vence a fase jogando normal, sem
+farmar.
+
+| Próxima fase | Recomendado | O bot sem teto vence com (média · o mais alto) | Teto |
+|---|---|---|---|
+| Fase 1, o Brock | — | 21 · 23 | 25 |
+| Fase 2, a Misty | 25 | 30 · 33 | 34 |
+| Fase 3, o Surge | 33 | 40 · 44 | 44 |
+| A Usina, o Zapdos | 36 | 43 · 47 | 47 |
+| Fase 4, a Erika | 40 | 47 · 52 | 51 |
+| Fase 5, o Koga | 46 | 51 · 56 | 55 |
+| Fase 6, a Sabrina | 50 | 56 · 62 | 60 |
+| Fase 7, o Blaine | 55 | 59 · 66 | 63 |
+| Seafoam, o Articuno | 57 | 60 · 67 | 64 |
+| Fase 8, o Giovanni | 60 | 64 · 71 | 68 |
+| O Monte Brasa, o Moltres | 62 | 65 · 73 | 69 |
+| A Lorelei | 64 | 69 · 76 | 73 |
+| O Bruno | 66 | 72 · 80 | 76 |
+| A Agatha | 70 | 76 · 84 | 80 |
+| O Lance | 72 | 80 · 89 | 84 |
+| O Campeão | 74 | 78 · 86 | 86 |
+| Depois do Campeão | | | sem teto |
+
+**A medida** (24 jornadas cada, com as missões): sem teto, 55,4 tentativas somadas, 22
+jornadas paradas no caminho e 2 Campeões; com o teto, 54,2 tentativas, 21 paradas e 3 Campeões.
+Ou seja, quem joga normal (o bot joga pior que o Fellipe) não sente o teto, e farmar não passa
+de uns 4 níveis acima disso. Com 3 níveis de folga, a Liga ficou dura demais para o bot (nenhum
+Campeão); com 6, nada mudou antes da Liga.
+
+**O registro de antes** (o pedido e as perguntas que ficaram no padrão):
 
 Pedido do Fellipe (2026-11-11, depois da missão do Zapdos): "vai existir Level Cap,
 cada fase os pokémons podem evoluir até um limite, liberando o próximo limite somente

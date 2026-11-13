@@ -10,6 +10,7 @@ import { assetUrl } from '../render/assets.js';
 import { iconHTML } from '../render/icons.js';
 import { formatTime } from '../core/utils.js';
 import { leaderTeamTypes, teamWeaknesses } from '../systems/matchup.js';
+import { MAX_LEVEL } from '../data/levelCap.js';
 
 /** A engrenagem de Opções, a mesma do canto das outras telas. */
 const GEAR_SVG = '<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path fill="currentColor" d="M19.4 13a7.6 7.6 0 0 0 0-2l2.1-1.6-2-3.4-2.5 1a7.7 7.7 0 0 0-1.7-1L15 3.3h-4l-.4 2.7a7.7 7.7 0 0 0-1.7 1l-2.5-1-2 3.4L6.5 11a7.6 7.6 0 0 0 0 2l-2.1 1.6 2 3.4 2.5-1a7.7 7.7 0 0 0 1.7 1l.4 2.7h4l.4-2.7a7.7 7.7 0 0 0 1.7-1l2.5 1 2-3.4zM13 15.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z" transform="translate(-1 0)"/></svg>';
@@ -332,10 +333,14 @@ export class Lobby {
       const gap = stage.recommendedLevel - team;
       const tone = done || gap <= 0 ? 'ok' : gap <= 5 ? 'close' : 'far';
       const line = create('p', `panel-level ${tone}`);
-      line.innerHTML = `Nível recomendado <b>${stage.recommendedLevel}</b> · sua equipe <b>${team}</b>`;
-      line.title = tone === 'far'
+      // o Level Cap: o teto de agora, enquanto a história não passa desta fase
+      const cap = this.game.levelCap();
+      line.innerHTML = `Nível recomendado <b>${stage.recommendedLevel}</b> · sua equipe <b>${team}</b>`
+        + (cap < MAX_LEVEL ? `<br>Teto de nível <b>${cap}</b>` : '');
+      line.title = (tone === 'far'
         ? 'Sua equipe está bem abaixo: rejogue as fases anteriores para fortalecer os Pokémon.'
-        : 'A média de nível da equipe com que a fase costuma ser vencida.';
+        : 'A média de nível da equipe com que a fase costuma ser vencida.')
+        + (cap < MAX_LEVEL ? ` Teto de nível: nenhum Pokémon passa do ${cap} até você vencer a próxima fase da história.` : '');
       panel.appendChild(line);
     }
 
