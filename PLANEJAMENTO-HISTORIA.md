@@ -13,9 +13,9 @@
 > ideias"): todo "**padrão**" deste texto virou decisão (seção 12). Ele também
 > acrescentou uma regra para a captura dos lendários (seção 6). **A H-1 está no
 > jogo desde a 0.38**: as quests, o rastreador e o prólogo, do quarto ao Brock. **Da H-2
-> à H-12, prontas na branch (0.39)**: a história de Kanto inteira, do quarto ao Kyogre, com as
-> recompensas das quests (a H-12, a última, em 2026-11-12). Sobe toda de uma vez, com o jogo
-> recomeçando do zero (decisão 17).
+> à H-13, no ar desde a 0.39 (2026-11-13)**: a história de Kanto inteira, do quarto ao Kyogre, com as
+> recompensas das quests e a lapidação (o Level Cap, a trilha e os sons das cenas). Subiu toda de
+> uma vez, com o jogo recomeçando do zero (decisão 17).
 >
 > **A história inteira, em texto corrido** (o que acontece e por quê, capítulo por capítulo, as
 > pistas e as ideias em aberto), está no [HISTORIA.md](HISTORIA.md). Este arquivo é como ela

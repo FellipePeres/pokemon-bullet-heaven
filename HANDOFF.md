@@ -5,7 +5,7 @@
 > decisão foi tomada e o que falta fazer. O `README.md` é o manual de uso;
 > este aqui é o contexto de desenvolvimento.
 
-**Versão atual:** `0.39.0` · **Última atualização:** 2026-11-12
+**Versão atual:** `0.39.0` · **Última atualização:** 2026-11-13 (a história no ar)
 **Stack:** HTML + CSS + JavaScript puro (ES Modules). Sem backend, sem build, sem dependências.
 **Repositório:** https://github.com/FellipePeres/pokemon-bullet-heaven (público)
 **Jogo no ar:** https://fellipeperes.github.io/pokemon-bullet-heaven/
@@ -866,7 +866,7 @@ Nunca voltar bônus globais para o pool de level up — foi pedido explícito.
   a cena pendente ao continuar e ao carregar; o Origin Pulse do Kyogre em campo
   desenhado do 1º quadro ao fim). O roteiro de screenshots é `kyogre`.
 
-### A tela de Missões (H-3, 0.39 na branch)
+### A tela de Missões (H-3, 0.39)
 - PLANEJAMENTO-HISTORIA.md, seção 7.3 ("vamos para o H-3"; os detalhes no padrão).
 - **O botão** `#hub-quests` (a barra da vila) e `#bar-quests` (a do mapa da jornada),
   logo depois das Conquistas, com o ícone `quests` (o item `journal` da PokeAPI). Abre
@@ -885,7 +885,7 @@ Nunca voltar bônus globais para o pool de level up — foi pedido explícito.
   quest seguinte, o diário depois da mãe, o diário inteiro depois do Koga, com os
   capítulos na ordem e o Pedaço de Metal) e o roteiro de screenshots `missoes`.
 
-### O Capítulo 3: a trava da Fase 4 e a cena do emblema (H-4, 0.39 na branch)
+### O Capítulo 3: a trava da Fase 4 e a cena do emblema (H-4, 0.39)
 - Pedido do Fellipe (decisão 18 do PLANEJAMENTO-HISTORIA, a proposta "Celadon: o
   emblema", aprovada com a cena montada como maquete). **Regra dele: nada de spoiler em
   título** (fase, quest, trava, card, aviso): a descoberta do Zapdos é na Usina.
@@ -912,7 +912,7 @@ Nunca voltar bônus globais para o pool de level up — foi pedido explícito.
   Fase 4 abrindo com a luz da Usina, a cena inteira, o item, a quest do Koga e a da
   Sabrina) e o roteiro de screenshots `celadon`.
 
-### O molde das missões e a luta do Zapdos (H-5 e H-6, 0.39 na branch)
+### O molde das missões e a luta do Zapdos (H-5 e H-6, 0.39)
 - Pedido do Fellipe ("pode construir isso": a luta do Zapdos, para o Lutar do card
   funcionar). Os detalhes que ele não decidiu ficaram no padrão
   (PLANEJAMENTO-HISTORIA.md, seção 5.1, e as decisões 15 e 16). **Refino dele depois de
@@ -996,7 +996,7 @@ Nunca voltar bônus globais para o pool de level up — foi pedido explícito.
   bolas e o nível do card batem com os da fase, as passagens com `when`). O roteiro de
   screenshots é `zapdos`.
 
-### O Capítulo 4 e a missão do Articuno (H-7, 0.39 na branch)
+### O Capítulo 4 e a missão do Articuno (H-7, 0.39)
 - Pedido do Fellipe: a proposta "Seafoam: as ondas" (PLANEJAMENTO-HISTORIA.md, seção 5.2,
   decisão 19), aprovada inteira com os padrões ("pode seguir com o que fez").
 - **As quests**: depois da Sabrina, o Capítulo 4, "As ondas": `c4_blaine` (a vitória e a pista
@@ -1072,7 +1072,7 @@ Nunca voltar bônus globais para o pool de level up — foi pedido explícito.
   vitória, a cena de depois, a vila) e o `check-data` (o caminho a pé, as bolas com a regra de altura,
   os gatilhos de tile). O roteiro de screenshots é `articuno`.
 
-### O Capítulo 5 e a missão do Moltres (H-8, 0.39 na branch)
+### O Capítulo 5 e a missão do Moltres (H-8, 0.39)
 - Pedido do Fellipe: a proposta "Monte Brasa: o fogo" (PLANEJAMENTO-HISTORIA.md, seção 5.3), com
   o ajuste da decisão 22 antes ("construa a h-8 então"). A emboscada do Maxie fica para a H-9.
 - **As quests**: o `c5_giovanni` ganhou o segundo objetivo, "Mostre o Pedaço de Metal ao
@@ -1137,7 +1137,7 @@ Nunca voltar bônus globais para o pool de level up — foi pedido explícito.
   meio, a derrota, a vitória, a cena de depois, a vila) e o `check-data` (o caminho a pé com os pulos,
   as bolas, os enfeites com `cells`). O roteiro de screenshots é `moltres`.
 
-### O Level Cap (H-13, a lapidação; 0.39 na branch)
+### O Level Cap (H-13, a lapidação; 0.39)
 - Pedido do Fellipe: "o próximo é level cap, não pode ser um level cap onde fica impossível, mas
   não pode ser fácil por fase". As regras abertas do PLANEJAMENTO-HISTORIA (seção 13.1) ficaram no
   padrão (decisão 28).
@@ -1171,7 +1171,7 @@ Nunca voltar bônus globais para o pool de level up — foi pedido explícito.
   outros, a evolução segurada, a captura abaixo do teto) e o `ui-smoke` (a partida com o teto, o
   selo do HUD, o aviso e o Modo Livre com o teto novo, a linha no card da missão).
 
-### A trilha das cenas (H-13, a lapidação; 0.39 na branch)
+### A trilha das cenas (H-13, a lapidação; 0.39)
 - Pedido do Fellipe: "músicas nas cenas que combine com a tensão do ambiente ou ambientação
   pacífica, você decide". Antes, toda cena tocava a música do lugar, e nos ginásios, nas salas da
   Liga, no laboratório, na Usina e nas cidades era a calma da vila.
@@ -1190,7 +1190,7 @@ Nunca voltar bônus globais para o pool de level up — foi pedido explícito.
   FireRed (`mus_poke_mansion`) ao andar por ela.
 - O `check-data` confere que toda música de cena e de lugar existe; o `ui-smoke`, a troca na cena do Mew.
 
-### O fim de Kanto, os gritos do Mewtwo e do Mew e os sons da vila (H-13, a lapidação; 0.39 na branch)
+### O fim de Kanto, os gritos do Mewtwo e do Mew e os sons da vila (H-13, a lapidação; 0.39)
 - Pedido do Fellipe (os itens 5, 6 e 7 das pendências): "você vai fazer agora, planejar e já levar para
   branch, confio nas suas escolhas".
 - **O fim de Kanto** (`FIM_KANTO` em `data/cutscenes.js`): depois da cena do Maxie (na lagoa ou no
@@ -1217,7 +1217,7 @@ Nunca voltar bônus globais para o pool de level up — foi pedido explícito.
 - **Os testes**: o `ui-smoke` (o card depois do Maxie, com o tema de Pallet; o Espaço; o caso fora de
   ordem; a tela de Missões no fim; cada som pedido no lugar certo). Roteiro de screenshots: `fim`.
 
-### Os sons da caixa de texto (H-13, a lapidação; 0.39 na branch)
+### Os sons da caixa de texto (H-13, a lapidação; 0.39)
 - Pedido do Fellipe: "deve ter um som de caixa de texto nas cenas e o som da escrita aparecendo".
 - **A caixa**: o `se_select` do FireRed (o "pi" do A), renderizado do decomp pelo `render_music.py`
   (a lista nova SOUND_EFFECTS, em `assets/sound/se/`). Toca quando uma fala abre e quando o
@@ -1229,7 +1229,7 @@ Nunca voltar bônus globais para o pool de level up — foi pedido explícito.
   mixer das Opções. Vale nas cenas, nas conversas da vila e no salão do Kyogre. Conferido no
   Chrome (o efeito decodifica, sem erro) e no `ui-smoke` (quantas vezes cada som é pedido).
 
-### As recompensas das quests (H-12, 0.39 na branch)
+### As recompensas das quests (H-12, 0.39)
 - Pedido do Fellipe: "pode fazer tudo o que falta" (as recompensas ficaram para o final, pedido dele
   desde a H-1). Os valores são o padrão (decisão 26; a tabela está na seção 7.1 do
   PLANEJAMENTO-HISTORIA): Shards em todas as 24 quests, crescendo por capítulo (25 a 1.000; 5.600 no
@@ -1248,7 +1248,7 @@ Nunca voltar bônus globais para o pool de level up — foi pedido explícito.
   "Recebido" no diário; o pagamento em silêncio, uma vez só; o texto da recompensa). O roteiro de
   screenshots é `recompensas`.
 
-### O Capítulo 8: a lagoa e o Kyogre (H-11, 0.39 na branch)
+### O Capítulo 8: a lagoa e o Kyogre (H-11, 0.39)
 - Pedido do Fellipe: "pode fazer o faltante então" (a descida do Dive, o salão e a luta do Kyogre e
   a cena do Maxie já existiam desde a 0.36 e a 0.37; faltava ligar à história). Sem cena nova.
 - **A quest** `c8_lagoa` ("Descubra o que a lagoa guarda", Capítulo 8): abre depois da cena do
@@ -1269,7 +1269,7 @@ Nunca voltar bônus globais para o pool de level up — foi pedido explícito.
   "Você de novo?!", o sábio e o rapaz; a captura fechada antes da cena do laboratório da Mansão e
   aberta depois) e o `smoke-test` (a captura com e sem a cena). O roteiro de screenshots é `lagoa`.
 
-### O Capítulo 7: a Liga, o rival Campeão, o Carvalho e o Mew (H-10, 0.39 na branch)
+### O Capítulo 7: a Liga, o rival Campeão, o Carvalho e o Mew (H-10, 0.39)
 - Pedido do Fellipe: a proposta "O sonho da Liga" (PLANEJAMENTO-HISTORIA.md, seção 5.5), aprovada
   inteira ("top, tudo aprovado"), com as notas dele: o Mew no laboratório, por telepatia, depois do
   Campeão (HISTORIA.md), e os lendários nas Poké Balls depois do Campeão (a seção Captura, abaixo).
@@ -1300,7 +1300,7 @@ Nunca voltar bônus globais para o pool de level up — foi pedido explícito.
   172 falas. O `smoke-test` confere a captura fechada sem o Campeão e aberta com ele (as aves desde a
   Fase 7, o Mewtwo e o Mew na Liga, um de cada). O roteiro de screenshots é `liga`.
 
-### O Capítulo 6: a Elite dos Quatro e a base na Mansão (H-9, 0.39 na branch)
+### O Capítulo 6: a Elite dos Quatro e a base na Mansão (H-9, 0.39)
 - Pedido do Fellipe: a proposta "A base na Mansão" (PLANEJAMENTO-HISTORIA.md, seção 5.4), aprovada
   inteira ("pode seguir exatamente com esse roteiro") com um refino: **a caixa de texto nunca tampa
   ninguém em cena** (ver abaixo, e a regra vale para todas as cenas).
@@ -1846,6 +1846,7 @@ o Brock como está, todas as outras mais duras, menos níveis.
 | 76 | o refino da história: "essas maquinas que prendem os lendários sugam a energia deles" e mandam em ondas para um lugar misterioso, onde uma máquina central numa base do Maxie desorienta os Pokémon (ideia de End Game); o Zapdos enfraquecido explica a vitória de um jogador de nível baixo; "ao derrotar o Zapdos, rola uma cutscene do Zapdos voando e fugindo, assustado", sem captura por enquanto | 0.39 (na branch): a luta sem captura e de nível 36 (medida: 11 de 12 no 36), a energia escorrendo pelas correntes, a cena com o Zapdos do FireRed caído que foge pelo alto (os passos `cry`, `tremble` e `fly`) e a pista da energia mandada para longe; o card "Sem captura nesta luta" |
 | 77 | "A fase da Erika é barrada, o jogador precisa passar do Zapdos para liberar a Erika, o emblema pode ser visto outra vez e o jogador faz ligação que era o mesmo da máquina"; "não pode ter spoilers no título das fases ou quests"; a cena do emblema "montada já no artifact" e "um bate papo simples dando indícios da continuação"; "ficou excelente" | 0.39 (na branch): a trava da Fase 4 (`lock`, o Túnel de Pedra no escuro, sem o nome do Zapdos), as quests douradas da Usina, a do Koga e a da Sabrina, o palco do ginásio de Celadon com a Erika, a cena `depois_erika` (a lembrança com a sombra de asas, o pedaço de metal, o emblema reconhecido, as pistas: a Rocket no Cassino, a sombra para o sul) e os passos `toast`, `storm` e `item` |
 | 78 | "vamos para o H-3" | 0.39 (na branch): a tela de Missões (seção 7.3 do PLANEJAMENTO-HISTORIA): o Diário nas duas barras com o pontinho de quest nova, o que fazer agora, o diário por capítulo com as datas e os itens importantes; nenhuma quest futura aparece |
+| 89 | "Finalizamos o game, pequenos ajustes vou arrumando com ele no ar, quero subir tudo que fizemos a versão final do game" | 0.39 no ar (2026-11-13): a branch `etapa-0-1-treinador` (a H-1 à H-13 e a lapidação) entrou inteira na `main` e foi publicada; o jogo recomeça do zero (decisão 17, o save de antes vai para o backup). Daqui em diante os ajustes vão direto para a `main`, como antes da história |
 | 88 | "músicas nas cenas que combine com a tensão do ambiente ou ambientação pacífica, você decide, e o próximo é level cap, não pode ser um level cap onde fica impossível, mas não pode ser fácil por fase"; "deve ter um som de caixa de texto nas cenas e o som da escrita aparecendo" | 0.39 (na branch): a H-13, a lapidação: a trilha das cenas (sete faixas novas do FireRed e o passo `music`), os sons da caixa de texto (o `se_select` e o tique das letras) e o Level Cap (o teto da próxima fase, 4 níveis acima de quem joga normal, medido pelo bot com as missões) |
 | 87 | "pode fazer tudo o que falta, ai vamos dar um check se acabamos tudo" | 0.39 (na branch): a H-12, as recompensas das quests (decisão 26): Shards por capítulo e Revivers e Novos Sorteios nos lendários e no fim, na comemoração, num toast e na tela de Missões. Fora da branch, na `main` (0.37.10): o card do Kyogre do salão, cujo banner sumia |
 | 86 | "capturas de lendários liberam depois da cena que salva a E4 ... só muda a regra mesmo"; "me mostra a taxa de captura de hoje de um lendário em relação aos demais pokemons nas fases da E4 + Campeão"; "pode fazer todo o resto que falta" | 0.39 (na branch): a captura abre com a cena do subsolo da Mansão (decisão 25); a taxa medida (5% a 12% por Poké Ball na Liga, contra ~2,9% de uma espécie comum em média); a H-11: a quest da lagoa, o pescador, o Maxie no segundo encontro e a vila depois do Kyogre |
