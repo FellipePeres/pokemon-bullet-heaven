@@ -5,7 +5,7 @@
 > decisão foi tomada e o que falta fazer. O `README.md` é o manual de uso;
 > este aqui é o contexto de desenvolvimento.
 
-**Versão atual:** `1.0.0` · **Última atualização:** 2026-11-13 (o lançamento: a história no ar)
+**Versão atual:** `1.0.1` · **Última atualização:** 2026-11-13 (o lançamento: a história no ar)
 **Stack:** HTML + CSS + JavaScript puro (ES Modules). Sem backend, sem build, sem dependências.
 **Repositório:** https://github.com/FellipePeres/pokemon-bullet-heaven (público)
 **Jogo no ar:** https://fellipeperes.github.io/pokemon-bullet-heaven/
@@ -1846,8 +1846,9 @@ o Brock como está, todas as outras mais duras, menos níveis.
 | 76 | o refino da história: "essas maquinas que prendem os lendários sugam a energia deles" e mandam em ondas para um lugar misterioso, onde uma máquina central numa base do Maxie desorienta os Pokémon (ideia de End Game); o Zapdos enfraquecido explica a vitória de um jogador de nível baixo; "ao derrotar o Zapdos, rola uma cutscene do Zapdos voando e fugindo, assustado", sem captura por enquanto | 0.39 (na branch): a luta sem captura e de nível 36 (medida: 11 de 12 no 36), a energia escorrendo pelas correntes, a cena com o Zapdos do FireRed caído que foge pelo alto (os passos `cry`, `tremble` e `fly`) e a pista da energia mandada para longe; o card "Sem captura nesta luta" |
 | 77 | "A fase da Erika é barrada, o jogador precisa passar do Zapdos para liberar a Erika, o emblema pode ser visto outra vez e o jogador faz ligação que era o mesmo da máquina"; "não pode ter spoilers no título das fases ou quests"; a cena do emblema "montada já no artifact" e "um bate papo simples dando indícios da continuação"; "ficou excelente" | 0.39 (na branch): a trava da Fase 4 (`lock`, o Túnel de Pedra no escuro, sem o nome do Zapdos), as quests douradas da Usina, a do Koga e a da Sabrina, o palco do ginásio de Celadon com a Erika, a cena `depois_erika` (a lembrança com a sombra de asas, o pedaço de metal, o emblema reconhecido, as pistas: a Rocket no Cassino, a sombra para o sul) e os passos `toast`, `storm` e `item` |
 | 78 | "vamos para o H-3" | 0.39 (na branch): a tela de Missões (seção 7.3 do PLANEJAMENTO-HISTORIA): o Diário nas duas barras com o pontinho de quest nova, o que fazer agora, o diário por capítulo com as datas e os itens importantes; nenhuma quest futura aparece |
+| 91 | "uma observação importante, jogadores com saves antigos perderam o save, e backups antigos tambem nao devem funcionar mais" | 1.0.1: o autosave de antes da história é apagado, sem cópia, e a cópia que a 1.0.0 guardou no navegador também sai; o aviso do título, a mensagem do arquivo recusado, o README e as notas do release v1.0.0 dizem que os saves e os backups de antes não funcionam mais |
 | 90 | "1.0.0, perfeito esse vai ser o realese" | 1.0.0 (2026-11-13): o lançamento. É a 0.39 com o número de versão final (nos comentários do código e neste arquivo, "0.39" continua sendo o rótulo de quando cada parte da história foi feita); a tag `v1.0.0` e o release no GitHub |
-| 89 | "Finalizamos o game, pequenos ajustes vou arrumando com ele no ar, quero subir tudo que fizemos a versão final do game" | 0.39 no ar (2026-11-13): a branch `etapa-0-1-treinador` (a H-1 à H-13 e a lapidação) entrou inteira na `main` e foi publicada; o jogo recomeça do zero (decisão 17, o save de antes vai para o backup). Daqui em diante os ajustes vão direto para a `main`, como antes da história |
+| 89 | "Finalizamos o game, pequenos ajustes vou arrumando com ele no ar, quero subir tudo que fizemos a versão final do game" | 0.39 no ar (2026-11-13): a branch `etapa-0-1-treinador` (a H-1 à H-13 e a lapidação) entrou inteira na `main` e foi publicada; o jogo recomeça do zero (decisão 17). Daqui em diante os ajustes vão direto para a `main`, como antes da história |
 | 88 | "músicas nas cenas que combine com a tensão do ambiente ou ambientação pacífica, você decide, e o próximo é level cap, não pode ser um level cap onde fica impossível, mas não pode ser fácil por fase"; "deve ter um som de caixa de texto nas cenas e o som da escrita aparecendo" | 0.39 (na branch): a H-13, a lapidação: a trilha das cenas (sete faixas novas do FireRed e o passo `music`), os sons da caixa de texto (o `se_select` e o tique das letras) e o Level Cap (o teto da próxima fase, 4 níveis acima de quem joga normal, medido pelo bot com as missões) |
 | 87 | "pode fazer tudo o que falta, ai vamos dar um check se acabamos tudo" | 0.39 (na branch): a H-12, as recompensas das quests (decisão 26): Shards por capítulo e Revivers e Novos Sorteios nos lendários e no fim, na comemoração, num toast e na tela de Missões. Fora da branch, na `main` (0.37.10): o card do Kyogre do salão, cujo banner sumia |
 | 86 | "capturas de lendários liberam depois da cena que salva a E4 ... só muda a regra mesmo"; "me mostra a taxa de captura de hoje de um lendário em relação aos demais pokemons nas fases da E4 + Campeão"; "pode fazer todo o resto que falta" | 0.39 (na branch): a captura abre com a cena do subsolo da Mansão (decisão 25); a taxa medida (5% a 12% por Poké Ball na Liga, contra ~2,9% de uma espécie comum em média); a H-11: a quest da lagoa, o pescador, o Maxie no segundo encontro e a vila depois do Kyogre |
@@ -2197,11 +2198,13 @@ O que está planejado:
 - **O jogo recomeça do zero quando a história subir** (o Fellipe, 2026-11-11; decisão 17
   do PLANEJAMENTO-HISTORIA): as etapas novas não precisam tratar saves antigos. **O reset
   está no código (0.39)**: o save passou para o schema 2 (`SaveManager`, `STORY_SCHEMA`). O
-  autosave de antes (schema 1, até a 0.37) não carrega: vai inteiro para
-  `pbh.autosave.antes-da-historia` no navegador (o primeiro backup fica; dá para recuperar à
-  mão) e sai do lugar; a tela de título mostra uma vez "A história chegou a Kanto! Com ela, o
-  jogo recomeçou do zero..." no canto de cima à esquerda. Um arquivo .json de antes é
-  recusado com a mesma explicação. As Opções (outra chave) continuam. Roteiro de screenshots:
+  autosave de antes (schema 1, até a 0.37) não carrega e é **apagado, sem cópia** (desde a
+  1.0.1, a pedido do Fellipe: "jogadores com saves antigos perderam o save, e backups antigos
+  também não devem funcionar mais"; a 1.0.0 ainda guardava uma cópia em
+  `pbh.autosave.antes-da-historia`, que agora é apagada ao abrir o jogo, `LEGACY_BACKUP_KEY`).
+  A tela de título mostra uma vez "A história chegou a Kanto! Com a versão 1.0, o jogo
+  recomeçou do zero: os saves e os backups de antes não funcionam mais..." no canto de cima
+  à esquerda. Um arquivo .json de antes (o backup exportado) é recusado com a mesma explicação. As Opções (outra chave) continuam. Roteiro de screenshots:
   `reset`.
 - **A vila** ([PLANEJAMENTO-LOBBY.md](PLANEJAMENTO-LOBBY.md)): a L-7 (sons e
   capricho), o modo Endless pelo mato alto e o modo aquático pela lagoa (cada um

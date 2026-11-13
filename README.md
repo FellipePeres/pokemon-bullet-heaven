@@ -77,7 +77,7 @@ campo** e **quais melhorias escolher**.
 > quarto — dá para levar sua jornada para outra máquina.
 >
 > Com a história (1.0), o jogo recomeçou do zero: os saves de antes dela (até a 0.37)
-> não carregam mais.
+> foram perdidos, e os backups `.json` exportados antes da 1.0 também não funcionam mais.
 
 ## Os sistemas
 

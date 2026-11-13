@@ -1204,12 +1204,12 @@ console.log('\n[save]');
   try { SaveManager.parse({ foo: 'bar' }); } catch (e) { bad = e.message; }
   check('save inválido é rejeitado', !!bad, bad ?? '');
 
-  // o reset da história (0.39, decisão 17): o save de antes dela não carrega
+  // o reset da história (1.0, decisão 17): o save de antes dela não carrega, nem o backup exportado
   check('o save novo sai com o schema da história', data.schemaVersion === 2 && !isBeforeStory(data));
   let old = null;
   try { SaveManager.parse({ ...JSON.parse(json), schemaVersion: 1, gameVersion: '0.37.10' }); } catch (e) { old = e.message; }
   check('o save de antes da história (schema 1) não carrega, e a mensagem diz por quê',
-        !!old && old.includes('antes da história') && old.includes('v0.37.10') && old.includes('Nova jornada'), old ?? '');
+        !!old && old.includes('antes da história') && old.includes('v0.37.10') && old.includes('backups de antes não funcionam mais') && old.includes('Nova jornada'), old ?? '');
   let unversioned = null;
   try { SaveManager.parse({ signature: 'pokemon-bullet-heaven', profile }); } catch (e) { unversioned = e.message; }
   check('...nem o mais antigo, sem número de schema', !!unversioned && unversioned.includes('antes da história'));

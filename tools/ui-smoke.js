@@ -2545,23 +2545,21 @@ game.quitToMenu();
   game.sfx = real;
 }
 
-// ---- o reset da história (0.39, decisão 17): o autosave de antes dela vai para o backup ----
+// ---- o reset da história (1.0, decisão 17): o autosave de antes dela é apagado, sem cópia ----
 {
-  const { SaveManager, BACKUP_KEY } = await import('../src/save/SaveManager.js');
+  const { SaveManager, LEGACY_BACKUP_KEY } = await import('../src/save/SaveManager.js');
   const key = CONFIG.save.storageKey;
   const keep = localStorage.getItem(key);
   const oldRaw = JSON.stringify({ signature: 'pokemon-bullet-heaven', schemaVersion: 1, gameVersion: '0.37.10', profile: { trainer: 'red', shards: 9999 } });
   localStorage.setItem(key, oldRaw);
-  localStorage.removeItem(BACKUP_KEY);
   const loaded = SaveManager.loadLocal();
   check('o autosave de antes da história não carrega: o título fica sabendo', loaded?.beforeStory === true && loaded.gameVersion === '0.37.10');
-  check('...ele sai do lugar e fica guardado no backup, inteiro', localStorage.getItem(key) === null && localStorage.getItem(BACKUP_KEY) === oldRaw);
-  localStorage.setItem(key, JSON.stringify({ signature: 'pokemon-bullet-heaven', schemaVersion: 1, gameVersion: '0.38.0', profile: {} }));
-  SaveManager.loadLocal();
-  check('...e o primeiro backup não é trocado por outro antigo', localStorage.getItem(BACKUP_KEY) === oldRaw);
+  check('...ele é apagado, e nenhuma cópia fica no navegador', localStorage.getItem(key) === null && localStorage.getItem(LEGACY_BACKUP_KEY) === null);
+  localStorage.setItem(LEGACY_BACKUP_KEY, oldRaw);
   localStorage.setItem(key, JSON.stringify(game.buildSaveData()));
   { const now = SaveManager.loadLocal(); check('o save da história carrega normalmente', !!now?.profile && !now.beforeStory && now.schemaVersion === 2); }
-  localStorage.removeItem(BACKUP_KEY);
+  check('...e a cópia que a 1.0.0 guardou também sai', localStorage.getItem(LEGACY_BACKUP_KEY) === null);
+  check('o aviso do título diz que os saves e os backups de antes não funcionam mais', /id="story-reset"[^>]*>[^<]*os saves e os backups de antes não funcionam mais/.test(html));
   if (keep == null) localStorage.removeItem(key); else localStorage.setItem(key, keep);
 }
 
