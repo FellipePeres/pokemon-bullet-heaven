@@ -149,8 +149,8 @@ não abre até você vencer.
   ao Kyogre, em 8 capítulos: [HISTORIA.md](HISTORIA.md) conta, e
   [PLANEJAMENTO-HISTORIA.md](PLANEJAMENTO-HISTORIA.md) mostra como foi construída.
 - **O teto de nível** (0.39): até você vencer a próxima fase da história, nenhum Pokémon passa
-  do teto dela (no card da fase). No teto, a barra de XP fica dourada e o XP vai para os outros
-  da equipe. Farmar rende só alguns níveis; quem joga normal quase nunca encosta nele. Depois do
+  do teto dela (no card da fase). No teto, a barra de XP fica dourada e a parte dele no XP some
+  (não vai para ninguém). Farmar rende só alguns níveis; quem joga normal quase nunca encosta nele. Depois do
   Campeão, não há teto.
 - **A trilha e os sons das cenas** (0.39): cada cena com a música do clima dela, do FireRed, e a
   caixa de texto com o "pi" do A e o tique das letras.

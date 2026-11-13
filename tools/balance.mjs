@@ -166,7 +166,9 @@ function playParallel() {
   const self = fileURLToPath(import.meta.url);
   const passThrough = args.filter((_, i) => !['--jobs', '--save'].includes(args[i]) && !['--jobs', '--save'].includes(args[i - 1]));
   // um processo que cai (no Windows, com muitos subindo juntos, alguns saem com código 1 sem
-  // mensagem; sozinhos, rodam até o fim) é refeito, até 3 vezes, e o aviso sai na tela
+  // mensagem; sozinhos, rodam até o fim) é refeito depois de 3 s, até 5 vezes, e o aviso sai na
+  // tela. Os processos sobem com 1,5 s de intervalo, o que já evita quase todas as quedas
+  const wait = (ms) => new Promise((done) => setTimeout(done, ms));
   const runSlice = (j, tries = 1) => new Promise((resolve, reject) => {
     const child = spawn(process.execPath, [self, ...passThrough, '--slice', `${j}/${JOBS}`], { stdio: ['ignore', 'pipe', 'inherit'] });
     // os pontos de progresso do filho vêm pelo stderr (direto na tela); o stdout é só o JSON
@@ -175,12 +177,12 @@ function playParallel() {
     child.on('error', reject);
     child.on('close', (code, signal) => {
       if (code === 0) return resolve(JSON.parse(out));
-      if (tries >= 3) return reject(new Error(`processo ${j} saiu com código ${code ?? signal} (${tries} tentativas)`));
+      if (tries >= 5) return reject(new Error(`processo ${j} saiu com código ${code ?? signal} (${tries} tentativas)`));
       process.stderr.write(`\n[processo ${j} saiu com código ${code ?? signal}; refazendo a fatia]\n`);
-      resolve(runSlice(j, tries + 1));
+      resolve(wait(3000).then(() => runSlice(j, tries + 1)));
     });
   });
-  return Promise.all(Array.from({ length: JOBS }, (_, j) => runSlice(j)));
+  return Promise.all(Array.from({ length: JOBS }, (_, j) => wait(j * 1500).then(() => runSlice(j))));
 }
 
 const startedAt = Date.now();

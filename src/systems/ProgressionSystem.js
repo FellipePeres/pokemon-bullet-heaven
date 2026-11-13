@@ -54,9 +54,9 @@ export class ProgressionSystem {
     if (run.stage.noXp) return;   // o Endless aquático (0.37): sem XP, só Shards
     // no Modo Livre o XP é reduzido (0.20, CONFIG.endless.xpMult)
     const total = amount * run.playerStats.xpGain * (run.endless ? CONFIG.endless.xpMult : 1);
-    // o Level Cap: quem está no teto não ganha XP, e a parte dele vai para os outros (com todos
-    // no teto, o XP se perde)
-    const members = run.team.members.filter((m) => !m.fainted && !this.atCap(m));
+    // o Level Cap: quem está no teto continua na divisão, mas a parte dele some (o addXpTo não dá
+    // nada a ele). O Fellipe: senão seria meta deixar Pokémon no teto para os outros upar mais
+    const members = run.team.members.filter((m) => !m.fainted);
     if (!members.length) return;
 
     const { active: wActive, benched: wBench } = CONFIG.progression.xpWeight;

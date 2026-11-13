@@ -64,8 +64,9 @@ for (const starter of ['charmander', 'bulbasaur', 'squirtle']) {
 // ------------------------------------------- 2. jornada encadeada (campanha)
 console.log('\n[jornada — equipe e build passam de fase em fase]');
 {
-  // A fase é desafiadora de propósito (tools/balance.mjs) e perder devolve ao
-  // início com a mesma equipe, então o teste também repete. Mas uma equipe ruim
+  // A fase é desafiadora de propósito (tools/balance.mjs) e perder guarda o progresso
+  // (0.17: os níveis, as melhorias e as capturas da tentativa ficam), então o teste
+  // repete levando a equipe, como o jogo e o bot (até 10 vezes). Mas uma equipe ruim
   // montada na Fase 1 perde a Fase 2 todas as vezes: aí começa uma jornada nova,
   // até 3. Vai de Squirtle: desde a 0.10 o Charmander contra o Brock é o caminho
   // difícil (fogo contra pedra, como no FireRed), e o teste é da jornada, não dele.
@@ -83,7 +84,8 @@ console.log('\n[jornada — equipe e build passam de fase em fase]');
         // o Bulbasaur não tem desvantagem de tipo no Brock nem na Misty (desde a 0.32 o tipo pesa, e o
         // Squirtle contra a Misty virou o confronto mais duro do começo); aqui só interessa a jornada
         result = simulate(stageId, 'bulbasaur', { maxSeconds: stage.duration + 240, journey });
-      } while (result.run.state !== 'victory' && attempts < 6);
+        journey = { team: result.run.team.serialize() };   // vencendo ou não, a equipe fica (0.17)
+      } while (result.run.state !== 'victory' && attempts < 10);
       results.push({ stage, result, attempts });
       if (result.run.state !== 'victory') break;
       journey = { team: result.run.team.serialize() };
@@ -507,7 +509,9 @@ console.log('\n[ajuste por inicial]');
   check('com o inicial ajustado, os selvagens têm mais vida e dano',
         Math.abs(tuned.maxHp / base.maxHp - 1.2) < 1e-9 && Math.abs(tuned.damage / base.damage - 1.2) < 1e-9);
   const boss = foe('charmander', 'brock_onix'), tunedBoss = foe('squirtle', 'brock_onix');
-  check('o líder também', Math.abs(tunedBoss.maxHp / boss.maxHp - 1.2) < 1e-9 && tunedBoss.attackMult === 1.2 && boss.attackMult === 1);
+  // (a força da fase também entra: desde a lapidação a Fase 1 tem 1,45, então vale a proporção)
+  check('o líder também', Math.abs(tunedBoss.maxHp / boss.maxHp - 1.2) < 1e-9
+        && Math.abs(tunedBoss.attackMult / boss.attackMult - 1.2) < 1e-9 && Math.abs(boss.attackMult - (stage.difficulty ?? 1)) < 1e-9);
   stage.starterTuning = saved;
 
   // o líder das últimas fases (0.12.2): vida e dano do time dele multiplicados pela fase
@@ -1807,7 +1811,17 @@ console.log('\n[o Level Cap — o teto da próxima fase da história]');
   lead.level = 15; lead.xp = 0;
   run.progression.addXp(5000);
   check('no teto, o Pokémon não ganha XP nem nível', lead.level === 15 && lead.xp === 0);
-  check('...e o XP dele vai para quem está abaixo', other.level > 10, `Pidgey Nv.${other.level}`);
+  // a parte do Charmander some: o Pidgey recebe só a dele, igual a uma partida sem teto
+  const pair = (levelCap) => {
+    const r = new Run('gym_1_pewter', { starter: 'charmander', levelCap });
+    r.team.add('pidgey', 10);
+    r.team.members[0].level = 15;
+    r.progression.addXp(300);
+    return r.team.members[1];
+  };
+  const withCap = pair(15), noCap = pair(null);
+  check('...e a parte dele some: o outro recebe só a sua, igual a sem teto', withCap.level === noCap.level && Math.abs(withCap.xp - noCap.xp) < 1e-6,
+        `Pidgey Nv.${withCap.level} ${withCap.xp.toFixed(1)} XP (sem teto: Nv.${noCap.level} ${noCap.xp.toFixed(1)} XP)`);
   check('...que também para no teto', other.level <= 15);
   check('o teto segura a evolução por nível (o Charmander no 15 não vira Charmeleon no 16)', lead.pokemonId === 'charmander');
   const free = new Run('gym_1_pewter', { starter: 'charmander' });

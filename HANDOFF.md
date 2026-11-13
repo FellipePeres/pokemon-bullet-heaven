@@ -1146,7 +1146,8 @@ Nunca voltar bônus globais para o pool de level up — foi pedido explícito.
   depois do Campeão) e `STORY_MISSIONS` (para o bot). `Game.levelCap()` passa o teto para a
   partida (`options.levelCap`, `Run.levelCap`).
 - **A regra** (`ProgressionSystem`): `atCap(member)`; quem está no teto não recebe XP, e a divisão
-  do XP só conta quem está abaixo (a parte dele vai para os outros); o XP que passa do teto se
+  do XP é a de sempre, mas a parte de quem está no teto some (o Fellipe: senão seria meta deixar
+  Pokémon no teto para os outros upar mais); o XP que passa do teto se
   perde. A evolução por nível para no teto; a por item é livre. A captura e os presentes chegam
   pela média da equipe (já ficam abaixo).
 - **Na tela**: a linha "Teto de nível N" no card da fase (`lobby.js`) e no das missões

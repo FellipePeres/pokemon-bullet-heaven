@@ -50,6 +50,7 @@ export const STAGES = {
   gym_1_pewter: {
     id: 'gym_1_pewter',
     name: 'Fase 1 — Rumo a Pewter',
+    difficulty: 1.45,   // a força da fase (a lapidação, o Fellipe: "uma média de 2 tentativas para players reais até as 4 primeiras fases"; o bot ~3,5); era 1
     region: 'Kanto',
     type: 'gym',
     icon: 'tm-rock',
@@ -116,7 +117,7 @@ export const STAGES = {
     xpScale: 1.41,   // 2:45 até o líder (0.15; era 3:30, e antes da 0.11, mais): cada inimigo vale mais XP
     world: { width: 3000, height: 2000, theme: 'cave' },
     scaling: { hp: 2.9, speed: 0.34, damage: 1.0 },
-    difficulty: 1.25,   // a força da fase (0.17; 0.28: era 1,08, recalibrada com a curva de XP nova)
+    difficulty: 1.65,   // a força da fase (a lapidação, o Fellipe: "uma média de 2 tentativas para players reais até as 4 primeiras fases"; o bot ~3,5); era 1,25
     unlockedBy: 'gym_1_pewter',
 
     segments: [
@@ -174,7 +175,7 @@ export const STAGES = {
     xpScale: 1.44,   // 2:45 até o líder (0.15; era 3:30, e antes da 0.11, mais): cada inimigo vale mais XP
     world: { width: 3000, height: 2000, theme: 'grass' },
     scaling: { hp: 3.0, speed: 0.3, damage: 2.3 },
-    difficulty: 1.4,   // a força da fase (0.17)
+    difficulty: 1.55,   // a força da fase (a lapidação, o Fellipe: "uma média de 2 tentativas para players reais até as 4 primeiras fases"; o bot ~3,5); era 1,4
     unlockedBy: 'gym_2_cerulean',
 
     segments: [
@@ -229,6 +230,7 @@ export const STAGES = {
   gym_4_celadon: {
     id: 'gym_4_celadon',
     name: 'Fase 4 — Rumo a Celadon',
+    difficulty: 1.35,   // a força da fase (a lapidação, o Fellipe: "uma média de 2 tentativas para players reais até as 4 primeiras fases"; o bot ~3,5); era 1
     region: 'Kanto',
     type: 'gym',
     icon: 'tm-grass',
@@ -307,7 +309,7 @@ export const STAGES = {
     xpScale: 1.51,   // 2:45 até o líder (0.15; era 3:30, e antes da 0.11, mais): cada inimigo vale mais XP
     world: { width: 3200, height: 2100, theme: 'cave' },
     scaling: { hp: 4.0, speed: 0.3, damage: 7.2 },
-    difficulty: 0.85,   // a força da fase (0.17; 0.28: era 1, recalibrada com a curva de XP nova)
+    difficulty: 1.0,   // a força da fase (a lapidação: o começo mais duro deixou o Koga fácil, 1,8 tentativas do bot; de volta a ~3); era 0,85
     unlockedBy: 'gym_4_celadon',
 
     segments: [

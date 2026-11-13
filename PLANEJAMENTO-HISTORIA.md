@@ -1024,8 +1024,9 @@ do Zapdos, o tipo, as fraquezas e o nível recomendado (36; sem captura, decisã
     vila aqui: é o jogo seguinte. Muda a decisão 9 e a seção 10.
 28. **O Level Cap** (H-13; o Fellipe, 2026-11-12: "não pode ser um level cap onde fica impossível,
     mas não pode ser fácil por fase"; as regras abertas da seção 13.1 ficaram no padrão): vale o
-    teto da próxima fase da história, em qualquer lugar; no teto, o XP vai para os outros da
-    equipe; a evolução por item é livre; depois do Campeão, sem teto. Os valores saíram do bot:
+    teto da próxima fase da história, em qualquer lugar; no teto, a parte dele no XP some (não vai
+    para ninguém: "senão seria muito meta", o Fellipe); a evolução por item é livre; depois do
+    Campeão, sem teto. Os valores saíram do bot:
     4 níveis acima da média com que a equipe vence a fase jogando normal. A tabela e a medida
     estão na seção 13.1.
 
@@ -1040,8 +1041,8 @@ do Zapdos, o tipo, as fraquezas e o nível recomendado (36; sem captura, decisã
 - **Qual teto vale**: o da próxima fase da história a vencer (as fases e as missões, na ordem),
   em qualquer lugar: na tentativa dela, ao rejogar uma vencida e no Modo Livre. Vencer a fase
   sobe o teto, com o aviso "O teto de nível subiu: agora é 51.".
-- **No teto**: o Pokémon não ganha XP, e a parte dele vai para os outros da equipe abaixo do
-  teto (a equipe se nivela). Com todos no teto, o XP se perde. Sem melhorias novas: elas vêm com
+- **No teto**: o Pokémon não ganha XP, e a parte dele some, sem ir para ninguém (o Fellipe:
+  "senão seria muito meta pegar Pokémon no teto no time e upar os outros"). Sem melhorias novas: elas vêm com
   o nível.
 - **A evolução**: por nível, o teto segura; por item, livre (o Poké Mart), como decidido.
 - **Quem entra**: a captura, o presente e o lendário chegam pela média da equipe, então ficam

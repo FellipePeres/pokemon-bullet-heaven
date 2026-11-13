@@ -5,8 +5,9 @@
  * - Cada fase da história tem um teto de nível. Vale o da PRÓXIMA fase a vencer (a primeira de
  *   STORY_ORDER que a jornada ainda não venceu), em qualquer lugar: na tentativa dela, ao
  *   rejogar uma fase vencida e no Modo Livre. Vencer a fase sobe o teto para o da seguinte.
- * - No teto, o Pokémon não ganha XP: o XP dele vai para os outros da equipe que ainda estão
- *   abaixo (systems/ProgressionSystem.js). Com todos no teto, o XP se perde.
+ * - No teto, o Pokémon não ganha XP, e a parte dele SOME: não vai para ninguém (o Fellipe:
+ *   "senão seria muito meta pegar Pokémon no teto no time e upar os outros"). A divisão do XP
+ *   continua a de sempre (systems/ProgressionSystem.js).
  * - O teto segura a evolução por nível; a por item é livre (o Poké Mart).
  * - Quem entra na equipe (captura, presente, lendário) chega pela média da equipe, então fica
  *   abaixo do teto sozinho.
@@ -29,12 +30,12 @@ export const STORY_MISSIONS = { gym_3_vermilion: 'zapdos', gym_7_cinnabar: 'arti
 
 /** O teto enquanto a fase é a próxima a vencer. */
 export const LEVEL_CAPS = {
-  gym_1_pewter: 25,
-  gym_2_cerulean: 34,
-  gym_3_vermilion: 44,
-  zapdos: 47,
-  gym_4_celadon: 51,
-  gym_5_fuchsia: 55,
+  gym_1_pewter: 28,
+  gym_2_cerulean: 37,
+  gym_3_vermilion: 48,
+  zapdos: 49,
+  gym_4_celadon: 54,
+  gym_5_fuchsia: 57,
   gym_6_saffron: 60,
   gym_7_cinnabar: 63,
   articuno: 64,
