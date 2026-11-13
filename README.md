@@ -76,7 +76,7 @@ campo** e **quais melhorias escolher**.
 > `.json` pelo botão **Salvar** (na vila e no mapa da jornada) ou dormindo na cama do
 > quarto — dá para levar sua jornada para outra máquina.
 >
-> Com a história (0.39), o jogo recomeçou do zero: os saves de antes dela (até a 0.37)
+> Com a história (1.0), o jogo recomeçou do zero: os saves de antes dela (até a 0.37)
 > não carregam mais.
 
 ## Os sistemas
@@ -132,6 +132,9 @@ não abre até você vencer.
 
 ## Conteúdo atual
 
+> **Versão 1.0.0** (2026-11-13): a primeira versão completa, com a história de Kanto
+> inteira, do quarto ao Kyogre.
+
 - **Kanto inteira, 13 etapas** — os 8 ginásios (Brock, Misty, Lt. Surge, Erika,
   Koga, Sabrina, Blaine e Giovanni), a Elite Four (Lorelei, Bruno, Agatha e Lance)
   e o Campeão, cada líder com o time do FireRed. O time do rival muda conforme o
@@ -145,20 +148,20 @@ não abre até você vencer.
 - **A história e as quests** (0.38): o rastreador no canto de cima da vila e do mapa da
   jornada (e uma linha na partida) guia o prólogo, do quarto ao laboratório do
   Carvalho e daí ao Brock. Ao fechar uma quest, o ✓ e o "Missão concluída!", e a
-  próxima entra deslizando. A história de Kanto está inteira no jogo (0.39), do quarto
+  próxima entra deslizando. A história de Kanto está inteira no jogo (1.0), do quarto
   ao Kyogre, em 8 capítulos: [HISTORIA.md](HISTORIA.md) conta, e
   [PLANEJAMENTO-HISTORIA.md](PLANEJAMENTO-HISTORIA.md) mostra como foi construída.
-- **O teto de nível** (0.39): até você vencer a próxima fase da história, nenhum Pokémon passa
+- **O teto de nível** (1.0): até você vencer a próxima fase da história, nenhum Pokémon passa
   do teto dela (no card da fase). No teto, a barra de XP fica dourada e a parte dele no XP some
   (não vai para ninguém). Farmar rende só alguns níveis; quem joga normal quase nunca encosta nele. Depois do
   Campeão, não há teto.
-- **A trilha e os sons das cenas** (0.39): cada cena com a música do clima dela, do FireRed; a
+- **A trilha e os sons das cenas** (1.0): cada cena com a música do clima dela, do FireRed; a
   caixa de texto com o "pi" do A e o tique das letras; a porta, a vinheta do item e a da missão
   concluída na vila; e um card de fim quando a história de Kanto acaba.
-- **As recompensas das quests** (0.39): cada quest dá Shards, mais a cada capítulo, e as
+- **As recompensas das quests** (1.0): cada quest dá Shards, mais a cada capítulo, e as
   missões dos lendários e o fim dão também Revivers e Novos Sorteios. A comemoração do
   rastreador diz o que veio, e a tela de Missões mostra a recompensa de cada uma.
-- **As cenas** (0.39): o Carvalho encena o discurso do prólogo, e o rival chega
+- **As cenas** (1.0): o Carvalho encena o discurso do prólogo, e o rival chega
   atrasado ao laboratório para pegar o inicial com vantagem sobre o seu. As cenas
   são roteiros em dados, com câmera, gente andando, itens e quests. A história
   acontece antes e depois das fases, nunca no meio delas, sempre em tela cheia: depois
