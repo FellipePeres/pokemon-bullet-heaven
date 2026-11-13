@@ -1154,10 +1154,15 @@ Nunca voltar bônus globais para o pool de level up — foi pedido explícito.
   (`missionCard.js`); o selo dourado no nível e a barra de XP dourada no HUD (`.capped`); o aviso
   ao vencer (`endRun`: "O teto de nível subiu: agora é N.", e o Modo Livre da mesma partida já usa
   o novo); uma linha no "Como jogar". Roteiro de screenshots: `teto`.
-- **Os valores** saíram do bot: 4 níveis acima da média com que a equipe vence a fase sem farmar
-  (a tabela está no PLANEJAMENTO-HISTORIA). Medido com 24 jornadas: sem teto, 55,4 tentativas
-  somadas, 22 paradas e 2 Campeões; com o teto, 54,2, 21 e 3. Com 3 de folga, a Liga ficou dura
-  demais para o bot; com 6, nada mudou antes dela.
+- **Os valores** saíram do bot: 4 níveis acima da média com que a equipe vence a fase sem farmar,
+  6 nas quatro primeiras e no Koga (a tabela está no PLANEJAMENTO-HISTORIA, seção 13.1).
+- **As quatro primeiras fases mais duras** (o Fellipe: "uma média de 2 tentativas para players
+  reais até as 4 primeiras fases"): a força 1,45 / 1,65 / 1,55 / 1,35 (era 1 / 1,25 / 1,4 / 1), e o
+  Koga de 0,85 para 1,0 (o começo mais duro o deixou fácil). A medida final, 48 jornadas com o teto:
+  o bot precisa de 3,3 / 3,7 / 3,0 / 4,2 tentativas nas quatro primeiras (uma pessoa, umas 2), a
+  curva do Koga ao Moltres fica entre 2,9 e 3,6, e 4 Campeões (8%, a mesma proporção de antes).
+- **O XP do teto some**: a parte de quem está no teto não vai para ninguém (o Fellipe: senão seria
+  meta deixar Pokémon no teto para os outros upar).
 - **O `balance.mjs`** joga as missões no lugar delas (`--sem-missoes` tira), mede com `--teto` e
   `--teto-mais N`, mostra o nível do mais alto (`máx (P90)`) e quantas vitórias encostaram no teto,
   e refaz a fatia de um processo que cai (no Windows, com muitos subindo juntos, alguns saem com

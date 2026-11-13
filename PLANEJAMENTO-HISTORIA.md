@@ -1054,33 +1054,41 @@ do Zapdos, o tipo, as fraquezas e o nível recomendado (36; sem captura, decisã
 
 **Os valores** saíram do bot (`tools/balance.mjs`, que agora joga as missões no lugar delas e
 mede com `--teto`): 4 níveis acima da média com que a equipe vence a fase jogando normal, sem
-farmar.
+farmar; 6 nas quatro primeiras e no Koga, que ficaram mais duras (abaixo) e onde o inicial carrega
+a equipe (travá-lo no teto travava a jornada).
 
-| Próxima fase | Recomendado | O bot sem teto vence com (média · o mais alto) | Teto |
-|---|---|---|---|
-| Fase 1, o Brock | — | 21 · 23 | 25 |
-| Fase 2, a Misty | 25 | 30 · 33 | 34 |
-| Fase 3, o Surge | 33 | 40 · 44 | 44 |
-| A Usina, o Zapdos | 36 | 43 · 47 | 47 |
-| Fase 4, a Erika | 40 | 47 · 52 | 51 |
-| Fase 5, o Koga | 46 | 51 · 56 | 55 |
-| Fase 6, a Sabrina | 50 | 56 · 62 | 60 |
-| Fase 7, o Blaine | 55 | 59 · 66 | 63 |
-| Seafoam, o Articuno | 57 | 60 · 67 | 64 |
-| Fase 8, o Giovanni | 60 | 64 · 71 | 68 |
-| O Monte Brasa, o Moltres | 62 | 65 · 73 | 69 |
-| A Lorelei | 64 | 69 · 76 | 73 |
-| O Bruno | 66 | 72 · 80 | 76 |
-| A Agatha | 70 | 76 · 84 | 80 |
-| O Lance | 72 | 80 · 89 | 84 |
-| O Campeão | 74 | 78 · 86 | 86 |
-| Depois do Campeão | | | sem teto |
+**As quatro primeiras fases mais duras** (o Fellipe: "uma média de 2 tentativas para players reais
+até as 4 primeiras fases; depois pode deixar como está, mantendo um equilíbrio"): a força das Fases
+1 a 4 subiu, e o Koga, que ficou fácil com o começo mais duro (1,8 tentativas do bot), subiu junto.
+O bot precisa de umas 3,5 tentativas onde uma pessoa precisa de 2 (o HANDOFF: o que para o bot é 3
+para o Fellipe é 1 a 2).
 
-**A medida** (24 jornadas cada, com as missões): sem teto, 55,4 tentativas somadas, 22
-jornadas paradas no caminho e 2 Campeões; com o teto, 54,2 tentativas, 21 paradas e 3 Campeões.
-Ou seja, quem joga normal (o bot joga pior que o Fellipe) não sente o teto, e farmar não passa
-de uns 4 níveis acima disso. Com 3 níveis de folga, a Liga ficou dura demais para o bot (nenhum
-Campeão); com 6, nada mudou antes da Liga.
+| Fase | Força | Teto | Tentativas do bot | De primeira | Jornadas paradas |
+|---|---|---|---|---|---|
+| Fase 1, o Brock | 1,45 (era 1) | 28 | 3,3 (era 1,5) | 1/48 | 1 |
+| Fase 2, a Misty | 1,65 (era 1,25) | 37 | 3,7 (era 2,3) | 6/47 | 2 |
+| Fase 3, o Surge | 1,55 (era 1,4) | 48 | 3,0 (era 2,9) | 15/45 | 3 |
+| A Usina, o Zapdos | 1,1 | 49 | 1,5 | 33/42 | 0 |
+| Fase 4, a Erika | 1,35 (era 1) | 54 | 4,2 (era 2,0) | 18/42 | 6 |
+| Fase 5, o Koga | 1,0 (era 0,85) | 57 | 3,6 (era 3,5) | 11/36 | 5 |
+| Fase 6, a Sabrina | 0,82 | 60 | 2,9 (era 4,7) | 15/31 | 4 |
+| Fase 7, o Blaine | 0,82 | 63 | 3,0 | 14/27 | 3 |
+| Seafoam, o Articuno | 1,2 | 64 | 3,4 (era 4,9) | 14/24 | 4 |
+| Fase 8, o Giovanni | 0,8 | 68 | 3,5 | 11/20 | 3 |
+| O Monte Brasa, o Moltres | 1,2 | 69 | 3,5 | 9/17 | 3 |
+| A Lorelei | 0,8 | 73 | 2,9 | 8/14 | 2 |
+| O Bruno | 0,97 | 76 | 2,7 | 6/12 | 0 |
+| A Agatha | 0,95 | 80 | 5,2 | 5/12 | 3 |
+| O Lance | 0,88 | 84 | 2,7 | 7/9 | 1 |
+| O Campeão | 1,08 | 86 | 5,8 | 2/8 | 4 |
+| Depois do Campeão | | sem teto | | | |
+
+**A medida final** (48 jornadas, com as missões e o teto; o "era" é a medida de antes, sem teto e
+com a força antiga, 24 jornadas): 4 Campeões (8%), a mesma proporção de antes (2 de 24). A curva do
+Koga ao Moltres ficou lisa (2,9 a 3,6), sem os picos da Sabrina e do Articuno. Na Liga chegam poucas
+jornadas (8 a 14), então a Agatha e o Campeão variam bastante de uma medida para outra. As
+primeiras medidas do teto (24 jornadas, a força antiga): com 3 níveis de folga, a Liga ficou dura
+demais para o bot (nenhum Campeão); com 6, nada mudou antes da Liga; com 4, igual a sem teto.
 
 **O registro de antes** (o pedido e as perguntas que ficaram no padrão):
 
